@@ -8,6 +8,7 @@
 - `FSD_FRAMEWORK_ESTABLISHED=SIM`
 - `G3_FLOWS_FORMALIZED=SIM`
 - `G4_FLOWS_FORMALIZED=SIM`
+- `G5_FLOWS_FORMALIZED=SIM`
 
 ---
 
@@ -286,5 +287,157 @@ Conforme os Gates forem abertos pelo Chat Mestre, as seguintes categorias de flu
 - **OBSERVABILITY**: Log especificando a entrada maliciosa ou anômala detectada.
 - **ACCEPTANCE_CRITERIA**: `result.valid === false`, `EXTRA_FILE_REJECTED=PASS`, `PATH_TRAVERSAL_REJECTED=PASS`.
 - **TRACEABILITY**: Requisitos do Gate G4 seção 15, 16 e 26.
+
+---
+
+## 6. Fluxos Funcionais de Bootstrap e Persistência Local (Gate G5)
+
+### F-G5-001_FIRST_IMPORT_SUCCESS — Primeira Importação e Promoção de Catálogo Local
+
+- **FLOW_ID**: `F-G5-001_FIRST_IMPORT_SUCCESS`
+- **TRIGGER**: Disparo da primeira importação de pacote via `BootstrapService.importPackage(packageSource)` no cliente.
+- **PRECONDITIONS**: Sistema em estado `NO_ACTIVE_CATALOG`; pacote ZIP válido recebido.
+- **MAIN_FLOW**:
+  1. O importador valida integralmente o pacote via `PackageValidator` (G4);
+  2. Verifica que não há catálogo ativo anterior coincidente;
+  3. Escreve os arquivos do snapshot na área de quarentena `prebuilt/staging/<snapshotId>/`;
+  4. Executa a validação de releitura (`STAGING_READBACK_VALIDATION`), confirmando hash SHA-256 e contrato de dados v1;
+  5. Promove o snapshot para `prebuilt/snapshots/<snapshotId>/`;
+  6. Grava atomicamente o ponteiro `prebuilt/active.json`;
+  7. Remove resíduos da pasta de staging;
+  8. Transiciona o estado do bootstrap para `ACTIVE_CATALOG_READY`;
+  9. Retorna `ImportResult` com `status: 'PROMOTED'` e métricas completas de instrumentação.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: Se qualquer validação preliminar ou de releitura falhar, aborta a promoção e mantém `NO_ACTIVE_CATALOG`.
+- **TERMINAL_STATES**: `SUCCESS_FIRST_IMPORT_PROMOTED`.
+- **DATA_READ**: Buffer ou arquivo ZIP de provisionamento.
+- **DATA_WRITE**: `prebuilt/snapshots/<snapshotId>/`, `prebuilt/active.json`.
+- **NETWORK**: Nenhuma (`NO_NETWORK_ACCESS=SIM`).
+- **SECURITY**: Gravação restrita a armazenamento privado do aplicativo (`APP_PRIVATE_STORAGE=SIM`).
+- **OBSERVABILITY**: Emissão de métricas de tempo para validação, staging, readback e promoção.
+- **ACCEPTANCE_CRITERIA**: `result.success === true`, `result.status === 'PROMOTED'`, `hasActiveCatalog === true`.
+- **TRACEABILITY**: Requisitos do Gate G5, Architecture Contract seção 4, `docs/DEVICE_BOOTSTRAP.md`.
+
+---
+
+### F-G5-002_REIMPORT_IDEMPOTENT — Reimportação Idempotente do Mesmo Pacote Ativo
+
+- **FLOW_ID**: `F-G5-002_REIMPORT_IDEMPOTENT`
+- **TRIGGER**: Submissão de pacote idêntico ao já ativo no dispositivo.
+- **PRECONDITIONS**: Catálogo ativo pré-existente (`ACTIVE_CATALOG_READY`).
+- **MAIN_FLOW**:
+  1. O importador valida o pacote de entrada;
+  2. Compara `snapshotId` e `packageContentHash` com o `ActivePointer` atual;
+  3. Constata coincidência absoluta de geração;
+  4. Não regrava arquivos no disco nem altera o ponteiro ativo;
+  5. Retorna imediatamente `status: 'ALREADY_ACTIVE'` com `success: true`.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: N/A.
+- **TERMINAL_STATES**: `SUCCESS_IDEMPOTENT_NOOP`.
+- **DATA_READ**: Pacote de entrada, `prebuilt/active.json`.
+- **DATA_WRITE**: Nenhum.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Economia de I/O e proteção contra desgaste de memória flash sem exposição de dados.
+- **OBSERVABILITY**: Log de detecção de reimportação idempotente.
+- **ACCEPTANCE_CRITERIA**: `result.success === true`, `result.status === 'ALREADY_ACTIVE'`, `snapshotId` inalterado.
+- **TRACEABILITY**: Requisitos do Gate G5 seção 18.
+
+---
+
+### F-G5-003_NEW_GENERATION_PROMOTION — Atualização para Nova Geração Válida de Snapshot
+
+- **FLOW_ID**: `F-G5-003_NEW_GENERATION_PROMOTION`
+- **TRIGGER**: Submissão de novo pacote válido com `snapshotId` ou versão distinta da atualmente ativa.
+- **PRECONDITIONS**: Catálogo `A` atualmente ativo.
+- **MAIN_FLOW**:
+  1. O importador valida o novo pacote `B`;
+  2. Grava `B` em quarentena `prebuilt/staging/<snapshotIdB>/`;
+  3. Executa `STAGING_READBACK_VALIDATION` com sucesso;
+  4. Promove `B` para a pasta de snapshots;
+  5. Atualiza o `ActivePointer` para apontar atomicamente para `B`;
+  6. Limpa o staging;
+  7. O catálogo ativo no runtime passa a ser `B` (`ACTIVE_SNAPSHOT_ID !== SNAPSHOT_A`).
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: Se `B` falhar em qualquer validação, transiciona para `F-G5-005`.
+- **TERMINAL_STATES**: `SUCCESS_NEW_GENERATION_ACTIVE`.
+- **DATA_READ**: Pacote `B`, `prebuilt/active.json`.
+- **DATA_WRITE**: `prebuilt/snapshots/<snapshotIdB>/`, `prebuilt/active.json`.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Isolamento entre gerações de snapshots em disco.
+- **OBSERVABILITY**: Emissão de métricas com registro do `previousSnapshotId` e novo `snapshotId`.
+- **ACCEPTANCE_CRITERIA**: `result.success === true`, `result.status === 'PROMOTED'`, `pointer.snapshotId === snapshotIdB`.
+- **TRACEABILITY**: Requisitos do Gate G5 seção 19.
+
+---
+
+### F-G5-004_INVALID_PACKAGE_REJECTED — Rejeição Fail-Closed de Pacote Inválido
+
+- **FLOW_ID**: `F-G5-004_INVALID_PACKAGE_REJECTED`
+- **TRIGGER**: Submissão de pacote corrompido, adulterado, com versão divergente ou path traversal.
+- **PRECONDITIONS**: `PackageImporter` ativo.
+- **MAIN_FLOW**:
+  1. O validador do pacote detecta a violação (hash mismatch, schema mismatch, arquivo extra ou path traversal);
+  2. A importação é abortada imediatamente antes de qualquer gravação em staging;
+  3. Retorna `status: 'REJECTED'` com array detalhado de erros;
+  4. O estado de catálogo ativo permanece inalterado.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: Rejeição fail-closed sem exceções de runtime não tratadas.
+- **TERMINAL_STATES**: `FAILED_PACKAGE_REJECTED`.
+- **DATA_READ**: Pacote inválido.
+- **DATA_WRITE**: Nenhum.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Bloqueio prévio absoluto de dados não conformes.
+- **OBSERVABILITY**: Logs de rejeição especificando o código de erro detectado.
+- **ACCEPTANCE_CRITERIA**: `result.success === false`, `result.status === 'REJECTED'`, nenhum snapshot criado.
+- **TRACEABILITY**: Requisitos do Gate G5 seção 15 e 29.
+
+---
+
+### F-G5-005_FAILED_UPDATE_PRESERVES_ACTIVE — Preservação do Catálogo Ativo após Falha de Atualização
+
+- **FLOW_ID**: `F-G5-005_FAILED_UPDATE_PRESERVES_ACTIVE`
+- **TRIGGER**: Tentativa de atualização a partir de pacote defeituoso enquanto há um catálogo íntegro ativo.
+- **PRECONDITIONS**: Snapshot `B` ativo; pacote defeituoso `C` recebido.
+- **MAIN_FLOW**:
+  1. O importador rejeita o pacote `C` na fase 1 ou na fase 4 (readback);
+  2. Qualquer resíduo de `C` em staging é eliminado (`cleanupStaging`);
+  3. O `ActivePointer` não é tocado e permanece apontando para `B`;
+  4. O estado do bootstrap transiciona para `IMPORT_FAILED_ACTIVE_PRESERVED`;
+  5. `getActiveCatalog()` continua retornando o catálogo íntegro `B`.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: Retorno controlado de erro com preservação de continuidade operacional.
+- **TERMINAL_STATES**: `FAILED_ACTIVE_PRESERVED`.
+- **DATA_READ**: Pacote `C`, `prebuilt/active.json`.
+- **DATA_WRITE**: Limpeza da pasta de staging de `C`.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Garantia de resiliência e disponibilidade do catálogo local.
+- **OBSERVABILITY**: Log indicando rejeição do pacote candidato e manutenção do snapshot ativo prévio.
+- **ACCEPTANCE_CRITERIA**: `activePointer.snapshotId === snapshotIdB`, `FAILED_UPDATE_PRESERVES_LAST_GOOD=PASS`.
+- **TRACEABILITY**: Requisitos do Gate G5 seção 20.
+
+---
+
+### F-G5-006_NO_ACTIVE_CATALOG — Tratamento Estrito de Inicialização sem Catálogo
+
+- **FLOW_ID**: `F-G5-006_NO_ACTIVE_CATALOG`
+- **TRIGGER**: Inicialização da aplicação antes de qualquer pacote ser importado.
+- **PRECONDITIONS**: Armazenamento local sem arquivo `prebuilt/active.json`.
+- **MAIN_FLOW**:
+  1. `BootstrapService.initialize()` consulta o storage;
+  2. Não encontra ponteiro ativo válido;
+  3. Define o status como `NO_ACTIVE_CATALOG` com `hasActiveCatalog: false`;
+  4. Bloqueia a interpretação de que o catálogo está "vazio" (`NO_FALSE_EMPTY_GUARD`);
+  5. Sinaliza à camada de apresentação a necessidade de importação inicial de provisionamento.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: N/A.
+- **TERMINAL_STATES**: `READY_AWAITING_IMPORT`.
+- **DATA_READ**: `prebuilt/active.json` (inexistente).
+- **DATA_WRITE**: Nenhum.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Impedimento semântico de renderização errônea de estado vazio.
+- **OBSERVABILITY**: Status reportado como `NO_ACTIVE_CATALOG`.
+- **ACCEPTANCE_CRITERIA**: `summary.status === 'NO_ACTIVE_CATALOG'`, `summary.hasActiveCatalog === false`.
+- **TRACEABILITY**: Requisitos do Gate G5 seção 8 e 9.
+
 
 

@@ -12,11 +12,13 @@
     "ingestion:synthetic": "node scripts/run-ingestion-pipeline.mjs",
     "ingestion:negative": "node scripts/run-ingestion-pipeline.mjs --negative",
     "provisioning:build": "node scripts/build-provisioning-package.mjs",
-    "provisioning:check": "node scripts/validate-provisioning-package.mjs"
+    "provisioning:check": "node scripts/validate-provisioning-package.mjs",
+    "bootstrap:check": "node scripts/validate-device-bootstrap.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^7.0.0",
     "@capacitor/core": "^7.0.0",
+    "@capacitor/filesystem": "^7.1.8",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },

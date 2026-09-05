@@ -37,24 +37,35 @@
 | `PACKAGE_VALIDATION` | `FAIL_CLOSED` | Rejeição automática de pacotes com divergência de hash, tamanho, versão, path traversal ou contrato. |
 | `LOGICAL_PACKAGE_DETERMINISM` | `REQUIRED` | Obrigatoriedade de determinismo estrito na serialização lógica e recálculo estável de hashes de conteúdo. |
 | `ZIP_PATH_TRAVERSAL_PROTECTION` | `REQUIRED` | Rejeição ativa de entradas ZIP maliciosas contendo .., barras invertidas, letras de unidade ou caminhos absolutos. |
+| `DEVICE_IMPORT_MODEL` | `STAGING_THEN_PROMOTION` | Importação em duas fases: quarentena em staging com readback validation antes de promoção atômica. |
+| `ACTIVE_POINTER` | `REQUIRED` | Ponteiro active.json enxuto e atômico como única fonte de verdade da geração ativa no dispositivo. |
+| `ACTIVE_GENERATION_SAFETY` | `REQUIRED` | Impossibilidade de staging parcial, erro de descompressão ou falha de escrita sobrescrever o catálogo ativo. |
+| `FAILED_IMPORT_PRESERVES_ACTIVE` | `REQUIRED` | Qualquer falha durante a importação preserva integralmente o catálogo ativo anterior (last-known-good). |
+| `STAGING_READBACK_VALIDATION` | `REQUIRED` | Validação compulsoria de releitura do snapshot em staging contra contrato e integridade antes da promoção. |
+| `SAME_PACKAGE_REIMPORT` | `IDEMPOTENT` | Reimportação de pacote idêntico ao ativo não causa regravação no disco nem alteração de ponteiro. |
+| `NO_FALSE_EMPTY` | `REQUIRED` | Estado limpo sem catálogo ativo é explicitamente NO_ACTIVE_CATALOG, proibido de ser tratado como vazio. |
+| `APP_PRIVATE_STORAGE` | `REQUIRED` | Armazenamento de catálogo restrito ao diretório privado do aplicativo (Directory.Data), sem acesso compartilhado. |
+| `LOCAL_STORAGE_STRATEGY` | `CAPACITOR_FILESYSTEM_CANONICAL_JSON` | Persistência local estruturada de snapshots e ponteiro ativo em JSON canônico via Capacitor Filesystem. |
 
 ---
 
 ## 2. Decisoes Tecnicas em Aberto (DECISIONS_OPEN)
 
-1. `PACKAGE_SIGNING_STRATEGY`: Protocolo criptografico para assinatura e verificacao de autoria do pacote (ECDSA, Ed25519) sem chave estática.
-2. `PACKAGE_ENCRYPTION`: Necessidade, escopo e algoritmo de criptografia em repouso e em trânsito para os pacotes de provisionamento.
-3. `USER_SOURCE_BINDING`: Modelo de associacao entre credenciais de acesso da fonte e a distribuicao de pacotes personalizados.
-4. `SNAPSHOT_RETENTION`: Politica de retencao e expiracao de snapshots e versoes antigas de catalogos.
-5. `ROLLBACK`: Mecanismo de fallback no cliente caso a importacao de uma versao mais recente falhe ou resulte em inconsistencias.
-6. `SIZE_LIMITS`: Limites contratuais de tamanho para o pacote de provisionamento e footprint de memoria (evidências empíricas atuais não são SLA).
-7. `SEARCH_INDEX_TRANSPORTABILITY`: Avaliar viabilidade tecnica de gerar indices (ex: SQLite FTS, MiniSearch index dump) externamente para transporte direto ao cliente.
-8. `SEARCH_SEED_STRATEGY`: Estrategia de indexacao inicial no cliente caso o indice transportado apresente incompatibilidades.
-9. `REAL_SOURCE_AUTH_STRATEGY`: Arquitetura de autenticacao com provedores de origem sem expor credenciais primarias ao cliente.
-10. `INCREMENTAL_UPDATE_STRATEGY`: Algoritmo para geracao e aplicacao de deltas/diffs incrementais de catalogo sem necessidade de re-download completo.
-11. `OFFLINE_POLICY`: Comportamento da aplicacao diante da ausencia prolongada de conexao com a internet apos o bootstrap inicial.
-12. `ARTWORK_CACHE_POLICY`: Politica de download, resolucao, compressao e expiracao de posters e imagens de catalogo.
-13. `PERFORMANCE_SLA`: Metas empiricas de tempo de abertura e resposta que serao homologadas apenas no Gate G12.
+1. `SEARCH_STORAGE`: Mecanismo e estrutura de persistência do índice de busca no dispositivo (SQLite FTS, MiniSearch JSON, etc.).
+2. `SEARCH_INDEX_TRANSPORTABILITY`: Avaliar viabilidade de transportar índices pré-gerados vs indexação local no cliente.
+3. `SEARCH_SEED_STRATEGY`: Estratégia de indexação inicial no cliente caso o índice transportado apresente incompatibilidades.
+4. `ROLLBACK_FULL`: Política avançada de retenção de múltiplos snapshots históricos e reversão manual de versão.
+5. `SNAPSHOT_RETENTION`: Política de limpeza e expiração de snapshots antigos acumulados no armazenamento privado.
+6. `INCREMENTAL_UPDATE_STRATEGY`: Algoritmo para geração e aplicação de deltas/diffs de catálogo sem re-download completo.
+7. `PACKAGE_SIGNING_STRATEGY`: Protocolo criptográfico para assinatura e verificação de autoria do pacote (ECDSA, Ed25519).
+8. `PACKAGE_ENCRYPTION`: Necessidade e algoritmo de criptografia em repouso/trânsito para os pacotes de provisionamento.
+9. `USER_SOURCE_BINDING`: Modelo de associação entre credenciais de acesso da fonte e a distribuição de pacotes personalizados.
+10. `REAL_SOURCE_AUTH_STRATEGY`: Arquitetura de autenticação com provedores de origem sem expor credenciais primárias ao cliente.
+11. `OFFLINE_POLICY`: Comportamento da aplicação diante da ausência prolongada de conexão com a internet após o bootstrap inicial.
+12. `ARTWORK_CACHE_POLICY`: Política de download, resolução, compressão e expiração de posters e imagens de catálogo.
+13. `SIZE_LIMITS`: Limites contratuais de tamanho para o pacote de provisionamento e footprint de memória (evidências empíricas atuais não são SLA).
+14. `PERFORMANCE_SLA`: Metas empíricas de tempo de abertura e resposta que serão homologadas apenas no Gate G12.
+
 
 
 

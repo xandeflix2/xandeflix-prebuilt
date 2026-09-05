@@ -6,23 +6,23 @@
 
 - **PROJECT**: `XANDEFLIX_PREBUILT`
 - **PARENT_CONTEXT**: `MARCO_ZERO_CANONICO_XANDEFLIX_PREBUILT`
-- **LAST_CLOSED_GATE**: `G4`
+- **LAST_CLOSED_GATE**: `G5`
 - **G0_STATUS**: `PASS`
 - **G1_STATUS**: `PASS`
 - **G2_STATUS**: `PASS`
 - **G3_STATUS**: `PASS`
 - **G4_STATUS**: `PASS`
-- **MVP_PROGRESS_PERCENT**: `44`
-- **CURRENT_GATE**: `G5`
+- **G5_STATUS**: `PASS`
+- **MVP_PROGRESS_PERCENT**: `56`
+- **CURRENT_GATE**: `G6`
 - **G4_STARTED**: `SIM`
-- **G5_STATUS**: `NOT_STARTED`
-- **G5_STARTED**: `NAO`
-- **NEXT_GATE**: `XANDEFLIX_PREBUILT_G5_FAST_DEVICE_BOOTSTRAP`
+- **G5_STATUS**: `PASS`
+- **G5_STARTED**: `SIM`
+- **G6_STATUS**: `NOT_STARTED`
+- **G6_STARTED**: `NAO`
+- **NEXT_GATE**: `XANDEFLIX_PREBUILT_G6_CATALOG_UI`
 - **NEXT_GATE_STARTED**: `NAO`
-- **HISTORICAL_RECORD**: `G4_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM`
-
-
-
+- **HISTORICAL_RECORD**: `G5_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G5_ADJUDICATION_CLOSED_PASS=SIM`
 
 ---
 
@@ -56,11 +56,28 @@
 - `PACKAGE_CONTENT_HASH_ALGORITHM`: SHA256
 - `UNKNOWN_PACKAGE_FILES`: REJECT
 - `PACKAGE_VALIDATION`: FAIL_CLOSED
+- `LOGICAL_PACKAGE_DETERMINISM`: REQUIRED
+- `ZIP_PATH_TRAVERSAL_PROTECTION`: REQUIRED
+- `DEVICE_IMPORT_MODEL`: STAGING_THEN_PROMOTION
+- `ACTIVE_POINTER`: REQUIRED
+- `ACTIVE_GENERATION_SAFETY`: REQUIRED
+- `FAILED_IMPORT_PRESERVES_ACTIVE`: REQUIRED
+- `STAGING_READBACK_VALIDATION`: REQUIRED
+- `SAME_PACKAGE_REIMPORT`: IDEMPOTENT
+- `NO_FALSE_EMPTY`: REQUIRED
+- `APP_PRIVATE_STORAGE`: REQUIRED
+- `LOCAL_STORAGE_STRATEGY`: CAPACITOR_FILESYSTEM_CANONICAL_JSON
 
 ---
 
 ## 4. Decisoes Abertas (DECISIONS_OPEN)
 
+- `SEARCH_STORAGE`: Em aberto (SQLite FTS, MiniSearch JSON, etc.).
+- `SEARCH_INDEX_TRANSPORTABILITY`: Em aberto.
+- `SEARCH_SEED_STRATEGY`: Em aberto.
+- `ROLLBACK_FULL`: Em aberto.
+- `SNAPSHOT_RETENTION`: Em aberto.
+- `INCREMENTAL_UPDATE_STRATEGY`: Em aberto.
 - `PACKAGE_SIGNING_STRATEGY`: Em aberto (ECDSA, Ed25519).
 - `PACKAGE_ENCRYPTION`: Em aberto.
 - `USER_SOURCE_BINDING`: Em aberto.
@@ -102,20 +119,20 @@
 
 ## 8. Validacao em Dispositivos (DEVICE_VALIDATION_STATUS)
 
-- `NOT_STARTED` (previsto para gates subsequentes: G5, G8, G11).
+- `NOT_REQUIRED_G5` (logica de bootstrap, persistencia local transacional e compilacao nativa Android validadas; validacao fisica ampla permanece reservada ao G11).
 
 ---
 
 ## 9. Linhas de Base (BASELINES)
 
-- **PERFORMANCE_BASELINES**: Nao estabelecidas no G0.
-- **STORAGE_BASELINES**: Nao estabelecidas no G0.
+- **PERFORMANCE_BASELINES**: Evidencias empiricas registradas no G5 (PACKAGE_VALIDATE_MS=17ms, STAGING_WRITE_MS=0ms, STAGING_READBACK_VALIDATE_MS=1ms, PROMOTION_MS=3ms, TOTAL_BOOTSTRAP_MS=21ms; PERFORMANCE_EVIDENCE_IS_NOT_SLA=SIM).
+- **STORAGE_BASELINES**: Evidencias empiricas no G5 (PACKAGE_SIZE_BYTES=2045, CATALOG_SIZE_BYTES=8368, ACTIVE_STORAGE_SIZE_BYTES=6718).
 
 ---
 
 ## 10. Proximo Gate (NEXT_GATE)
 
-- **NEXT_GATE**: `XANDEFLIX_PREBUILT_G5_FAST_DEVICE_BOOTSTRAP`
+- **NEXT_GATE**: `XANDEFLIX_PREBUILT_G6_CATALOG_UI`
 - **NEXT_GATE_STARTED**: `NAO`
 
 ---
@@ -230,8 +247,24 @@
   - G5 permanece NOT_STARTED (G5_STARTED=NAO, NEXT_GATE_STARTED=NAO);
   - Autorização expressa concedida para commit e push canônicos na branch origin/main.
 
+- **Ciclo G5 (Fast Device Bootstrap)**:
+  - Implementacao da arquitetura transacional de bootstrap local e persistencia do catalogo PREBUILT no cliente;
+  - Adicao minima da dependencia oficial `@capacitor/filesystem` (^7.1.8) e sincronizacao Android (`npx cap sync android`);
+  - Estruturacao dos modulos de bootstrap em `src/bootstrap/`: tipos canonicos (`types.ts`), abstracao de storage (`storage/storage.interface.ts`), adaptador Capacitor (`storage/capacitor-filesystem.storage.ts`), adaptador in-memory para testes/CLI (`storage/in-memory.storage.ts`), gerenciador de ponteiro ativo (`active-snapshot.ts`), importador transacional (`package-importer.ts`), gerenciador de estado (`bootstrap-state.ts`) e servico unificado (`bootstrap.service.ts`);
+  - Implementacao de garantia de fail-closed e isolamento: `ACTIVE_GENERATION_SAFETY=REQUIRED`, `NO_FALSE_EMPTY=REQUIRED`, `FAIL_CLOSED_IMPORT=REQUIRED`, `FAILED_IMPORT_PRESERVES_ACTIVE=SIM`, `STAGING_READBACK_VALIDATION=REQUIRED`, `SAME_PACKAGE_REIMPORT=IDEMPOTENT`;
+  - Criacao do script de verificacao automatizado `scripts/validate-device-bootstrap.mjs` (`npm run bootstrap:check`);
+  - Validacao dos 8 cenarios funcionais e negativos (primeira importacao com sucesso, reimportacao idempotente, promocao de nova geracao, rejeicao de pacote adulterado, preservacao do ativo anterior em falha, rejeicao de staging parcial, preservacao do ativo em falha de gravacao de ponteiro, e estado `NO_ACTIVE_CATALOG` sem falso vazio);
+  - Elaboracao da documentacao tecnica completa em `docs/DEVICE_BOOTSTRAP.md`;
+  - Formalizacao de 6 fluxos funcionais em `docs/FSD.md` (`F-G5-001` a `F-G5-006`);
+  - Registro de decisoes arquiteturais fechadas em `docs/DECISIONS.md`;
+  - Auditoria de segredos e isolamento confirmada (sem credenciais reais, sem service_role, sem conexao Supabase, sem UI de catalogo, sem busca, sem player, sem atualizacao incremental);
+  - Revalidacoes tecnicas completas com PASS (contract:check, ingestion:synthetic, ingestion:negative, provisioning:build, provisioning:check, bootstrap:check, typecheck, build web, android unit tests e assembleDebug);
+  - Registro historico: G5_STATUS=COMPLETE_PENDING_MASTER_ADJUDICATION.
 
-
-
-
-
+- **Adjudicacao G5 e Canonicalizacao (2026-09-05)**:
+  - G5 formalmente adjudicado pelo Chat Mestre como PASS (`RESULT=PASS_PREBUILT_G5_FAST_DEVICE_BOOTSTRAP_CLOSED`);
+  - Bootstrap rapido de dispositivo aprovado (importacao transacional, staging em quarentena, readback validation, promocao atomica via active.json e protecao contra falso vazio);
+  - MVP_PROGRESS_PERCENT atualizado de 44 para 56;
+  - CURRENT_GATE avancado para G6 (NEXT_AUTHORIZABLE_GATE=G6);
+  - G6 permanece NOT_STARTED (G6_STARTED=NAO, NEXT_GATE_STARTED=NAO);
+  - Autorizacao expressa concedida para commit e push canonicos na branch origin/main.
