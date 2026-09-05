@@ -19,6 +19,7 @@ import type {
   Season,
   Episode,
   ArtworkRef,
+  StreamRef,
 } from '../contracts/catalog.ts';
 
 export class CatalogReadModel {
@@ -27,6 +28,7 @@ export class CatalogReadModel {
   readonly categoryById = new Map<string, Category>();
   readonly genreById = new Map<string, Genre>();
   readonly artworkById = new Map<string, ArtworkRef>();
+  readonly streamsById = new Map<string, StreamRef>();
 
   readonly moviesById = new Map<string, Movie>();
   readonly seriesById = new Map<string, Series>();
@@ -139,6 +141,11 @@ export class CatalogReadModel {
     for (const eps of this.episodesBySeasonId.values()) {
       eps.sort((a, b) => a.episodeNumber - b.episodeNumber);
     }
+
+    // 7. Streams
+    for (const stream of this.catalog.streams) {
+      this.streamsById.set(stream.id, stream);
+    }
   }
 
   // Helpers de formatação e resolução segura
@@ -195,5 +202,10 @@ export class CatalogReadModel {
     return categoryIds
       .map((id) => this.categoryById.get(id)?.name)
       .filter((name): name is string => typeof name === 'string' && name.trim().length > 0);
+  }
+
+  getStreamRef(id: string): StreamRef | undefined {
+    if (!id) return undefined;
+    return this.streamsById.get(id);
   }
 }

@@ -6,7 +6,7 @@
 
 - **PROJECT**: `XANDEFLIX_PREBUILT`
 - **PARENT_CONTEXT**: `MARCO_ZERO_CANONICO_XANDEFLIX_PREBUILT`
-- **LAST_CLOSED_GATE**: `G7`
+- **LAST_CLOSED_GATE**: `G8`
 - **G0_STATUS**: `PASS`
 - **G1_STATUS**: `PASS`
 - **G2_STATUS**: `PASS`
@@ -15,13 +15,14 @@
 - **G5_STATUS**: `PASS`
 - **G6_STATUS**: `PASS`
 - **G7_STATUS**: `PASS`
-- **MVP_PROGRESS_PERCENT**: `74`
-- **CURRENT_GATE**: `G8`
-- **G8_STATUS**: `NOT_STARTED`
-- **G8_STARTED**: `NAO`
-- **NEXT_GATE**: `XANDEFLIX_PREBUILT_G8_SOURCE_AND_DIRECT_PLAYBACK`
+- **G8_STATUS**: `PASS`
+- **MVP_PROGRESS_PERCENT**: `82`
+- **CURRENT_GATE**: `G9`
+- **G9_STATUS**: `NOT_STARTED`
+- **G9_STARTED**: `NAO`
+- **NEXT_GATE**: `XANDEFLIX_PREBUILT_G9_INCREMENTAL_UPDATE`
 - **NEXT_GATE_STARTED**: `NAO`
-- **HISTORICAL_RECORD**: `G5_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G5_ADJUDICATION_CLOSED_PASS=SIM; G6_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G6_ADJUDICATION_CLOSED_PASS=SIM; G7_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G7_ADJUDICATION_CLOSED_PASS=SIM; SEARCH_SCALE_PERFORMANCE_RISK=OPEN_NON_BLOCKING`
+- **HISTORICAL_RECORD**: `G5_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G5_ADJUDICATION_CLOSED_PASS=SIM; G6_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G6_ADJUDICATION_CLOSED_PASS=SIM; G7_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G7_ADJUDICATION_CLOSED_PASS=SIM; SEARCH_SCALE_PERFORMANCE_RISK=OPEN_NON_BLOCKING; G8_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G8_ADJUDICATION_CLOSED_PASS=SIM`
 
 ---
 
@@ -89,24 +90,39 @@
 - `SEARCH_INDEX_DATA_MINIMIZATION`: REQUIRED
 - `SEARCH_ENABLED_PACKAGE_FORMAT_VERSION`: 2
 - `PACKAGE_FORMAT_V1_BACKWARD_COMPATIBLE`: REQUIRED
+- `PLAYBACK_CONNECTION`: DEVICE_TO_SOURCE_DIRECT
+- `CENTRAL_STREAM_PROXY`: PROHIBITED
+- `CENTRAL_VIDEO_RELAY`: PROHIBITED
+- `CENTRAL_IPTV_STREAMING_BACKEND`: PROHIBITED
+- `PLAYBACK_ENGINE_ANDROID`: MEDIA3_EXOPLAYER
+- `PLAYBACK_PROTOCOLS_BASELINE`: HLS_PROGRESSIVE
+- `STREAM_REF_CREDENTIAL_POLICY`: CREDENTIAL_FREE
+- `SOURCE_AUTH_BOUNDARY`: RUNTIME_ONLY_NO_CATALOG_SECRET
+- `RESOLVED_PLAYBACK_REQUEST_PERSISTENCE`: NONE
+- `PLAYBACK_QUERY_NETWORK_PATH`: DEVICE_TO_SOURCE_ONLY
+- `PLAYBACK_URI_ALLOWLIST`: HTTPS_BASELINE
+- `PLAYBACK_HEADERS_LOGGING`: PROHIBITED
+- `NATIVE_PLAYER_ACTIVITY_EXPORTED`: NAO
+- `NATIVE_PLAYER_DPAD_BASELINE`: MEDIA3_STANDARD_CONTROLS
+- `STREAM_RESOLVER_MEDIA_BYTES_HANDLED`: 0
 
 ---
 
 ## 4. Decisoes Abertas (DECISIONS_OPEN)
 
-- `REAL_SOURCE_AUTH_STRATEGY`: Em aberto.
-- `PLAYBACK_UI`: Em aberto (G8).
-- `ARTWORK_CACHE_POLICY`: Em aberto.
-- `FULL_TV_SPATIAL_NAVIGATION`: Em aberto (G11).
-- `PERFORMANCE_SLA`: Em aberto (G11/G12).
-- `ROLLBACK_FULL`: Em aberto.
-- `SNAPSHOT_RETENTION`: Em aberto.
-- `INCREMENTAL_UPDATE_STRATEGY`: Em aberto.
-- `PACKAGE_SIGNING_STRATEGY`: Em aberto (ECDSA, Ed25519).
-- `PACKAGE_ENCRYPTION`: Em aberto.
-- `USER_SOURCE_BINDING`: Em aberto.
-- `OFFLINE_POLICY`: Em aberto.
-- `SIZE_LIMITS`: Em aberto (evidência empírica não é SLA).
+1. `REAL_SOURCE_AUTH_STRATEGY`: Arquitetura final de autenticação com provedores de origem em produção.
+2. `USER_SOURCE_BINDING`: Modelo de associação entre credenciais de usuário e provisionamento personalizado de pacotes.
+3. `PACKAGE_SIGNING_STRATEGY`: Protocolo criptográfico para assinatura e verificação de integridade/autoria do pacote.
+4. `PACKAGE_ENCRYPTION`: Algoritmo e chaveamento de criptografia em repouso e trânsito para pacotes de provisionamento.
+5. `PLAYER_SECURE_FLAG_POLICY`: Política de bloqueio de captura de tela e recents via FLAG_SECURE (aberto para G10).
+6. `PERSISTENT_PLAYBACK_PROGRESS`: Mecanismo e modelo de dados para persistência contínua de histórico de reprodução e resume.
+7. `ARTWORK_CACHE_POLICY`: Política de download, resolução, compressão e expiração de posters e imagens de catálogo.
+8. `FULL_TV_SPATIAL_NAVIGATION`: Navegação espacial avançada bidimensional com aceleração de cursor ou mesh de nós (G11).
+9. `PERFORMANCE_SLA`: Metas contratuais de tempo de abertura e resposta homologadas em hardware físico (G11/G12).
+10. `INCREMENTAL_UPDATE_STRATEGY`: Algoritmo para geração e aplicação de deltas/diffs de catálogo sem re-download completo (G9).
+11. `ROLLBACK_FULL`: Política avançada de retenção de múltiplos snapshots históricos e reversão manual de versão.
+12. `SNAPSHOT_RETENTION`: Política de limpeza e expiração de snapshots antigos acumulados no armazenamento privado.
+13. `SIZE_LIMITS`: Limites contratuais de tamanho para pacotes e footprint de memória em hardware de entrada.
 
 ---
 
@@ -337,6 +353,35 @@
   - MVP_PROGRESS_PERCENT atualizado de 64 para 74;
   - CURRENT_GATE avançado para G8 (`NEXT_AUTHORIZABLE_GATE=G8`);
   - G8 permanece NOT_STARTED (`G8_STARTED=NAO`, `NEXT_GATE_STARTED=NAO`);
+  - Autorização expressa concedida para commit e push canônicos na branch origin/main.
+
+- **Ciclo G8 (Source and Direct Playback)**:
+  - Implementação da fronteira canônica de reprodução direta Device-to-Source (`PLAYBACK_CONNECTION=DEVICE_TO_SOURCE_DIRECT`, `CENTRAL_STREAM_PROXY=PROHIBITED`, `CENTRAL_VIDEO_RELAY=PROHIBITED`, `STREAM_RESOLVER_MEDIA_BYTES_HANDLED=0`);
+  - Desacoplamento estrito entre metadados de catálogo e credenciais de acesso: `StreamRef` preservado rigorosamente sem senhas, tokens ou URLs completas (`STREAM_REF_CREDENTIAL_FREE=PASS`);
+  - Criação do modelo em memória `RuntimeSourceContext` e validador de sessão/expiração (`SOURCE_RUNTIME_BOUNDARY=PASS`);
+  - Desenvolvimento do `DirectStreamResolver` transformando logicamente referências de stream em requisições transitórias (`ResolvedPlaybackRequest`) sem persistência (`RESOLVED_PLAYBACK_REQUEST_PERSISTENCE=NONE`);
+  - Integração nativa com `AndroidX Media3 ExoPlayer` (`media3-exoplayer:1.5.1`, `media3-exoplayer-hls:1.5.1`, `media3-ui:1.5.1`) via `NativePlayerActivity` (`android:exported="false"`, `PLAYER_RELEASE_ON_DESTROY=PASS`, `PLAYER_SINGLE_INSTANCE_PER_ACTIVITY=SIM`);
+  - Desenvolvimento do plugin Capacitor `NativePlayerPlugin` e cliente TypeScript `NativePlayerClient` com fallback controlado para navegador web (`WEB_NATIVE_PLAYER_UNAVAILABLE=PASS`);
+  - Validação estrita de segurança de URIs: `PLAYBACK_URI_ALLOWLIST=HTTPS_BASELINE`, rejeição de esquemas proibidos (`file:`, `content:`, `javascript:`, etc.) e rejeição de userinfo credentials (`URL_USERINFO_CREDENTIALS_REJECTED=PASS`);
+  - Política de privacidade e logs: `PLAYBACK_HEADERS_LOGGING=PROHIBITED`, sanitização de query parameters em logs;
+  - Ativação das ações de reprodução direta na interface (`MovieDetailPage` e `SeriesDetailPage`) para filmes e episódios com exibição de estados sanitizados;
+  - Testes unitários Android implementados (`PlaybackIntentContractTest` e `AndroidManifestAuditTest`) com aprovação em `gradlew test` e build bem-sucedido em `gradlew assembleDebug`;
+  - Elaboração da documentação arquitetural em `docs/DIRECT_PLAYBACK.md` e formalização de 10 fluxos no FSD (`F-G8-001` a `F-G8-010`);
+  - Criação da suíte de validação `scripts/validate-direct-playback.mjs` (`npm run playback:check`) com 100% de aprovação;
+  - Preservação integral das regressões de todos os Gates anteriores (G2, G3, G4, G5, G6, G7);
+  - Auditoria de segredos e escopo: zero credenciais reais, sem service_role, sem proxy central, sem G9;
+  - Registro histórico: `G8_STATUS=COMPLETE_PENDING_MASTER_ADJUDICATION`, `MVP_PROGRESS_PERCENT=74`.
+
+- **Adjudicacao G8 e Canonicalizacao (2026-09-05)**:
+  - G8 formalmente adjudicado pelo Chat Mestre como PASS (`RESULT=PASS_PREBUILT_G8_SOURCE_AND_DIRECT_PLAYBACK_CLOSED`);
+  - Fronteira canônica de reprodução direta Device-to-Source aprovada (`PLAYBACK_CONNECTION=DEVICE_TO_SOURCE_DIRECT`, `CENTRAL_STREAM_PROXY=PROHIBITED`, `CENTRAL_VIDEO_RELAY=PROHIBITED`, `CENTRAL_IPTV_STREAMING_BACKEND=PROHIBITED`, `STREAM_RESOLVER_MEDIA_BYTES_HANDLED=0`);
+  - `StreamRef` livre de credenciais e segredos (`STREAM_REF_CREDENTIAL_FREE=PASS`), runtime source context efêmero em memória (`SOURCE_RUNTIME_BOUNDARY=PASS`) e resolução direta sem persistência (`RESOLVED_PLAYBACK_REQUEST_PERSISTENCE=NONE`);
+  - Player nativo Android implementado com AndroidX Media3 ExoPlayer (`media3-exoplayer:1.5.1`, `media3-exoplayer-hls:1.5.1`, `media3-ui:1.5.1`), `NativePlayerActivity` não exportada (`android:exported="false"`), liberação de recursos em `onDestroy`, ponte Capacitor com sanitização de cabeçalhos e fallback seguro na web (`WEB_NATIVE_PLAYER_UNAVAILABLE=PASS`);
+  - Proteção de segurança comprovada: `PLAYBACK_URI_ALLOWLIST=HTTPS_BASELINE`, rejeição estrita de userinfo credentials (`URL_USERINFO_CREDENTIALS_REJECTED=PASS`) e cabeçalhos sensíveis omitidos de logs (`PLAYBACK_HEADERS_LOGGING=PROHIBITED`);
+  - Ausência de fonte real e validação física registradas como não-requisitos de G8 (`REAL_SOURCE_IMPLEMENTED=NAO`, `REAL_SOURCE_AUTHENTICATED=NAO`, `REAL_SOURCE_PLAYBACK_PROVEN=NAO`, `PHYSICAL_MEDIA_PLAYING_PROVEN=NAO`, `PHYSICAL_DEVICE_VALIDATION=NOT_REQUIRED_G8`);
+  - MVP_PROGRESS_PERCENT atualizado de 74 para 82;
+  - CURRENT_GATE avançado para G9 (`NEXT_AUTHORIZABLE_GATE=G9`);
+  - G9 permanece NOT_STARTED (`G9_STATUS=NOT_STARTED`, `G9_STARTED=NAO`, `NEXT_GATE_STARTED=NAO`);
   - Autorização expressa concedida para commit e push canônicos na branch origin/main.
 
 

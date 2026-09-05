@@ -1253,3 +1253,49 @@ html, body {
   border: 1px solid rgba(229, 9, 20, 0.2);
   border-radius: 12px;
 }
+
+/* ==========================================================================
+   Gate G8 — Device-Direct Playback UI Styles
+   ========================================================================== */
+
+.playback-action-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.btn-resolving {
+  opacity: 0.75;
+  cursor: wait;
+}
+
+.playback-status-notice {
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  margin-top: 0.25rem;
+}
+
+.playback-status-notice.notice-info {
+  color: var(--accent-cyan, #00d2ff);
+}
+
+.playback-status-notice.notice-error {
+  color: var(--accent-red, #ff4b4b);
+}
+
+.series-playback-status-banner {
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  background: rgba(0, 210, 255, 0.05);
+  border: 1px solid rgba(0, 210, 255, 0.2);
+}
+
+.btn-episode-play {
+  padding: 0.35rem 0.875rem;
+  font-size: 0.8125rem;
+  border-radius: 6px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+

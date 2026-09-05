@@ -8,10 +8,11 @@
  * - PLAYBACK DEFERRED: Botão "Assistir" desabilitado com aviso explicativo do Gate G8.
  */
 
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import type { CatalogReadModel } from '../../catalog/catalog-read-model.ts';
 import { getMovieDetail } from '../../catalog/catalog-selectors.ts';
 import { Artwork } from '../components/Artwork.tsx';
+import { defaultPlaybackService } from '../../playback/playback.service.ts';
 
 interface MovieDetailPageProps {
   movieId: string;
@@ -21,6 +22,34 @@ interface MovieDetailPageProps {
 
 export const MovieDetailPage: React.FC<MovieDetailPageProps> = ({ movieId, readModel, onBack }) => {
   const detail = getMovieDetail(readModel, movieId);
+  const [isResolving, setIsResolving] = useState(false);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [statusKind, setStatusKind] = useState<'info' | 'error' | null>(null);
+
+  const handlePlayMovie = useCallback(async () => {
+    setIsResolving(true);
+    setStatusKind('info');
+    setStatusMessage('Preparando reprodução...');
+
+    try {
+      const result = await defaultPlaybackService.playMovie(movieId, readModel);
+      if (result.state === 'NATIVE_PLAYER_OPENED') {
+        setStatusMessage(null);
+        setStatusKind(null);
+      } else if (result.state === 'NATIVE_PLAYER_UNAVAILABLE') {
+        setStatusKind('info');
+        setStatusMessage('Player nativo Android indisponível no navegador web.');
+      } else {
+        setStatusKind('error');
+        setStatusMessage(result.errorMessage || 'Falha ao iniciar player nativo.');
+      }
+    } catch (err: unknown) {
+      setStatusKind('error');
+      setStatusMessage(err instanceof Error ? err.message : 'Falha na resolução de stream.');
+    } finally {
+      setIsResolving(false);
+    }
+  }, [movieId, readModel]);
 
   if (!detail) {
     return (
@@ -93,18 +122,21 @@ export const MovieDetailPage: React.FC<MovieDetailPageProps> = ({ movieId, readM
             )}
 
             <div className="detail-actions">
-              <div className="playback-placeholder-container">
+              <div className="playback-action-container">
                 <button
                   type="button"
-                  className="focusable-item btn-primary btn-playback-disabled"
-                  disabled
-                  aria-describedby="playback-notice"
+                  className={`focusable-item btn-primary ${isResolving ? 'btn-resolving' : ''}`}
+                  onClick={handlePlayMovie}
+                  disabled={isResolving}
                 >
-                  ▶ Assistir
+                  {isResolving ? 'Preparando reprodução...' : '▶ Assistir'}
                 </button>
-                <p id="playback-notice" className="playback-notice-text">
-                  Resolução de stream e player serão ativados no Gate G8 (Device-Direct Playback).
-                </p>
+
+                {statusMessage && (
+                  <p className={`playback-status-notice ${statusKind === 'error' ? 'notice-error' : 'notice-info'}`}>
+                    {statusMessage}
+                  </p>
+                )}
               </div>
 
               <button

@@ -873,6 +873,250 @@ Conforme os Gates forem abertos pelo Chat Mestre, as seguintes categorias de flu
 - **ACCEPTANCE_CRITERIA**: `SEARCH_INDEX_SNAPSHOT_MISMATCH_REJECTED=PASS`, `SNAPSHOT_MISMATCH_REJECTED=PASS`.
 - **TRACEABILITY**: Requisitos do Gate G7 seção 21, 23, 42.
 
+---
+
+## 9. Fluxos Funcionais do Gate G8 (Source and Direct Playback)
+
+### F-G8-001_MOVIE_DIRECT_PLAYBACK_REQUEST — Disparo de Reprodução Direta de Filme
+
+- **FLOW_ID**: `F-G8-001_MOVIE_DIRECT_PLAYBACK_REQUEST`
+- **TRIGGER**: Usuário clica ou pressiona Enter no botão "▶ Assistir" na tela `MovieDetailPage`.
+- **PRECONDITIONS**: `MovieDetailPage` renderizada com metadados válidos de um filme que possui `streamIds`.
+- **MAIN_FLOW**:
+  1. O componente aciona `PlaybackService.playMovie(movieId, readModel)`;
+  2. A UI atualiza o estado local para `isResolving=true` exibindo "Preparando reprodução...";
+  3. `PlaybackService` localiza o primeiro `streamId` do filme e resolve a entidade `StreamRef`;
+  4. Encaminha para resolução direta via `DirectStreamResolver` com o `RuntimeSourceContext` ativo;
+  5. Despacha a requisição resultante (`ResolvedPlaybackRequest`) para o `NativePlayerClient`;
+  6. Em ambiente Android nativo, a `NativePlayerActivity` é aberta em tela cheia.
+- **ALTERNATIVE_FLOW**: Em ambiente web puro, o cliente detecta ausência de player nativo e retorna `NATIVE_PLAYER_UNAVAILABLE`, exibindo aviso amigável.
+- **ERROR_FLOW**: Se o filme não tiver `streamIds` ou o `StreamRef` não for encontrado, falha fail-closed com `STREAM_REF_NOT_FOUND`.
+- **TERMINAL_STATES**: `PLAYING` (Android) ou `UNAVAILABLE` (Web).
+- **DATA_READ**: `readModel.moviesById`, `readModel.streamsById`.
+- **DATA_WRITE**: Nenhum.
+- **NETWORK**: Conexão direta do player ao host da fonte de mídia (Device → Source).
+- **SECURITY**: Nenhum segredo embutido no catálogo; URI sanitizada antes do log.
+- **OBSERVABILITY**: Transição de estados emitida para ouvintes do `PlaybackService`.
+- **ACCEPTANCE_CRITERIA**: `MOVIE_PLAYBACK_FLOW=PASS`, `MOVIE_DETAIL_PLAYBACK_ACTION=PASS`, `MOVIE_STREAM_REF_LOOKUP=PASS`.
+- **TRACEABILITY**: Requisitos do Gate G8 seção 24, 27.
+
+---
+
+### F-G8-002_EPISODE_DIRECT_PLAYBACK_REQUEST — Disparo de Reprodução Direta de Episódio
+
+- **FLOW_ID**: `F-G8-002_EPISODE_DIRECT_PLAYBACK_REQUEST`
+- **TRIGGER**: Usuário clica ou aciona o botão "▶ Assistir" de um episódio específico na `SeriesDetailPage`.
+- **PRECONDITIONS**: `SeriesDetailPage` renderizada com temporadas e episódios resolvidos.
+- **MAIN_FLOW**:
+  1. O componente aciona `PlaybackService.playEpisode(seriesId, episodeId, readModel)`;
+  2. O episódio específico entra em estado `resolvingEpisodeId=episodeId`;
+  3. `PlaybackService` localiza o `StreamRef` associado ao episódio no `CatalogReadModel`;
+  4. Monta o título contextualizado (`Série — EP X: Título`) e resolve o stream;
+  5. Despacha a requisição para o `NativePlayerClient`;
+  6. No Android, a reprodução é iniciada na `NativePlayerActivity`.
+- **ALTERNATIVE_FLOW**: Ambiente web puro retorna `NATIVE_PLAYER_UNAVAILABLE`.
+- **ERROR_FLOW**: Se o episódio não existir ou não tiver streamId, falha fail-closed com `STREAM_REF_NOT_FOUND`.
+- **TERMINAL_STATES**: `PLAYING` ou `UNAVAILABLE`.
+- **DATA_READ**: `readModel.episodesById`, `readModel.seriesById`, `readModel.streamsById`.
+- **DATA_WRITE**: Nenhum.
+- **NETWORK**: Device → Source direto.
+- **SECURITY**: Sem credenciais persistidas no catálogo ou índice.
+- **OBSERVABILITY**: Estado de resolução propagado para a UI do episódio.
+- **ACCEPTANCE_CRITERIA**: `EPISODE_PLAYBACK_FLOW=PASS`, `EPISODE_STREAM_REF_LOOKUP=PASS`.
+- **TRACEABILITY**: Requisitos do Gate G8 seção 24, 28.
+
+---
+
+### F-G8-003_STREAM_REF_RESOLUTION — Resolução Lógica Direta de StreamRef
+
+- **FLOW_ID**: `F-G8-003_STREAM_REF_RESOLUTION`
+- **TRIGGER**: Chamada interna de `DirectStreamResolver.resolve(streamRef, runtimeContext, options)`.
+- **PRECONDITIONS**: `StreamRef` válido e `RuntimeSourceContext` válido e não expirado.
+- **MAIN_FLOW**:
+  1. Valida o contexto runtime da fonte (`sourceId`, `baseUrl`, data de expiração);
+  2. Extrai `sourceItemId`, `contentKind` e `containerExtension` do `StreamRef`;
+  3. Constrói a URI direta da fonte: `{baseUrl}/{subpath}/{sourceItemId}.{extension}`;
+  4. Valida a URI gerada contra a allowlist (HTTPS baseline, rejeição de userinfo);
+  5. Deriva o mimeType apropriado (`application/x-mpegURL`, `video/mp4`, etc.);
+  6. Retorna `ResolvedPlaybackRequest` em memória.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: Falha de validação de URI ou contexto lança `PlaybackError` com categoria sanitizada.
+- **TERMINAL_STATES**: `RESOLVED_PLAYBACK_REQUEST_READY`.
+- **DATA_READ**: `StreamRef`, `RuntimeSourceContext`.
+- **DATA_WRITE**: Nenhum (RESOLVED_PLAYBACK_REQUEST_PERSISTENCE = NONE).
+- **NETWORK**: Nenhuma (STREAM_RESOLVER_MEDIA_BYTES_HANDLED = 0).
+- **SECURITY**: `URL_USERINFO_CREDENTIALS_REJECTED`, sem proxy central.
+- **OBSERVABILITY**: Medição de `STREAM_RESOLUTION_MS`.
+- **ACCEPTANCE_CRITERIA**: `VALID_SYNTHETIC_RESOLUTION=PASS`, `NO_CENTRAL_PROXY=PASS`.
+- **TRACEABILITY**: Requisitos do Gate G8 seção 10, 12, 13.
+
+---
+
+### F-G8-004_SOURCE_CONTEXT_UNAVAILABLE — Tratamento de Falta de Contexto Runtime
+
+- **FLOW_ID**: `F-G8-004_SOURCE_CONTEXT_UNAVAILABLE`
+- **TRIGGER**: Tentativa de resolução de playback quando `RuntimeSourceContext` não foi configurado ou é nulo.
+- **PRECONDITIONS**: `runtimeContext == undefined` ou `sourceId` vazio.
+- **MAIN_FLOW**:
+  1. `validateSourceContext` detecta ausência de contexto de fonte;
+  2. Interrompe imediatamente o fluxo de resolução (fail-closed);
+  3. Lança `PlaybackError` com categoria `SOURCE_CONTEXT_UNAVAILABLE`;
+  4. A UI recebe o erro e exibe "Reprodução indisponível" sem vazar exceções internas.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: Resolução abortada sem envio de dados ou chamadas de rede.
+- **TERMINAL_STATES**: `ERROR_SOURCE_CONTEXT_UNAVAILABLE`.
+- **DATA_READ**: Nenhum.
+- **DATA_WRITE**: Nenhum.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Impede tentativas cegas de resolução contra endpoints desconhecidos.
+- **OBSERVABILITY**: Log registra categoria `SOURCE_CONTEXT_UNAVAILABLE`.
+- **ACCEPTANCE_CRITERIA**: `MISSING_SOURCE_CONTEXT_REJECTED=PASS`.
+- **TRACEABILITY**: Requisitos do Gate G8 seção 7, 23.
+
+---
+
+### F-G8-005_SOURCE_CONTEXT_EXPIRED — Rejeição de Contexto Expirado
+
+- **FLOW_ID**: `F-G8-005_SOURCE_CONTEXT_EXPIRED`
+- **TRIGGER**: Tentativa de resolução com `RuntimeSourceContext.expiresAt` anterior ao timestamp atual.
+- **PRECONDITIONS**: `context.expiresAt > 0 && Date.now() > context.expiresAt`.
+- **MAIN_FLOW**:
+  1. `validateSourceContext` compara `Date.now()` com `context.expiresAt`;
+  2. Identifica expiração da sessão da fonte;
+  3. Aborta a resolução fail-closed com categoria `SOURCE_CONTEXT_EXPIRED`;
+  4. UI notifica que a sessão expirou.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: Abortamento imediato.
+- **TERMINAL_STATES**: `ERROR_SOURCE_CONTEXT_EXPIRED`.
+- **DATA_READ**: Timestamp atual e `expiresAt`.
+- **DATA_WRITE**: Nenhum.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Garante respeito absoluto ao tempo de vida de sessões efêmeras.
+- **OBSERVABILITY**: Categoria `SOURCE_CONTEXT_EXPIRED` emitida.
+- **ACCEPTANCE_CRITERIA**: `EXPIRED_SOURCE_CONTEXT_REJECTED=PASS`.
+- **TRACEABILITY**: Requisitos do Gate G8 seção 7, 23.
+
+---
+
+### F-G8-006_NATIVE_PLAYER_LAUNCH — Disparo do Player Nativo Android
+
+- **FLOW_ID**: `F-G8-006_NATIVE_PLAYER_LAUNCH`
+- **TRIGGER**: `NativePlayerClient.launch(resolvedRequest)` chamado em ambiente Android nativo.
+- **PRECONDITIONS**: `Capacitor.isNativePlatform() == true`, `ResolvedPlaybackRequest` validado.
+- **MAIN_FLOW**:
+  1. O plugin `NativePlayerPlugin.play()` recebe a chamada IPC do Capacitor;
+  2. Valida a URI no boundary nativo via `PlaybackIntentContract.validatePlaybackUri()`;
+  3. Monta Intent explícito para `NativePlayerActivity` com extras transitórios;
+  4. Inicia a Activity nativa em tela cheia com flags de imersão e `FLAG_KEEP_SCREEN_ON`;
+  5. `NativePlayerActivity` inicializa o `ExoPlayer` com `MediaItem` e `DefaultHttpDataSource.Factory`;
+  6. Inicia o buffering e reprodução física direta da fonte.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: Se a URI for rejeitada na validação nativa, rejeita o PluginCall com mensagem sanitizada.
+- **TERMINAL_STATES**: `NATIVE_PLAYER_OPENED`.
+- **DATA_READ**: Intent extras.
+- **DATA_WRITE**: Nenhum.
+- **NETWORK**: Streaming direto de pacotes de mídia entre dispositivo e CDN da fonte.
+- **SECURITY**: `android:exported="false"`, zero logging de headers confidenciais.
+- **OBSERVABILITY**: Eventos de Player.Listener (`onPlaybackStateChanged`, `onPlayerError`).
+- **ACCEPTANCE_CRITERIA**: `NATIVE_ANDROID_PLAYER_IMPLEMENTED=SIM`, `VALID_NATIVE_REQUEST_ACCEPTED=PASS`.
+- **TRACEABILITY**: Requisitos do Gate G8 seção 15, 16, 43.
+
+---
+
+### F-G8-007_NATIVE_PLAYER_BACK_RETURN — Retorno Limpo do Player Nativo
+
+- **FLOW_ID**: `F-G8-007_NATIVE_PLAYER_BACK_RETURN`
+- **TRIGGER**: Usuário pressiona o botão Back no controle remoto ou teclado durante a reprodução.
+- **PRECONDITIONS**: `NativePlayerActivity` ativa.
+- **MAIN_FLOW**:
+  1. Evento de Back fecha a `NativePlayerActivity`;
+  2. O ciclo de vida executa `onPause()`, `onStop()` e `onDestroy()`;
+  3. O método `releasePlayer()` é acionado de forma idempotente, liberando decodificadores e instâncias do ExoPlayer;
+  4. O foco retorna para a tela de detalhe anterior (`MovieDetailPage` ou `SeriesDetailPage`) na `MainActivity`;
+  5. O estado da UI anterior é preservado sem reinicializar o aplicativo inteiro.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: N/A.
+- **TERMINAL_STATES**: `PLAYER_DESTROYED_RETURNED_TO_DETAIL`.
+- **DATA_READ**: Nenhum.
+- **DATA_WRITE**: Nenhum.
+- **NETWORK**: Conexões de streaming são encerradas.
+- **SECURITY**: Liberação de decodificadores de hardware e buffers de memória do sistema.
+- **OBSERVABILITY**: Log registra liberação do ExoPlayer.
+- **ACCEPTANCE_CRITERIA**: `PLAYER_RELEASE_ON_DESTROY=PASS`, `PLAYER_RELEASE_IDEMPOTENT=SIM`.
+- **TRACEABILITY**: Requisitos do Gate G8 seção 30, 33, 34.
+
+---
+
+### F-G8-008_INVALID_PLAYBACK_URI_REJECTION — Rejeição de Esquemas e Credenciais Perigosas
+
+- **FLOW_ID**: `F-G8-008_INVALID_PLAYBACK_URI_REJECTION`
+- **TRIGGER**: Tentativa de reprodução com URI maliciosa, esquema não autorizado (`file:`, `javascript:`, etc.) ou contendo `user:pass@`.
+- **PRECONDITIONS**: Chamada a `validatePlaybackUri(uri)`.
+- **MAIN_FLOW**:
+  1. O validador inspeciona o prefixo e esquema da URI;
+  2. Detecta violação de esquema ou presença de `parsed.username / parsed.password`;
+  3. Rejeita fail-closed imediatamente lançando `PlaybackError`;
+  4. Impede que a requisição seja repassada ao player nativo ou engine de rede.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: Rejeição determinística e segura.
+- **TERMINAL_STATES**: `ERROR_SECURITY_VIOLATION_REJECTED`.
+- **DATA_READ**: String da URI.
+- **DATA_WRITE**: Nenhum.
+- **NETWORK**: Nenhuma requisição emitida.
+- **SECURITY**: Proteção contra SSRF local, acesso a arquivos privados (`file:`) e injeção de credenciais de URL.
+- **OBSERVABILITY**: Erro categorizado como `UNSUPPORTED_SCHEME` ou `URL_USERINFO_CREDENTIALS_REJECTED`.
+- **ACCEPTANCE_CRITERIA**: `UNSUPPORTED_URI_REJECTED=PASS`, `URL_USERINFO_CREDENTIALS_REJECTED=PASS`.
+- **TRACEABILITY**: Requisitos do Gate G8 seção 18, 52.
+
+---
+
+### F-G8-009_WEB_NATIVE_PLAYER_UNAVAILABLE — Fallback Controlado para Navegador Web
+
+- **FLOW_ID**: `F-G8-009_WEB_NATIVE_PLAYER_UNAVAILABLE`
+- **TRIGGER**: Invocação de playback em ambiente navegador (desenvolvimento / browser).
+- **PRECONDITIONS**: `Capacitor.isNativePlatform() == false` e plugin nativo ausente.
+- **MAIN_FLOW**:
+  1. `NativePlayerClient` detecta ausência de suporte nativo;
+  2. Retorna `{ success: false, state: 'NATIVE_PLAYER_UNAVAILABLE' }`;
+  3. O `PlaybackService` transiciona para estado `UNAVAILABLE`;
+  4. A UI exibe mensagem explicativa: *"Player nativo Android indisponível no navegador web."*;
+  5. Não cria elemento `<video>` HTML5 não autorizado e não abre abas no navegador.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: N/A.
+- **TERMINAL_STATES**: `NATIVE_PLAYER_UNAVAILABLE`.
+- **DATA_READ**: Metadados de plataforma Capacitor.
+- **DATA_WRITE**: Nenhum.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Preserva o contrato canônico de player nativo sem gambiarras no navegador.
+- **OBSERVABILITY**: Estado `UNAVAILABLE` refletido na sessão de playback.
+- **ACCEPTANCE_CRITERIA**: `WEB_NATIVE_PLAYER_UNAVAILABLE=PASS`.
+- **TRACEABILITY**: Requisitos do Gate G8 seção 17, 49.
+
+---
+
+### F-G8-010_PLAYBACK_ERROR_SANITIZATION — Sanitização Estrita de Mensagens e Logs
+
+- **FLOW_ID**: `F-G8-010_PLAYBACK_ERROR_SANITIZATION`
+- **TRIGGER**: Ocorrência de qualquer exceção durante resolução, montagem de requisição ou reprodução.
+- **PRECONDITIONS**: Exceção capturada no fluxo de playback.
+- **MAIN_FLOW**:
+  1. O manipulador de erro extrai a categoria padronizada do `PlaybackError`;
+  2. Caso a mensagem contenha URIs ou query strings, passa pelo helper `sanitizePlaybackUriForLog()`;
+  3. Caso contenha headers de autorização ou cookies, passa por `sanitizeHeadersForLog()`;
+  4. Registra apenas mensagens sanitizadas, impedindo vazamento de tokens, senhas ou assinaturas;
+  5. A UI apresenta mensagem limpa e compreensível ao usuário final.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: N/A.
+- **TERMINAL_STATES**: `ERROR_SANITIZED_AND_RECORDED`.
+- **DATA_READ**: Objeto de exceção.
+- **DATA_WRITE**: Log de console ou buffer de sessão.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: `PLAYBACK_HEADERS_LOGGING = PROHIBITED`, zero vazamento de credenciais.
+- **OBSERVABILITY**: Log seguro contendo categoria, ID de sessão e host genérico.
+- **ACCEPTANCE_CRITERIA**: `SYNTHETIC_HEADERS_SANITIZED=PASS`, `PLAYBACK_HEADERS_LOGGING=PROHIBITED`.
+- **TRACEABILITY**: Requisitos do Gate G8 seção 20, 21, 53.
+
+
 
 
 

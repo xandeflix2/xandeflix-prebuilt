@@ -8,10 +8,11 @@
  * - PLAYBACK DEFERRED: Reprodução de episódios desabilitada até o Gate G8.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import type { CatalogReadModel } from '../../catalog/catalog-read-model.ts';
 import { getSeriesDetail } from '../../catalog/catalog-selectors.ts';
 import { Artwork } from '../components/Artwork.tsx';
+import { defaultPlaybackService } from '../../playback/playback.service.ts';
 
 interface SeriesDetailPageProps {
   seriesId: string;
@@ -28,6 +29,31 @@ export const SeriesDetailPage: React.FC<SeriesDetailPageProps> = ({
 
   const seasons = detail?.seasons || [];
   const [selectedSeasonIndex, setSelectedSeasonIndex] = useState<number>(0);
+  const [resolvingEpisodeId, setResolvingEpisodeId] = useState<string | null>(null);
+  const [episodeStatusNotice, setEpisodeStatusNotice] = useState<string | null>(null);
+
+  const handlePlayEpisode = useCallback(
+    async (episodeId: string) => {
+      setResolvingEpisodeId(episodeId);
+      setEpisodeStatusNotice('Preparando reprodução...');
+
+      try {
+        const result = await defaultPlaybackService.playEpisode(seriesId, episodeId, readModel);
+        if (result.state === 'NATIVE_PLAYER_OPENED') {
+          setEpisodeStatusNotice(null);
+        } else if (result.state === 'NATIVE_PLAYER_UNAVAILABLE') {
+          setEpisodeStatusNotice('Player nativo Android indisponível no navegador web.');
+        } else {
+          setEpisodeStatusNotice(result.errorMessage || 'Falha ao iniciar player nativo.');
+        }
+      } catch (err: unknown) {
+        setEpisodeStatusNotice(err instanceof Error ? err.message : 'Falha na resolução de stream.');
+      } finally {
+        setResolvingEpisodeId(null);
+      }
+    },
+    [seriesId, readModel]
+  );
 
   if (!detail) {
     return (
@@ -134,6 +160,12 @@ export const SeriesDetailPage: React.FC<SeriesDetailPageProps> = ({
             </div>
           )}
 
+          {episodeStatusNotice && (
+            <div className="series-playback-status-banner">
+              <p className="playback-status-notice notice-info">{episodeStatusNotice}</p>
+            </div>
+          )}
+
           {currentSeason && (
             <div className="episodes-list">
               {currentSeason.episodes.length === 0 ? (
@@ -160,8 +192,15 @@ export const SeriesDetailPage: React.FC<SeriesDetailPageProps> = ({
                         )}
                       </div>
                       {ep.overview && <p className="episode-overview">{ep.overview}</p>}
-                      <div className="episode-playback-status">
-                        <span className="playback-pill-disabled">Playback no Gate G8</span>
+                      <div className="episode-playback-action">
+                        <button
+                          type="button"
+                          className={`focusable-item btn-primary btn-episode-play ${resolvingEpisodeId === ep.id ? 'btn-resolving' : ''}`}
+                          onClick={() => handlePlayEpisode(ep.id)}
+                          disabled={resolvingEpisodeId !== null}
+                        >
+                          {resolvingEpisodeId === ep.id ? 'Preparando...' : '▶ Assistir'}
+                        </button>
                       </div>
                     </div>
                   </article>

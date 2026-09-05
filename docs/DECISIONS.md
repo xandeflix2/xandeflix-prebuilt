@@ -72,24 +72,40 @@
 | `SEARCH_INDEX_DATA_MINIMIZATION` | `REQUIRED` | Índice minimizado: omissão de sinopses completas, referências de stream, URLs de arte e dados desnecessários. |
 | `SEARCH_ENABLED_PACKAGE_FORMAT_VERSION` | `2` | Versão de formato de pacote de provisionamento com suporte a índice de busca pré-construído. |
 | `PACKAGE_FORMAT_V1_BACKWARD_COMPATIBLE` | `REQUIRED` | Pacotes v1 continuam perfeitamente suportados pelo importer e UI (com busca reportando SEARCH_INDEX_UNAVAILABLE). |
+| `PLAYBACK_CONNECTION` | `DEVICE_TO_SOURCE_DIRECT` | Conexão de mídia direta do dispositivo do usuário para a origem da fonte de streaming sem intermediários. |
+| `CENTRAL_STREAM_PROXY` | `PROHIBITED` | Proibição categórica de qualquer proxy central de stream no backend Xandeflix, Vercel ou Supabase. |
+| `CENTRAL_VIDEO_RELAY` | `PROHIBITED` | Proibição de retransmissão de pacotes de vídeo através de servidores próprios. |
+| `CENTRAL_IPTV_STREAMING_BACKEND` | `PROHIBITED` | Proibição categórica de backend central IPTV de intermediação de streaming de mídia. |
+| `PLAYBACK_ENGINE_ANDROID` | `MEDIA3_EXOPLAYER` | Motor canônico de reprodução nativa Android definido como AndroidX Media3 ExoPlayer. |
+| `PLAYBACK_PROTOCOLS_BASELINE` | `HLS_PROGRESSIVE` | Protocolos de baseline suportados na reprodução direta: HLS (.m3u8) e Progressive MP4 (.mp4). |
+| `STREAM_REF_CREDENTIAL_POLICY` | `CREDENTIAL_FREE` | Entidades StreamRef no catálogo contêm estritamente identificadores opacos e nunca credenciais ou URLs. |
+| `SOURCE_AUTH_BOUNDARY` | `RUNTIME_ONLY_NO_CATALOG_SECRET` | Contexto de autenticação e sessão da fonte mantido exclusivamente em memória transitória de execução. |
+| `RESOLVED_PLAYBACK_REQUEST_PERSISTENCE` | `NONE` | A requisição de reprodução direta resolvida existe somente em memória durante a sessão e nunca é persistida em storage ou catálogo. |
+| `PLAYBACK_QUERY_NETWORK_PATH` | `DEVICE_TO_SOURCE_ONLY` | Tráfego de pacotes de streaming transita exclusivamente entre o cliente Android e os servidores CDN da fonte. |
+| `PLAYBACK_URI_ALLOWLIST` | `HTTPS_BASELINE` | Esquema HTTPS canônico; esquemas arbitrários (file:, content:, javascript:) e credenciais embutidas (user:pass@) são rejeitados. |
+| `PLAYBACK_HEADERS_LOGGING` | `PROHIBITED` | Proibição terminante de registro de headers de autenticação, tokens ou cookies em logs ou relatórios. |
+| `NATIVE_PLAYER_ACTIVITY_EXPORTED` | `NAO` | NativePlayerActivity configurada com android:exported="false" para proteger a superfície IPC do app. |
+| `NATIVE_PLAYER_DPAD_BASELINE` | `MEDIA3_STANDARD_CONTROLS` | Controles de TV/D-pad padronizados nos controles nativos da Media3 (Play/Pause, Seek, Back). |
+| `STREAM_RESOLVER_MEDIA_BYTES_HANDLED` | `0` | O resolver de stream apenas compõe a requisição lógica de playback e manipula rigorosamente zero bytes de mídia. |
 
 ---
 
 ## 2. Decisoes Tecnicas em Aberto (DECISIONS_OPEN)
 
-1. `REAL_SOURCE_AUTH_STRATEGY`: Arquitetura de autenticação com provedores de origem sem expor credenciais primárias ao cliente.
-2. `PLAYBACK_UI`: Interface do player de mídia e controles de tela cheia (previsto para G8).
-3. `ARTWORK_CACHE_POLICY`: Política de download, resolução, compressão e expiração de posters e imagens de catálogo.
-4. `FULL_TV_SPATIAL_NAVIGATION`: Navegação espacial avançada bidimensional com aceleração de cursor ou mesh de nós (G11).
-5. `PERFORMANCE_SLA`: Metas contratuais de tempo de abertura e resposta homologadas em hardware físico (G11/G12).
-6. `ROLLBACK_FULL`: Política avançada de retenção de múltiplos snapshots históricos e reversão manual de versão.
-7. `SNAPSHOT_RETENTION`: Política de limpeza e expiração de snapshots antigos acumulados no armazenamento privado.
-8. `INCREMENTAL_UPDATE_STRATEGY`: Algoritmo para geração e aplicação de deltas/diffs de catálogo sem re-download completo.
-9. `PACKAGE_SIGNING_STRATEGY`: Protocolo criptográfico para assinatura e verificação de autoria do pacote (ECDSA, Ed25519).
-10. `PACKAGE_ENCRYPTION`: Necessidade e algoritmo de criptografia em repouso/trânsito para os pacotes de provisionamento.
-11. `USER_SOURCE_BINDING`: Modelo de associação entre credenciais de acesso da fonte e a distribuição de pacotes personalizados.
-12. `OFFLINE_POLICY`: Comportamento da aplicação diante da ausência prolongada de conexão com a internet após o bootstrap inicial.
-13. `SIZE_LIMITS`: Limites contratuais de tamanho para o pacote de provisionamento e footprint de memória (evidências empíricas atuais não são SLA).
+1. `REAL_SOURCE_AUTH_STRATEGY`: Arquitetura final de obtenção/renovação de credenciais e tokens da fonte em produção.
+2. `USER_SOURCE_BINDING`: Modelo de associação entre credenciais de usuário e provisionamento personalizado de pacotes.
+3. `PACKAGE_SIGNING_STRATEGY`: Protocolo criptográfico para assinatura e verificação de integridade/autoria do pacote.
+4. `PACKAGE_ENCRYPTION`: Algoritmo e chaveamento de criptografia em repouso e trânsito para pacotes de provisionamento.
+5. `PLAYER_SECURE_FLAG_POLICY`: Política de bloqueio de captura de tela e recents via FLAG_SECURE (aberto para decisão de produto/G10).
+6. `PERSISTENT_PLAYBACK_PROGRESS`: Mecanismo e modelo de dados para persistência contínua de histórico de reprodução e resume.
+7. `ARTWORK_CACHE_POLICY`: Política de download, resolução, compressão e expiração de posters e imagens de catálogo.
+8. `FULL_TV_SPATIAL_NAVIGATION`: Navegação espacial avançada bidimensional com aceleração de cursor ou mesh de nós (G11).
+9. `PERFORMANCE_SLA`: Metas contratuais de tempo de abertura e resposta homologadas em hardware físico (G11/G12).
+10. `INCREMENTAL_UPDATE_STRATEGY`: Algoritmo para geração e aplicação de deltas/diffs de catálogo sem re-download completo (G9).
+11. `ROLLBACK_FULL`: Política avançada de retenção de múltiplos snapshots históricos e reversão manual de versão.
+12. `SNAPSHOT_RETENTION`: Política de limpeza e expiração de snapshots antigos acumulados no armazenamento privado.
+13. `SIZE_LIMITS`: Limites contratuais de tamanho para pacotes e footprint de memória em hardware de entrada.
+
 
 
 

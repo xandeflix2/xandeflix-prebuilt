@@ -24,6 +24,12 @@
 
         </activity>
 
+        <activity
+            android:name=".player.NativePlayerActivity"
+            android:exported="false"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|screenLayout|uiMode|navigation"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
