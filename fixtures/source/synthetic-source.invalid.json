@@ -1,0 +1,27 @@
+{
+  "sourceName": "Synthetic Corrupted Provider",
+  "sourceVersion": "2026.1-corrupted",
+  "movies": [
+    {
+      "title": "Filme Sem Source ID",
+      "year": 2024,
+      "categories": ["Ação"],
+      "genres": ["Ação"]
+    },
+    {
+      "sourceItemId": "9999",
+      "title": "Filme com Ano Invalido",
+      "year": "ano-invalido-xyz",
+      "categories": ["Drama"],
+      "genres": ["Drama"]
+    },
+    {
+      "sourceItemId": "9999",
+      "title": "Filme com ID Duplicado",
+      "year": 2023,
+      "categories": ["Comédia"],
+      "genres": ["Comédia"]
+    }
+  ],
+  "series": []
+}

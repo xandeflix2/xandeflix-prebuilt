@@ -1,0 +1,183 @@
+{
+  "sourceName": "Synthetic Test Provider Alpha",
+  "sourceVersion": "2026.1-synthetic",
+  "movies": [
+    {
+      "sourceItemId": "1001",
+      "title": "  Movie Synthetic Alpha  ",
+      "originalTitle": "Synthetic Alpha: Origin",
+      "year": "2024",
+      "overview": "Uma aventura sintética em um ambiente de testes controlado.",
+      "durationSeconds": 7200,
+      "categories": [
+        "  Ação Sintética  ",
+        "Ficção Científica Sintética"
+      ],
+      "genres": [
+        "Ação",
+        "Ficção Científica"
+      ],
+      "artworks": [
+        {
+          "kind": "poster",
+          "url": "https://art.synthetic.test/alpha-poster.jpg"
+        },
+        {
+          "kind": "backdrop",
+          "url": "https://art.synthetic.test/alpha-backdrop.jpg"
+        }
+      ],
+      "streams": [
+        {
+          "sourceItemId": "stream-m-1001",
+          "containerExtension": "mp4",
+          "qualityLabel": "1080p"
+        }
+      ],
+      "tmdbId": "90001",
+      "imdbId": "tt9000001"
+    },
+    {
+      "sourceItemId": "1002",
+      "title": "Movie Synthetic Beta",
+      "originalTitle": "Synthetic Beta: Revolution",
+      "year": 2023,
+      "overview": "A continuação da jornada sintética com novos parâmetros de teste.",
+      "durationSeconds": "5400",
+      "categories": [
+        "Ação Sintética",
+        "Drama Sintético"
+      ],
+      "genres": [
+        "Ação",
+        "Drama"
+      ],
+      "artworks": [
+        {
+          "kind": "poster",
+          "url": "https://art.synthetic.test/beta-poster.jpg"
+        }
+      ],
+      "streams": [
+        {
+          "sourceItemId": "stream-m-1002",
+          "containerExtension": "mkv",
+          "qualityLabel": "720p"
+        }
+      ],
+      "tmdbId": 90002
+    }
+  ],
+  "series": [
+    {
+      "sourceItemId": "2001",
+      "title": "  Series Synthetic Gamma  ",
+      "originalTitle": "Synthetic Chronicles",
+      "year": "2023",
+      "overview": "Crônicas completas de entidades sintéticas em execução determinística.",
+      "categories": [
+        "Ficção Científica Sintética",
+        "Mistério Sintético"
+      ],
+      "genres": [
+        "Ficção Científica",
+        "Mistério"
+      ],
+      "artworks": [
+        {
+          "kind": "poster",
+          "url": "https://art.synthetic.test/gamma-series-poster.jpg"
+        },
+        {
+          "kind": "backdrop",
+          "url": "https://art.synthetic.test/gamma-series-backdrop.jpg"
+        }
+      ],
+      "tmdbId": "90101",
+      "seasons": [
+        {
+          "seasonNumber": 1,
+          "title": "Temporada 1: O Despertar",
+          "artworks": [
+            {
+              "kind": "poster",
+              "url": "https://art.synthetic.test/gamma-s1-poster.jpg"
+            }
+          ],
+          "episodes": [
+            {
+              "episodeNumber": 1,
+              "title": "  Episódio 01: Inicialização  ",
+              "overview": "O primeiro ciclo de testes do ambiente artificial.",
+              "durationSeconds": 2700,
+              "artworks": [
+                {
+                  "kind": "thumbnail",
+                  "url": "https://art.synthetic.test/gamma-s1e1-thumb.jpg"
+                }
+              ],
+              "streams": [
+                {
+                  "sourceItemId": "stream-ep-2001-1-1",
+                  "containerExtension": "mp4",
+                  "qualityLabel": "1080p"
+                }
+              ]
+            },
+            {
+              "episodeNumber": 2,
+              "title": "Episódio 02: Processamento",
+              "overview": "Normalização de dados e consistência referencial.",
+              "durationSeconds": "2800",
+              "artworks": [
+                {
+                  "kind": "thumbnail",
+                  "url": "https://art.synthetic.test/gamma-s1e2-thumb.jpg"
+                }
+              ],
+              "streams": [
+                {
+                  "sourceItemId": "stream-ep-2001-1-2",
+                  "containerExtension": "mp4",
+                  "qualityLabel": "1080p"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "seasonNumber": 2,
+          "title": "Temporada 2: Convergência",
+          "episodes": [
+            {
+              "episodeNumber": 1,
+              "title": "Episódio 01: Replay Determinístico",
+              "overview": "Validação de idêntica saída para entradas idênticas.",
+              "durationSeconds": 2900,
+              "streams": [
+                {
+                  "sourceItemId": "stream-ep-2001-2-1",
+                  "containerExtension": "mkv",
+                  "qualityLabel": "1080p"
+                }
+              ]
+            },
+            {
+              "episodeNumber": 2,
+              "title": "Episódio 02: Fechamento de Gate",
+              "overview": "Conclusão e emissão do relatório terminal.",
+              "durationSeconds": 3100,
+              "streams": [
+                {
+                  "sourceItemId": "stream-ep-2001-2-2",
+                  "containerExtension": "mp4",
+                  "qualityLabel": "1080p"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

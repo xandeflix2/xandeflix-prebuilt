@@ -6,17 +6,18 @@
 
 - **PROJECT**: `XANDEFLIX_PREBUILT`
 - **PARENT_CONTEXT**: `MARCO_ZERO_CANONICO_XANDEFLIX_PREBUILT`
-- **LAST_CLOSED_GATE**: `G2`
+- **LAST_CLOSED_GATE**: `G3`
 - **G0_STATUS**: `PASS`
 - **G1_STATUS**: `PASS`
 - **G2_STATUS**: `PASS`
-- **MVP_PROGRESS_PERCENT**: `22`
-- **CURRENT_GATE**: `G3`
-- **G3_STATUS**: `NOT_STARTED`
-- **G3_STARTED**: `NAO`
-- **NEXT_GATE**: `XANDEFLIX_PREBUILT_G3_EXTERNAL_INGESTION_PIPELINE`
+- **G3_STATUS**: `PASS`
+- **MVP_PROGRESS_PERCENT**: `34`
+- **CURRENT_GATE**: `G4`
+- **G4_STATUS**: `NOT_STARTED`
+- **G4_STARTED**: `NAO`
+- **NEXT_GATE**: `XANDEFLIX_PREBUILT_G4_PROVISIONING_PACKAGE`
 - **NEXT_GATE_STARTED**: `NAO`
-- **HISTORICAL_RECORD**: `G2_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM`
+- **HISTORICAL_RECORD**: `G3_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM`
 
 
 
@@ -102,7 +103,7 @@
 
 ## 10. Proximo Gate (NEXT_GATE)
 
-- **NEXT_GATE**: `XANDEFLIX_PREBUILT_G3_EXTERNAL_INGESTION_PIPELINE`
+- **NEXT_GATE**: `XANDEFLIX_PREBUILT_G4_PROVISIONING_PACKAGE`
 - **NEXT_GATE_STARTED**: `NAO`
 
 ---
@@ -164,6 +165,32 @@
   - CURRENT_GATE avancado para G3 (NEXT_AUTHORIZABLE_GATE=G3);
   - G3 permanece NOT_STARTED (G3_STARTED=NAO, NEXT_GATE_STARTED=NAO);
   - Autorizacao expressa concedida para commit e push canonicos na branch origin/main.
+
+- **Ciclo G3 (External Ingestion Pipeline)**:
+  - Implementacao da arquitetura desacoplada de pipeline externo com interface `SourceAdapter`;
+  - Implementacao do `SyntheticSourceAdapter` validando e consumindo fixtures sinteticas controladas;
+  - Criacao do modelo intermediario bruto isolado (`RawSourceCatalog`, `RawMovie`, `RawSeries`, `RawSeason`, `RawEpisode`);
+  - Motor de normalizacao deterministica (`INGESTION_ID_STRATEGY=DETERMINISTIC`) com IDs estaveis (`syn:movie:*`, `syn:series:*`, etc.);
+  - Normalizacao segura de categorias e generos com deduplicacao por slug e mapeamento relacional;
+  - Tratamento estrito de referencias de streaming e artwork (`STREAM_CREDENTIAL_EMBEDDING=PROHIBITED`);
+  - Calculo automatico e exato de contagens declaradas (`SnapshotCounts`) e geracao deterministica de `snapshotId` via SHA-256;
+  - Validacao pos-normalizacao automatica contra JSON Schema canonico Draft 2020-12 e integridade referencial;
+  - Prova de determinismo via replay identico (`PIPELINE_DETERMINISTIC=SIM`);
+  - Criacao de scripts `npm run ingestion:synthetic` e `npm run ingestion:negative` com 8 testes negativos fail-closed aprovados;
+  - Elaboracao da documentacao tecnica completa em `docs/INGESTION_PIPELINE.md` e formalizacao dos fluxos funcionais no `docs/FSD.md`;
+  - Registro de decisoes arquiteturais fechadas em `docs/DECISIONS.md`;
+  - Revalidacoes tecnicas de regressao (contract:check, typecheck, build web, android unit tests e assembleDebug) concluidas com PASS;
+  - Registro historico: G3_STATUS=COMPLETE_PENDING_MASTER_ADJUDICATION.
+
+- **Adjudicacao G3 e Canonicalizacao (2026-09-04)**:
+  - G3 formalmente adjudicado pelo Chat Mestre como PASS;
+  - Pipeline externo de ingestao e normalizacao aprovado com motor deterministico e fixtures sinteticas;
+  - Observacao de processo nao-bloqueadora registrada em docs/ERRORS_AND_BLOCKERS.md (emissao de mensagem intermediaria informativa antes do relatorio terminal sob QUIET_UNTIL_FINAL_REPORT, com G3_PASS_INVALIDATED=NAO);
+  - MVP_PROGRESS_PERCENT atualizado de 22 para 34;
+  - CURRENT_GATE avancado para G4 (NEXT_AUTHORIZABLE_GATE=G4);
+  - G4 permanece NOT_STARTED (G4_STARTED=NAO, NEXT_GATE_STARTED=NAO);
+  - Autorizacao expressa concedida para commit e push canonicos na branch origin/main.
+
 
 
 

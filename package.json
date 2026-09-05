@@ -8,7 +8,9 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "contract:check": "node scripts/validate-data-contract.mjs"
+    "contract:check": "node scripts/validate-data-contract.mjs",
+    "ingestion:synthetic": "node scripts/run-ingestion-pipeline.mjs",
+    "ingestion:negative": "node scripts/run-ingestion-pipeline.mjs --negative"
   },
   "dependencies": {
     "@capacitor/android": "^7.0.0",

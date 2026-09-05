@@ -48,3 +48,17 @@ Cada incidente, erro ou bloqueador tecnico devera ser registrado segundo o forma
   - `APK_GENERATED`: SIM
   - `G1_PASS_INVALIDATED`: NAO
 
+### OCORRENCIA-003 — Emissão de Mensagem Intermediária durante QUIET_UNTIL_FINAL_REPORT
+
+- **DATE**: 2026-09-04
+- **GATE**: G3_EXTERNAL_INGESTION_PIPELINE
+- **CLASSIFICATION**: `PROCESS_OUTPUT_DEVIATION`
+- **DESCRIPTION**: O executor emitiu uma mensagem intermediária informando início/aguardo de regressão Android antes do relatório terminal final, apesar de QUIET_UNTIL_FINAL_REPORT.
+- **EVIDENCE**: Mensagem de texto intermediária informativa enviada durante a execução assíncrona do Gradle antes do relatório terminal.
+- **ROOT_CAUSE**: Instrução de suporte do tooling de background task sobreposta involuntariamente à diretriz de modo silencioso.
+- **ROOT_CAUSE_CONFIDENCE**: HIGH
+- **IMPACT**: `NON_BLOCKING`
+- **RESOLUTION_STATUS**: `RESOLVED_BY_REINFORCED_EXECUTION_RULE`
+- **NOTAS_NORMATIVAS**:
+  - `G3_PASS_INVALIDATED`: NAO
+
