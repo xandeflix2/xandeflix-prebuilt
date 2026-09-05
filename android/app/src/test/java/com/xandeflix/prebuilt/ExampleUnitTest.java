@@ -1,4 +1,4 @@
-package com.getcapacitor.myapp;
+package com.xandeflix.prebuilt;
 
 import static org.junit.Assert.*;
 

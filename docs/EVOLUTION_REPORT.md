@@ -6,16 +6,17 @@
 
 - **PROJECT**: `XANDEFLIX_PREBUILT`
 - **PARENT_CONTEXT**: `MARCO_ZERO_CANONICO_XANDEFLIX_PREBUILT`
-- **LAST_CLOSED_GATE**: `G1`
+- **LAST_CLOSED_GATE**: `G2`
 - **G0_STATUS**: `PASS`
 - **G1_STATUS**: `PASS`
-- **MVP_PROGRESS_PERCENT**: `12`
-- **CURRENT_GATE**: `G2`
-- **G2_STATUS**: `NOT_STARTED`
-- **G2_STARTED**: `NAO`
-- **NEXT_GATE**: `XANDEFLIX_PREBUILT_G2_PREBUILT_DATA_CONTRACT`
+- **G2_STATUS**: `PASS`
+- **MVP_PROGRESS_PERCENT**: `22`
+- **CURRENT_GATE**: `G3`
+- **G3_STATUS**: `NOT_STARTED`
+- **G3_STARTED**: `NAO`
+- **NEXT_GATE**: `XANDEFLIX_PREBUILT_G3_EXTERNAL_INGESTION_PIPELINE`
 - **NEXT_GATE_STARTED**: `NAO`
-- **HISTORICAL_RECORD**: `G1_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM`
+- **HISTORICAL_RECORD**: `G2_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM`
 
 
 
@@ -101,7 +102,7 @@
 
 ## 10. Proximo Gate (NEXT_GATE)
 
-- **NEXT_GATE**: `XANDEFLIX_PREBUILT_G2_PREBUILT_DATA_CONTRACT`
+- **NEXT_GATE**: `XANDEFLIX_PREBUILT_G3_EXTERNAL_INGESTION_PIPELINE`
 - **NEXT_GATE_STARTED**: `NAO`
 
 ---
@@ -142,6 +143,26 @@
   - MVP_PROGRESS_PERCENT atualizado de 5 para 12;
   - CURRENT_GATE avancado para G2 (NEXT_AUTHORIZABLE_GATE=G2);
   - G2 permanece NOT_STARTED (G2_STARTED=NAO, NEXT_GATE_STARTED=NAO);
+  - Autorizacao expressa concedida para commit e push canonicos na branch origin/main.
+
+- **Ciclo G2 (Prebuilt Data Contract)**:
+  - Definicao formal do contrato canonico humano em `docs/DATA_CONTRACT.md`;
+  - Definicao formal do contrato machine-readable em `schemas/prebuilt-catalog.schema.json` (Draft 2020-12);
+  - Tipos TypeScript estritos sem semantica concorrente em `src/contracts/catalog.ts`;
+  - Criacao de fixture sintetica com dados artificiais seguros em `fixtures/prebuilt-catalog.synthetic.json`;
+  - Script de validacao automatizado em `scripts/validate-data-contract.mjs` (`npm run contract:check`);
+  - Implementacao e aprovacao de 7 testes negativos de contrato em memoria;
+  - Higiene estrita do scaffold Android: remocao de residuos `com.getcapacitor.myapp` / `com.getcapacitor.app` nos testes para `com.xandeflix.prebuilt`;
+  - Revalidacao completa de typecheck, build web e compilacao nativa Android (`assembleDebug`);
+  - Auditoria de segredos e isolamento confirmada (sem credenciais reais, sem service_role, sem conexao Supabase);
+  - Registro historico: G2_STATUS=COMPLETE_PENDING_MASTER_ADJUDICATION.
+
+- **Adjudicacao G2 e Canonicalizacao (2026-09-04)**:
+  - G2 formalmente adjudicado pelo Chat Mestre como PASS;
+  - Contrato de dados canonico do catalogo PREBUILT aprovado (JSON Schema Draft 2020-12, TypeScript e documentacao);
+  - MVP_PROGRESS_PERCENT atualizado de 12 para 22;
+  - CURRENT_GATE avancado para G3 (NEXT_AUTHORIZABLE_GATE=G3);
+  - G3 permanece NOT_STARTED (G3_STARTED=NAO, NEXT_GATE_STARTED=NAO);
   - Autorizacao expressa concedida para commit e push canonicos na branch origin/main.
 
 

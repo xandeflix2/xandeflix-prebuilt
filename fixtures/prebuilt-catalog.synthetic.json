@@ -1,0 +1,151 @@
+{
+  "metadata": {
+    "schemaVersion": 1,
+    "catalogVersion": "1.0.0-synthetic",
+    "snapshotId": "snap-synthetic-001",
+    "generatedAt": "2026-09-04T22:00:00Z",
+    "counts": {
+      "movies": 1,
+      "series": 1,
+      "seasons": 1,
+      "episodes": 1,
+      "categories": 2,
+      "genres": 2,
+      "streams": 2,
+      "artworks": 4
+    },
+    "generator": "xandeflix-synthetic-fixture-v1"
+  },
+  "categories": [
+    {
+      "id": "cat-movies-01",
+      "name": "Filmes Sinteticos",
+      "contentKinds": ["movie"]
+    },
+    {
+      "id": "cat-series-01",
+      "name": "Series Sinteticas",
+      "contentKinds": ["series"]
+    }
+  ],
+  "genres": [
+    {
+      "id": "gn-ficcao-01",
+      "name": "Ficcao Cientifica Sintetica"
+    },
+    {
+      "id": "gn-aventura-01",
+      "name": "Aventura Sintetica"
+    }
+  ],
+  "artworks": [
+    {
+      "id": "art-mov-01-poster",
+      "kind": "poster",
+      "uri": "https://art.synthetic.xandeflix.test/posters/movie-001.jpg",
+      "width": 600,
+      "height": 900,
+      "mimeType": "image/jpeg"
+    },
+    {
+      "id": "art-mov-01-backdrop",
+      "kind": "backdrop",
+      "uri": "https://art.synthetic.xandeflix.test/backdrops/movie-001.jpg",
+      "width": 1920,
+      "height": 1080,
+      "mimeType": "image/jpeg"
+    },
+    {
+      "id": "art-ser-01-poster",
+      "kind": "poster",
+      "uri": "https://art.synthetic.xandeflix.test/posters/series-001.jpg",
+      "width": 600,
+      "height": 900,
+      "mimeType": "image/jpeg"
+    },
+    {
+      "id": "art-ep-01-thumb",
+      "kind": "thumbnail",
+      "uri": "https://art.synthetic.xandeflix.test/thumbs/ep-001.jpg",
+      "width": 640,
+      "height": 360,
+      "mimeType": "image/jpeg"
+    }
+  ],
+  "streams": [
+    {
+      "id": "stm-mov-01",
+      "sourceItemId": "src-item-movie-001",
+      "contentKind": "movie",
+      "containerExtension": "mp4",
+      "qualityLabel": "1080p"
+    },
+    {
+      "id": "stm-ep-01",
+      "sourceItemId": "src-item-ep-001",
+      "contentKind": "episode",
+      "containerExtension": "mp4",
+      "qualityLabel": "1080p"
+    }
+  ],
+  "movies": [
+    {
+      "id": "mov-001",
+      "title": "Filme Sintetico 001",
+      "originalTitle": "Synthetic Movie 001",
+      "year": 2026,
+      "overview": "Uma narrativa sintetica de ficcao para validacao de contrato.",
+      "durationSeconds": 7200,
+      "genreIds": ["gn-ficcao-01"],
+      "categoryIds": ["cat-movies-01"],
+      "artworkIds": ["art-mov-01-poster", "art-mov-01-backdrop"],
+      "streamIds": ["stm-mov-01"],
+      "externalIds": {
+        "tmdbId": 999001,
+        "sourceItemId": "src-item-movie-001"
+      }
+    }
+  ],
+  "series": [
+    {
+      "id": "ser-001",
+      "title": "Serie Sintetica 001",
+      "originalTitle": "Synthetic Series 001",
+      "year": 2026,
+      "overview": "Uma serie sintetica exemplar para validacao de integridade referencial.",
+      "genreIds": ["gn-ficcao-01", "gn-aventura-01"],
+      "categoryIds": ["cat-series-01"],
+      "artworkIds": ["art-ser-01-poster"],
+      "seasonIds": ["sea-001-01"],
+      "externalIds": {
+        "tmdbId": 999002,
+        "sourceItemId": "src-item-series-001"
+      }
+    }
+  ],
+  "seasons": [
+    {
+      "id": "sea-001-01",
+      "seriesId": "ser-001",
+      "seasonNumber": 1,
+      "title": "Temporada 1",
+      "episodeIds": ["ep-001-01-01"]
+    }
+  ],
+  "episodes": [
+    {
+      "id": "ep-001-01-01",
+      "seriesId": "ser-001",
+      "seasonId": "sea-001-01",
+      "episodeNumber": 1,
+      "title": "Episodio Piloto Sintetico",
+      "overview": "Episodio inaugural com dados estritamente sinteticos.",
+      "durationSeconds": 3000,
+      "artworkIds": ["art-ep-01-thumb"],
+      "streamIds": ["stm-ep-01"],
+      "externalIds": {
+        "sourceItemId": "src-item-ep-001"
+      }
+    }
+  ]
+}
