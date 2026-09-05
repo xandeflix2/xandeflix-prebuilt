@@ -109,5 +109,33 @@ Cada incidente, erro ou bloqueador tecnico devera ser registrado segundo o forma
   - `FIRE_STICK_SEARCH_PERFORMANCE_PROVEN`: NAO
   - `G7_PASS_INVALIDATED`: NAO
 
+### OCORRENCIA-006 — Evidência de Pico de Memória em Escala Sintética no Update Incremental (240k)
 
-
+- **DATE**: 2026-09-05
+- **GATE**: G9_INCREMENTAL_UPDATE
+- **CLASSIFICATION**: `PERFORMANCE_EVIDENCE_RISK`
+- **STATUS**: `OPEN_NON_BLOCKING`
+- **DESCRIPTION**: O teste de escala sintético com 240.000 documentos comprovou a vantagem substancial de transporte incremental (< 1% a ~4.3% do payload full), porém o pico de memória no harness de aplicação atingiu 459 MB (1% sparse) e 640 MB (5% moderate), justificando validação futura em hardware real (G11/G12).
+- **EVIDENCE**:
+  - `EVIDENCE_SOURCE`: SYNTHETIC_240K_INCREMENTAL_TEST
+  - `SPARSE_DOCUMENT_COUNT`: 240000
+  - `SPARSE_CHANGE_PERCENT`: 1
+  - `SPARSE_DELTA_PACKAGE_SIZE_BYTES`: 42233
+  - `SPARSE_FULL_TARGET_PACKAGE_SIZE_BYTES`: 4585619
+  - `SPARSE_DELTA_TO_FULL_RATIO`: 0.0092
+  - `SPARSE_MEMORY_PEAK_MB`: 459
+  - `MODERATE_DOCUMENT_COUNT`: 240000
+  - `MODERATE_CHANGE_PERCENT`: 5
+  - `MODERATE_DELTA_PACKAGE_SIZE_BYTES`: 199353
+  - `MODERATE_FULL_TARGET_PACKAGE_SIZE_BYTES`: 4630164
+  - `MODERATE_DELTA_TO_FULL_RATIO`: 0.0431
+  - `MODERATE_MEMORY_PEAK_MB`: 640
+- **ROOT_CAUSE**: Manipulação em memória do grafo completo de 240k entidades e índice invertido durante parsing, staging e diff no processo Node.js sem paginação de disco intermediária.
+- **ROOT_CAUSE_CONFIDENCE**: HIGH
+- **IMPACT**: `NON_BLOCKING`
+- **RESOLUTION_STATUS**: `MONITORING_FOR_PHYSICAL_VALIDATION`
+- **NOTAS_NORMATIVAS**:
+  - `INTERPRETATION`: A vantagem de transporte incremental foi comprovada sinteticamente, porém o pico de memória observado no harness de escala justifica validação futura em hardware real.
+  - `PERFORMANCE_EVIDENCE_IS_NOT_SLA`: SIM
+  - `REAL_DEVICE_INCREMENTAL_UPDATE_PROVEN`: NAO
+  - `G9_PASS_INVALIDATED`: NAO

@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xandeflix.com/schemas/prebuilt-catalog-delta.schema.json",
+  "title": "PrebuiltCatalogDelta",
+  "description": "Contrato canônico de delta incremental de catálogo (Gate G9).",
+  "type": "object",
+  "required": [
+    "deltaVersion",
+    "baseSnapshotId",
+    "targetSnapshotId",
+    "baseCatalogVersion",
+    "targetCatalogVersion",
+    "targetMetadata",
+    "categories",
+    "genres",
+    "movies",
+    "series",
+    "seasons",
+    "episodes",
+    "streams",
+    "artworks"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "deltaVersion": {
+      "type": "integer",
+      "const": 1,
+      "description": "Versão do formato do delta de catálogo."
+    },
+    "baseSnapshotId": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]+$",
+      "description": "Identificador do snapshot base exigido."
+    },
+    "targetSnapshotId": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]+$",
+      "description": "Identificador do snapshot target resultante."
+    },
+    "baseCatalogVersion": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Versão do catálogo base."
+    },
+    "targetCatalogVersion": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Versão do catálogo target resultante."
+    },
+    "targetMetadata": {
+      "type": "object",
+      "required": ["schemaVersion", "catalogVersion", "snapshotId", "generatedAt", "counts"],
+      "description": "Metadados completos declarados para o catálogo target final."
+    },
+    "categories": { "$ref": "#/$defs/collectionDelta" },
+    "genres": { "$ref": "#/$defs/collectionDelta" },
+    "movies": { "$ref": "#/$defs/collectionDelta" },
+    "series": { "$ref": "#/$defs/collectionDelta" },
+    "seasons": { "$ref": "#/$defs/collectionDelta" },
+    "episodes": { "$ref": "#/$defs/collectionDelta" },
+    "streams": { "$ref": "#/$defs/collectionDelta" },
+    "artworks": { "$ref": "#/$defs/collectionDelta" }
+  },
+  "$defs": {
+    "collectionDelta": {
+      "type": "object",
+      "required": ["upsert", "removeIds"],
+      "additionalProperties": false,
+      "properties": {
+        "upsert": {
+          "type": "array",
+          "description": "Entidades completas adicionadas ou substituídas no target (Full Entity Replacement)."
+        },
+        "removeIds": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Lista de IDs canônicos removidos no catálogo target."
+        }
+      }
+    }
+  }
+}

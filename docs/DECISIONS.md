@@ -86,25 +86,41 @@
 | `PLAYBACK_HEADERS_LOGGING` | `PROHIBITED` | Proibição terminante de registro de headers de autenticação, tokens ou cookies em logs ou relatórios. |
 | `NATIVE_PLAYER_ACTIVITY_EXPORTED` | `NAO` | NativePlayerActivity configurada com android:exported="false" para proteger a superfície IPC do app. |
 | `NATIVE_PLAYER_DPAD_BASELINE` | `MEDIA3_STANDARD_CONTROLS` | Controles de TV/D-pad padronizados nos controles nativos da Media3 (Play/Pause, Seek, Back). |
-| `STREAM_RESOLVER_MEDIA_BYTES_HANDLED` | `0` | O resolver de stream apenas compõe a requisição lógica de playback e manipula rigorosamente zero bytes de mídia. |
+| `INCREMENTAL_UPDATE_STRATEGY` | `EXTERNAL_ID_BASED_DELTA_TO_STAGING_FULL_TARGET` | Geração externa de diffs declarativos baseados em IDs canônicos, aplicados em staging isolado gerando snapshot target canônico completo. |
+| `DELTA_PACKAGE_FORMAT_VERSION` | `1` | Formato canônico de invólucro do pacote delta (delta-manifest.json, catalog-delta.json, search-index-delta.json). |
+| `DELTA_GENERATION` | `EXTERNAL_PREBUILT` | Processamento pesado de diffing executado 100% fora do dispositivo cliente. |
+| `DELTA_BASE_BINDING` | `STRICT` | Vinculação estrita à geração ativa por snapshotId, catalogVersion, catalogSha256 e search contentHash. |
+| `CATALOG_DELTA_ADDRESSING` | `CANONICAL_ID_BASED` | Endereçamento exclusivo por ID canônico de entidade, eliminando ambiguidades posicionais de JSON Patch. |
+| `DELTA_UPSERT_SEMANTICS` | `FULL_ENTITY_REPLACEMENT` | Upsert definido estritamente como substituição integral da entidade existente (ou adição de nova), sem mesclagem parcial ambígua de campos. |
+| `DELTA_APPLICATION_DETERMINISTIC` | `REQUIRED` | Aplicação independente da ordem de entrada, produzindo ordenações estáveis e hashes idênticos. |
+| `DELTA_CONTENT_HASH_ALGORITHM` | `SHA256` | Identidade lógica determinística do delta baseada em SHA-256 de propriedades imutáveis e hashes dos payloads. |
+| `IN_PLACE_ACTIVE_PATCH` | `PROHIBITED` | Proibição categórica de mutação dos arquivos do snapshot ativo no local; staging em quarentena compulsorio. |
+| `TARGET_STORAGE` | `FULL_CANONICAL_SNAPSHOT` | A persistência no dispositivo após aplicação de delta resulta em um snapshot completo canônico em snapshots/<targetSnapshotId>/. |
+| `DELTA_TRANSPORT` | `INCREMENTAL` | Economia de transferência de rede através de artefatos de delta de tamanho reduzido para mudanças esparsas. |
+| `SEARCH_ENABLED_DELTA_ATOMICITY` | `CATALOG_AND_SEARCH_TOGETHER` | Catálogo target e índice de busca target formam uma única geração lógica indissociável na promoção. |
+| `ON_DEVICE_SEARCH_FULL_REINDEX_DURING_UPDATE` | `PROHIBITED` | Proibição de reindexação do catálogo completo no dispositivo durante a aplicação do delta. |
+| `CROSS_PROFILE_DELTA` | `REJECT_REQUIRE_FULL_PACKAGE` | Transições de perfil (catalog-only <-> search-enabled) via delta são proibidas e exigem pacote full. |
+| `SAME_DELTA_REAPPLY` | `IDEMPOTENT` | Reaplicação do mesmo delta cuja versão já é ativa é tratada como sucesso sem efeitos colaterais. |
+| `UPDATE_BASE_MISMATCH_POLICY` | `FULL_PACKAGE_REQUIRED` | Incompatibilidade de base, versão ou integridade sinaliza compulsoriamente a necessidade de pacote full. |
+| `ACTIVE_READERS_DURING_STAGING` | `CONTINUE_ON_ACTIVE_GENERATION` | Leituras ativas e playback em execução continuam sobre a geração anterior durante o staging sem interrupção. |
 
 ---
 
 ## 2. Decisoes Tecnicas em Aberto (DECISIONS_OPEN)
 
-1. `REAL_SOURCE_AUTH_STRATEGY`: Arquitetura final de obtenção/renovação de credenciais e tokens da fonte em produção.
-2. `USER_SOURCE_BINDING`: Modelo de associação entre credenciais de usuário e provisionamento personalizado de pacotes.
-3. `PACKAGE_SIGNING_STRATEGY`: Protocolo criptográfico para assinatura e verificação de integridade/autoria do pacote.
-4. `PACKAGE_ENCRYPTION`: Algoritmo e chaveamento de criptografia em repouso e trânsito para pacotes de provisionamento.
-5. `PLAYER_SECURE_FLAG_POLICY`: Política de bloqueio de captura de tela e recents via FLAG_SECURE (aberto para decisão de produto/G10).
-6. `PERSISTENT_PLAYBACK_PROGRESS`: Mecanismo e modelo de dados para persistência contínua de histórico de reprodução e resume.
-7. `ARTWORK_CACHE_POLICY`: Política de download, resolução, compressão e expiração de posters e imagens de catálogo.
-8. `FULL_TV_SPATIAL_NAVIGATION`: Navegação espacial avançada bidimensional com aceleração de cursor ou mesh de nós (G11).
-9. `PERFORMANCE_SLA`: Metas contratuais de tempo de abertura e resposta homologadas em hardware físico (G11/G12).
-10. `INCREMENTAL_UPDATE_STRATEGY`: Algoritmo para geração e aplicação de deltas/diffs de catálogo sem re-download completo (G9).
-11. `ROLLBACK_FULL`: Política avançada de retenção de múltiplos snapshots históricos e reversão manual de versão.
-12. `SNAPSHOT_RETENTION`: Política de limpeza e expiração de snapshots antigos acumulados no armazenamento privado.
-13. `SIZE_LIMITS`: Limites contratuais de tamanho para pacotes e footprint de memória em hardware de entrada.
+1. `UPDATE_DISTRIBUTION_CHANNEL`: Mecanismo de distribuição, descoberta, polling e notificação de novos pacotes (aberto para G10/G11).
+2. `PACKAGE_SIGNING_STRATEGY`: Assinatura digital criptográfica, chaves assimétricas e verificação de autoria/proveniência (aberto para G10).
+3. `PACKAGE_ENCRYPTION`: Criptografia em repouso e em trânsito de pacotes (aberto para G10).
+4. `USER_SOURCE_BINDING`: Modelo de vinculação entre conta do usuário e credenciais da fonte.
+5. `REAL_SOURCE_AUTH_STRATEGY`: Arquitetura de autenticação contra fontes reais de catálogo e streaming.
+6. `ROLLBACK_FULL`: Mecanismos de reversão manual e gerenciamento de histórico profundo de snapshots (aberto para G10).
+7. `SNAPSHOT_RETENTION`: Política global de limpeza, expiração e garbage collection de snapshots locais (aberto para G10).
+8. `PERFORMANCE_SLA`: Metas contratuais formais de tempo de resposta em hardware físico (aberto para G11).
+9. `PLAYER_SECURE_FLAG_POLICY`: Política de restrição de tela (FLAG_SECURE) no player Android.
+10. `PERSISTENT_PLAYBACK_PROGRESS`: Persistência contínua de ponto de parada e histórico de exibição.
+11. `ARTWORK_CACHE_POLICY`: Política de cacheamento, download e limpeza de imagens/posters.
+12. `FULL_TV_SPATIAL_NAVIGATION`: Navegação espacial bidimensional avançada na interface de TV.
+
 
 
 

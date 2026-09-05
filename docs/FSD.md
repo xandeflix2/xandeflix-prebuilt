@@ -11,6 +11,8 @@
 - `G5_FLOWS_FORMALIZED=SIM`
 - `G6_FLOWS_FORMALIZED=SIM`
 - `G7_FLOWS_FORMALIZED=SIM`
+- `G8_FLOWS_FORMALIZED=SIM`
+- `G9_FLOWS_FORMALIZED=SIM`
 
 ---
 
@@ -47,11 +49,11 @@ Conforme os Gates forem abertos pelo Chat Mestre, as seguintes categorias de flu
 
 1. **Pipeline de Ingestao Externa** (Gate G3 - Formalizado);
 2. **Pacote de Provisionamento e Empacotamento** (Gate G4 - Formalizado abaixo);
-3. **Bootstrap e Ingestao de Pacote no Dispositivo** (Gate G5);
-4. **Navegacao e Catalogo UI** (Gate G6 - Formalizado);
+3. **Bootstrap e Ingestao de Pacote no Dispositivo** (Gate G5 - Formalizado abaixo);
+4. **Navegacao e Catalogo UI** (Gate G6 - Formalizado abaixo);
 5. **Mecanismo de Busca Local** (Gate G7 - Formalizado abaixo);
-6. **Autenticacao de Fonte e Playback Direto** (Gate G8);
-7. **Atualizacao Incremental / Delta Sync** (Gate G9);
+6. **Autenticacao de Fonte e Playback Direto** (Gate G8 - Formalizado abaixo);
+7. **Atualizacao Incremental / Delta Sync** (Gate G9 - Formalizado abaixo);
 8. **Recuperacao de Falha e Modo Offline** (Gate G10).
 
 ---
@@ -1115,6 +1117,304 @@ Conforme os Gates forem abertos pelo Chat Mestre, as seguintes categorias de flu
 - **OBSERVABILITY**: Log seguro contendo categoria, ID de sessão e host genérico.
 - **ACCEPTANCE_CRITERIA**: `SYNTHETIC_HEADERS_SANITIZED=PASS`, `PLAYBACK_HEADERS_LOGGING=PROHIBITED`.
 - **TRACEABILITY**: Requisitos do Gate G8 seção 20, 21, 53.
+
+---
+
+## 10. Fluxos Funcionais de Atualização Incremental (Gate G9)
+
+### F-G9-001_BUILD_CATALOG_DELTA — Geração Externa de Delta de Catálogo
+
+- **FLOW_ID**: `F-G9-001_BUILD_CATALOG_DELTA`
+- **TRIGGER**: Execução do gerador de delta externo recebendo `baseCatalog` e `targetCatalog`.
+- **PRECONDITIONS**: Ambos os catálogos são instâncias válidas de `PrebuiltCatalog` v1; `targetCatalogVersion != baseCatalogVersion`.
+- **MAIN_FLOW**:
+  1. `CatalogDeltaBuilder` compara cada coleção canônica (`categories`, `genres`, `movies`, `series`, `seasons`, `episodes`, `streams`, `artworks`) entre base e target indexando por IDs canônicos;
+  2. Identifica entidades adicionadas ou modificadas e as insere em `upsert`;
+  3. Identifica IDs ausentes no target e os insere em `removeIds`;
+  4. Ordena deterministicamente as listas de `upsert` (por ID) e `removeIds` (alfabeticamente);
+  5. Anexa `targetMetadata` declarando as contagens finais esperadas;
+  6. Retorna o objeto estruturado `CatalogDelta`.
+- **ALTERNATIVE_FLOW**: Se nenhum elemento foi alterado, `hasChanges()` retorna `false` sinalizando `ZERO_CHANGE_DETECTED`.
+- **ERROR_FLOW**: Se catálogos forem inválidos ou corrompidos, lança erro de contrato.
+- **TERMINAL_STATES**: `CATALOG_DELTA_GENERATED`.
+- **DATA_READ**: Catálogo base e catálogo target em memória.
+- **DATA_WRITE**: Objeto `CatalogDelta`.
+- **NETWORK**: Nenhuma (`NO_NETWORK_ACCESS=SIM`).
+- **SECURITY**: Zero credenciais em coleções ou IDs.
+- **OBSERVABILITY**: Contagens de upsert e remove por entidade registradas.
+- **ACCEPTANCE_CRITERIA**: `CATALOG_DELTA_BUILD=PASS`, `ZERO_CHANGE_DETECTED=PASS`.
+- **TRACEABILITY**: G9 seções 9, 10, 11, 12, 18, 40.
+
+---
+
+### F-G9-002_BUILD_SEARCH_DELTA — Geração Externa de Delta do Índice de Busca
+
+- **FLOW_ID**: `F-G9-002_BUILD_SEARCH_DELTA`
+- **TRIGGER**: Construção de delta para perfil `SEARCH_ENABLED` a partir de `baseSearchIndex` e `targetSearchIndex`.
+- **PRECONDITIONS**: Índices de busca válidos gerados previamente fora do dispositivo.
+- **MAIN_FLOW**:
+  1. `SearchDeltaBuilder` indexa documentos de ambos os índices por ID;
+  2. Gera `documentUpserts` para documentos adicionados/modificados e `documentRemoveIds` para removidos;
+  3. Compara as tabelas de postings token por token;
+  4. Para tokens afetados, computa a lista final canônica de document IDs e insere em `postingUpserts[token]`;
+  5. Para tokens removidos do vocabulário, insere em `postingRemoveTokens`;
+  6. Preserva `targetDocumentCount`, `targetTokenCount`, `targetContentHash`, `targetGeneratedAt` e `targetGenerator`;
+  7. Retorna o objeto `SearchIndexDelta`.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: Falha em caso de inconsistência de metadados entre índices.
+- **TERMINAL_STATES**: `SEARCH_DELTA_GENERATED`.
+- **DATA_READ**: Índices de busca base e target.
+- **DATA_WRITE**: Objeto `SearchIndexDelta`.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: `SEARCH_DELTA_DATA_MINIMIZATION=PASS`. Proibição de dados sensíveis ou tokens de credenciais.
+- **OBSERVABILITY**: Contagem de documentos e tokens afetados.
+- **ACCEPTANCE_CRITERIA**: `SEARCH_DELTA_BUILD=PASS`.
+- **TRACEABILITY**: G9 seções 13, 14, 20, 21, 22.
+
+---
+
+### F-G9-003_VALIDATE_DELTA_PACKAGE — Validação Estrita do Pacote Delta
+
+- **FLOW_ID**: `F-G9-003_VALIDATE_DELTA_PACKAGE`
+- **TRIGGER**: Recepção de buffer ZIP do pacote delta para validação ou importação.
+- **PRECONDITIONS**: Buffer binário fornecido ao `DeltaPackageValidator`.
+- **MAIN_FLOW**:
+  1. Valida estrutura ZIP e rejeita tentativas de path traversal (`..` ou `/`);
+  2. Rejeita arquivos não autorizados no ZIP (`DELTA_UNKNOWN_FILES=REJECT`);
+  3. Lê e valida `delta-manifest.json` contra o schema Draft 2020-12;
+  4. Valida hashes SHA-256 de `catalog-delta.json` e `search-index-delta.json` contra o manifest;
+  5. Valida o `deltaContentHash` lógico determinístico;
+  6. Valida o payload de `catalog-delta.json` e `search-index-delta.json` contra seus respectivos schemas;
+  7. Retorna `valid: true` com as estruturas parseadas.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: Se qualquer validação falhar, retorna `valid: false` com lista de erros tipados.
+- **TERMINAL_STATES**: `DELTA_VALIDATED` ou `DELTA_REJECTED`.
+- **DATA_READ**: Buffer ZIP de entrada.
+- **DATA_WRITE**: Nenhum.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: `DELTA_PATH_TRAVERSAL_PROTECTION=REQUIRED`, rejeição de arquivos estranhos e auditoria de credenciais.
+- **OBSERVABILITY**: Erros detalhados em caso de rejeição.
+- **ACCEPTANCE_CRITERIA**: `DELTA_PACKAGE_VALIDATION=PASS`, `DELTA_PATH_TRAVERSAL_REJECTED=PASS`, `EXTRA_DELTA_FILE_REJECTED=PASS`.
+- **TRACEABILITY**: G9 seções 6, 7, 16, 44.
+
+---
+
+### F-G9-004_APPLY_DELTA_SUCCESS — Aplicação com Sucesso de Atualização Incremental
+
+- **FLOW_ID**: `F-G9-004_APPLY_DELTA_SUCCESS`
+- **TRIGGER**: Invocação de `IncrementalUpdateService.applyDelta(packageSource)`.
+- **PRECONDITIONS**: Dispositivo possui snapshot ativo íntegro correspondente à base declarada no delta.
+- **MAIN_FLOW**:
+  1. O serviço valida o pacote delta via `DeltaPackageValidator`;
+  2. Valida vinculação estrita (`STRICT_BASE_BINDING`): snapshotId, catalogVersion e SHA-256 do catálogo ativo;
+  3. Aplica o `CatalogDelta` em memória gerando o catálogo target;
+  4. Valida o catálogo target reconstruído contra o contrato G2 e confere o SHA-256 contra `manifest.targetCatalogSha256`;
+  5. Se `SEARCH_ENABLED`, aplica o `SearchIndexDelta` mapeando postings sem reindexar e valida hashes target;
+  6. Escreve a nova geração na área isolada `staging/<targetSnapshotId>/`;
+  7. Executa `readback validation` confirmando persistência física e integridade de hashes;
+  8. Promove atomicamente o `ActivePointer` para a nova geração;
+  9. Limpa a área de staging e retorna `UPDATE_SUCCESS`.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: Transiciona para `F-G9-006` ou `F-G9-007` em caso de erro.
+- **TERMINAL_STATES**: `UPDATE_SUCCESS`.
+- **DATA_READ**: Snapshot ativo do storage, pacote delta.
+- **DATA_WRITE**: `staging/<targetSnapshotId>/`, `snapshots/<targetSnapshotId>/`, `active.json`.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Imutabilidade da geração ativa mantida; ausência de mutação in-place.
+- **OBSERVABILITY**: Métricas de tempo por fase (validação, aplicação, staging, readback, promoção).
+- **ACCEPTANCE_CRITERIA**: `CATALOG_DELTA_APPLY=PASS`, `TARGET_CATALOG_HASH_MATCH=PASS`, `STAGING_THEN_PROMOTION=PASS`.
+- **TRACEABILITY**: G9 seções 14, 15, 17, 18, 19, 25, 26, 27.
+
+---
+
+### F-G9-005_BASE_MISMATCH_FULL_PACKAGE_REQUIRED — Detecção de Incompatibilidade de Base
+
+- **FLOW_ID**: `F-G9-005_BASE_MISMATCH_FULL_PACKAGE_REQUIRED`
+- **TRIGGER**: Submissão de delta cuja base não corresponde à geração atualmente ativa no dispositivo.
+- **PRECONDITIONS**: `activeSnapshot.id !== manifest.baseSnapshotId` ou divergência de `catalogVersion` ou `baseCatalogSha256`.
+- **MAIN_FLOW**:
+  1. O serviço compara os dados da geração ativa contra o manifest do delta;
+  2. Detecta a incompatibilidade de base (`STRICT_BASE_BINDING`);
+  3. Interrompe o processo sem tocar no armazenamento;
+  4. Transiciona para o estado `FULL_PACKAGE_REQUIRED`;
+  5. Preserva integralmente o snapshot ativo anterior.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: Retorna resultado com `success: false` e `state: 'FULL_PACKAGE_REQUIRED'`.
+- **TERMINAL_STATES**: `FULL_PACKAGE_REQUIRED`.
+- **DATA_READ**: `active.json`, `delta-manifest.json`.
+- **DATA_WRITE**: Nenhum.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Prevenção contra corrupção por aplicação sobre base arbitrária.
+- **OBSERVABILITY**: Log de incompatibilidade com valores esperado e encontrado.
+- **ACCEPTANCE_CRITERIA**: `WRONG_BASE_NOT_PATCHED=PASS`, `FULL_PACKAGE_REQUIRED_STATE=PASS`, `ACTIVE_UNCHANGED_ON_BASE_MISMATCH=PASS`.
+- **TRACEABILITY**: G9 seções 5, 14, 32, 50.
+
+---
+
+### F-G9-006_DELTA_TARGET_VALIDATION_FAILURE — Falha de Validação do Target Reconstruído
+
+- **FLOW_ID**: `F-G9-006_DELTA_TARGET_VALIDATION_FAILURE`
+- **TRIGGER**: Catálogo ou índice de busca reconstruído em memória diverge do contrato ou dos hashes declarados no manifest.
+- **PRECONDITIONS**: Delta corrompido, adulterado ou que gera referências quebradas.
+- **MAIN_FLOW**:
+  1. O serviço aplica o delta em memória;
+  2. Valida o resultado contra schemas e regras de integridade referencial;
+  3. Computa o SHA-256 e compara com o manifest;
+  4. Detecta divergência (ex: hash mismatch ou integridade quebrada);
+  5. Aborta a operação imediatamente antes de qualquer gravação ou promoção;
+  6. Transiciona para `UPDATE_FAILED_ACTIVE_PRESERVED`.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: Rejeição fail-closed.
+- **TERMINAL_STATES**: `UPDATE_FAILED_ACTIVE_PRESERVED`.
+- **DATA_READ**: Dados em memória.
+- **DATA_WRITE**: Nenhum.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Garantia de que dados corrompidos jamais chegam a disco nem a ponteiros ativos.
+- **OBSERVABILITY**: Erro `TARGET_CATALOG_HASH_MISMATCH_REJECTED` ou `BROKEN_TARGET_REF_REJECTED`.
+- **ACCEPTANCE_CRITERIA**: `TARGET_VALIDATION_FAILURE_PRESERVES_ACTIVE=PASS`, `CATALOG_DELTA_FAILURE_NOT_PROMOTED=PASS`.
+- **TRACEABILITY**: G9 seções 15, 38, 45, 47.
+
+---
+
+### F-G9-007_FAILED_DELTA_PRESERVES_ACTIVE — Preservação da Geração Ativa em Falhas
+
+- **FLOW_ID**: `F-G9-007_FAILED_DELTA_PRESERVES_ACTIVE`
+- **TRIGGER**: Ocorrência de qualquer erro durante validação, staging ou readback.
+- **PRECONDITIONS**: Snapshot ativo pré-existente no dispositivo.
+- **MAIN_FLOW**:
+  1. Uma falha de I/O, hash mismatch ou interrupção ocorre durante o processo de update;
+  2. O bloco `catch` do serviço captura a exceção;
+  3. A área de staging afetada é descartada;
+  4. O ponteiro ativo anterior é re-verificado e garantido intacto;
+  5. Retorna status `UPDATE_FAILED_ACTIVE_PRESERVED`.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: N/A.
+- **TERMINAL_STATES**: `UPDATE_FAILED_ACTIVE_PRESERVED`.
+- **DATA_READ**: Storage local.
+- **DATA_WRITE**: Limpeza de staging.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Fail-closed com tolerância a falhas sem estado zumbi.
+- **OBSERVABILITY**: Erro original registrado sanitizado.
+- **ACCEPTANCE_CRITERIA**: `FAILED_UPDATE_PRESERVES_ACTIVE=PASS`, `STAGING_WRITE_FAILURE_PRESERVES_ACTIVE=PASS`.
+- **TRACEABILITY**: G9 seções 20, 26, 47, 48.
+
+---
+
+### F-G9-008_DELTA_REAPPLY_IDEMPOTENT — Reaplicação Idempotente do Mesmo Delta
+
+- **FLOW_ID**: `F-G9-008_DELTA_REAPPLY_IDEMPOTENT`
+- **TRIGGER**: Submissão de um pacote delta cujo `targetSnapshotId` e `targetCatalogVersion` já são os ativos.
+- **PRECONDITIONS**: `previousPointer.snapshotId === manifest.targetSnapshotId`.
+- **MAIN_FLOW**:
+  1. O serviço valida o manifest do pacote;
+  2. Detecta que a versão target já está ativa;
+  3. Retorna imediatamente sucesso com aviso informativo de idempotência;
+  4. Nenhum novo diretório de snapshot é criado e nenhum ponteiro é reescrito.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: N/A.
+- **TERMINAL_STATES**: `UPDATE_SUCCESS` (Idempotente).
+- **DATA_READ**: `active.json`, `delta-manifest.json`.
+- **DATA_WRITE**: Nenhum.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Idempotência pura sem efeitos colaterais.
+- **OBSERVABILITY**: Aviso `[SAME_DELTA_REAPPLY] Delta já aplicado anteriormente.`
+- **ACCEPTANCE_CRITERIA**: `DELTA_REAPPLY_IDEMPOTENT=PASS`, `ACTIVE_POINTER_UNCHANGED_ON_REAPPLY=PASS`.
+- **TRACEABILITY**: G9 seções 35, 49.
+
+---
+
+### F-G9-009_SEARCH_ENABLED_ATOMIC_PROMOTION — Promoção Atômica de Catálogo e Busca
+
+- **FLOW_ID**: `F-G9-009_SEARCH_ENABLED_ATOMIC_PROMOTION`
+- **TRIGGER**: Atualização de geração com perfil `SEARCH_ENABLED`.
+- **PRECONDITIONS**: Ambos os deltas (catálogo e busca) validados e materializados em staging.
+- **MAIN_FLOW**:
+  1. O serviço aplica e valida tanto o catálogo target quanto o índice target;
+  2. Ambos são gravados juntos em `staging/<targetSnapshotId>/`;
+  3. A readback validation valida ambos os arquivos físicos;
+  4. A promoção atômica move/ativa a geração contendo catálogo e busca em um único passo;
+  5. Garante que o catálogo jamais seja promovido com o índice de busca ausente ou inconsistente.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: Se o índice falhar, aborta a promoção do catálogo.
+- **TERMINAL_STATES**: `UPDATE_SUCCESS`.
+- **DATA_READ**: Staging directory.
+- **DATA_WRITE**: `snapshots/<targetSnapshotId>/catalog.json`, `snapshots/<targetSnapshotId>/search-index.json`, `active.json`.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Atomicidade completa da geração lógica.
+- **OBSERVABILITY**: Hashes de catálogo e busca registrados na promoção.
+- **ACCEPTANCE_CRITERIA**: `SEARCH_ENABLED_DELTA_ATOMICITY=PASS`, `SEARCH_DELTA_FAILURE_NOT_PROMOTED=PASS`.
+- **TRACEABILITY**: G9 seções 24, 47, 48.
+
+---
+
+### F-G9-010_OUT_OF_ORDER_DELTA_REJECTION — Rejeição de Delta Fora de Ordem
+
+- **FLOW_ID**: `F-G9-010_OUT_OF_ORDER_DELTA_REJECTION`
+- **TRIGGER**: Recepção de delta para transição futura com lacuna na cadeia (ex: ativo é N, delta é N+1 -> N+2).
+- **PRECONDITIONS**: `manifest.baseSnapshotId !== activeSnapshot.id`.
+- **MAIN_FLOW**:
+  1. O serviço detecta a lacuna na cadeia de deltas;
+  2. Rejeita o pacote sem aplicar mutações parciais;
+  3. Sinaliza `FULL_PACKAGE_REQUIRED`;
+  4. O ponteiro ativo N permanece preservado.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: Rejeição determinística.
+- **TERMINAL_STATES**: `FULL_PACKAGE_REQUIRED`.
+- **DATA_READ**: `active.json`, `delta-manifest.json`.
+- **DATA_WRITE**: Nenhum.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Impede corrupção estrutural decorrente de pacotes desordenados.
+- **OBSERVABILITY**: Log de rejeição out-of-order.
+- **ACCEPTANCE_CRITERIA**: `OUT_OF_ORDER_DELTA_REJECTED=PASS`.
+- **TRACEABILITY**: G9 seções 33, 34.
+
+---
+
+### F-G9-011_NO_FALSE_EMPTY_AFTER_DELTA — Proteção contra Falso Vazio no Delta
+
+- **FLOW_ID**: `F-G9-011_NO_FALSE_EMPTY_AFTER_DELTA`
+- **TRIGGER**: Submissão de delta malicioso ou corrompido que esvaziaria o catálogo de forma inesperada.
+- **PRECONDITIONS**: Aplicação de delta com `removeIds` em massa.
+- **MAIN_FLOW**:
+  1. O serviço aplica as remoções declaradas;
+  2. Compara as contagens finais reais com `targetMetadata.counts`;
+  3. Se houver discrepância entre o que foi declarado e o resultado, lança `TARGET_COUNT_MISMATCH_REJECTED`;
+  4. Rejeita antes da promoção e mantém a geração anterior;
+  5. Impede que catálogos vazios acidentais substituam catálogos populados.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: Rejeição fail-closed.
+- **TERMINAL_STATES**: `UPDATE_FAILED_ACTIVE_PRESERVED`.
+- **DATA_READ**: Dados em memória.
+- **DATA_WRITE**: Nenhum.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Prevenção contra apagamento inadvertido ou acidental de conteúdo.
+- **OBSERVABILITY**: Discrepância de contagem logada detalhadamente.
+- **ACCEPTANCE_CRITERIA**: `NO_FALSE_EMPTY_DELTA_GUARD=PASS`.
+- **TRACEABILITY**: G9 seções 39, 45.
+
+---
+
+### F-G9-012_POST_PROMOTION_CATALOG_SEARCH_READ — Leituras de Catálogo e Busca Pós-Promoção
+
+- **FLOW_ID**: `F-G9-012_POST_PROMOTION_CATALOG_SEARCH_READ`
+- **TRIGGER**: Novas consultas de catálogo ou de busca disparadas após a promoção do ponteiro ativo.
+- **PRECONDITIONS**: Atualização promovida com sucesso para o target snapshot.
+- **MAIN_FLOW**:
+  1. O leitor (`storage.readActiveCatalog()` / `storage.readActiveSearchIndex()`) resolve o novo snapshot apontado em `active.json`;
+  2. Os novos dados e documentos refletem imediatamente as adições, alterações e remoções promovidas;
+  3. Consultas executadas contra o novo índice retornam resultados estritamente equivalentes ao índice gerado full externamente;
+  4. Leituras efetuadas antes da promoção concluem sem colisão no snapshot anterior.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: N/A.
+- **TERMINAL_STATES**: `POST_PROMOTION_READ_SUCCESS`.
+- **DATA_READ**: Novo snapshot ativo no storage.
+- **DATA_WRITE**: Nenhum.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Isolamento entre gerações ativas e leituras concorrentes.
+- **OBSERVABILITY**: Consultas retornam novo snapshotId nos metadados.
+- **ACCEPTANCE_CRITERIA**: `SEARCH_DELTA_QUERY_EQUIVALENCE=PASS`, `POST_DELTA_QUERY_EQUIVALENCE=PASS`.
+- **TRACEABILITY**: G9 seções 42, 43, 61, 62.
+
 
 
 

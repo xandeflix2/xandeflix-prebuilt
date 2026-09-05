@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xandeflix.com/schemas/prebuilt-search-index-delta.schema.json",
+  "title": "PrebuiltSearchIndexDelta",
+  "description": "Contrato canônico de delta incremental do índice de busca prebuilt (Gate G9).",
+  "type": "object",
+  "required": [
+    "deltaVersion",
+    "baseSnapshotId",
+    "targetSnapshotId",
+    "baseCatalogVersion",
+    "targetCatalogVersion",
+    "documentUpserts",
+    "documentRemoveIds",
+    "postingUpserts",
+    "postingRemoveTokens",
+    "targetDocumentCount",
+    "targetTokenCount",
+    "targetContentHash"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "deltaVersion": {
+      "type": "integer",
+      "const": 1,
+      "description": "Versão do formato do delta do índice de busca."
+    },
+    "baseSnapshotId": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]+$",
+      "description": "Identificador do snapshot base exigido."
+    },
+    "targetSnapshotId": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]+$",
+      "description": "Identificador do snapshot target resultante."
+    },
+    "baseCatalogVersion": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Versão do catálogo base."
+    },
+    "targetCatalogVersion": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Versão do catálogo target resultante."
+    },
+    "documentUpserts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "kind", "title", "genreIds", "categoryIds"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string" },
+          "kind": { "type": "string", "enum": ["movie", "series"] },
+          "title": { "type": "string" },
+          "originalTitle": { "type": "string" },
+          "year": { "type": "integer" },
+          "genreIds": { "type": "array", "items": { "type": "string" } },
+          "categoryIds": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "description": "Documentos adicionados ou modificados no índice target."
+    },
+    "documentRemoveIds": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "IDs de documentos removidos no índice target."
+    },
+    "postingUpserts": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": { "type": "string" }
+      },
+      "description": "Mapeamento token -> lista final ordenada de document IDs correspondentes ao token."
+    },
+    "postingRemoveTokens": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Tokens completamente removidos do vocabulário no índice target."
+    },
+    "targetDocumentCount": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Contagem final esperada de documentos no índice target."
+    },
+    "targetTokenCount": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Contagem final esperada de tokens no índice target."
+    },
+    "targetContentHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "Hash lógico SHA-256 do índice de busca target resultante."
+    },
+    "targetGeneratedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp de geração do índice target para determinismo estrito de hash físico."
+    },
+    "targetGenerator": {
+      "type": "string",
+      "description": "Identificador do gerador do índice target."
+    }
+  }
+}

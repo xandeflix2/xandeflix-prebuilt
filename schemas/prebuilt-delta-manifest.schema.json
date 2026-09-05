@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xandeflix.com/schemas/prebuilt-delta-manifest.schema.json",
+  "title": "PrebuiltDeltaManifest",
+  "description": "Contrato canônico do manifest de pacote delta incremental (Gate G9).",
+  "type": "object",
+  "required": [
+    "deltaFormatVersion",
+    "baseSnapshotId",
+    "targetSnapshotId",
+    "baseCatalogVersion",
+    "targetCatalogVersion",
+    "baseCatalogSha256",
+    "targetCatalogSha256",
+    "catalogDeltaFile",
+    "catalogDeltaSha256",
+    "catalogDeltaSizeBytes",
+    "targetPackageProfile",
+    "deltaContentHash",
+    "generatedAt",
+    "generator"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "deltaFormatVersion": {
+      "type": "integer",
+      "const": 1,
+      "description": "Versão do formato do pacote delta (DELTA_PACKAGE_FORMAT_VERSION=1)."
+    },
+    "baseSnapshotId": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]+$",
+      "description": "Identificador do snapshot base ao qual este delta se vincula estritamente."
+    },
+    "targetSnapshotId": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]+$",
+      "description": "Identificador do snapshot final resultante da aplicação do delta."
+    },
+    "baseCatalogVersion": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Versão semântica do catálogo base."
+    },
+    "targetCatalogVersion": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Versão semântica do catálogo target resultante."
+    },
+    "baseCatalogSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "Hash SHA-256 do catalog.json base (64 caracteres hexadecimais)."
+    },
+    "targetCatalogSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "Hash SHA-256 esperado do catalog.json target final."
+    },
+    "catalogDeltaFile": {
+      "type": "string",
+      "const": "catalog-delta.json",
+      "description": "Nome canônico do arquivo de delta de catálogo no pacote ZIP."
+    },
+    "catalogDeltaSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "Hash SHA-256 do arquivo catalog-delta.json."
+    },
+    "catalogDeltaSizeBytes": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Tamanho em bytes do arquivo catalog-delta.json descompactado."
+    },
+    "targetPackageProfile": {
+      "type": "string",
+      "enum": ["CATALOG_ONLY", "SEARCH_ENABLED"],
+      "description": "Perfil de conteúdo do pacote target (CATALOG_ONLY ou SEARCH_ENABLED)."
+    },
+    "searchDeltaFile": {
+      "type": "string",
+      "const": "search-index-delta.json",
+      "description": "Nome canônico do arquivo de delta do índice de busca no pacote ZIP."
+    },
+    "baseSearchIndexContentHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "Hash lógico de conteúdo do search-index.json base."
+    },
+    "targetSearchIndexContentHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "Hash lógico de conteúdo do search-index.json target esperado."
+    },
+    "searchDeltaSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "Hash SHA-256 do arquivo search-index-delta.json."
+    },
+    "searchDeltaSizeBytes": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Tamanho em bytes do arquivo search-index-delta.json descompactado."
+    },
+    "targetSearchIndexSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "Hash SHA-256 esperado do search-index.json target serializado."
+    },
+    "deltaContentHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "Hash lógico SHA-256 determinístico dos metadados e conteúdos do pacote delta."
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp ISO 8601 UTC de geração do delta manifest."
+    },
+    "generator": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Identificador do gerador do pacote delta."
+    }
+  }
+}

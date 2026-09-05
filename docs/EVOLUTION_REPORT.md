@@ -6,7 +6,7 @@
 
 - **PROJECT**: `XANDEFLIX_PREBUILT`
 - **PARENT_CONTEXT**: `MARCO_ZERO_CANONICO_XANDEFLIX_PREBUILT`
-- **LAST_CLOSED_GATE**: `G8`
+- **LAST_CLOSED_GATE**: `G9`
 - **G0_STATUS**: `PASS`
 - **G1_STATUS**: `PASS`
 - **G2_STATUS**: `PASS`
@@ -16,13 +16,15 @@
 - **G6_STATUS**: `PASS`
 - **G7_STATUS**: `PASS`
 - **G8_STATUS**: `PASS`
-- **MVP_PROGRESS_PERCENT**: `82`
-- **CURRENT_GATE**: `G9`
-- **G9_STATUS**: `NOT_STARTED`
-- **G9_STARTED**: `NAO`
-- **NEXT_GATE**: `XANDEFLIX_PREBUILT_G9_INCREMENTAL_UPDATE`
+- **G9_STATUS**: `PASS`
+- **MVP_PROGRESS_PERCENT**: `89`
+- **CURRENT_GATE**: `G10`
+- **G9_STARTED**: `SIM`
+- **G10_STATUS**: `NOT_STARTED`
+- **G10_STARTED**: `NAO`
+- **NEXT_GATE**: `XANDEFLIX_PREBUILT_G10_SECURITY_AND_RECOVERY`
 - **NEXT_GATE_STARTED**: `NAO`
-- **HISTORICAL_RECORD**: `G5_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G5_ADJUDICATION_CLOSED_PASS=SIM; G6_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G6_ADJUDICATION_CLOSED_PASS=SIM; G7_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G7_ADJUDICATION_CLOSED_PASS=SIM; SEARCH_SCALE_PERFORMANCE_RISK=OPEN_NON_BLOCKING; G8_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G8_ADJUDICATION_CLOSED_PASS=SIM`
+- **HISTORICAL_RECORD**: `G5_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G5_ADJUDICATION_CLOSED_PASS=SIM; G6_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G6_ADJUDICATION_CLOSED_PASS=SIM; G7_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G7_ADJUDICATION_CLOSED_PASS=SIM; SEARCH_SCALE_PERFORMANCE_RISK=OPEN_NON_BLOCKING; G8_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G8_ADJUDICATION_CLOSED_PASS=SIM; G9_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G9_ADJUDICATION_CLOSED_PASS=SIM; UPDATE_SCALE_MEMORY_RISK=OPEN_NON_BLOCKING`
 
 ---
 
@@ -380,8 +382,42 @@
   - Proteção de segurança comprovada: `PLAYBACK_URI_ALLOWLIST=HTTPS_BASELINE`, rejeição estrita de userinfo credentials (`URL_USERINFO_CREDENTIALS_REJECTED=PASS`) e cabeçalhos sensíveis omitidos de logs (`PLAYBACK_HEADERS_LOGGING=PROHIBITED`);
   - Ausência de fonte real e validação física registradas como não-requisitos de G8 (`REAL_SOURCE_IMPLEMENTED=NAO`, `REAL_SOURCE_AUTHENTICATED=NAO`, `REAL_SOURCE_PLAYBACK_PROVEN=NAO`, `PHYSICAL_MEDIA_PLAYING_PROVEN=NAO`, `PHYSICAL_DEVICE_VALIDATION=NOT_REQUIRED_G8`);
   - MVP_PROGRESS_PERCENT atualizado de 74 para 82;
-  - CURRENT_GATE avançado para G9 (`NEXT_AUTHORIZABLE_GATE=G9`);
-  - G9 permanece NOT_STARTED (`G9_STATUS=NOT_STARTED`, `G9_STARTED=NAO`, `NEXT_GATE_STARTED=NAO`);
+  - **Ciclo G9 (Incremental Update)**:
+  - Implementação da arquitetura de atualização incremental segura para catálogo e índice de busca (`DELTA_PACKAGE_FORMAT_VERSION=1`, `DELTA_GENERATION=EXTERNAL_PREBUILT`);
+  - Vinculação estrita à base ativa: `DELTA_BASE_BINDING=STRICT` exigindo correspondência exata de `snapshotId`, `catalogVersion`, `catalogSha256` e `searchIndex.contentHash`;
+  - Endereçamento determinístico por identificadores canônicos (`CATALOG_DELTA_ADDRESSING=CANONICAL_ID_BASED`) e semântica de substituição integral (`DELTA_UPSERT_SEMANTICS=FULL_ENTITY_REPLACEMENT`);
+  - Proteção de armazenamento: proibição categórica de patch in-place (`IN_PLACE_ACTIVE_PATCH=PROHIBITED`) adotando isolamento em staging (`STAGING_THEN_PROMOTION`) com readback validation física e promoção atômica do ponteiro `active.json`;
+  - Atomicidade lógica entre catálogo e busca no perfil `SEARCH_ENABLED`: `SEARCH_ENABLED_DELTA_ATOMICITY=CATALOG_AND_SEARCH_TOGETHER`;
+  - Prevenção de reindexação pesada no dispositivo cliente: `ON_DEVICE_SEARCH_FULL_REINDEX_DURING_UPDATE=PROHIBITED` através da aplicação direta de postings mapeadas por IDs;
+  - Tolerância a falhas e preservação da geração ativa em qualquer erro: `FAILED_UPDATE_PRESERVES_ACTIVE=PASS`, `PARTIAL_TARGET_STAGING_NOT_ACTIVE=PASS`, `WRONG_BASE_NOT_PATCHED=PASS`, `FULL_PACKAGE_REQUIRED_STATE=PASS`, `OUT_OF_ORDER_DELTA_REJECTED=PASS`, `NO_FALSE_EMPTY_DELTA_GUARD=PASS`;
+  - Idempotência pura em reaplicação do mesmo delta: `SAME_DELTA_REAPPLY=IDEMPOTENT`, `ACTIVE_POINTER_UNCHANGED_ON_REAPPLY=PASS`;
+  - Comprovação empírica de redução de tamanho de transferência: razão de 0,0092 (41,2 KB vs 4,37 MB do pacote full) no perfil `SPARSE_1_PERCENT` com 240.000 documentos (`SPARSE_1_PERCENT_DELTA_TO_FULL_RATIO_LT_1=PASS`);
+  - Execução de benchmark sintético com 240.000 documentos nos perfis SPARSE_1_PERCENT (1% = 2.400 itens alterados, apply 423ms) e MODERATE_5_PERCENT (5% = 12.000 itens alterados, apply 406ms, ratio 0.0431);
+  - Evidência empírica não-SLA: `PERFORMANCE_EVIDENCE_IS_NOT_SLA=SIM`, `REAL_DEVICE_INCREMENTAL_UPDATE_PROVEN=NAO`, `FIRE_STICK_UPDATE_FAST=NAO`;
+  - Elaboração da documentação arquitetural em `docs/INCREMENTAL_UPDATE.md` (36 seções canônicas) e formalização de 12 fluxos no FSD (`F-G9-001` a `F-G9-012`);
+  - Criação da suíte de validação `scripts/validate-incremental-update.mjs` (`npm run update:check`) e do benchmark `scripts/benchmark-incremental-update-scale.mjs` (`npm run update:benchmark`) com 100% de aprovação;
+  - Preservação integral das regressões de todos os Gates anteriores (G2, G3, G4, G5, G6, G7, G8, typecheck, web build e android build);
+  - Auditoria de segredos e escopo: zero credenciais reais, sem service_role, sem package signing/encryption (G10), sem canal de rede OTA, sem G10;
+  - Registro histórico: `G9_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM`.
+
+- **Adjudicacao G9 e Canonicalizacao (2026-09-05)**:
+  - G9 formalmente adjudicado pelo Chat Mestre como PASS (`RESULT=PASS_PREBUILT_G9_INCREMENTAL_UPDATE_CLOSED`);
+  - Arquitetura de atualização incremental para catálogo e índice de busca aprovada (`DELTA_PACKAGE_FORMAT_VERSION=1`, `DELTA_BASE_BINDING=STRICT`, `CATALOG_DELTA_ADDRESSING=CANONICAL_ID_BASED`, `DELTA_UPSERT_SEMANTICS=FULL_ENTITY_REPLACEMENT`);
+  - Imutabilidade da geração ativa mantida com isolamento em staging e promoção atômica do ponteiro `active.json` (`IN_PLACE_ACTIVE_PATCH=PROHIBITED`, `STAGING_THEN_PROMOTION=PASS`, `FAILED_UPDATE_PRESERVES_ACTIVE=PASS`);
+  - Atomicidade entre catálogo e busca no perfil `SEARCH_ENABLED` comprovada (`SEARCH_ENABLED_DELTA_ATOMICITY=CATALOG_AND_SEARCH_TOGETHER`, `ON_DEVICE_SEARCH_FULL_REINDEX_DURING_UPDATE=PROHIBITED`);
+  - Benefício de transporte incremental demonstrado com redução de dados para 0,0092 do pacote full em alterações de 1% (`SPARSE_1_PERCENT_DELTA_TO_FULL_RATIO_LT_1=PASS`);
+  - Registro de risco de escala sintética classificado como evidência não-bloqueadora:
+    - `CLASSIFICATION`: `PERFORMANCE_EVIDENCE_RISK`
+    - `GATE`: `G9_INCREMENTAL_UPDATE`
+    - `STATUS`: `OPEN_NON_BLOCKING`
+    - `EVIDENCE_SOURCE`: `SYNTHETIC_240K_INCREMENTAL_TEST`
+    - `SPARSE_1_PERCENT`: docs=240000, changed=2400, delta_pkg=42233B, full_pkg=4585619B, ratio=0.0092, apply=423ms, total=1867ms, peak_mem=459MB
+    - `MODERATE_5_PERCENT`: docs=240000, changed=12000, delta_pkg=199353B, full_pkg=4630164B, ratio=0.0431, apply=406ms, total=1575ms, peak_mem=640MB
+    - `INTERPRETATION`: A vantagem de transporte incremental foi comprovada sinteticamente, porém o pico de memória observado no harness de escala justifica validação futura em hardware real.
+    - `PERFORMANCE_EVIDENCE_IS_NOT_SLA`: `SIM`
+    - `REAL_DEVICE_INCREMENTAL_UPDATE_PROVEN`: `NAO`
+    - `G9_PASS_INVALIDATED`: `NAO`
+  - MVP_PROGRESS_PERCENT atualizado de 82 para 89;
+  - CURRENT_GATE avançado para G10 (`NEXT_AUTHORIZABLE_GATE=G10`);
+  - G10 permanece NOT_STARTED (`G10_STATUS=NOT_STARTED`, `G10_STARTED=NAO`, `NEXT_GATE_STARTED=NAO`);
   - Autorização expressa concedida para commit e push canônicos na branch origin/main.
-
-
