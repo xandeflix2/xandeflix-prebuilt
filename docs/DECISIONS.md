@@ -46,25 +46,36 @@
 | `NO_FALSE_EMPTY` | `REQUIRED` | Estado limpo sem catálogo ativo é explicitamente NO_ACTIVE_CATALOG, proibido de ser tratado como vazio. |
 | `APP_PRIVATE_STORAGE` | `REQUIRED` | Armazenamento de catálogo restrito ao diretório privado do aplicativo (Directory.Data), sem acesso compartilhado. |
 | `LOCAL_STORAGE_STRATEGY` | `CAPACITOR_FILESYSTEM_CANONICAL_JSON` | Persistência local estruturada de snapshots e ponteiro ativo em JSON canônico via Capacitor Filesystem. |
+| `CATALOG_UI_DATA_SOURCE` | `ACTIVE_LOCAL_CATALOG_ONLY` | A interface de catálogo consome estrita e exclusivamente o catálogo local ativo estabelecido no dispositivo pelo G5. |
+| `CATALOG_UI_NETWORK` | `NONE` | Zero chamadas de rede externas, fetch, axios, Supabase ou APIs de catálogo permitidas na camada de apresentação. |
+| `NO_FALSE_EMPTY_UI` | `REQUIRED` | A UI diferencia formalmente ausência de catálogo (NO_ACTIVE_CATALOG) de catálogo validamente vazio (VALID_EMPTY_CATALOG). |
+| `CATALOG_READ_MODEL` | `EPHEMERAL_VIEW_MODEL` | Projeção em memória com índices efêmeros O(1) gerada para desacoplar componentes do catálogo bruto persistido. |
+| `UNBOUNDED_DOM_RENDER` | `PROHIBITED` | Limites estritos de apresentação no DOM (HOME_RAIL_MAX_ITEMS_INITIAL=24, GRID_BATCH_SIZE=48) para evitar sobrecarga de memória. |
+| `TV_INPUT_BASELINE` | `DOM_FOCUS_DPAD` | Baseline de navegação direcional por teclado/D-pad em conformidade com Android TV e Fire TV Stick sobre foco nativo DOM. |
+| `INPUT_MODES` | `TOUCH_MOUSE_KEYBOARD_DPAD_BASELINE` | Compatibilidade simultânea de múltiplos modos de entrada sem conflito entre toque, clique e controle direcional. |
+| `EPHEMERAL_READ_INDEXES` | `ALLOWED` | Criação exclusiva em memória de Maps efêmeros para resolução rápida de relações (categorias, gêneros, seasons, episodes) sem persistência como SearchIndex. |
 
 ---
 
 ## 2. Decisoes Tecnicas em Aberto (DECISIONS_OPEN)
 
-1. `SEARCH_STORAGE`: Mecanismo e estrutura de persistência do índice de busca no dispositivo (SQLite FTS, MiniSearch JSON, etc.).
-2. `SEARCH_INDEX_TRANSPORTABILITY`: Avaliar viabilidade de transportar índices pré-gerados vs indexação local no cliente.
-3. `SEARCH_SEED_STRATEGY`: Estratégia de indexação inicial no cliente caso o índice transportado apresente incompatibilidades.
-4. `ROLLBACK_FULL`: Política avançada de retenção de múltiplos snapshots históricos e reversão manual de versão.
-5. `SNAPSHOT_RETENTION`: Política de limpeza e expiração de snapshots antigos acumulados no armazenamento privado.
-6. `INCREMENTAL_UPDATE_STRATEGY`: Algoritmo para geração e aplicação de deltas/diffs de catálogo sem re-download completo.
-7. `PACKAGE_SIGNING_STRATEGY`: Protocolo criptográfico para assinatura e verificação de autoria do pacote (ECDSA, Ed25519).
-8. `PACKAGE_ENCRYPTION`: Necessidade e algoritmo de criptografia em repouso/trânsito para os pacotes de provisionamento.
-9. `USER_SOURCE_BINDING`: Modelo de associação entre credenciais de acesso da fonte e a distribuição de pacotes personalizados.
-10. `REAL_SOURCE_AUTH_STRATEGY`: Arquitetura de autenticação com provedores de origem sem expor credenciais primárias ao cliente.
-11. `OFFLINE_POLICY`: Comportamento da aplicação diante da ausência prolongada de conexão com a internet após o bootstrap inicial.
-12. `ARTWORK_CACHE_POLICY`: Política de download, resolução, compressão e expiração de posters e imagens de catálogo.
-13. `SIZE_LIMITS`: Limites contratuais de tamanho para o pacote de provisionamento e footprint de memória (evidências empíricas atuais não são SLA).
-14. `PERFORMANCE_SLA`: Metas empíricas de tempo de abertura e resposta que serão homologadas apenas no Gate G12.
+1. `SEARCH_UI`: Interface e interação da caixa e telas de busca local (previsto para G7).
+2. `SEARCH_STORAGE`: Mecanismo e estrutura de persistência do índice de busca no dispositivo (SQLite FTS, MiniSearch JSON, etc., previsto para G7).
+3. `SEARCH_INDEX_TRANSPORTABILITY`: Avaliar viabilidade de transportar índices pré-gerados vs indexação local no cliente (previsto para G7).
+4. `SEARCH_SEED_STRATEGY`: Estratégia de indexação inicial no cliente caso o índice transportado apresente incompatibilidades (previsto para G7).
+5. `PLAYBACK_UI`: Interface do player de mídia e controles de tela cheia (previsto para G8).
+6. `ARTWORK_CACHE_POLICY`: Política de download, resolução, compressão e expiração de posters e imagens de catálogo.
+7. `FULL_TV_SPATIAL_NAVIGATION`: Navegação espacial avançada bidimensional com aceleração de cursor ou mesh de nós (G11).
+8. `PERFORMANCE_SLA`: Metas contratuais de tempo de abertura e resposta homologadas em hardware físico (G11/G12).
+9. `ROLLBACK_FULL`: Política avançada de retenção de múltiplos snapshots históricos e reversão manual de versão.
+10. `SNAPSHOT_RETENTION`: Política de limpeza e expiração de snapshots antigos acumulados no armazenamento privado.
+11. `INCREMENTAL_UPDATE_STRATEGY`: Algoritmo para geração e aplicação de deltas/diffs de catálogo sem re-download completo.
+12. `PACKAGE_SIGNING_STRATEGY`: Protocolo criptográfico para assinatura e verificação de autoria do pacote (ECDSA, Ed25519).
+13. `PACKAGE_ENCRYPTION`: Necessidade e algoritmo de criptografia em repouso/trânsito para os pacotes de provisionamento.
+14. `USER_SOURCE_BINDING`: Modelo de associação entre credenciais de acesso da fonte e a distribuição de pacotes personalizados.
+15. `REAL_SOURCE_AUTH_STRATEGY`: Arquitetura de autenticação com provedores de origem sem expor credenciais primárias ao cliente.
+16. `OFFLINE_POLICY`: Comportamento da aplicação diante da ausência prolongada de conexão com a internet após o bootstrap inicial.
+17. `SIZE_LIMITS`: Limites contratuais de tamanho para o pacote de provisionamento e footprint de memória (evidências empíricas atuais não são SLA).
 
 
 

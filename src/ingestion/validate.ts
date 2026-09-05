@@ -7,23 +7,15 @@
  * Princípio: ONE_SOURCE_OF_TRUTH. Reutiliza o schema schemas/prebuilt-catalog.schema.json.
  */
 
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 import type { PrebuiltCatalog } from '../contracts/catalog.ts';
+import schemaContent from '../../schemas/prebuilt-catalog.schema.json' with { type: 'json' };
 
 export interface ValidationResult {
   valid: boolean;
   errors: string[];
 }
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const SCHEMA_PATH = path.resolve(__dirname, '..', '..', 'schemas', 'prebuilt-catalog.schema.json');
-
-const schemaContent = JSON.parse(fs.readFileSync(SCHEMA_PATH, 'utf8'));
 
 // @ts-expect-error Ajv default export interoperability
 const AjvClass = Ajv2020.default || Ajv2020;

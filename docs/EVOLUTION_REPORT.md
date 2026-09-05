@@ -6,23 +6,26 @@
 
 - **PROJECT**: `XANDEFLIX_PREBUILT`
 - **PARENT_CONTEXT**: `MARCO_ZERO_CANONICO_XANDEFLIX_PREBUILT`
-- **LAST_CLOSED_GATE**: `G5`
+- **LAST_CLOSED_GATE**: `G6`
 - **G0_STATUS**: `PASS`
 - **G1_STATUS**: `PASS`
 - **G2_STATUS**: `PASS`
 - **G3_STATUS**: `PASS`
 - **G4_STATUS**: `PASS`
 - **G5_STATUS**: `PASS`
-- **MVP_PROGRESS_PERCENT**: `56`
-- **CURRENT_GATE**: `G6`
+- **G6_STATUS**: `PASS`
+- **MVP_PROGRESS_PERCENT**: `64`
+- **CURRENT_GATE**: `G7`
 - **G4_STARTED**: `SIM`
 - **G5_STATUS**: `PASS`
 - **G5_STARTED**: `SIM`
-- **G6_STATUS**: `NOT_STARTED`
-- **G6_STARTED**: `NAO`
-- **NEXT_GATE**: `XANDEFLIX_PREBUILT_G6_CATALOG_UI`
+- **G6_STATUS**: `PASS`
+- **G6_STARTED**: `SIM`
+- **G7_STATUS**: `NOT_STARTED`
+- **G7_STARTED**: `NAO`
+- **NEXT_GATE**: `XANDEFLIX_PREBUILT_G7_PREBUILT_SEARCH`
 - **NEXT_GATE_STARTED**: `NAO`
-- **HISTORICAL_RECORD**: `G5_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G5_ADJUDICATION_CLOSED_PASS=SIM`
+- **HISTORICAL_RECORD**: `G5_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G5_ADJUDICATION_CLOSED_PASS=SIM; G6_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G6_ADJUDICATION_CLOSED_PASS=SIM`
 
 ---
 
@@ -67,6 +70,13 @@
 - `NO_FALSE_EMPTY`: REQUIRED
 - `APP_PRIVATE_STORAGE`: REQUIRED
 - `LOCAL_STORAGE_STRATEGY`: CAPACITOR_FILESYSTEM_CANONICAL_JSON
+- `CATALOG_UI_DATA_SOURCE`: ACTIVE_LOCAL_CATALOG_ONLY
+- `CATALOG_UI_NETWORK`: NONE
+- `NO_FALSE_EMPTY_UI`: REQUIRED
+- `CATALOG_READ_MODEL`: EPHEMERAL_VIEW_MODEL
+- `UNBOUNDED_DOM_RENDER`: PROHIBITED
+- `TV_INPUT_BASELINE`: DOM_FOCUS_DPAD
+- `INPUT_MODES`: TOUCH_MOUSE_KEYBOARD_DPAD_BASELINE
 
 ---
 
@@ -268,3 +278,32 @@
   - CURRENT_GATE avancado para G6 (NEXT_AUTHORIZABLE_GATE=G6);
   - G6 permanece NOT_STARTED (G6_STARTED=NAO, NEXT_GATE_STARTED=NAO);
   - Autorizacao expressa concedida para commit e push canonicos na branch origin/main.
+
+- **Ciclo G6 (Catalog UI)**:
+  - Implementação da primeira interface funcional de catálogo do Xandeflix Prebuilt consumindo EXCLUSIVAMENTE o catálogo local ativo estabelecido no G5 (`CATALOG_UI_DATA_SOURCE=ACTIVE_LOCAL_CATALOG_ONLY`, `CATALOG_NETWORK_REQUESTS=0`);
+  - Auditoria de reuso read-only executada e registrada em `docs/UI_REUSE_ASSESSMENT.md` (`CODE_REUSE_PERFORMED=NAO`, `PROTECTED_REPOSITORY_WRITES=0`);
+  - Camada de Read Model/View Model determinística em memória (`src/catalog/catalog-read-model.ts`, `src/catalog/catalog-view-model.ts`, `src/catalog/catalog-selectors.ts`) com índices efêmeros O(1);
+  - Gating visual estrito de bootstrap: `NO_ACTIVE_CATALOG_UI=PASS`, `VALID_EMPTY_CATALOG_UI=PASS`, `NO_ACTIVE_NOT_FALSE_EMPTY=PASS`, `FAILED_IMPORT_ACTIVE_UI_CONTINUES=PASS`;
+  - Páginas e componentes de catálogo implementados: Home com Hero e MediaRails temáticos, MoviesPage com filtros por categoria e CatalogGrid em lotes, SeriesPage com listagem de séries, MovieDetailPage com metadados e botão de playback desabilitado (`PLAYBACK_AVAILABLE_IN_G8`), SeriesDetailPage com seleção de temporadas e listagem de episódios;
+  - Fallback visual resiliente para imagens e metadados ausentes (`Artwork.tsx`, `MISSING_ARTWORK_FALLBACK=PASS`, `MISSING_OPTIONAL_METADATA_SAFE=PASS`);
+  - Limites estritos de renderização no DOM (`UNBOUNDED_DOM_RENDER_GUARD=PASS`, `HOME_RAIL_MAX_ITEMS_INITIAL=24`, `GRID_BATCH_SIZE=48`);
+  - Baseline de navegação direcional por D-pad / teclado para Android TV e Fire TV Stick (`FIRST_FOCUS_ACQUIRED=PASS`, `ARROW_NAVIGATION=PASS`, `ENTER_OPENS_DETAIL=PASS`, `BACK_RETURNS_PREVIOUS_VIEW=PASS`, `FOCUS_VISIBLE=PASS`);
+  - Compatibilidade com toque, mouse e teclado mantida (`INPUT_MODES=TOUCH_MOUSE_KEYBOARD_DPAD_BASELINE`);
+  - Design system cinematográfico responsivo para Phone, Tablet e TV/Desktop em `src/index.css`;
+  - Suíte de validação de catálogo automatizada em `scripts/validate-catalog-ui.mjs` (`npm run catalog-ui:check`, 15 testes aprovados);
+  - Elaboração da documentação técnica canônica em `docs/CATALOG_UI.md`;
+  - Formalização de 9 especificações funcionais em `docs/FSD.md` (`F-G6-001` a `F-G6-009`);
+  - Registro de decisões arquiteturais fechadas em `docs/DECISIONS.md`;
+  - Bateria completa de regressões executada com sucesso: `contract:check` PASS, `ingestion:synthetic` PASS, `ingestion:negative` PASS, `provisioning:build` PASS, `provisioning:check` PASS, `bootstrap:check` PASS, `catalog-ui:check` PASS, `typecheck` PASS, `build` PASS, `cap sync android` PASS, `gradlew test` PASS, `gradlew assembleDebug` PASS;
+  - Auditoria de segredos e isolamento confirmada (sem credenciais reais, sem service_role, sem chamadas externas, sem busca, sem player, sem atualização incremental);
+  - Registro histórico: G6_STATUS=COMPLETE_PENDING_MASTER_ADJUDICATION.
+
+- **Adjudicacao G6 e Canonicalizacao (2026-09-05)**:
+  - G6 formalmente adjudicado pelo Chat Mestre como PASS (`RESULT=PASS_PREBUILT_G6_CATALOG_UI_CLOSED`);
+  - Auditoria complementar de escopo aprovada (`PASS_PREBUILT_G6_SCOPE_AUDIT_CLEAR_FOR_MASTER_ADJUDICATION`);
+  - Adaptações de compatibilidade em `src/ingestion/validate.ts` e `src/provisioning/integrity.ts` ratificadas como `G6_REQUIRED_COMPATIBILITY_ADAPTATION`, com preservação estrita da semântica G2/G3/G4 e fail-closed;
+  - Documentação de reuso em `docs/UI_REUSE_ASSESSMENT.md` atualizada para esclarecer `NEWLY_IMPLEMENTED_COMPONENTS` e `REBUILT_COMPONENTS=NENHUM`;
+  - MVP_PROGRESS_PERCENT atualizado de 56 para 64;
+  - CURRENT_GATE avançado para G7 (NEXT_AUTHORIZABLE_GATE=G7);
+  - G7 permanece NOT_STARTED (G7_STARTED=NAO, NEXT_GATE_STARTED=NAO);
+  - Autorização expressa concedida para commit e push canônicos na branch origin/main.

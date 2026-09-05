@@ -9,10 +9,13 @@
  * - LOGICAL_PACKAGE_DETERMINISTIC=SIM (createdAt não afeta o packageContentHash)
  */
 
-import { createHash } from 'node:crypto';
+import crypto from 'node:crypto';
 
 export function calculateSha256(data: string | Buffer): string {
-  return createHash('sha256').update(data).digest('hex');
+  if (crypto && typeof crypto.createHash === 'function') {
+    return crypto.createHash('sha256').update(data).digest('hex');
+  }
+  throw new Error('Ambiente sem suporte a hashing SHA-256');
 }
 
 export interface PackageContentHashInput {

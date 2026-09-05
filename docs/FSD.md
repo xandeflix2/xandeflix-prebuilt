@@ -437,7 +437,199 @@ Conforme os Gates forem abertos pelo Chat Mestre, as seguintes categorias de flu
 - **SECURITY**: Impedimento semântico de renderização errônea de estado vazio.
 - **OBSERVABILITY**: Status reportado como `NO_ACTIVE_CATALOG`.
 - **ACCEPTANCE_CRITERIA**: `summary.status === 'NO_ACTIVE_CATALOG'`, `summary.hasActiveCatalog === false`.
-- **TRACEABILITY**: Requisitos do Gate G5 seção 8 e 9.
+---
+
+## 7. Especificações Funcionais — Gate G6 (Catalog UI)
+
+### F-G6-001_HOME_ACTIVE_CATALOG — Apresentação da Home a partir do Catálogo Local Ativo
+
+- **TRIGGER**: Abertura da aplicação ou seleção da rota `/` (Início) com catálogo local ativo.
+- **PRECONDITIONS**: `BootstrapService` com status `ACTIVE_CATALOG_READY` e `hasActiveCatalog: true`.
+- **MAIN_FLOW**:
+  1. `useActiveCatalog` recupera o `PrebuiltCatalog` ativo via `BootstrapService.getActiveCatalog()`;
+  2. `CatalogReadModel` é instanciado em memória indexando categorias, gêneros, filmes e séries;
+  3. `getHeroItem()` seleciona deterministicamente o item de destaque;
+  4. `getHomeRails()` compõe as faixas temáticas (Destaques, Categorias e Gêneros) respeitando `HOME_RAIL_MAX_ITEMS_INITIAL = 24`;
+  5. `HomePage` renderiza o Hero e as faixas com cartões focáveis (`MediaCard`).
+- **ALTERNATIVE_FLOW**: Catálogo sem itens suficientes para faixas secundárias: renderiza apenas as faixas disponíveis com dados reais.
+- **ERROR_FLOW**: Se falha de leitura ocorrer, transiciona para `LoadingState` ou estado de erro controlado.
+- **TERMINAL_STATES**: `HOME_RENDERED`.
+- **DATA_READ**: Catálogo ativo via `LocalCatalogStorage`.
+- **DATA_WRITE**: Nenhum.
+- **NETWORK**: Nenhuma (`CATALOG_NETWORK_REQUESTS = 0`).
+- **SECURITY**: Nenhuma credencial ou token exposto em componentes.
+- **OBSERVABILITY**: Contagem de faixas e itens renderizados auditável em runtime.
+- **ACCEPTANCE_CRITERIA**: `HOME_LOCAL_CATALOG_RENDER=PASS`, hero presente e faixas com $\le 24$ itens.
+- **TRACEABILITY**: Requisitos do Gate G6 seção 8, 10, 22.
+
+---
+
+### F-G6-002_MOVIES_NAVIGATION — Navegação e Apresentação do Catálogo de Filmes
+
+- **TRIGGER**: Seleção do item "Filmes" na navegação ou rota `/movies`.
+- **PRECONDITIONS**: Catálogo ativo pronto em memória.
+- **MAIN_FLOW**:
+  1. `getAllMovies(readModel)` extrai a lista de filmes ordenada deterministicamente;
+  2. `MoviesPage` renderiza barra de filtros por categoria declarada;
+  3. `CatalogGrid` renderiza lote inicial de até 48 filmes (`GRID_BATCH_SIZE`);
+  4. Usuário pode filtrar por categoria ou clicar em "Carregar Mais" para paginar localmente;
+  5. Seleção de um card navega para a rota de detalhe (`movie-detail`).
+- **ALTERNATIVE_FLOW**: Categoria sem títulos: exibe mensagem indicando ausência de itens na categoria selecionada.
+- **ERROR_FLOW**: Item sem dados opcionais é renderizado com fallbacks seguros.
+- **TERMINAL_STATES**: `MOVIES_GRID_RENDERED`.
+- **DATA_READ**: `readModel.catalog.movies` e categorias associadas.
+- **DATA_WRITE**: Nenhum.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Sem chamadas externas ou URLs dinâmicas não sanitizadas.
+- **ACCEPTANCE_CRITERIA**: `MOVIES_LOCAL_CATALOG_RENDER=PASS`, grid responsivo, lote inicial $\le 48$.
+- **TRACEABILITY**: Requisitos do Gate G6 seção 12, 22, 23.
+
+---
+
+### F-G6-003_SERIES_NAVIGATION — Navegação e Apresentação do Catálogo de Séries
+
+- **TRIGGER**: Seleção do item "Séries" na navegação ou rota `/series`.
+- **PRECONDITIONS**: Catálogo ativo pronto em memória.
+- **MAIN_FLOW**:
+  1. `getAllSeries(readModel)` extrai a lista de séries mapeando metadados e contagem de temporadas;
+  2. `SeriesPage` renderiza os cards de série com badge de temporadas;
+  3. Seleção de um card navega para a rota `series-detail`.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: N/A.
+- **TERMINAL_STATES**: `SERIES_GRID_RENDERED`.
+- **DATA_READ**: `readModel.catalog.series` e `seasonsBySeriesId`.
+- **DATA_WRITE**: Nenhum.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Sem dados remotos ou telemetria invasiva.
+- **ACCEPTANCE_CRITERIA**: `SERIES_LOCAL_CATALOG_RENDER=PASS`.
+- **TRACEABILITY**: Requisitos do Gate G6 seção 13.
+
+---
+
+### F-G6-004_MOVIE_DETAIL — Apresentação dos Detalhes do Filme
+
+- **TRIGGER**: Seleção de um card de filme ou rota `/movie/:id`.
+- **PRECONDITIONS**: ID do filme válido no catálogo ativo.
+- **MAIN_FLOW**:
+  1. `getMovieDetail(readModel, movieId)` resolve metadados completos, duração e gêneros;
+  2. `MovieDetailPage` renderiza backdrop cinematográfico, título, ano, sinopse e badges;
+  3. Botão "Assistir" é exibido desabilitado com o badge explicativo `PLAYBACK_AVAILABLE_IN_G8`;
+  4. Botão "Voltar" ou tecla Back retorna à visualização anterior.
+- **ALTERNATIVE_FLOW**: Filme não encontrado: exibe mensagem de item inexistente com botão de retorno.
+- **ERROR_FLOW**: Metadados ausentes não geram strings `undefined` ou `NaN`.
+- **TERMINAL_STATES**: `MOVIE_DETAIL_RENDERED`.
+- **DATA_READ**: Filme, gêneros, categorias e artworks associados no `readModel`.
+- **DATA_WRITE**: Nenhum.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: `PLAYBACK_IMPLEMENTED = NAO`, zero resolução de stream URLs.
+- **ACCEPTANCE_CRITERIA**: `MOVIE_DETAIL_RENDER=PASS`, playback desabilitado para G8.
+- **TRACEABILITY**: Requisitos do Gate G6 seção 14, 16, 38.
+
+---
+
+### F-G6-005_SERIES_SEASON_DETAIL — Apresentação de Série, Temporadas e Episódios
+
+- **TRIGGER**: Seleção de um card de série ou rota `/series/:id`.
+- **PRECONDITIONS**: ID da série válido no catálogo ativo.
+- **MAIN_FLOW**:
+  1. `getSeriesDetail(readModel, seriesId)` resolve a série, suas temporadas ordenadas e episódios associados;
+  2. `SeriesDetailPage` exibe detalhes da série e abas de seleção para cada temporada;
+  3. A lista de episódios da temporada ativa é exibida ordenada por `episodeNumber`;
+  4. Cada episódio exibe título, duração, sinopse e botão de playback desabilitado (`PLAYBACK_AVAILABLE_IN_G8`).
+- **ALTERNATIVE_FLOW**: Série sem episódios em determinada temporada exibe aviso apropriado.
+- **ERROR_FLOW**: N/A.
+- **TERMINAL_STATES**: `SERIES_DETAIL_RENDERED`.
+- **DATA_READ**: Série, temporadas e episódios do `readModel`.
+- **DATA_WRITE**: Nenhum.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Zero chamadas de rede para resolução de mídia.
+- **ACCEPTANCE_CRITERIA**: `SERIES_DETAIL_RENDER=PASS`, `SEASON_EPISODE_RENDER=PASS`.
+- **TRACEABILITY**: Requisitos do Gate G6 seção 15.
+
+---
+
+### F-G6-006_NO_ACTIVE_CATALOG — Apresentação de Estado de Ausência de Catálogo
+
+- **TRIGGER**: Abertura do app em dispositivo recém-instalado ou sem pacote importado.
+- **PRECONDITIONS**: `BootstrapService` retorna `status === 'NO_ACTIVE_CATALOG'`.
+- **MAIN_FLOW**:
+  1. `useActiveCatalog` detecta ausência de catálogo ativo;
+  2. `NoActiveCatalogState` é renderizado explicitamente;
+  3. Informa ao usuário: "Catálogo ainda não disponível neste dispositivo. Aguardando provisionamento de pacote local.";
+  4. Bloqueia rigorosamente a renderização de falso-vazio ("Nenhum título encontrado").
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: N/A.
+- **TERMINAL_STATES**: `NO_ACTIVE_CATALOG_DISPLAYED`.
+- **DATA_READ**: Estado do bootstrap.
+- **DATA_WRITE**: Nenhum.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Prevenção de confusão do usuário ou estado inconsistente.
+- **ACCEPTANCE_CRITERIA**: `NO_ACTIVE_CATALOG_UI=PASS`, `NO_ACTIVE_NOT_FALSE_EMPTY=PASS`.
+- **TRACEABILITY**: Requisitos do Gate G6 seção 6, 29.
+
+---
+
+### F-G6-007_VALID_EMPTY_CATALOG — Apresentação de Catálogo Validamente Vazio
+
+- **TRIGGER**: Carregamento de pacote ativo que foi validado com sucesso mas possui zero títulos.
+- **PRECONDITIONS**: `hasActiveCatalog === true`, `status !== 'NO_ACTIVE_CATALOG'`, `movies.length === 0 && series.length === 0`.
+- **MAIN_FLOW**:
+  1. `useActiveCatalog` valida que há um catálogo ativo promovido e íntegro;
+  2. Detecta que as coleções de filmes e séries estão vazias;
+  3. Renderiza `EmptyState` com mensagem legítima de catálogo sem conteúdos;
+  4. Diferencia formalmente este estado de `NO_ACTIVE_CATALOG`.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: N/A.
+- **TERMINAL_STATES**: `VALID_EMPTY_CATALOG_DISPLAYED`.
+- **DATA_READ**: Catálogo ativo vazio.
+- **DATA_WRITE**: Nenhum.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Consistência lógica de estados de dados.
+- **ACCEPTANCE_CRITERIA**: `VALID_EMPTY_CATALOG_UI=PASS`.
+- **TRACEABILITY**: Requisitos do Gate G6 seção 30.
+
+---
+
+### F-G6-008_FAILED_IMPORT_ACTIVE_PRESERVED_UI — Continuidade da UI após Falha de Importação
+
+- **TRIGGER**: Ocorrência de erro durante atualização de pacote com catálogo ativo prévio íntegro.
+- **PRECONDITIONS**: `status === 'IMPORT_FAILED_ACTIVE_PRESERVED'`, snapshot anterior preservado.
+- **MAIN_FLOW**:
+  1. `BootstrapService` notifica a UI sobre a falha de importação;
+  2. `useActiveCatalog` mantém o catálogo ativo anterior em exibição normal;
+  3. A UI não limpa a tela nem transiciona para tela de erro fatal;
+  4. Um banner superior não-bloqueador é apresentado notificando que a atualização falhou mas o catálogo ativo anterior foi mantido.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: Falha de importação tratada de forma fail-closed e transparente.
+- **TERMINAL_STATES**: `ACTIVE_CATALOG_PRESERVED_WITH_NOTICE`.
+- **DATA_READ**: Catálogo ativo preservado.
+- **DATA_WRITE**: Nenhum.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Resiliência operacional de dispositivo embarcado (Android TV / Fire TV).
+- **ACCEPTANCE_CRITERIA**: `FAILED_IMPORT_ACTIVE_UI_CONTINUES=PASS`.
+- **TRACEABILITY**: Requisitos do Gate G6 seção 31.
+
+---
+
+### F-G6-009_DPAD_NAVIGATION_BASELINE — Baseline de Navegação por Teclado e D-Pad
+
+- **TRIGGER**: Pressionamento de teclas direcionais (`ArrowUp`, `ArrowDown`, `ArrowLeft`, `ArrowRight`), `Enter` ou `Escape/Backspace` pelo usuário.
+- **PRECONDITIONS**: Qualquer página da aplicação ativa.
+- **MAIN_FLOW**:
+  1. `useDpadNavigation` inicializa foco automático no primeiro elemento focável (`FIRST_FOCUS_ACQUIRED`);
+  2. As teclas direcionais movem o foco visual entre botões e cartões de mídia com anel de foco destacado (`FOCUS_VISIBLE`);
+  3. Pressionar `Enter` ativa o elemento atualmente em foco (abre detalhes ou troca abas);
+  4. Pressionar `Escape` ou `Backspace` navega retroativamente na pilha de histórico de rotas (`BACK_RETURNS_PREVIOUS_VIEW`).
+- **ALTERNATIVE_FLOW**: Interação concomitante via touch ou mouse não desabilita nem interfere com a navegação direcional.
+- **ERROR_FLOW**: Foco não é perdido em navegações entre telas.
+- **TERMINAL_STATES**: `FOCUS_MANAGED`.
+- **DATA_READ**: Árvore de elementos DOM focáveis e pilha de rotas.
+- **DATA_WRITE**: Estado de rotas na navegação retroativa.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Interface acessível sem dependência de apontador físico.
+- **ACCEPTANCE_CRITERIA**: `FIRST_FOCUS_ACQUIRED=PASS`, `ARROW_NAVIGATION=PASS`, `ENTER_OPENS_DETAIL=PASS`, `BACK_RETURNS_PREVIOUS_VIEW=PASS`, `FOCUS_VISIBLE=PASS`.
+- **TRACEABILITY**: Requisitos do Gate G6 seção 19, 33.
+
 
 
 

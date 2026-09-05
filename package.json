@@ -13,7 +13,8 @@
     "ingestion:negative": "node scripts/run-ingestion-pipeline.mjs --negative",
     "provisioning:build": "node scripts/build-provisioning-package.mjs",
     "provisioning:check": "node scripts/validate-provisioning-package.mjs",
-    "bootstrap:check": "node scripts/validate-device-bootstrap.mjs"
+    "bootstrap:check": "node scripts/validate-device-bootstrap.mjs",
+    "catalog-ui:check": "node scripts/validate-catalog-ui.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^7.0.0",
