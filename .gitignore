@@ -16,6 +16,8 @@ build/
 .gradle/
 *.apk
 *.aab
+local.properties
+
 
 # IDEs e Editores
 .vscode/

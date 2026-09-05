@@ -31,3 +31,20 @@ Cada incidente, erro ou bloqueador tecnico devera ser registrado segundo o forma
 - **ROOT_CAUSE_CONFIDENCE**: HIGH
 - **IMPACT**: `NON_BLOCKING` (O Gate G0 requer apenas o registro documental da identidade e proibe terminantemente qualquer intervencao remota no Supabase).
 - **RESOLUTION_STATUS**: `MONITORING` (Aguardando sincronizacao natural da plataforma de terceiros; nenhuma acao corretiva autorizada ou necessaria no G0).
+
+### OCORRENCIA-002 — Alerta de Tooling/Integracao IDE Java/Buildship
+
+- **DATE**: 2026-09-04
+- **GATE**: G1_APP_SKELETON
+- **CLASSIFICATION**: `IDE_TOOLING_WARNING`
+- **DESCRIPTION**: Integracao de IDE Java/Buildship reportou incapacidade de persistir preferencias de `org.eclipse.buildship.core` sob `android/.settings`.
+- **EVIDENCE**: Compilacao nativa `gradlew.bat assembleDebug` concluida com sucesso (`BUILD SUCCESSFUL, 85 actionable tasks: 85 executed`) e APK de debug gerado (`app-debug.apk`, 4.107.263 bytes).
+- **ROOT_CAUSE**: Questao de persistencia de preferencias de projeto do plugin IDE/Buildship, sem impacto na toolchain CLI do Gradle.
+- **ROOT_CAUSE_CONFIDENCE**: MEDIUM
+- **IMPACT**: `NON_BLOCKING`
+- **RESOLUTION_STATUS**: `MONITORING`
+- **NOTAS_NORMATIVAS**:
+  - `ANDROID_DEBUG_BUILD`: PASS
+  - `APK_GENERATED`: SIM
+  - `G1_PASS_INVALIDATED`: NAO
+

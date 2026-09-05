@@ -6,14 +6,18 @@
 
 - **PROJECT**: `XANDEFLIX_PREBUILT`
 - **PARENT_CONTEXT**: `MARCO_ZERO_CANONICO_XANDEFLIX_PREBUILT`
-- **LAST_CLOSED_GATE**: `G0`
+- **LAST_CLOSED_GATE**: `G1`
 - **G0_STATUS**: `PASS`
-- **MVP_PROGRESS_PERCENT**: `5`
-- **CURRENT_GATE**: `G1`
-- **G1_STATUS**: `NOT_STARTED`
-- **NEXT_GATE**: `XANDEFLIX_PREBUILT_G1_APP_SKELETON`
+- **G1_STATUS**: `PASS`
+- **MVP_PROGRESS_PERCENT**: `12`
+- **CURRENT_GATE**: `G2`
+- **G2_STATUS**: `NOT_STARTED`
+- **G2_STARTED**: `NAO`
+- **NEXT_GATE**: `XANDEFLIX_PREBUILT_G2_PREBUILT_DATA_CONTRACT`
 - **NEXT_GATE_STARTED**: `NAO`
-- **HISTORICAL_RECORD**: `G0_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM`
+- **HISTORICAL_RECORD**: `G1_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM`
+
+
 
 
 ---
@@ -97,7 +101,7 @@
 
 ## 10. Proximo Gate (NEXT_GATE)
 
-- **NEXT_GATE**: `G1_APP_SKELETON`
+- **NEXT_GATE**: `XANDEFLIX_PREBUILT_G2_PREBUILT_DATA_CONTRACT`
 - **NEXT_GATE_STARTED**: `NAO`
 
 ---
@@ -119,4 +123,26 @@
   - CURRENT_GATE avancado para G1 (NEXT_AUTHORIZABLE_GATE=G1);
   - G1 permanece NOT_STARTED (G1_STARTED=NAO, NEXT_GATE_STARTED=NAO);
   - Autorizacao expressa concedida para primeiro commit e push canonicos na branch origin/main.
+
+- **Ciclo G1 (App Skeleton)**:
+  - App universal inicializado em React + TypeScript + Vite + Capacitor;
+  - Configuracao estrita de TypeScript (`typecheck` PASS);
+  - Build web executado com sucesso (`build` PASS);
+  - Prova de inicializacao do runtime web executada (`HTTP 200 OK`);
+  - Projeto nativo Android gerado via Capacitor (`com.xandeflix.prebuilt`);
+  - Isolamento de package Android confirmado contra `com.xandeflix.app`;
+  - Compilacao Android concluida com sucesso (`assembleDebug` PASS);
+  - APK debug gerado (`app-debug.apk`, 4.107.263 bytes);
+  - Auditoria de segredos e dependencias minimas confirmada;
+  - Registro historico: G1_STATUS=COMPLETE_PENDING_MASTER_ADJUDICATION.
+
+- **Adjudicacao G1 e Canonicalizacao (2026-09-04)**:
+  - G1 formalmente adjudicado pelo Chat Mestre como PASS;
+  - Skeleton do aplicativo universal aprovado;
+  - MVP_PROGRESS_PERCENT atualizado de 5 para 12;
+  - CURRENT_GATE avancado para G2 (NEXT_AUTHORIZABLE_GATE=G2);
+  - G2 permanece NOT_STARTED (G2_STARTED=NAO, NEXT_GATE_STARTED=NAO);
+  - Autorizacao expressa concedida para commit e push canonicos na branch origin/main.
+
+
 
