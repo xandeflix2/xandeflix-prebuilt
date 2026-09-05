@@ -20,7 +20,8 @@
     "search:benchmark": "node scripts/benchmark-prebuilt-search-scale.mjs",
     "playback:check": "node scripts/validate-direct-playback.mjs",
     "update:check": "node scripts/validate-incremental-update.mjs",
-    "update:benchmark": "node scripts/benchmark-incremental-update-scale.mjs"
+    "update:benchmark": "node scripts/benchmark-incremental-update-scale.mjs",
+    "security:check": "node scripts/validate-security-recovery.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^7.0.0",

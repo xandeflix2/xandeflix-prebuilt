@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xandeflix.com/schemas/prebuilt-artifact-security.schema.json",
+  "title": "ArtifactSecurityEnvelope",
+  "description": "Envelope canônico de segurança criptográfica para artefatos de provisionamento e atualização (Gate G10).",
+  "type": "object",
+  "required": [
+    "securityFormatVersion",
+    "artifactType",
+    "artifactSha256",
+    "artifactSizeBytes",
+    "keyId",
+    "algorithm",
+    "issuedAt",
+    "signature"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "securityFormatVersion": {
+      "type": "integer",
+      "const": 1,
+      "description": "Versão do formato do envelope de segurança (ARTIFACT_SECURITY_FORMAT_VERSION=1)."
+    },
+    "artifactType": {
+      "type": "string",
+      "enum": ["FULL_PACKAGE_V1", "FULL_PACKAGE_V2", "DELTA_PACKAGE_V1"],
+      "description": "Classificação do tipo de artefato protegido pelo envelope."
+    },
+    "artifactSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "Hash SHA-256 dos bytes exatos do arquivo de artefato comprimido (ZIP)."
+    },
+    "artifactSizeBytes": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Tamanho exato em bytes do arquivo do artefato."
+    },
+    "keyId": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[a-zA-Z0-9_.:-]+$",
+      "description": "Identificador da chave pública confiável que assinou este envelope."
+    },
+    "algorithm": {
+      "type": "string",
+      "const": "ECDSA_P256_SHA256",
+      "description": "Algoritmo de assinatura criptográfica obrigatório (ECDSA_P256_SHA256)."
+    },
+    "issuedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp ISO 8601 da emissão da assinatura."
+    },
+    "signature": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Assinatura criptográfica codificada em Base64 (DER ou IEEE P1363)."
+    },
+    "artifactIdentity": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Identificador ou nome de arquivo canônico do artefato (opcional)."
+    },
+    "snapshotId": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]+$",
+      "description": "Identificador de snapshot do pacote completo (se aplicável)."
+    },
+    "baseSnapshotId": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]+$",
+      "description": "Identificador do snapshot base do pacote delta (se aplicável)."
+    },
+    "targetSnapshotId": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]+$",
+      "description": "Identificador do snapshot target do pacote delta (se aplicável)."
+    }
+  }
+}

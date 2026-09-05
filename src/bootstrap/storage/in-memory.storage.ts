@@ -137,4 +137,62 @@ export class InMemoryCatalogStorage implements LocalCatalogStorage {
       : 0;
     return pointerSize + manifestSize + catalogSize + indexSize;
   }
+
+  private recoveryJournal: import('../../recovery/recovery.types.ts').RecoveryJournalData | null = null;
+
+  async readRecoveryJournal(): Promise<import('../../recovery/recovery.types.ts').RecoveryJournalData | null> {
+    return this.recoveryJournal ? { ...this.recoveryJournal } : null;
+  }
+
+  async writeRecoveryJournal(journal: import('../../recovery/recovery.types.ts').RecoveryJournalData): Promise<void> {
+    this.recoveryJournal = { ...journal };
+  }
+
+  async readSnapshot(snapshotId: string): Promise<{
+    manifest: ProvisioningManifest;
+    catalog: PrebuiltCatalog;
+    searchIndex?: PrebuiltSearchIndex | null;
+  } | null> {
+    const entry = this.snapshots.get(snapshotId);
+    if (!entry) return null;
+    try {
+      const manifest = JSON.parse(entry.manifestJson) as ProvisioningManifest;
+      const catalog = JSON.parse(entry.catalogJson) as PrebuiltCatalog;
+      const searchIndex = entry.searchIndexJson
+        ? (JSON.parse(entry.searchIndexJson) as PrebuiltSearchIndex)
+        : null;
+      return { manifest, catalog, searchIndex };
+    } catch {
+      return null;
+    }
+  }
+
+  corruptSnapshotCatalog(snapshotId: string, corruptedJson = '{ invalid_json'): void {
+    const entry = this.snapshots.get(snapshotId);
+    if (entry) {
+      entry.catalogJson = corruptedJson;
+    }
+  }
+
+  corruptSnapshotSearchIndex(snapshotId: string, corruptedJson = '{ invalid_json'): void {
+    const entry = this.snapshots.get(snapshotId);
+    if (entry) {
+      entry.searchIndexJson = corruptedJson;
+    }
+  }
+
+  corruptSnapshotManifest(snapshotId: string, corruptedJson = '{ invalid_json'): void {
+    const entry = this.snapshots.get(snapshotId);
+    if (entry) {
+      entry.manifestJson = corruptedJson;
+    }
+  }
+
+  deleteSnapshot(snapshotId: string): void {
+    this.snapshots.delete(snapshotId);
+  }
+
+  corruptActivePointerRaw(corruptedPointer: unknown): void {
+    this.activePointer = corruptedPointer as ActivePointer;
+  }
 }

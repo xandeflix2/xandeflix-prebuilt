@@ -102,24 +102,40 @@
 | `CROSS_PROFILE_DELTA` | `REJECT_REQUIRE_FULL_PACKAGE` | Transições de perfil (catalog-only <-> search-enabled) via delta são proibidas e exigem pacote full. |
 | `SAME_DELTA_REAPPLY` | `IDEMPOTENT` | Reaplicação do mesmo delta cuja versão já é ativa é tratada como sucesso sem efeitos colaterais. |
 | `UPDATE_BASE_MISMATCH_POLICY` | `FULL_PACKAGE_REQUIRED` | Incompatibilidade de base, versão ou integridade sinaliza compulsoriamente a necessidade de pacote full. |
-| `ACTIVE_READERS_DURING_STAGING` | `CONTINUE_ON_ACTIVE_GENERATION` | Leituras ativas e playback em execução continuam sobre a geração anterior durante o staging sem interrupção. |
+| `ARTIFACT_SECURITY_FORMAT_VERSION` | `1` | Versão 1 do formato de envelope de segurança (ArtifactSecurityEnvelope) desacoplado do conteúdo interno dos pacotes. |
+| `ARTIFACT_SIGNATURE_ALGORITHM` | `ECDSA_P256_SHA256` | Algoritmo criptográfico de assinatura digital estabelecido como ECDSA NIST P-256 com digest SHA-256 (DER format). |
+| `ARTIFACT_AUTHENTICITY` | `SIGNATURE_REQUIRED_FOR_EXTERNAL_IMPORT` | Autenticidade criptográfica de autoria e integridade compulsoriamente exigida para qualquer importação externa. |
+| `TRUST_ANCHOR_MODEL` | `PINNED_PUBLIC_KEY_SET` | Âncoras de confiança modeladas como conjunto fixo de chaves públicas conhecidas e gerenciadas com status ACTIVE/REVOKED. |
+| `PRIVATE_SIGNING_KEY_LOCATION` | `EXTERNAL_ONLY` | Chaves privadas de assinatura mantidas estritamente em pipelines externos fora do repositório, fora do APK e fora dos pacotes. |
+| `SIGNING_PAYLOAD_CANONICALIZATION` | `DETERMINISTIC` | Serialização canônica determinística com chaves ordenadas alfabeticamente para evitar ambiguidades de formatação JSON. |
+| `UNSIGNED_NEW_ARTIFACT_IMPORT` | `REJECT` | Rejeição sumária no boundary de produção de qualquer novo artefato que não possua assinatura válida. |
+| `UNKNOWN_SIGNING_KEY` | `REJECT` | Rejeição fail-closed de artefatos assinados com identificadores de chave (keyId) não cadastrados no cliente. |
+| `REVOKED_SIGNING_KEY` | `REJECT` | Rejeição sumária de artefatos assinados com chaves formalmente revogadas. |
+| `SECURE_IMPORT_FAIL_CLOSED` | `REQUIRED` | Bloqueio imediato antes da descompressão ou parsing em caso de qualquer inconsistência de segurança ou envelope. |
+| `STARTUP_ACTIVE_VALIDATION` | `REQUIRED` | Validação profunda compulsoria de esquema, integridade referencial e hashes da geração ativa durante a inicialização. |
+| `RECOVERY_BASELINE` | `ACTIVE_PLUS_PREVIOUS_KNOWN_GOOD` | Manutenção permanente de no mínimo duas gerações válidas locais: o snapshot ativo e o último snapshot íntegro conhecido. |
+| `RECOVERY_MINIMUM_GENERATIONS` | `2` | Quantidade mínima de gerações de snapshots preservadas para viabilizar recuperação resiliente local. |
+| `AUTOMATIC_LAST_KNOWN_GOOD_RECOVERY` | `SUPPORTED` | Recuperação automática transparente com promoção atômica da geração anterior íntegra em caso de corrupção do ativo. |
+| `RECOVERY_NETWORK` | `NONE` | Recuperação estritamente local; zero chamadas de rede ou downloads automatizados durante processos de recuperação. |
+| `MANUAL_ARBITRARY_ROLLBACK` | `OUT_OF_SCOPE_G10` | Reversão manual para pontos arbitrários do passado considerada fora do escopo do Gate G10. |
+| `PACKAGE_ENCRYPTION_MVP_REQUIREMENT` | `NOT_REQUIRED_FOR_CREDENTIAL_FREE_PROVISIONING_DATA` | Criptografia de pacotes em repouso considerada desnecessária no MVP devido à ausência estrita de dados secretos ou credenciais nos artefatos. |
 
 ---
 
 ## 2. Decisoes Tecnicas em Aberto (DECISIONS_OPEN)
 
-1. `UPDATE_DISTRIBUTION_CHANNEL`: Mecanismo de distribuição, descoberta, polling e notificação de novos pacotes (aberto para G10/G11).
-2. `PACKAGE_SIGNING_STRATEGY`: Assinatura digital criptográfica, chaves assimétricas e verificação de autoria/proveniência (aberto para G10).
-3. `PACKAGE_ENCRYPTION`: Criptografia em repouso e em trânsito de pacotes (aberto para G10).
-4. `USER_SOURCE_BINDING`: Modelo de vinculação entre conta do usuário e credenciais da fonte.
-5. `REAL_SOURCE_AUTH_STRATEGY`: Arquitetura de autenticação contra fontes reais de catálogo e streaming.
-6. `ROLLBACK_FULL`: Mecanismos de reversão manual e gerenciamento de histórico profundo de snapshots (aberto para G10).
-7. `SNAPSHOT_RETENTION`: Política global de limpeza, expiração e garbage collection de snapshots locais (aberto para G10).
-8. `PERFORMANCE_SLA`: Metas contratuais formais de tempo de resposta em hardware físico (aberto para G11).
-9. `PLAYER_SECURE_FLAG_POLICY`: Política de restrição de tela (FLAG_SECURE) no player Android.
-10. `PERSISTENT_PLAYBACK_PROGRESS`: Persistência contínua de ponto de parada e histórico de exibição.
-11. `ARTWORK_CACHE_POLICY`: Política de cacheamento, download e limpeza de imagens/posters.
-12. `FULL_TV_SPATIAL_NAVIGATION`: Navegação espacial bidimensional avançada na interface de TV.
+1. `REAL_SOURCE_AUTH_STRATEGY`: Arquitetura de autenticação contra fontes reais de catálogo e streaming.
+2. `USER_SOURCE_BINDING`: Modelo de vinculação entre conta do usuário e credenciais da fonte.
+3. `UPDATE_DISTRIBUTION_CHANNEL`: Mecanismo de distribuição, descoberta, polling e notificação de novos pacotes.
+4. `PRODUCTION_SIGNING_KEY_OPERATION`: Gestão operacional, provisionamento de chaves reais de produção e armazenamento em HSM/KMS.
+5. `KEY_ROTATION_DISTRIBUTION`: Mecanismos de distribuição e rotação segura de novas chaves públicas em clientes instalados.
+6. `SNAPSHOT_RETENTION_BEYOND_RECOVERY_MINIMUM`: Política global de limpeza, expiração e garbage collection de snapshots além das 2 gerações mínimas.
+7. `PERFORMANCE_SLA`: Metas contratuais formais de tempo de resposta em hardware físico (aberto para G11).
+8. `PLAYER_SECURE_FLAG_POLICY`: Política de restrição de tela (FLAG_SECURE) no player Android.
+9. `PERSISTENT_PLAYBACK_PROGRESS`: Persistência contínua de ponto de parada e histórico de exibição.
+10. `ARTWORK_CACHE_POLICY`: Política de cacheamento, download e limpeza de imagens/posters.
+11. `FULL_TV_SPATIAL_NAVIGATION`: Navegação espacial bidimensional avançada na interface de TV.
+
 
 
 

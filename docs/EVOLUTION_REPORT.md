@@ -6,7 +6,7 @@
 
 - **PROJECT**: `XANDEFLIX_PREBUILT`
 - **PARENT_CONTEXT**: `MARCO_ZERO_CANONICO_XANDEFLIX_PREBUILT`
-- **LAST_CLOSED_GATE**: `G9`
+- **LAST_CLOSED_GATE**: `G10`
 - **G0_STATUS**: `PASS`
 - **G1_STATUS**: `PASS`
 - **G2_STATUS**: `PASS`
@@ -17,14 +17,16 @@
 - **G7_STATUS**: `PASS`
 - **G8_STATUS**: `PASS`
 - **G9_STATUS**: `PASS`
-- **MVP_PROGRESS_PERCENT**: `89`
-- **CURRENT_GATE**: `G10`
-- **G9_STARTED**: `SIM`
-- **G10_STATUS**: `NOT_STARTED`
-- **G10_STARTED**: `NAO`
-- **NEXT_GATE**: `XANDEFLIX_PREBUILT_G10_SECURITY_AND_RECOVERY`
+- **G10_STATUS**: `PASS`
+- **MVP_PROGRESS_PERCENT**: `94`
+- **CURRENT_GATE**: `G11`
+- **G10_STARTED**: `SIM`
+- **G11_STATUS**: `NOT_STARTED`
+- **G11_STARTED**: `NAO`
+- **G12_STATUS**: `NOT_STARTED`
+- **NEXT_GATE**: `XANDEFLIX_PREBUILT_G11_PHYSICAL_MULTI_DEVICE_TESTING`
 - **NEXT_GATE_STARTED**: `NAO`
-- **HISTORICAL_RECORD**: `G5_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G5_ADJUDICATION_CLOSED_PASS=SIM; G6_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G6_ADJUDICATION_CLOSED_PASS=SIM; G7_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G7_ADJUDICATION_CLOSED_PASS=SIM; SEARCH_SCALE_PERFORMANCE_RISK=OPEN_NON_BLOCKING; G8_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G8_ADJUDICATION_CLOSED_PASS=SIM; G9_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G9_ADJUDICATION_CLOSED_PASS=SIM; UPDATE_SCALE_MEMORY_RISK=OPEN_NON_BLOCKING`
+- **HISTORICAL_RECORD**: `G5_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G5_ADJUDICATION_CLOSED_PASS=SIM; G6_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G6_ADJUDICATION_CLOSED_PASS=SIM; G7_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G7_ADJUDICATION_CLOSED_PASS=SIM; SEARCH_SCALE_PERFORMANCE_RISK=OPEN_NON_BLOCKING; G8_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G8_ADJUDICATION_CLOSED_PASS=SIM; G9_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G9_ADJUDICATION_CLOSED_PASS=SIM; UPDATE_SCALE_MEMORY_RISK=OPEN_NON_BLOCKING; G10_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G10_ADJUDICATION_CLOSED_PASS=SIM`
 
 ---
 
@@ -421,3 +423,34 @@
   - CURRENT_GATE avançado para G10 (`NEXT_AUTHORIZABLE_GATE=G10`);
   - G10 permanece NOT_STARTED (`G10_STATUS=NOT_STARTED`, `G10_STARTED=NAO`, `NEXT_GATE_STARTED=NAO`);
   - Autorização expressa concedida para commit e push canônicos na branch origin/main.
+
+- **Ciclo G10 (Security & Recovery — 2026-09-05)**:
+  - Implementação da camada formal de autenticidade criptográfica e recuperação resiliente para o Xandeflix Prebuilt;
+  - Formato de envelope de segurança desacoplado V1 (`ArtifactSecurityEnvelope`, `securityFormatVersion=1`, `schemas/prebuilt-artifact-security.schema.json`) preservando os formatos de dados internos consolidados nos Gates G4, G7 e G9;
+  - Algoritmo de assinatura estabelecido como ECDSA NIST P-256 com digest SHA-256 no formato DER (`ARTIFACT_SIGNATURE_ALGORITHM=ECDSA_P256_SHA256`);
+  - Payload de assinatura canônico determinístico com ordenação alfabética estrita de propriedades (`SIGNING_PAYLOAD_CANONICALIZATION=DETERMINISTIC`);
+  - Separação estrita de chaves assimétricas: chave privada externa ao repositório e ao cliente (`PRIVATE_SIGNING_KEY_LOCATION=EXTERNAL_ONLY`), ferramenta externa de assinatura CLI (`scripts/sign-provisioning-artifact.mjs`), chaves efêmeras em testes (`TEST_PRIVATE_KEY_PERSISTED=NAO`), e ausência de chaves de produção inventadas (`PRODUCTION_SIGNING_KEY_PROVISIONED=NAO`);
+  - Âncoras de confiança modeladas como conjunto fixo de chaves públicas gerenciadas (`TRUST_ANCHOR_MODEL=PINNED_PUBLIC_KEY_SET`, `TrustedPublicKeyStore`) com status `ACTIVE` e `REVOKED`;
+  - Verificação fail-closed compulsoria antes de descompressão ou parsing (`ArtifactVerifier`, `SECURE_IMPORT_FAIL_CLOSED=REQUIRED`);
+  - Rejeição comprovada de artefatos não assinados no boundary de produção (`UNSIGNED_NEW_ARTIFACT_IMPORT=REJECT`, `PRODUCTION_IMPORT_BYPASS=NAO`);
+  - Rejeições comprovadas de ataques e defeitos: adulteração de artefato (`TAMPERED_ARTIFACT_REJECTED=PASS`), assinatura forjada (`TAMPERED_SIGNATURE_REJECTED=PASS`), chave errada (`WRONG_KEY_REJECTED=PASS`), chave desconhecida (`UNKNOWN_KEY_ID_REJECTED=PASS`), chave revogada (`REVOKED_KEY_REJECTED=PASS`), discrepância de tamanho (`ARTIFACT_SIZE_MISMATCH_REJECTED=PASS`), divergência de hash (`ARTIFACT_HASH_MISMATCH_REJECTED=PASS`) e confusão de algoritmo (`ALGORITHM_CONFUSION_REJECTED=PASS`);
+  - Suporte completo e retrocompatível comprovado para `FULL_PACKAGE_V1`, `FULL_PACKAGE_V2` e `DELTA_PACKAGE_V1`;
+  - Arquitetura de recuperação resiliente com validação profunda no startup (`STARTUP_ACTIVE_VALIDATION=REQUIRED`, `RecoveryService`), diário de recuperação atômico (`prebuilt/recovery.json`, `RecoveryJournalManager`), retenção mínima de 2 gerações (`RECOVERY_MINIMUM_GENERATIONS=2`, `RECOVERY_BASELINE=ACTIVE_PLUS_PREVIOUS_KNOWN_GOOD`) e promoção atômica transparente da última geração íntegra conhecida (`AUTOMATIC_LAST_KNOWN_GOOD_RECOVERY=SUPPORTED`, `PREVIOUS_VALID_SNAPSHOT_RECOVERED=PASS`);
+  - Prevenção formal e comprovada de falso vazio (`RECOVERY_FALSE_EMPTY_PREVENTED=PASS`);
+  - Idempotência pura na recuperação (`RECOVERY_IDEMPOTENT=PASS`) e segurança contra falha de escrita no ponteiro (`RECOVERY_POINTER_WRITE_FAILURE_SAFE=PASS`);
+  - Recuperação estritamente local sem tráfego de rede (`RECOVERY_NETWORK=NONE`);
+  - Decisão formal sobre criptografia de pacotes: não-requisito no MVP devido à estrita ausência de dados secretos ou credenciais nos artefatos de provisionamento (`PACKAGE_ENCRYPTION_MVP_REQUIREMENT=NOT_REQUIRED_FOR_CREDENTIAL_FREE_PROVISIONING_DATA`, `PACKAGE_ENCRYPTION_IMPLEMENTED=NAO`);
+  - Elaboração da documentação arquitetural em `docs/SECURITY_AND_RECOVERY.md` (23 seções canônicas) e formalização de 12 fluxos funcionais no FSD (`F-G10-001` a `F-G10-012`);
+  - Suíte completa de testes de segurança e recuperação implementada em `scripts/validate-security-recovery.mjs` (`npm run security:check`) com 100% de aprovação;
+  - Preservação de 100% dos testes de regressão dos Gates anteriores G2 a G9, além de typecheck, build web e compilação nativa Android (`CAP_SYNC_ANDROID=PASS`, `ANDROID_UNIT_TESTS=PASS`, `ANDROID_DEBUG_BUILD=PASS`);
+  - Registro de conclusão técnica: `G10_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM`.
+
+- **Adjudicacao G10 e Canonicalizacao (2026-09-05)**:
+  - Gate G10 formalmente adjudicado pelo Chat Mestre como PASS (`RESULT=PASS_PREBUILT_G10_SECURITY_AND_RECOVERY_CLOSED`);
+  - `G10_STATUS=PASS`, `G10_ADJUDICATION_CLOSED_PASS=SIM`;
+  - MVP_PROGRESS_PERCENT elevado de 89 para 94 (`MVP_PROGRESS_PERCENT=94`);
+  - CURRENT_GATE avançado para G11 (`NEXT_AUTHORIZABLE_GATE=G11`);
+  - G11 permanece NOT_STARTED (`G11_STATUS=NOT_STARTED`, `G11_STARTED=NAO`, `NEXT_GATE_STARTED=NAO`);
+  - Autorização expressa concedida para commit e push canônicos na branch origin/main.
+
+

@@ -13,6 +13,7 @@
 - `G7_FLOWS_FORMALIZED=SIM`
 - `G8_FLOWS_FORMALIZED=SIM`
 - `G9_FLOWS_FORMALIZED=SIM`
+- `G10_FLOWS_FORMALIZED=SIM`
 
 ---
 
@@ -54,7 +55,7 @@ Conforme os Gates forem abertos pelo Chat Mestre, as seguintes categorias de flu
 5. **Mecanismo de Busca Local** (Gate G7 - Formalizado abaixo);
 6. **Autenticacao de Fonte e Playback Direto** (Gate G8 - Formalizado abaixo);
 7. **Atualizacao Incremental / Delta Sync** (Gate G9 - Formalizado abaixo);
-8. **Recuperacao de Falha e Modo Offline** (Gate G10).
+8. **Recuperacao de Falha e Seguranca** (Gate G10 - Formalizado abaixo).
 
 ---
 
@@ -1414,6 +1415,291 @@ Conforme os Gates forem abertos pelo Chat Mestre, as seguintes categorias de flu
 - **OBSERVABILITY**: Consultas retornam novo snapshotId nos metadados.
 - **ACCEPTANCE_CRITERIA**: `SEARCH_DELTA_QUERY_EQUIVALENCE=PASS`, `POST_DELTA_QUERY_EQUIVALENCE=PASS`.
 - **TRACEABILITY**: G9 seções 42, 43, 61, 62.
+
+---
+
+## 11. Fluxos Funcionais de Segurança e Recuperação (Gate G10)
+
+### F-G10-001_SIGN_ARTIFACT_EXTERNALLY — Assinatura Externa de Artefatos de Provisionamento
+
+- **FLOW_ID**: `F-G10-001_SIGN_ARTIFACT_EXTERNALLY`
+- **TRIGGER**: Execução do utilitário externo de assinatura (`scripts/sign-provisioning-artifact.mjs`) sobre pacote full ou delta.
+- **PRECONDITIONS**: Artefato compilado existente; chave privada ECDSA P-256 informada externamente (arquivo externo ou variável de ambiente).
+- **MAIN_FLOW**:
+  1. A ferramenta lê os bytes exatos do artefato ZIP (`catalog-package.zip` ou `delta-package.zip`);
+  2. Calcula o digest SHA-256 e o tamanho exato em bytes;
+  3. Constrói o payload canônico determinístico com chaves ordenadas lexicograficamente;
+  4. Assina o payload utilizando a chave privada NIST P-256 e digest SHA-256 (DER format);
+  5. Gera o arquivo sidecar `ArtifactSecurityEnvelope` (`.sig.json`) com `securityFormatVersion=1`;
+  6. A chave privada permanece estritamente em memória do processo de build e nunca é gravada no repositório.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: Chave privada inválida, arquivo inexistente ou parâmetros ausentes abortam com código de erro não-zero.
+- **TERMINAL_STATES**: `ARTIFACT_SIGNED_SUCCESSFULLY`.
+- **DATA_READ**: Artefato de provisionamento ZIP, arquivo externo de chave privada.
+- **DATA_WRITE**: Arquivo de envelope `.sig.json`.
+- **NETWORK**: Nenhuma (`NO_NETWORK_ACCESS=SIM`).
+- **SECURITY**: Chave privada externa ao repositório e ao APK; sanitização de logs de chave privada.
+- **ACCEPTANCE_CRITERIA**: `PRIVATE_SIGNING_KEY_EXTERNAL_ONLY=PASS`, `TEST_PRIVATE_KEY_PERSISTED=NAO`.
+- **TRACEABILITY**: G10 seções 6, 7, 8, 12, 13, 47.
+
+---
+
+### F-G10-002_VERIFY_SIGNED_FULL_PACKAGE — Verificação de Pacote Completo Assinado
+
+- **FLOW_ID**: `F-G10-002_VERIFY_SIGNED_FULL_PACKAGE`
+- **TRIGGER**: Submissão de pacote completo (`FULL_PACKAGE_V1` ou `FULL_PACKAGE_V2`) acompanhado de envelope de segurança.
+- **PRECONDITIONS**: `TrustedPublicKeyStore` configurado com chaves públicas ativas.
+- **MAIN_FLOW**:
+  1. `ArtifactVerifier` valida a estrutura do envelope contra `prebuilt-artifact-security.schema.json`;
+  2. Confere se o algoritmo é exatamente `ECDSA_P256_SHA256`;
+  3. Localiza a chave pública correspondente ao `keyId` no `TrustedPublicKeyStore`;
+  4. Valida se o status da chave é `ACTIVE`;
+  5. Confere o tamanho em bytes do artefato;
+  6. Recalcula o SHA-256 do artefato e compara com `artifactSha256`;
+  7. Reconstrói o payload canônico determinístico e valida a assinatura criptográfica via WebCrypto;
+  8. Retorna resultado de verificação com sucesso (`valid: true`).
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: Qualquer discrepância dispara erro tipado e rejeição fail-closed.
+- **TERMINAL_STATES**: `VERIFICATION_SUCCESS`.
+- **DATA_READ**: Bytes do artefato ZIP, envelope JSON, chave pública do store.
+- **DATA_WRITE**: Nenhum.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Verificação estrita antes de descompressão ou parse do ZIP.
+- **ACCEPTANCE_CRITERIA**: `SIGNED_PACKAGE_V1_ACCEPTED=PASS`, `SIGNED_PACKAGE_V2_ACCEPTED=PASS`.
+- **TRACEABILITY**: G10 seções 11, 14, 56.
+
+---
+
+### F-G10-003_VERIFY_SIGNED_DELTA — Verificação de Pacote Delta Assinado
+
+- **FLOW_ID**: `F-G10-003_VERIFY_SIGNED_DELTA`
+- **TRIGGER**: Submissão de pacote delta (`DELTA_PACKAGE_V1`) acompanhado de envelope de segurança.
+- **PRECONDITIONS**: Chave pública confiável disponível no store.
+- **MAIN_FLOW**:
+  1. `ArtifactVerifier` valida o envelope com `artifactType === 'DELTA_PACKAGE_V1'`;
+  2. Confere algoritmo, keyId, status da chave, tamanho e SHA-256 dos bytes do delta;
+  3. Valida a assinatura ECDSA P-256;
+  4. Encaminha o delta para aplicação em staging pelo `IncrementalUpdateService`;
+  5. O delta é processado em quarentena sem bypass de segurança.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: Rejeição fail-closed preservando snapshot ativo.
+- **TERMINAL_STATES**: `VERIFICATION_SUCCESS`.
+- **DATA_READ**: Bytes do pacote delta, envelope JSON.
+- **DATA_WRITE**: Nenhum.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Prevenção contra injeção de deltas adulterados.
+- **ACCEPTANCE_CRITERIA**: `SIGNED_DELTA_V1_ACCEPTED=PASS`.
+- **TRACEABILITY**: G10 seções 11, 57.
+
+---
+
+### F-G10-004_REJECT_UNSIGNED_ARTIFACT — Rejeição de Artefato Não Assinado
+
+- **FLOW_ID**: `F-G10-004_REJECT_UNSIGNED_ARTIFACT`
+- **TRIGGER**: Submissão de artefato para importação no boundary de produção sem envelope de segurança.
+- **PRECONDITIONS**: `SecureArtifactImportService` em execução com `requireSignature: true`.
+- **MAIN_FLOW**:
+  1. O serviço de importação verifica a presença do envelope de segurança;
+  2. Detecta ausência de assinatura/envelope;
+  3. Interrompe a importação imediatamente sem tocar o armazenamento local nem invocar descompressão;
+  4. Lança erro `UNSIGNED_ARTIFACT` com severidade de segurança.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: Rejeição imediata fail-closed.
+- **TERMINAL_STATES**: `REJECTED_UNSIGNED_ARTIFACT`.
+- **DATA_READ**: Nenhum.
+- **DATA_WRITE**: Nenhum.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Bloqueio total de artefatos não assinados no boundary de produção (`UNSIGNED_NEW_ARTIFACT_IMPORT=REJECT`).
+- **ACCEPTANCE_CRITERIA**: `UNSIGNED_ARTIFACT_REJECTED=PASS`, `PRODUCTION_IMPORT_BYPASS=NAO`.
+- **TRACEABILITY**: G10 seções 4, 21, 58.
+
+---
+
+### F-G10-005_REJECT_TAMPERED_ARTIFACT — Rejeição de Artefato ou Assinatura Adulterada
+
+- **FLOW_ID**: `F-G10-005_REJECT_TAMPERED_ARTIFACT`
+- **TRIGGER**: Submissão de artefato cujos bytes foram alterados após a assinatura ou cujo envelope contém assinatura adulterada.
+- **PRECONDITIONS**: Envelope de segurança formatado.
+- **MAIN_FLOW**:
+  1. Se 1 byte do artefato for adulterado:
+     - O recálculo de SHA-256 detecta divergência (`ARTIFACT_HASH_MISMATCH`);
+     - A importação aborta antes da verificação criptográfica;
+  2. Se a assinatura no envelope for adulterada:
+     - O recálculo de SHA-256 confere, mas a verificação criptográfica ECDSA falha (`SIGNATURE_INVALID`);
+  3. Em ambos os casos, a importação é sumariamente rejeitada.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: Rejeição fail-closed.
+- **TERMINAL_STATES**: `REJECTED_TAMPERED_ARTIFACT`.
+- **DATA_READ**: Bytes adulterados.
+- **DATA_WRITE**: Nenhum.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Proteção rigorosa de integridade e autenticidade.
+- **ACCEPTANCE_CRITERIA**: `TAMPERED_ARTIFACT_REJECTED=PASS`, `TAMPERED_SIGNATURE_REJECTED=PASS`.
+- **TRACEABILITY**: G10 seções 17, 18, 52.
+
+---
+
+### F-G10-006_REJECT_UNKNOWN_OR_REVOKED_KEY — Rejeição de Chave Desconhecida ou Revogada
+
+- **FLOW_ID**: `F-G10-006_REJECT_UNKNOWN_OR_REVOKED_KEY`
+- **TRIGGER**: Submissão de artefato assinado com `keyId` não cadastrado no store ou com status `REVOKED`.
+- **PRECONDITIONS**: `TrustedPublicKeyStore` ativo.
+- **MAIN_FLOW**:
+  1. Se o `keyId` não constar no store:
+     - O validador rejeita com `UNKNOWN_SIGNING_KEY`;
+     - Nenhum download remoto de chaves é disparado (`RECOVERY_NETWORK=NONE`);
+  2. Se o `keyId` estiver registrado com status `REVOKED`:
+     - O validador rejeita com `REVOKED_SIGNING_KEY`;
+  3. A operação aborta sem inspecionar o conteúdo do artefato.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: Rejeição imediata.
+- **TERMINAL_STATES**: `REJECTED_UNTRUSTED_KEY`.
+- **DATA_READ**: Store de chaves públicas.
+- **DATA_WRITE**: Nenhum.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Controle estrito do conjunto de chaves confiáveis (`PINNED_PUBLIC_KEY_SET`).
+- **ACCEPTANCE_CRITERIA**: `UNKNOWN_KEY_ID_REJECTED=PASS`, `REVOKED_KEY_REJECTED=PASS`.
+- **TRACEABILITY**: G10 seções 15, 16, 52.
+
+---
+
+### F-G10-007_DETECT_CORRUPTED_ACTIVE — Detecção de Snapshot Ativo Corrompido no Startup
+
+- **FLOW_ID**: `F-G10-007_DETECT_CORRUPTED_ACTIVE`
+- **TRIGGER**: Inicialização do aplicativo ou chamada de verificação de integridade pós-boot.
+- **PRECONDITIONS**: `RecoveryService` instanciado com storage local.
+- **MAIN_FLOW**:
+  1. `RecoveryService.validateActiveSnapshot()` lê `active.json` e localiza o snapshot apontado;
+  2. Executa validação profunda em `manifest.json`, `catalog.json` e, se search-enabled, `search-index.json`;
+  3. Detecta anomalia (JSON malformado, hash divergente, integridade relacional violada ou ponteiro ausente);
+  4. Retorna diagnóstico estruturado com `valid: false` e categoria do erro;
+  5. Aciona o fluxo de auto-recuperação (`F-G10-008`).
+- **ALTERNATIVE_FLOW**: Se o snapshot ativo estiver íntegro, transiciona para `ACTIVE_CATALOG_READY`.
+- **ERROR_FLOW**: Encaminhamento para recuperação.
+- **TERMINAL_STATES**: `CORRUPTION_DETECTED`.
+- **DATA_READ**: Storage privado do app (`active.json`, snapshot ativo).
+- **DATA_WRITE**: Nenhum.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Fail-closed na detecção de corrupção.
+- **ACCEPTANCE_CRITERIA**: `STARTUP_ACTIVE_VALIDATION=PASS`, `CORRUPTED_ACTIVE_CATALOG_DETECTED=PASS`.
+- **TRACEABILITY**: G10 seções 25, 30, 53.
+
+---
+
+### F-G10-008_RECOVER_PREVIOUS_KNOWN_GOOD — Recuperação Automática da Geração Anterior Conhecida
+
+- **FLOW_ID**: `F-G10-008_RECOVER_PREVIOUS_KNOWN_GOOD`
+- **TRIGGER**: Detecção de anomalia ou corrupção no snapshot ativo durante validação ou inicialização.
+- **PRECONDITIONS**: Diário de recuperação `prebuilt/recovery.json` registrando geração anterior íntegra.
+- **MAIN_FLOW**:
+  1. O `RecoveryService` transiciona para estado `RECOVERING`;
+  2. Lê o diário de recuperação e identifica o `previousSnapshotId` / `lastKnownGoodSnapshotId`;
+  3. Executa a validação profunda completa e recálculo de hashes da geração anterior;
+  4. Confirmada a integridade da geração anterior, promove atomicamente o ponteiro `active.json`;
+  5. Atualiza o diário de recuperação refletindo o novo ativo;
+  6. Notifica o sistema que o catálogo foi recuperado com sucesso (`RECOVERY_SUCCEEDED`).
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: Se a geração anterior também estiver corrompida, transiciona para `F-G10-009`.
+- **TERMINAL_STATES**: `RECOVERY_SUCCEEDED`.
+- **DATA_READ**: `prebuilt/recovery.json`, snapshots anteriores.
+- **DATA_WRITE**: `active.json`, `prebuilt/recovery.json` (atômicos).
+- **NETWORK**: Nenhuma (`RECOVERY_NETWORK=NONE`).
+- **SECURITY**: Promoção atômica; não sobrescreve o snapshot com defeito.
+- **ACCEPTANCE_CRITERIA**: `PREVIOUS_VALID_SNAPSHOT_RECOVERED=PASS`, `RECOVERY_IDEMPOTENT=PASS`.
+- **TRACEABILITY**: G10 seções 26, 28, 31, 33, 54.
+
+---
+
+### F-G10-009_FAIL_CLOSED_WITH_NO_VALID_SNAPSHOT — Encerramento Seguro sem Snapshot Válido
+
+- **FLOW_ID**: `F-G10-009_FAIL_CLOSED_WITH_NO_VALID_SNAPSHOT`
+- **TRIGGER**: Falha na validação do snapshot ativo e de todas as gerações candidatas anteriores no dispositivo.
+- **PRECONDITIONS**: Nenhuma geração local íntegra identificada no storage.
+- **MAIN_FLOW**:
+  1. O serviço de recuperação tenta validar o ativo e o anterior;
+  2. Constata que ambos estão ausentes ou corrompidos;
+  3. Transiciona formalmente para o estado terminal `NO_VALID_LOCAL_SNAPSHOT`;
+  4. Não tenta fabricar dados fictícios nem conectar em rede para baixar pacotes;
+  5. Sinaliza erro claro para o subsistema de apresentação.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: Bloqueio seguro total.
+- **TERMINAL_STATES**: `NO_VALID_LOCAL_SNAPSHOT`.
+- **DATA_READ**: Storage local.
+- **DATA_WRITE**: Nenhum.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Fail-closed rigoroso contra execução com dados corrompidos.
+- **ACCEPTANCE_CRITERIA**: `NO_VALID_SNAPSHOT_FAIL_CLOSED=PASS`.
+- **TRACEABILITY**: G10 seções 34, 35, 53.
+
+---
+
+### F-G10-010_PREVENT_FALSE_EMPTY_DURING_RECOVERY — Prevenção de Falso Vazio na Recuperação
+
+- **FLOW_ID**: `F-G10-010_PREVENT_FALSE_EMPTY_DURING_RECOVERY`
+- **TRIGGER**: Ocorrência de corrupção ou falha de leitura que poderia induzir a aplicação a expor catálogo vazio.
+- **PRECONDITIONS**: Erro de inicialização ou ponteiro ausente/corrompido.
+- **MAIN_FLOW**:
+  1. A camada de storage e o `RecoveryService` interceptam o erro;
+  2. Garantem que o estado retornado seja `RECOVERING` ou `NO_VALID_LOCAL_SNAPSHOT`;
+  3. Impedem terminantemente que métodos de catálogo retornem array vazio `[]` como se o catálogo fosse válido;
+  4. A interface do usuário renderiza estado explícito de erro/recuperação e não tela vazia normal.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: N/A.
+- **TERMINAL_STATES**: `FALSE_EMPTY_PREVENTED`.
+- **DATA_READ**: Storage local.
+- **DATA_WRITE**: Nenhum.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Integridade da experiência do usuário e prevenção de diagnóstico enganoso.
+- **ACCEPTANCE_CRITERIA**: `RECOVERY_FALSE_EMPTY_PREVENTED=PASS`.
+- **TRACEABILITY**: G10 seções 29, 32, 53.
+
+---
+
+### F-G10-011_RECOVERY_POINTER_WRITE_FAILURE — Tratamento de Falha de Escrita no Ponteiro de Recuperação
+
+- **FLOW_ID**: `F-G10-011_RECOVERY_POINTER_WRITE_FAILURE`
+- **TRIGGER**: Falha física ou de permissão ao tentar gravar `active.json` durante o processo de promoção da recuperação.
+- **PRECONDITIONS**: Tentativa de recuperação ativa.
+- **MAIN_FLOW**:
+  1. O serviço tenta escrever o novo ponteiro atômico via `writeActivePointer`;
+  2. O sistema de arquivos lança erro de escrita simulado ou real;
+  3. O serviço aborta a promoção com `RECOVERY_WRITE_FAILURE`;
+  4. Nenhum ponteiro parcial ou corrompido é persistido no disco;
+  5. O snapshot anterior continua preservado intacto.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: Operação cancelada de forma atômica e segura.
+- **TERMINAL_STATES**: `RECOVERY_ABORTED_SAFE`.
+- **DATA_READ**: Storage local.
+- **DATA_WRITE**: Tentativa abortada com rollback.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Atomicidade da mutação de ponteiro.
+- **ACCEPTANCE_CRITERIA**: `RECOVERY_POINTER_WRITE_FAILURE_SAFE=PASS`.
+- **TRACEABILITY**: G10 seções 33, 55.
+
+---
+
+### F-G10-012_SECURE_IMPORT_BOUNDARY — Fronteira de Importação Segura do Aplicativo
+
+- **FLOW_ID**: `F-G10-012_SECURE_IMPORT_BOUNDARY`
+- **TRIGGER**: Requisição de importação de pacote inicial ou atualização pelo runtime do aplicativo.
+- **PRECONDITIONS**: Aplicativo em execução em ambiente web ou Android.
+- **MAIN_FLOW**:
+  1. Toda entrada de novos dados de provisionamento é obrigatoriamente roteada pelo `SecureArtifactImportService`;
+  2. O serviço exige o artefato e seu envelope assinado correspondente;
+  3. Valida criptograficamente o artefato via `ArtifactVerifier`;
+  4. Apenas após a aprovação criptográfica e estrutural, delega aos importadores de baixo nível (`PackageImporter` ou `IncrementalUpdateService`);
+  5. O importador realiza staging em quarentena, readback e promoção atômica com atualização do diário de recuperação;
+  6. Nenhuma chamada direta ao importador de baixo nível sem assinatura é acessível pela UI.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: Rejeição no security boundary antes de qualquer staging.
+- **TERMINAL_STATES**: `SECURE_IMPORT_COMPLETE`.
+- **DATA_READ**: Bytes do artefato, envelope.
+- **DATA_WRITE**: Staging em quarentena e promoção atômica.
+- **NETWORK**: Nenhuma no MVP (`NO_NETWORK_ACCESS=SIM`).
+- **SECURITY**: Trust boundary unificado e proteção contra bypass em produção.
+- **ACCEPTANCE_CRITERIA**: `PRODUCTION_IMPORT_BYPASS=NAO`, `SECURE_IMPORT_BOUNDARY=PASS`.
+- **TRACEABILITY**: G10 seções 4, 21, 45, 58.
+
 
 
 

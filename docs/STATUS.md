@@ -5,9 +5,9 @@
 ## 1. Identidade e Localizacao
 
 - **PROJECT**: `XANDEFLIX_PREBUILT`
-- **LAST_CLOSED_GATE**: `G9`
-- **CURRENT_GATE**: `G10`
-- **MVP_PROGRESS_PERCENT**: `89`
+- **LAST_CLOSED_GATE**: `G10`
+- **CURRENT_GATE**: `G11`
+- **MVP_PROGRESS_PERCENT**: `94`
 - **IMPLEMENTATION_STARTED**: `SIM`
 - **G1_STARTED**: `SIM`
 - **G2_STARTED**: `SIM`
@@ -22,19 +22,20 @@
 - **G8_STATUS**: `PASS`
 - **G9_STARTED**: `SIM`
 - **G9_STATUS**: `PASS`
-- **G10_STATUS**: `NOT_STARTED`
-- **G10_STARTED**: `NAO`
+- **G10_STATUS**: `PASS`
+- **G10_STARTED**: `SIM`
 - **G11_STATUS**: `NOT_STARTED`
+- **G11_STARTED**: `NAO`
 - **G12_STATUS**: `NOT_STARTED`
-- **NEXT_GATE**: `XANDEFLIX_PREBUILT_G10_SECURITY_AND_RECOVERY`
+- **NEXT_GATE**: `XANDEFLIX_PREBUILT_G11_PHYSICAL_MULTI_DEVICE_TESTING`
 - **NEXT_GATE_STARTED**: `NAO`
 - **REPOSITORY**: `xandeflix2/xandeflix-prebuilt`
 - **WORKSPACE**: `C:\Xandeflix\xandeflix-prebuilt`
 - **SUPABASE_PROJECT**: `cujbmyhitgomlgwfkaat`
 - **ANDROID_PACKAGE_ID**: `com.xandeflix.prebuilt`
 
-> *Nota explicativa*: O Gate G9 (`XANDEFLIX_PREBUILT_G9_INCREMENTAL_UPDATE`) foi formalmente adjudicado pelo Chat Mestre como `PASS` (`RESULT=PASS_PREBUILT_G9_INCREMENTAL_UPDATE_CLOSED`), elevando o progresso do MVP para 89%. A arquitetura de atualização incremental segura foi estabelecida com formato canônico `DELTA_PACKAGE_FORMAT_VERSION=1`, vinculação estrita à base (`DELTA_BASE_BINDING=STRICT`), endereçamento por ID (`CATALOG_DELTA_ADDRESSING=CANONICAL_ID_BASED`), semântica de upsert integral (`DELTA_UPSERT_SEMANTICS=FULL_ENTITY_REPLACEMENT`), aplicação determinística em staging isolado (`STAGING_THEN_PROMOTION`), verificação atômica de integridade e recálculo de hashes para catálogo e busca. A redução de tamanho de transferência foi comprovada empiricamente (0,0092 em alterações esparsas de 1% no benchmark de 240k documentos). A evidência empírica de pico de memória de 640 MB no teste moderado de 5% foi classificada como risco não-bloqueador (`UPDATE_SCALE_MEMORY_RISK=OPEN_NON_BLOCKING`), mantendo a diretriz de que evidência de performance não constitui SLA (`PERFORMANCE_EVIDENCE_IS_NOT_SLA=SIM`). O próximo Gate G10 (`XANDEFLIX_PREBUILT_G10_SECURITY_AND_RECOVERY`) permanece estritamente `NOT_STARTED` (`G10_STATUS=NOT_STARTED`, `G10_STARTED=NAO`, `NEXT_GATE_STARTED=NAO`).
-> *Histórico preservado*: `G9_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G9_ADJUDICATION_CLOSED_PASS=SIM; UPDATE_SCALE_MEMORY_RISK=OPEN_NON_BLOCKING`.
+> *Nota explicativa*: O Gate G10 (`XANDEFLIX_PREBUILT_G10_SECURITY_AND_RECOVERY`) foi formalmente adjudicado pelo Chat Mestre como `PASS` (`RESULT=PASS_PREBUILT_G10_SECURITY_AND_RECOVERY_CLOSED`), elevando o progresso do MVP para 94%. Foram consolidados e homologados: autenticidade criptográfica de artefatos de provisionamento (pacotes completos v1/v2 e deltas) via envelope de segurança externo (`ArtifactSecurityEnvelope` V1, `ECDSA_P256_SHA256`) sem alteração dos formatos de dados congelados nos Gates G4, G7 e G9; separação estrita de chaves assimétricas mantendo a chave privada exclusivamente em ambiente seguro externo (`PRIVATE_SIGNING_KEY_LOCATION=EXTERNAL_ONLY`, `TEST_PRIVATE_KEY_PERSISTED=NAO`); trust anchor model com conjunto fixo de chaves públicas gerenciadas (`TRUST_ANCHOR_MODEL=PINNED_PUBLIC_KEY_SET`); rejeição fail-closed sumária de artefatos não assinados no boundary de produção (`UNSIGNED_NEW_ARTIFACT_IMPORT=REJECT`, `PRODUCTION_IMPORT_BYPASS=NAO`); proteção comprovada contra adulteração de artefato ou assinatura, chaves não confiáveis ou revogadas e confusão de algoritmo; validação profunda de inicialização (`STARTUP_ACTIVE_VALIDATION=REQUIRED`); arquitetura de recuperação resiliente com diário atômico (`prebuilt/recovery.json`), retenção mínima de 2 gerações (`RECOVERY_MINIMUM_GENERATIONS=2`, `RECOVERY_BASELINE=ACTIVE_PLUS_PREVIOUS_KNOWN_GOOD`) e promoção automática transparente da última geração íntegra conhecida (`AUTOMATIC_LAST_KNOWN_GOOD_RECOVERY=SUPPORTED`); prevenção absoluta de falso vazio (`RECOVERY_FALSE_EMPTY_PREVENTED=PASS`); recuperação estritamente local (`RECOVERY_NETWORK=NONE`); e decisão de não-requisito de criptografia de pacotes para metadados sem segredos (`PACKAGE_ENCRYPTION_MVP_REQUIREMENT=NOT_REQUIRED_FOR_CREDENTIAL_FREE_PROVISIONING_DATA`). O próximo Gate G11 (`XANDEFLIX_PREBUILT_G11_PHYSICAL_MULTI_DEVICE_TESTING`) permanece estritamente `NOT_STARTED` (`G11_STATUS=NOT_STARTED`, `G11_STARTED=NAO`, `NEXT_GATE_STARTED=NAO`).
+> *Histórico preservado*: `G10_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G10_ADJUDICATION_CLOSED_PASS=SIM; LAST_CLOSED_GATE=G10; MVP_PROGRESS_PERCENT=94; G11_STATUS=NOT_STARTED; G11_STARTED=NAO; NEXT_GATE_STARTED=NAO`.
 
 ---
 
@@ -50,6 +51,6 @@
 - **G7_STATUS**: `PASS`
 - **G8_STATUS**: `PASS`
 - **G9_STATUS**: `PASS`
-- **G10_STATUS**: `NOT_STARTED`
+- **G10_STATUS**: `PASS`
 - **G11_STATUS**: `NOT_STARTED`
 - **G12_STATUS**: `NOT_STARTED`

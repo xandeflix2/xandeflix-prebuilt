@@ -188,6 +188,17 @@ export class PackageImporter {
 
       const newPointer = createActivePointer(manifest);
       await this.storage.writeActivePointer(newPointer);
+
+      if (this.storage.writeRecoveryJournal) {
+        await this.storage.writeRecoveryJournal({
+          journalFormatVersion: 1,
+          activeSnapshotId: manifest.snapshotId,
+          previousSnapshotId: previousSnapshotId || null,
+          lastKnownGoodSnapshotId: manifest.snapshotId,
+          updatedAt: new Date().toISOString(),
+        });
+      }
+
       metrics.promotionMs = Date.now() - promoStart;
 
       // -----------------------------------------------------------

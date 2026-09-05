@@ -519,6 +519,17 @@ export class IncrementalUpdateService {
 
       const newPointer = createActivePointer(targetManifest);
       await this.storage.writeActivePointer(newPointer);
+
+      if (this.storage.writeRecoveryJournal) {
+        await this.storage.writeRecoveryJournal({
+          journalFormatVersion: 1,
+          activeSnapshotId: manifest.targetSnapshotId,
+          previousSnapshotId: manifest.baseSnapshotId,
+          lastKnownGoodSnapshotId: manifest.targetSnapshotId,
+          updatedAt: new Date().toISOString(),
+        });
+      }
+
       metrics.promotionMs = Date.now() - promoStart;
 
       // -----------------------------------------------------------

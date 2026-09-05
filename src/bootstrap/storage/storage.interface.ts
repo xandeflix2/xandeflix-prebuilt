@@ -81,4 +81,23 @@ export interface LocalCatalogStorage {
    * Calcula o espaço físico em bytes ocupado pelo snapshot atualmente ativo.
    */
   calculateActiveStorageSize(): Promise<number>;
+
+  /**
+   * Lê o RecoveryJournal persistido (ou null se inexistente).
+   */
+  readRecoveryJournal?(): Promise<import('../../recovery/recovery.types.ts').RecoveryJournalData | null>;
+
+  /**
+   * Grava atomicamente o RecoveryJournal.
+   */
+  writeRecoveryJournal?(journal: import('../../recovery/recovery.types.ts').RecoveryJournalData): Promise<void>;
+
+  /**
+   * Lê o snapshot específico armazenado na área permanente de snapshots.
+   */
+  readSnapshot?(snapshotId: string): Promise<{
+    manifest: ProvisioningManifest;
+    catalog: PrebuiltCatalog;
+    searchIndex?: PrebuiltSearchIndex | null;
+  } | null>;
 }

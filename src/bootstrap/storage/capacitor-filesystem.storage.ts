@@ -17,9 +17,11 @@ import type { ProvisioningManifest } from '../../provisioning/types.ts';
 import type { PrebuiltSearchIndex } from '../../search/search-index.types.ts';
 import type { ActivePointer } from '../types.ts';
 import type { LocalCatalogStorage } from './storage.interface.ts';
+import type { RecoveryJournalData } from '../../recovery/recovery.types.ts';
 
 const PREBUILT_DIR = 'prebuilt';
 const ACTIVE_POINTER_FILE = `${PREBUILT_DIR}/active.json`;
+const RECOVERY_JOURNAL_FILE = `${PREBUILT_DIR}/recovery.json`;
 const STAGING_DIR = `${PREBUILT_DIR}/staging`;
 const SNAPSHOTS_DIR = `${PREBUILT_DIR}/snapshots`;
 
@@ -291,6 +293,75 @@ export class CapacitorFilesystemStorage implements LocalCatalogStorage {
       return (pointerStat.size || 0) + (manifestStat.size || 0) + (catalogStat.size || 0) + indexSize;
     } catch {
       return 0;
+    }
+  }
+
+  async readRecoveryJournal(): Promise<RecoveryJournalData | null> {
+    try {
+      const result = await Filesystem.readFile({
+        path: RECOVERY_JOURNAL_FILE,
+        directory: this.baseDir,
+        encoding: Encoding.UTF8,
+      });
+      if (!result.data || typeof result.data !== 'string') return null;
+      return JSON.parse(result.data) as RecoveryJournalData;
+    } catch {
+      return null;
+    }
+  }
+
+  async writeRecoveryJournal(journal: RecoveryJournalData): Promise<void> {
+    await this.ensureDir(PREBUILT_DIR);
+    await Filesystem.writeFile({
+      path: RECOVERY_JOURNAL_FILE,
+      data: JSON.stringify(journal, null, 2),
+      directory: this.baseDir,
+      encoding: Encoding.UTF8,
+    });
+  }
+
+  async readSnapshot(snapshotId: string): Promise<{
+    manifest: ProvisioningManifest;
+    catalog: PrebuiltCatalog;
+    searchIndex?: PrebuiltSearchIndex | null;
+  } | null> {
+    const targetSnapDir = `${SNAPSHOTS_DIR}/${snapshotId}`;
+    try {
+      const manifestFile = await Filesystem.readFile({
+        path: `${targetSnapDir}/manifest.json`,
+        directory: this.baseDir,
+        encoding: Encoding.UTF8,
+      });
+      const catalogFile = await Filesystem.readFile({
+        path: `${targetSnapDir}/catalog.json`,
+        directory: this.baseDir,
+        encoding: Encoding.UTF8,
+      });
+
+      if (typeof manifestFile.data !== 'string' || typeof catalogFile.data !== 'string') {
+        return null;
+      }
+
+      const manifest = JSON.parse(manifestFile.data) as ProvisioningManifest;
+      const catalog = JSON.parse(catalogFile.data) as PrebuiltCatalog;
+
+      let searchIndex: PrebuiltSearchIndex | null = null;
+      try {
+        const indexFile = await Filesystem.readFile({
+          path: `${targetSnapDir}/search-index.json`,
+          directory: this.baseDir,
+          encoding: Encoding.UTF8,
+        });
+        if (typeof indexFile.data === 'string') {
+          searchIndex = JSON.parse(indexFile.data) as PrebuiltSearchIndex;
+        }
+      } catch {
+        // search-index opcional para pacotes v1
+      }
+
+      return { manifest, catalog, searchIndex };
+    } catch {
+      return null;
     }
   }
 }
