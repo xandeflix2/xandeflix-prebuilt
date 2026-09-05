@@ -14,6 +14,7 @@
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
 import type { PrebuiltCatalog } from '../../contracts/catalog.ts';
 import type { ProvisioningManifest } from '../../provisioning/types.ts';
+import type { PrebuiltSearchIndex } from '../../search/search-index.types.ts';
 import type { ActivePointer } from '../types.ts';
 import type { LocalCatalogStorage } from './storage.interface.ts';
 
@@ -64,7 +65,8 @@ export class CapacitorFilesystemStorage implements LocalCatalogStorage {
   async writeStaging(
     snapshotId: string,
     manifest: ProvisioningManifest,
-    catalog: PrebuiltCatalog
+    catalog: PrebuiltCatalog,
+    searchIndex?: PrebuiltSearchIndex | null
   ): Promise<void> {
     const stagingSnapDir = `${STAGING_DIR}/${snapshotId}`;
     await this.ensureDir(stagingSnapDir);
@@ -82,11 +84,24 @@ export class CapacitorFilesystemStorage implements LocalCatalogStorage {
       directory: this.baseDir,
       encoding: Encoding.UTF8,
     });
+
+    if (searchIndex) {
+      await Filesystem.writeFile({
+        path: `${stagingSnapDir}/search-index.json`,
+        data: JSON.stringify(searchIndex, null, 2),
+        directory: this.baseDir,
+        encoding: Encoding.UTF8,
+      });
+    }
   }
 
   async readStaging(
     snapshotId: string
-  ): Promise<{ manifest: ProvisioningManifest; catalog: PrebuiltCatalog } | null> {
+  ): Promise<{
+    manifest: ProvisioningManifest;
+    catalog: PrebuiltCatalog;
+    searchIndex?: PrebuiltSearchIndex | null;
+  } | null> {
     const stagingSnapDir = `${STAGING_DIR}/${snapshotId}`;
     try {
       const manifestFile = await Filesystem.readFile({
@@ -106,7 +121,22 @@ export class CapacitorFilesystemStorage implements LocalCatalogStorage {
 
       const manifest = JSON.parse(manifestFile.data) as ProvisioningManifest;
       const catalog = JSON.parse(catalogFile.data) as PrebuiltCatalog;
-      return { manifest, catalog };
+
+      let searchIndex: PrebuiltSearchIndex | null = null;
+      try {
+        const indexFile = await Filesystem.readFile({
+          path: `${stagingSnapDir}/search-index.json`,
+          directory: this.baseDir,
+          encoding: Encoding.UTF8,
+        });
+        if (typeof indexFile.data === 'string') {
+          searchIndex = JSON.parse(indexFile.data) as PrebuiltSearchIndex;
+        }
+      } catch {
+        // search-index opcional para pacotes v1
+      }
+
+      return { manifest, catalog, searchIndex };
     } catch {
       return null;
     }
@@ -135,6 +165,15 @@ export class CapacitorFilesystemStorage implements LocalCatalogStorage {
       directory: this.baseDir,
       encoding: Encoding.UTF8,
     });
+
+    if (stagingData.searchIndex) {
+      await Filesystem.writeFile({
+        path: `${targetSnapDir}/search-index.json`,
+        data: JSON.stringify(stagingData.searchIndex, null, 2),
+        directory: this.baseDir,
+        encoding: Encoding.UTF8,
+      });
+    }
   }
 
   async readActiveCatalog(): Promise<PrebuiltCatalog | null> {
@@ -166,6 +205,23 @@ export class CapacitorFilesystemStorage implements LocalCatalogStorage {
       });
       if (typeof manifestFile.data !== 'string') return null;
       return JSON.parse(manifestFile.data) as ProvisioningManifest;
+    } catch {
+      return null;
+    }
+  }
+
+  async readActiveSearchIndex(): Promise<PrebuiltSearchIndex | null> {
+    const pointer = await this.readActivePointer();
+    if (!pointer) return null;
+
+    try {
+      const indexFile = await Filesystem.readFile({
+        path: `${SNAPSHOTS_DIR}/${pointer.snapshotId}/search-index.json`,
+        directory: this.baseDir,
+        encoding: Encoding.UTF8,
+      });
+      if (typeof indexFile.data !== 'string') return null;
+      return JSON.parse(indexFile.data) as PrebuiltSearchIndex;
     } catch {
       return null;
     }
@@ -221,7 +277,18 @@ export class CapacitorFilesystemStorage implements LocalCatalogStorage {
         path: `${SNAPSHOTS_DIR}/${pointer.snapshotId}/catalog.json`,
         directory: this.baseDir,
       });
-      return (pointerStat.size || 0) + (manifestStat.size || 0) + (catalogStat.size || 0);
+      let indexSize = 0;
+      try {
+        const indexStat = await Filesystem.stat({
+          path: `${SNAPSHOTS_DIR}/${pointer.snapshotId}/search-index.json`,
+          directory: this.baseDir,
+        });
+        indexSize = indexStat.size || 0;
+      } catch {
+        // Sem índice no snapshot
+      }
+
+      return (pointerStat.size || 0) + (manifestStat.size || 0) + (catalogStat.size || 0) + indexSize;
     } catch {
       return 0;
     }

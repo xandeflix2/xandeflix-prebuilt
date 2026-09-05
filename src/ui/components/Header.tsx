@@ -71,6 +71,13 @@ export const Header: React.FC<HeaderProps> = ({
         >
           Séries
         </button>
+        <button
+          type="button"
+          className={`focusable-item nav-link ${currentView === 'search' ? 'active' : ''}`}
+          onClick={() => onNavigate('search')}
+        >
+          Busca
+        </button>
       </nav>
 
       <div className="header-right">

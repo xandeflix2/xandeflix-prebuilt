@@ -76,4 +76,38 @@ Cada incidente, erro ou bloqueador tecnico devera ser registrado segundo o forma
 - **NOTAS_NORMATIVAS**:
   - `G4_PASS_INVALIDATED`: NAO
 
+### OCORRENCIA-005 — Evidência de Custo de Performance no Benchmark Sintético de Escala (240k)
+
+- **DATE**: 2026-09-05
+- **GATE**: G7_PREBUILT_SEARCH
+- **CLASSIFICATION**: `PERFORMANCE_EVIDENCE_RISK`
+- **STATUS**: `OPEN_NON_BLOCKING`
+- **DESCRIPTION**: O teste de escala sintético com 240.000 documentos comprovou a viabilidade lógica e algorítmica da busca pré-construída, mas revelou custos observados relevantes de tempo de build externo, tamanho do payload serializado e latência de consulta que justificam avaliação e otimização posterior em hardware físico.
+- **EVIDENCE**:
+  - `EVIDENCE_SOURCE`: SYNTHETIC_240K_SCALE_TEST
+  - `OBSERVED_DOCUMENT_COUNT`: 240000
+  - `OBSERVED_EXTERNAL_INDEX_BUILD_MS`: 12216
+  - `OBSERVED_SEARCH_INDEX_SERIALIZED_SIZE_BYTES`: 52672308
+  - `OBSERVED_SEARCH_INDEX_COMPRESSED_ESTIMATE_BYTES`: 6848000
+  - `OBSERVED_SEARCH_INDEX_LOAD_MS`: 771
+  - `OBSERVED_RUNTIME_MATERIALIZATION_MS`: 771
+  - `OBSERVED_QUERY_EXACT_MS`: 2850.06
+  - `OBSERVED_QUERY_PREFIX_MS`: 1233.61
+  - `OBSERVED_QUERY_MULTI_TOKEN_MS`: 1239.05
+  - `OBSERVED_QUERY_NO_RESULT_MS`: 21.63
+  - `OBSERVED_PROCESS_MEMORY_BEFORE_MB`: 9
+  - `OBSERVED_PROCESS_MEMORY_AFTER_BUILD_MB`: 336
+  - `OBSERVED_PROCESS_MEMORY_AFTER_LOAD_MB`: 271
+- **ROOT_CAUSE**: Volume massivo de dados sintéticos (240k itens) operando com busca ponderada puramente em JavaScript/Node.js sem aceleração de hardware nativa.
+- **ROOT_CAUSE_CONFIDENCE**: HIGH
+- **IMPACT**: `NON_BLOCKING`
+- **RESOLUTION_STATUS**: `MONITORING_FOR_PHYSICAL_VALIDATION`
+- **NOTAS_NORMATIVAS**:
+  - `INTERPRETATION`: A arquitetura de transportabilidade foi funcionalmente comprovada, mas os custos sintéticos observados justificam avaliação posterior de otimização e prova física antes de qualquer alegação de performance em Fire Stick.
+  - `PERFORMANCE_EVIDENCE_IS_NOT_SLA`: SIM
+  - `REAL_CATALOG_SEARCH_PROVEN`: NAO
+  - `FIRE_STICK_SEARCH_PERFORMANCE_PROVEN`: NAO
+  - `G7_PASS_INVALIDATED`: NAO
+
+
 

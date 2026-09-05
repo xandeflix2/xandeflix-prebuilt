@@ -14,7 +14,10 @@
     "provisioning:build": "node scripts/build-provisioning-package.mjs",
     "provisioning:check": "node scripts/validate-provisioning-package.mjs",
     "bootstrap:check": "node scripts/validate-device-bootstrap.mjs",
-    "catalog-ui:check": "node scripts/validate-catalog-ui.mjs"
+    "catalog-ui:check": "node scripts/validate-catalog-ui.mjs",
+    "search:index:build": "node scripts/build-prebuilt-search-index.mjs",
+    "search:check": "node scripts/validate-prebuilt-search.mjs",
+    "search:benchmark": "node scripts/benchmark-prebuilt-search-scale.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^7.0.0",

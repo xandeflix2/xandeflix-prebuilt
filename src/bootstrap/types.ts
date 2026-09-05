@@ -25,6 +25,8 @@ export interface ActivePointer {
   schemaVersion: number;
   packageContentHash: string;
   promotedAt: string;
+  searchIndexVersion?: number;
+  searchIndexContentHash?: string;
 }
 
 export interface ImportMetrics {

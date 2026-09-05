@@ -28,6 +28,7 @@ import { EmptyState } from './ui/components/EmptyState.tsx';
 import { HomePage } from './ui/pages/HomePage.tsx';
 import { MoviesPage } from './ui/pages/MoviesPage.tsx';
 import { SeriesPage } from './ui/pages/SeriesPage.tsx';
+import { SearchPage } from './ui/pages/SearchPage.tsx';
 import { MovieDetailPage } from './ui/pages/MovieDetailPage.tsx';
 import { SeriesDetailPage } from './ui/pages/SeriesDetailPage.tsx';
 
@@ -110,6 +111,8 @@ export default function App(): React.JSX.Element {
         return <MoviesPage readModel={readModel} onSelectItem={handleSelectItem} />;
       case 'series':
         return <SeriesPage readModel={readModel} onSelectItem={handleSelectItem} />;
+      case 'search':
+        return <SearchPage readModel={readModel} onSelectItem={handleSelectItem} />;
       case 'movie-detail':
         return (
           <MovieDetailPage

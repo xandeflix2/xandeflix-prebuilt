@@ -8,7 +8,7 @@
  * - BACK_RETURNS_PREVIOUS_VIEW: Pilha de histórico para suporte a voltar/Escape/D-pad Back.
  */
 
-export type AppView = 'home' | 'movies' | 'series' | 'movie-detail' | 'series-detail';
+export type AppView = 'home' | 'movies' | 'series' | 'search' | 'movie-detail' | 'series-detail';
 
 export interface RouteLocation {
   view: AppView;

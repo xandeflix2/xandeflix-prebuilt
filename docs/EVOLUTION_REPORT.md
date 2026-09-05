@@ -6,7 +6,7 @@
 
 - **PROJECT**: `XANDEFLIX_PREBUILT`
 - **PARENT_CONTEXT**: `MARCO_ZERO_CANONICO_XANDEFLIX_PREBUILT`
-- **LAST_CLOSED_GATE**: `G6`
+- **LAST_CLOSED_GATE**: `G7`
 - **G0_STATUS**: `PASS`
 - **G1_STATUS**: `PASS`
 - **G2_STATUS**: `PASS`
@@ -14,18 +14,14 @@
 - **G4_STATUS**: `PASS`
 - **G5_STATUS**: `PASS`
 - **G6_STATUS**: `PASS`
-- **MVP_PROGRESS_PERCENT**: `64`
-- **CURRENT_GATE**: `G7`
-- **G4_STARTED**: `SIM`
-- **G5_STATUS**: `PASS`
-- **G5_STARTED**: `SIM`
-- **G6_STATUS**: `PASS`
-- **G6_STARTED**: `SIM`
-- **G7_STATUS**: `NOT_STARTED`
-- **G7_STARTED**: `NAO`
-- **NEXT_GATE**: `XANDEFLIX_PREBUILT_G7_PREBUILT_SEARCH`
+- **G7_STATUS**: `PASS`
+- **MVP_PROGRESS_PERCENT**: `74`
+- **CURRENT_GATE**: `G8`
+- **G8_STATUS**: `NOT_STARTED`
+- **G8_STARTED**: `NAO`
+- **NEXT_GATE**: `XANDEFLIX_PREBUILT_G8_SOURCE_AND_DIRECT_PLAYBACK`
 - **NEXT_GATE_STARTED**: `NAO`
-- **HISTORICAL_RECORD**: `G5_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G5_ADJUDICATION_CLOSED_PASS=SIM; G6_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G6_ADJUDICATION_CLOSED_PASS=SIM`
+- **HISTORICAL_RECORD**: `G5_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G5_ADJUDICATION_CLOSED_PASS=SIM; G6_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G6_ADJUDICATION_CLOSED_PASS=SIM; G7_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G7_ADJUDICATION_CLOSED_PASS=SIM; SEARCH_SCALE_PERFORMANCE_RISK=OPEN_NON_BLOCKING`
 
 ---
 
@@ -77,30 +73,40 @@
 - `UNBOUNDED_DOM_RENDER`: PROHIBITED
 - `TV_INPUT_BASELINE`: DOM_FOCUS_DPAD
 - `INPUT_MODES`: TOUCH_MOUSE_KEYBOARD_DPAD_BASELINE
+- `PACKAGE_FORMAT_V1`: PRESERVED
+- `PACKAGE_FORMAT_V2`: SEARCH_ENABLED
+- `SEARCH_INDEX_FORMAT`: CANONICAL_JSON_INVERTED_INDEX_V1
+- `SEARCH_INDEX_VERSION`: 1
+- `SEARCH_NORMALIZATION_VERSION`: 1
+- `SEARCH_INDEX_BUILD`: EXTERNAL_PREBUILT
+- `SEARCH_STORAGE`: CAPACITOR_FILESYSTEM_CANONICAL_JSON
+- `SEARCH_INDEX_TRANSPORTABILITY`: PROVEN_SYNTHETIC_LOGICAL
+- `SEARCH_SEED_STRATEGY`: PREBUILT_INDEX_REQUIRED_FOR_FAST_SEARCH
+- `SEARCH_INDEX_DEVICE_STARTUP_REBUILD`: PROHIBITED
+- `SEARCH_QUERY_NETWORK`: NONE
+- `SEARCH_RANKING`: DETERMINISTIC_WEIGHTED_TEXT_V1
+- `SEARCH_DOCUMENT_KINDS`: MOVIE_SERIES
+- `SEARCH_INDEX_DATA_MINIMIZATION`: REQUIRED
+- `SEARCH_ENABLED_PACKAGE_FORMAT_VERSION`: 2
+- `PACKAGE_FORMAT_V1_BACKWARD_COMPATIBLE`: REQUIRED
 
 ---
 
 ## 4. Decisoes Abertas (DECISIONS_OPEN)
 
-- `SEARCH_STORAGE`: Em aberto (SQLite FTS, MiniSearch JSON, etc.).
-- `SEARCH_INDEX_TRANSPORTABILITY`: Em aberto.
-- `SEARCH_SEED_STRATEGY`: Em aberto.
+- `REAL_SOURCE_AUTH_STRATEGY`: Em aberto.
+- `PLAYBACK_UI`: Em aberto (G8).
+- `ARTWORK_CACHE_POLICY`: Em aberto.
+- `FULL_TV_SPATIAL_NAVIGATION`: Em aberto (G11).
+- `PERFORMANCE_SLA`: Em aberto (G11/G12).
 - `ROLLBACK_FULL`: Em aberto.
 - `SNAPSHOT_RETENTION`: Em aberto.
 - `INCREMENTAL_UPDATE_STRATEGY`: Em aberto.
 - `PACKAGE_SIGNING_STRATEGY`: Em aberto (ECDSA, Ed25519).
 - `PACKAGE_ENCRYPTION`: Em aberto.
 - `USER_SOURCE_BINDING`: Em aberto.
-- `SNAPSHOT_RETENTION`: Em aberto.
-- `ROLLBACK`: Em aberto.
-- `SIZE_LIMITS`: Em aberto (evidência empírica não é SLA).
-- `SEARCH_INDEX_TRANSPORTABILITY`: Em aberto.
-- `SEARCH_SEED_STRATEGY`: Em aberto.
-- `REAL_SOURCE_AUTH_STRATEGY`: Em aberto.
-- `INCREMENTAL_UPDATE_STRATEGY`: Em aberto.
 - `OFFLINE_POLICY`: Em aberto.
-- `ARTWORK_CACHE_POLICY`: Em aberto.
-- `PERFORMANCE_SLA`: Em aberto.
+- `SIZE_LIMITS`: Em aberto (evidência empírica não é SLA).
 
 ---
 
@@ -307,3 +313,30 @@
   - CURRENT_GATE avançado para G7 (NEXT_AUTHORIZABLE_GATE=G7);
   - G7 permanece NOT_STARTED (G7_STARTED=NAO, NEXT_GATE_STARTED=NAO);
   - Autorização expressa concedida para commit e push canônicos na branch origin/main.
+
+- **Ciclo G7 (Prebuilt Search)**:
+  - Comprovação da hipótese arquitetural de busca prebuilt (`SEARCH_INDEX_EXTERNAL_BUILD=REQUIRED`, `SEARCH_INDEX_DEVICE_STARTUP_REBUILD=PROHIBITED`, `SEARCH_QUERY_NETWORK=NONE`);
+  - Implementação do formato de índice canônico independente em JSON (`CANONICAL_JSON_INVERTED_INDEX_V1`) com JSON Schema Draft 2020-12 (`schemas/prebuilt-search-index.schema.json`);
+  - Criação dos módulos de normalização de texto determinística (`search-normalization.ts`, Unicode NFD, diacríticos removidos, lowercase, trim), builder externo (`search-index-builder.ts`), validador estrito fail-closed (`search-index-validator.ts`), motor de consulta em memória (`search-engine.ts`) com ranqueamento ponderado determinístico (`DETERMINISTIC_WEIGHTED_TEXT_V1`) e serviço de busca integrado ao storage do cliente (`search.service.ts`);
+  - Extensão do formato de pacote de provisionamento para v2 (`SEARCH_ENABLED_PACKAGE_FORMAT_VERSION=2`) incorporando `search-index.json`, manifest estendido e hash lógico de pacote v2;
+  - Garantia rigorosa de retrocompatibilidade com pacotes v1 (`PACKAGE_FORMAT_V1_BACKWARD_COMPATIBLE=PASS`, importação v1 preserva integridade do catálogo e reporta busca como indisponível sem falhas);
+  - Bootstrap v2 com importação transacional em quarentena de staging, readback validation e promoção atômica para storage privado (`prebuilt/snapshots/<snapshotId>/search-index.json`);
+  - Inicialização leve da busca no startup (`ON_DEVICE_FULL_REINDEX_AT_STARTUP=NAO`) carregando apenas postings serializadas;
+  - Falha de índice não quebra o catálogo ativo (`INVALID_SEARCH_INDEX_PRESERVES_CATALOG=PASS`);
+  - Interface de busca responsiva integrada à UI (`/search`, `SearchPage.tsx`, `SearchInput.tsx`, `SearchResults.tsx`, `SearchState.tsx`) com navegação por D-pad / teclado para TV/Android (`SEARCH_DPAD_BASELINE=PASS`) e abertura direta dos detalhes de filmes e séries (`MovieDetailPage`, `SeriesDetailPage`);
+  - Execução de benchmark sintético em 240.000 documentos (`SCALE_DOCUMENT_COUNT=240000`, build externo em 12.2s, 50.2MB serializado / 6.5MB gzip, carregamento em runtime em 771ms, consultas em 1.2s - 2.8s, heap controlado com 271MB);
+  - Elaboração da documentação técnica em `docs/PREBUILT_SEARCH.md` e formalização de 10 fluxos no FSD (`F-G7-001` a `F-G7-010`);
+  - Bateria de testes de regressão executada com 100% de aprovação (G2, G3, G4, G5, G6, G7, typecheck, web build e android build);
+  - Auditoria de segredos e isolamento confirmada (zero credenciais reais, sem service_role, sem conexões externas, sem playback G8, sem atualizações incrementais);
+  - Registro histórico: G7_STATUS=COMPLETE_PENDING_MASTER_ADJUDICATION.
+
+- **Adjudicacao G7 e Canonicalizacao (2026-09-05)**:
+  - G7 formalmente adjudicado pelo Chat Mestre como PASS (`RESULT=PASS_PREBUILT_G7_PREBUILT_SEARCH_CLOSED`);
+  - Busca pré-construída externa comprovada (`CANONICAL_JSON_INVERTED_INDEX_V1`), pacote de provisionamento v2 com retrocompatibilidade v1, carregamento leve sem reconstrução no startup e interface D-pad funcional;
+  - Registro de risco de escala sintética não-bloqueador classificado: `SEARCH_SCALE_PERFORMANCE_RISK=OPEN_NON_BLOCKING` (`PERFORMANCE_EVIDENCE_IS_NOT_SLA=SIM`, `REAL_CATALOG_SEARCH_PROVEN=NAO`, `FIRE_STICK_SEARCH_PERFORMANCE_PROVEN=NAO`, `G7_PASS_INVALIDATED=NAO`);
+  - MVP_PROGRESS_PERCENT atualizado de 64 para 74;
+  - CURRENT_GATE avançado para G8 (`NEXT_AUTHORIZABLE_GATE=G8`);
+  - G8 permanece NOT_STARTED (`G8_STARTED=NAO`, `NEXT_GATE_STARTED=NAO`);
+  - Autorização expressa concedida para commit e push canônicos na branch origin/main.
+
+

@@ -9,6 +9,8 @@
 - `G3_FLOWS_FORMALIZED=SIM`
 - `G4_FLOWS_FORMALIZED=SIM`
 - `G5_FLOWS_FORMALIZED=SIM`
+- `G6_FLOWS_FORMALIZED=SIM`
+- `G7_FLOWS_FORMALIZED=SIM`
 
 ---
 
@@ -46,8 +48,8 @@ Conforme os Gates forem abertos pelo Chat Mestre, as seguintes categorias de flu
 1. **Pipeline de Ingestao Externa** (Gate G3 - Formalizado);
 2. **Pacote de Provisionamento e Empacotamento** (Gate G4 - Formalizado abaixo);
 3. **Bootstrap e Ingestao de Pacote no Dispositivo** (Gate G5);
-4. **Navegacao e Catalogo UI** (Gate G6);
-5. **Mecanismo de Busca Local** (Gate G7);
+4. **Navegacao e Catalogo UI** (Gate G6 - Formalizado);
+5. **Mecanismo de Busca Local** (Gate G7 - Formalizado abaixo);
 6. **Autenticacao de Fonte e Playback Direto** (Gate G8);
 7. **Atualizacao Incremental / Delta Sync** (Gate G9);
 8. **Recuperacao de Falha e Modo Offline** (Gate G10).
@@ -629,6 +631,248 @@ Conforme os Gates forem abertos pelo Chat Mestre, as seguintes categorias de flu
 - **SECURITY**: Interface acessível sem dependência de apontador físico.
 - **ACCEPTANCE_CRITERIA**: `FIRST_FOCUS_ACQUIRED=PASS`, `ARROW_NAVIGATION=PASS`, `ENTER_OPENS_DETAIL=PASS`, `BACK_RETURNS_PREVIOUS_VIEW=PASS`, `FOCUS_VISIBLE=PASS`.
 - **TRACEABILITY**: Requisitos do Gate G6 seção 19, 33.
+
+---
+
+## 8. Fluxos Funcionais da Busca Pré-construída (Gate G7)
+
+### F-G7-001_EXTERNAL_INDEX_BUILD — Construção Externa de Índice de Busca Determinístico
+
+- **FLOW_ID**: `F-G7-001_EXTERNAL_INDEX_BUILD`
+- **TRIGGER**: Execução do script externo de indexação (`npm run search:index:build`) ou chamada de `SearchIndexBuilder.build(catalog)`.
+- **PRECONDITIONS**: `PrebuiltCatalog` v1 válido em memória.
+- **MAIN_FLOW**:
+  1. `SearchIndexBuilder` extrai todos os filmes e séries do catálogo;
+  2. Normaliza títulos, títulos originais, anos, gêneros e categorias com `search-normalization.ts`;
+  3. Gera lista invertida (`postings`) associando tokens normalizados a índices dos documentos;
+  4. Ordena deterministicamente o array de documentos e as chaves/valores de postings;
+  5. Calcula o hash lógico `contentHash` (SHA-256) dos dados estáveis;
+  6. Valida o índice gerado contra o schema `prebuilt-search-index.schema.json` e amarras do catálogo;
+  7. Retorna `SearchIndex` v1 pronto e serializável.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: Se o catálogo contiver dados corrompidos ou falhar nas validações, o build falha de forma fail-closed sem gerar índice.
+- **TERMINAL_STATES**: `SUCCESS_SEARCH_INDEX_BUILT`.
+- **DATA_READ**: `PrebuiltCatalog` em memória.
+- **DATA_WRITE**: `tmp/search/search-index.json` (temporário/gitignored).
+- **NETWORK**: Nenhuma (`NO_NETWORK_ACCESS=SIM`).
+- **SECURITY**: `SEARCH_INDEX_SECRETS_EXPOSURE=NAO`. Ausência de URLs com credenciais, streams ou tokens privados.
+- **OBSERVABILITY**: Logs emitindo total de documentos indexados, tokens únicos e hash SHA-256.
+- **ACCEPTANCE_CRITERIA**: `SEARCH_INDEX_BUILD=PASS`, `SEARCH_INDEX_DETERMINISTIC=SIM`.
+- **TRACEABILITY**: Requisitos do Gate G7 seção 15, 17, 18.
+
+---
+
+### F-G7-002_SEARCH_ENABLED_PACKAGE_V2_BUILD — Construção de Pacote de Provisionamento v2 com Busca
+
+- **FLOW_ID**: `F-G7-002_SEARCH_ENABLED_PACKAGE_V2_BUILD`
+- **TRIGGER**: Chamada de `PackageBuilder.build(catalog, { searchIndex })` com `packageFormatVersion=2`.
+- **PRECONDITIONS**: `PrebuiltCatalog` válido e `SearchIndex` válido compatível com o catálogo (`snapshotId` e `catalogVersion` coincidentes).
+- **MAIN_FLOW**:
+  1. `PackageBuilder` valida o catálogo e o índice de busca;
+  2. Serializa deterministicamente `catalog.json` e `search-index.json`;
+  3. Calcula hashes SHA-256 físicos e tamanhos em bytes de ambos os arquivos;
+  4. Constrói `manifest.json` v2 incluindo metadados do índice de busca e calcula `packageContentHash` v2;
+  5. Empacota os três arquivos (`manifest.json`, `catalog.json`, `search-index.json`) em ZIP;
+  6. Retorna resultado com sucesso contendo o buffer ZIP.
+- **ALTERNATIVE_FLOW**: Construção v1 sem busca preservada quando opção de busca não é fornecida.
+- **ERROR_FLOW**: Se houver divergência entre o `snapshotId` do catálogo e do índice, aborta com erro.
+- **TERMINAL_STATES**: `SUCCESS_PACKAGE_V2_BUILT`.
+- **DATA_READ**: Catálogo e índice de busca em memória.
+- **DATA_WRITE**: Arquivo ZIP v2 em diretório temporário de provisionamento.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Hashes criptográficos e amarras rígidas entre catálogo e índice de busca.
+- **OBSERVABILITY**: Logs detalhados com hashes de catálogo, índice e manifesto v2.
+- **ACCEPTANCE_CRITERIA**: `PACKAGE_V2_BUILD=PASS`, `packageFormatVersion === 2`.
+- **TRACEABILITY**: Requisitos do Gate G7 seção 19, 20.
+
+---
+
+### F-G7-003_DEVICE_IMPORT_SEARCH_INDEX — Importação Transacional de Pacote v2 no Dispositivo
+
+- **FLOW_ID**: `F-G7-003_DEVICE_IMPORT_SEARCH_INDEX`
+- **TRIGGER**: Chamada de `PackageImporter.importPackage(packageSource)`.
+- **PRECONDITIONS**: Pacote v2 de provisionamento disponível.
+- **MAIN_FLOW**:
+  1. `PackageValidator.validate` valida a estrutura do ZIP, manifest v2, hashes e schemas;
+  2. `PackageImporter` extrai `catalog.json` e `search-index.json` para o diretório de staging;
+  3. Executa readback e revalidação de integridade física dos arquivos no staging;
+  4. Promove atomicamente os arquivos para `prebuilt/snapshots/<snapshotId>/`;
+  5. Atualiza o ponteiro ativo `active-pointer.json` com os metadados do snapshot e do índice;
+  6. Retorna status `IMPORTED` e snapshotId ativo.
+- **ALTERNATIVE_FLOW**: Importação de pacote v1 continua válida (sem salvar `search-index.json`).
+- **ERROR_FLOW**: Se qualquer arquivo falhar na validação no staging, o staging é removido e o snapshot ativo anterior é mantido intacto.
+- **TERMINAL_STATES**: `SUCCESS_PACKAGE_V2_IMPORTED`.
+- **DATA_READ**: Buffer do pacote v2.
+- **DATA_WRITE**: `prebuilt/staging/`, `prebuilt/snapshots/<snapshotId>/`, `prebuilt/active-pointer.json`.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Storage privado do app via Capacitor Filesystem, proteção de path traversal e isolamento de geração ativa.
+- **ACCEPTANCE_CRITERIA**: `V2_FIRST_IMPORT_WITH_SEARCH=PASS`, `V2_REIMPORT_IDEMPOTENT=PASS`.
+- **TRACEABILITY**: Requisitos do Gate G7 seção 24, 25.
+
+---
+
+### F-G7-004_SEARCH_STARTUP_LOAD — Carregamento Inicial do Índice de Busca no Startup
+
+- **FLOW_ID**: `F-G7-004_SEARCH_STARTUP_LOAD`
+- **TRIGGER**: Inicialização do cliente ou montagem da UI de busca.
+- **PRECONDITIONS**: `BootstrapService` inicializado.
+- **MAIN_FLOW**:
+  1. `SearchService.initialize()` consulta o ponteiro ativo em storage;
+  2. Identifica o snapshot ativo e carrega `search-index.json` já pronto;
+  3. Valida amarrações entre `catalogSnapshotId` do índice e catálogo ativo;
+  4. Carrega o `SearchEngine` criando mapas rápidos de postings em memória;
+  5. Transiciona o estado para `SEARCH_READY`.
+- **ALTERNATIVE_FLOW**: Se o snapshot ativo for v1 (sem `search-index.json`), transiciona para `SEARCH_INDEX_UNAVAILABLE`.
+- **ERROR_FLOW**: Se o arquivo do índice estiver corrompido, transiciona para `SEARCH_INDEX_INVALID` preservando o catálogo ativo intacto.
+- **TERMINAL_STATES**: `SEARCH_READY` ou `SEARCH_INDEX_UNAVAILABLE` ou `SEARCH_INDEX_INVALID`.
+- **DATA_READ**: `prebuilt/active-pointer.json`, `prebuilt/snapshots/<snapshotId>/search-index.json`.
+- **DATA_WRITE**: Nenhum.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Nenhum segredo lido ou exposto; validação fail-closed.
+- **ACCEPTANCE_CRITERIA**: `ON_DEVICE_FULL_REINDEX_AT_STARTUP=NAO`, `SEARCH_READY_FROM_TRANSPORTED_INDEX=PASS`.
+- **TRACEABILITY**: Requisitos do Gate G7 seção 28, 29, 30.
+
+---
+
+### F-G7-005_LOCAL_SEARCH_SUCCESS — Execução de Consulta Local com Resultados Ranqueados
+
+- **FLOW_ID**: `F-G7-005_LOCAL_SEARCH_SUCCESS`
+- **TRIGGER**: Usuário digita termo no campo de busca ou chama `SearchService.query(term)`.
+- **PRECONDITIONS**: Estado do serviço é `SEARCH_READY`.
+- **MAIN_FLOW**:
+  1. `SearchEngine.query` normaliza o termo de consulta via `search-normalization.ts`;
+  2. Localiza tokens correspondentes nas postings (exato, prefixo, multi-token);
+  3. Calcula pontuações determinísticas (`DETERMINISTIC_WEIGHTED_TEXT_V1`);
+  4. Aplica desempate alfabético estável por título normalizado e ID canônico;
+  5. Retorna lista de `SearchResultItem` contendo ID, kind, título, ano e score;
+  6. `SearchResults` renderiza os cartões na tela;
+  7. Selecionar um cartão abre a tela de detalhe correspondente (`MovieDetailPage` ou `SeriesDetailPage`).
+- **ALTERNATIVE_FLOW**: Aplicação de filtros opcionais locais (`kind`, `genreId`, `year`).
+- **ERROR_FLOW**: Termo vazio transiciona para `SEARCH_QUERY_EMPTY`.
+- **TERMINAL_STATES**: `SEARCH_RESULTS_DISPLAYED`.
+- **DATA_READ**: Postings e documentos do `SearchEngine` em memória.
+- **DATA_WRITE**: Nenhum.
+- **NETWORK**: Nenhuma (`SEARCH_QUERY_NETWORK=NONE`).
+- **SECURITY**: Consulta 100% offline, sem telemetria de termos buscados.
+- **ACCEPTANCE_CRITERIA**: `LOCAL_QUERY_EXACT=PASS`, `LOCAL_QUERY_PREFIX=PASS`, `LOCAL_QUERY_MULTI_TOKEN=PASS`, `DETERMINISTIC_RANKING=PASS`.
+- **TRACEABILITY**: Requisitos do Gate G7 seção 12, 13, 34, 35.
+
+---
+
+### F-G7-006_LOCAL_SEARCH_NO_RESULTS — Apresentação de Estado de Busca Sem Resultados
+
+- **FLOW_ID**: `F-G7-006_LOCAL_SEARCH_NO_RESULTS`
+- **TRIGGER**: Usuário executa consulta válida que não possui correspondência no catálogo indexado.
+- **PRECONDITIONS**: `SEARCH_READY`, termo de busca não vazio.
+- **MAIN_FLOW**:
+  1. `SearchEngine.query` processa a consulta e obtém array vazio de resultados;
+  2. `SearchService` emite estado `SEARCH_NO_RESULTS`;
+  3. `SearchState` exibe mensagem amigável: "Nenhum resultado encontrado para '<termo>'";
+  4. Distingue explicitamente este estado de índice indisponível ou catálogo ausente.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: N/A.
+- **TERMINAL_STATES**: `NO_RESULTS_DISPLAYED`.
+- **DATA_READ**: Estruturas de busca em memória.
+- **DATA_WRITE**: Nenhum.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Nenhum vazamento de informações.
+- **ACCEPTANCE_CRITERIA**: `SEARCH_NO_RESULTS_UI=PASS`.
+- **TRACEABILITY**: Requisitos do Gate G7 seção 30, 39.
+
+---
+
+### F-G7-007_INVALID_INDEX_SEARCH_UNAVAILABLE — Tratamento Fail-Closed de Índice Corrompido
+
+- **FLOW_ID**: `F-G7-007_INVALID_INDEX_SEARCH_UNAVAILABLE`
+- **TRIGGER**: Carregamento de `search-index.json` que falha na validação de schema, hash ou integridade.
+- **PRECONDITIONS**: Snapshot ativo possui arquivo `search-index.json` adulterado ou corrompido.
+- **MAIN_FLOW**:
+  1. `SearchService` detecta erro na validação do arquivo durante o carregamento;
+  2. Transiciona o estado de busca para `SEARCH_INDEX_INVALID`;
+  3. A UI de busca exibe aviso seguro: "Busca temporariamente indisponível";
+  4. O catálogo ativo e todas as outras telas da UI continuam operando normalmente (`CATALOG_UI_CONTINUES=SIM`);
+  5. O sistema não tenta refazer o índice nem dispara varreduras pesadas no cliente.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: Falha tratada de forma fail-closed sem travar a aplicação.
+- **TERMINAL_STATES**: `SEARCH_INDEX_INVALID_CATALOG_PRESERVED`.
+- **DATA_READ**: Storage privado.
+- **DATA_WRITE**: Nenhum.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Isolamento de falhas e resiliência operacional.
+- **ACCEPTANCE_CRITERIA**: `INVALID_SEARCH_INDEX_PRESERVES_CATALOG=PASS`, `SEARCH_INDEX_UNAVAILABLE_UI=PASS`.
+- **TRACEABILITY**: Requisitos do Gate G7 seção 24, 31.
+
+---
+
+### F-G7-008_V1_PACKAGE_CATALOG_WITHOUT_SEARCH — Retrocompatibilidade com Pacotes de Provisionamento v1
+
+- **FLOW_ID**: `F-G7-008_V1_PACKAGE_CATALOG_WITHOUT_SEARCH`
+- **TRIGGER**: Importação e execução de pacote no formato v1 (`PACKAGE_FORMAT_VERSION=1`).
+- **PRECONDITIONS**: Pacote v1 contendo apenas `manifest.json` e `catalog.json`.
+- **MAIN_FLOW**:
+  1. `PackageImporter` importa com sucesso o pacote v1;
+  2. O catálogo é promovido e ativado no dispositivo;
+  3. `SearchService` detecta ausência de `search-index.json` no snapshot v1;
+  4. Define o estado de busca como `SEARCH_INDEX_UNAVAILABLE`;
+  5. A UI do catálogo funciona perfeitamente (Home, Filmes, Séries, Detalhes);
+  6. A tela de busca informa que a busca não está disponível para o pacote atual sem causar crash.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: O pacote v1 não é rejeitado como corrompido.
+- **TERMINAL_STATES**: `V1_CATALOG_ACTIVE_SEARCH_UNAVAILABLE`.
+- **DATA_READ**: Snapshot v1.
+- **DATA_WRITE**: Storage privado.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Garantia estrita de backward compatibility.
+- **ACCEPTANCE_CRITERIA**: `PACKAGE_V1_BACKWARD_COMPATIBLE=PASS`, `V1_PACKAGE_BACKWARD_COMPATIBLE=PASS`.
+- **TRACEABILITY**: Requisitos do Gate G7 seção 19, 22, 43.
+
+---
+
+### F-G7-009_SEARCH_DPAD_NAVIGATION — Navegação por D-pad e Teclado na Interface de Busca
+
+- **FLOW_ID**: `F-G7-009_SEARCH_DPAD_NAVIGATION`
+- **TRIGGER**: Navegação via controle remoto ou setas do teclado na tela `/search`.
+- **PRECONDITIONS**: Rota de busca aberta.
+- **MAIN_FLOW**:
+  1. O campo de busca recebe foco inicial automaticamente (`SEARCH_INPUT_FOCUSABLE=PASS`);
+  2. Usuário digita texto e visualiza resultados em tempo real;
+  3. Pressionar seta para baixo (`ArrowDown`) no input move o foco diretamente para o primeiro card de resultado (`ARROW_DOWN_FROM_INPUT_TO_RESULTS=PASS`);
+  4. Setas direcionais navegam entre os cards de resultados (`ARROW_NAVIGATION_RESULTS=PASS`);
+  5. Pressionar `Enter` no card selecionado abre a tela de detalhe correspondente (`ENTER_OPENS_SEARCH_RESULT=PASS`);
+  6. Pressionar `Escape` ou Back retorna à visualização anterior (`BACK_RETURNS_FROM_SEARCH=PASS`).
+- **ALTERNATIVE_FLOW**: Uso paralelo com touch ou mouse permanece funcional.
+- **ERROR_FLOW**: N/A.
+- **TERMINAL_STATES**: `SEARCH_NAVIGATION_HANDLED`.
+- **DATA_READ**: DOM elements.
+- **DATA_WRITE**: Rota ativa.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Compatibilidade com dispositivos Android TV / Fire TV.
+- **ACCEPTANCE_CRITERIA**: `SEARCH_DPAD_BASELINE=PASS`.
+- **TRACEABILITY**: Requisitos do Gate G7 seção 36, 49.
+
+---
+
+### F-G7-010_INDEX_SNAPSHOT_MISMATCH_REJECTION — Rejeição de Índice com Snapshot Mismatch
+
+- **FLOW_ID**: `F-G7-010_INDEX_SNAPSHOT_MISMATCH_REJECTION`
+- **TRIGGER**: Tentativa de validação, empacotamento ou carregamento de índice cujo `catalogSnapshotId` difere do catálogo associado.
+- **PRECONDITIONS**: `SearchIndex` possui `catalogSnapshotId != catalog.metadata.snapshotId`.
+- **MAIN_FLOW**:
+  1. `PackageValidator` ou `SearchService` compara os IDs de snapshot e versões;
+  2. Detecta a divergência entre catálogo e índice de busca;
+  3. Interrompe imediatamente o processo (fail-closed);
+  4. Rejeita o pacote ou marca o índice como inválido;
+  5. O catálogo associado não é infectado com dados de busca órfãos.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: Rejeição determinística e controlada.
+- **TERMINAL_STATES**: `FAILED_SNAPSHOT_MISMATCH_REJECTED`.
+- **DATA_READ**: Metadados de catálogo e índice.
+- **DATA_WRITE**: Nenhum dado corrompido é promovido.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Prevenção de corrupção relacional de dados.
+- **ACCEPTANCE_CRITERIA**: `SEARCH_INDEX_SNAPSHOT_MISMATCH_REJECTED=PASS`, `SNAPSHOT_MISMATCH_REJECTED=PASS`.
+- **TRACEABILITY**: Requisitos do Gate G7 seção 21, 23, 42.
+
 
 
 

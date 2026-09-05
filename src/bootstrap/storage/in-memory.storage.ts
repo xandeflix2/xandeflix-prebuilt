@@ -8,11 +8,13 @@
 import type { PrebuiltCatalog } from '../../contracts/catalog.ts';
 import type { ProvisioningManifest } from '../../provisioning/types.ts';
 import type { ActivePointer } from '../types.ts';
+import type { PrebuiltSearchIndex } from '../../search/search-index.types.ts';
 import type { LocalCatalogStorage } from './storage.interface.ts';
 
 interface StoredSnapshot {
   manifestJson: string;
   catalogJson: string;
+  searchIndexJson?: string;
 }
 
 export class InMemoryCatalogStorage implements LocalCatalogStorage {
@@ -38,23 +40,32 @@ export class InMemoryCatalogStorage implements LocalCatalogStorage {
   async writeStaging(
     snapshotId: string,
     manifest: ProvisioningManifest,
-    catalog: PrebuiltCatalog
+    catalog: PrebuiltCatalog,
+    searchIndex?: PrebuiltSearchIndex | null
   ): Promise<void> {
     this.staging.set(snapshotId, {
       manifestJson: JSON.stringify(manifest),
       catalogJson: JSON.stringify(catalog),
+      searchIndexJson: searchIndex ? JSON.stringify(searchIndex) : undefined,
     });
   }
 
   async readStaging(
     snapshotId: string
-  ): Promise<{ manifest: ProvisioningManifest; catalog: PrebuiltCatalog } | null> {
+  ): Promise<{
+    manifest: ProvisioningManifest;
+    catalog: PrebuiltCatalog;
+    searchIndex?: PrebuiltSearchIndex | null;
+  } | null> {
     const entry = this.staging.get(snapshotId);
     if (!entry) return null;
     try {
       const manifest = JSON.parse(entry.manifestJson) as ProvisioningManifest;
       const catalog = JSON.parse(entry.catalogJson) as PrebuiltCatalog;
-      return { manifest, catalog };
+      const searchIndex = entry.searchIndexJson
+        ? (JSON.parse(entry.searchIndexJson) as PrebuiltSearchIndex)
+        : null;
+      return { manifest, catalog, searchIndex };
     } catch {
       return null;
     }
@@ -90,6 +101,17 @@ export class InMemoryCatalogStorage implements LocalCatalogStorage {
     }
   }
 
+  async readActiveSearchIndex(): Promise<PrebuiltSearchIndex | null> {
+    if (!this.activePointer) return null;
+    const entry = this.snapshots.get(this.activePointer.snapshotId);
+    if (!entry || !entry.searchIndexJson) return null;
+    try {
+      return JSON.parse(entry.searchIndexJson) as PrebuiltSearchIndex;
+    } catch {
+      return null;
+    }
+  }
+
   async cleanupStaging(snapshotId?: string): Promise<void> {
     if (snapshotId) {
       this.staging.delete(snapshotId);
@@ -110,6 +132,9 @@ export class InMemoryCatalogStorage implements LocalCatalogStorage {
     const pointerSize = Buffer.byteLength(JSON.stringify(this.activePointer), 'utf8');
     const manifestSize = Buffer.byteLength(entry.manifestJson, 'utf8');
     const catalogSize = Buffer.byteLength(entry.catalogJson, 'utf8');
-    return pointerSize + manifestSize + catalogSize;
+    const indexSize = entry.searchIndexJson
+      ? Buffer.byteLength(entry.searchIndexJson, 'utf8')
+      : 0;
+    return pointerSize + manifestSize + catalogSize + indexSize;
   }
 }

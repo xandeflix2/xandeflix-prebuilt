@@ -11,6 +11,7 @@
 
 import type { PrebuiltCatalog } from '../contracts/catalog.ts';
 import type { ProvisioningManifest } from '../provisioning/types.ts';
+import type { PrebuiltSearchIndex } from '../search/search-index.types.ts';
 import type { LocalCatalogStorage } from './storage/storage.interface.ts';
 import { PackageImporter } from './package-importer.ts';
 import { BootstrapStateManager, type StateChangeListener } from './bootstrap-state.ts';
@@ -76,6 +77,20 @@ export class BootstrapService {
    */
   async getActiveMetadata(): Promise<ProvisioningManifest | null> {
     return this.storage.readActiveManifest();
+  }
+
+  /**
+   * Retorna o índice de busca pré-construído do snapshot ativo (se disponível).
+   */
+  async getActiveSearchIndex(): Promise<PrebuiltSearchIndex | null> {
+    return this.storage.readActiveSearchIndex();
+  }
+
+  /**
+   * Retorna a instância de storage subjacente.
+   */
+  getStorage(): LocalCatalogStorage {
+    return this.storage;
   }
 
   /**

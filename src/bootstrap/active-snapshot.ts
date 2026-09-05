@@ -11,13 +11,20 @@ export function createActivePointer(
   manifest: ProvisioningManifest,
   promotedAt?: string
 ): ActivePointer {
-  return {
+  const pointer: ActivePointer = {
     snapshotId: manifest.snapshotId,
     catalogVersion: manifest.catalogVersion,
     schemaVersion: manifest.schemaVersion,
     packageContentHash: manifest.packageContentHash,
     promotedAt: promotedAt || new Date().toISOString(),
   };
+
+  if ('searchIndexVersion' in manifest) {
+    pointer.searchIndexVersion = manifest.searchIndexVersion;
+    pointer.searchIndexContentHash = manifest.searchIndexContentHash;
+  }
+
+  return pointer;
 }
 
 export function isValidActivePointer(pointer: unknown): pointer is ActivePointer {

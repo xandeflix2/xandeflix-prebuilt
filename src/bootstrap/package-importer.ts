@@ -24,10 +24,12 @@ import { calculateSha256 } from '../provisioning/integrity.ts';
 import type { LocalCatalogStorage } from './storage/storage.interface.ts';
 import { createActivePointer, isSameActiveGeneration } from './active-snapshot.ts';
 import type { ImportPackageOptions, ImportResult, ImportMetrics } from './types.ts';
+import { SearchIndexValidator } from '../search/search-index-validator.ts';
 
 export class PackageImporter {
   private storage: LocalCatalogStorage;
   private validator = new PackageValidator();
+  private searchIndexValidator = new SearchIndexValidator();
 
   constructor(storage: LocalCatalogStorage) {
     this.storage = storage;
@@ -59,7 +61,7 @@ export class PackageImporter {
     const previousSnapshotId = previousPointer?.snapshotId;
 
     // -------------------------------------------------------------
-    // FASE 1: Validação do Pacote de Entrada (G4)
+    // FASE 1: Validação do Pacote de Entrada (G4 / G7)
     // -------------------------------------------------------------
     const valStart = Date.now();
     const validationResult = await this.validator.validate(packageSource);
@@ -80,7 +82,7 @@ export class PackageImporter {
       };
     }
 
-    const { manifest, catalog } = validationResult;
+    const { manifest, catalog, searchIndex } = validationResult;
     metrics.catalogSizeBytes = manifest.catalogSizeBytes;
 
     // -------------------------------------------------------------
@@ -108,7 +110,7 @@ export class PackageImporter {
       // FASE 3: Escrita em Staging
       // -----------------------------------------------------------
       const stageStart = Date.now();
-      await this.storage.writeStaging(targetSnapshotId, manifest, catalog);
+      await this.storage.writeStaging(targetSnapshotId, manifest, catalog, searchIndex);
       metrics.stagingWriteMs = Date.now() - stageStart;
 
       // -----------------------------------------------------------
@@ -144,6 +146,38 @@ export class PackageImporter {
       const stagedSha = calculateSha256(stagedCatalogBuffer);
       if (stagedSha !== manifest.catalogSha256) {
         throw new Error('[STAGING_HASH_MISMATCH] Hash SHA-256 do catálogo em staging diverge do manifest');
+      }
+
+      // 4.4 Se pacote v2, validação de releitura do search-index
+      if ('searchIndexFile' in manifest) {
+        if (!stagingData.searchIndex) {
+          throw new Error('[STAGING_SEARCH_INDEX_MISSING] search-index.json ausente em staging para pacote v2');
+        }
+
+        const indexValidation = this.searchIndexValidator.validate(stagingData.searchIndex, {
+          expectedSnapshotId: manifest.snapshotId,
+          expectedCatalogVersion: manifest.catalogVersion,
+        });
+
+        if (!indexValidation.valid) {
+          throw new Error(
+            `[STAGING_SEARCH_INDEX_CORRUPTED] search-index em staging é inválido: ${indexValidation.errors.join('; ')}`
+          );
+        }
+
+        if (stagingData.searchIndex.contentHash !== manifest.searchIndexContentHash) {
+          throw new Error(
+            '[STAGING_SEARCH_INDEX_HASH_MISMATCH] contentHash do search-index em staging diverge do manifest'
+          );
+        }
+
+        const stagedIndexBuffer = Buffer.from(JSON.stringify(stagingData.searchIndex, null, 2), 'utf8');
+        const stagedIndexSha = calculateSha256(stagedIndexBuffer);
+        if (stagedIndexSha !== manifest.searchIndexSha256) {
+          throw new Error(
+            '[STAGING_SEARCH_INDEX_SHA_MISMATCH] Hash SHA-256 do search-index em staging diverge do manifest'
+          );
+        }
       }
 
       // -----------------------------------------------------------

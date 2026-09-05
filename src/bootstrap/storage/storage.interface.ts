@@ -12,6 +12,7 @@
 
 import type { PrebuiltCatalog } from '../../contracts/catalog.ts';
 import type { ProvisioningManifest } from '../../provisioning/types.ts';
+import type { PrebuiltSearchIndex } from '../../search/search-index.types.ts';
 import type { ActivePointer } from '../types.ts';
 
 export interface LocalCatalogStorage {
@@ -31,15 +32,20 @@ export interface LocalCatalogStorage {
   writeStaging(
     snapshotId: string,
     manifest: ProvisioningManifest,
-    catalog: PrebuiltCatalog
+    catalog: PrebuiltCatalog,
+    searchIndex?: PrebuiltSearchIndex | null
   ): Promise<void>;
 
   /**
-   * Lê o manifest e catálogo armazenados na área de staging para readback validation.
+   * Lê o manifest, catálogo e índice opcional armazenados na área de staging para readback validation.
    */
   readStaging(
     snapshotId: string
-  ): Promise<{ manifest: ProvisioningManifest; catalog: PrebuiltCatalog } | null>;
+  ): Promise<{
+    manifest: ProvisioningManifest;
+    catalog: PrebuiltCatalog;
+    searchIndex?: PrebuiltSearchIndex | null;
+  } | null>;
 
   /**
    * Promove o snapshot de staging para a área permanente de snapshots.
@@ -55,6 +61,11 @@ export interface LocalCatalogStorage {
    * Lê o manifest referenciado pelo ponteiro ativo.
    */
   readActiveManifest(): Promise<ProvisioningManifest | null>;
+
+  /**
+   * Lê o índice de busca pré-construído referenciado pelo ponteiro ativo (se existir).
+   */
+  readActiveSearchIndex(): Promise<PrebuiltSearchIndex | null>;
 
   /**
    * Limpa artefatos temporários da área de staging.

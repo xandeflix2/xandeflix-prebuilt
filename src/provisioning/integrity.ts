@@ -27,6 +27,11 @@ export interface PackageContentHashInput {
   catalogSha256: string;
   catalogSizeBytes: number;
   compression: string;
+  searchIndexFile?: string;
+  searchIndexVersion?: number;
+  searchIndexSha256?: string;
+  searchIndexSizeBytes?: number;
+  searchIndexContentHash?: string;
 }
 
 /**
@@ -34,16 +39,36 @@ export interface PackageContentHashInput {
  * Exclui deliberadamente campos transitórios/não-determinísticos como createdAt.
  */
 export function calculatePackageContentHash(input: PackageContentHashInput): string {
-  const canonicalPayload = JSON.stringify({
-    packageFormatVersion: input.packageFormatVersion,
-    schemaVersion: input.schemaVersion,
-    catalogVersion: input.catalogVersion,
-    snapshotId: input.snapshotId,
-    catalogFile: input.catalogFile,
-    catalogSha256: input.catalogSha256,
-    catalogSizeBytes: input.catalogSizeBytes,
-    compression: input.compression,
-  });
+  let canonicalPayload: string;
+
+  if (input.packageFormatVersion === 2) {
+    canonicalPayload = JSON.stringify({
+      packageFormatVersion: 2,
+      schemaVersion: input.schemaVersion,
+      catalogVersion: input.catalogVersion,
+      snapshotId: input.snapshotId,
+      catalogFile: input.catalogFile,
+      catalogSha256: input.catalogSha256,
+      catalogSizeBytes: input.catalogSizeBytes,
+      compression: input.compression,
+      searchIndexFile: input.searchIndexFile,
+      searchIndexVersion: input.searchIndexVersion,
+      searchIndexSha256: input.searchIndexSha256,
+      searchIndexSizeBytes: input.searchIndexSizeBytes,
+      searchIndexContentHash: input.searchIndexContentHash,
+    });
+  } else {
+    canonicalPayload = JSON.stringify({
+      packageFormatVersion: input.packageFormatVersion,
+      schemaVersion: input.schemaVersion,
+      catalogVersion: input.catalogVersion,
+      snapshotId: input.snapshotId,
+      catalogFile: input.catalogFile,
+      catalogSha256: input.catalogSha256,
+      catalogSizeBytes: input.catalogSizeBytes,
+      compression: input.compression,
+    });
+  }
 
   return calculateSha256(canonicalPayload);
 }

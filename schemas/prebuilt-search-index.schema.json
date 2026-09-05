@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xandeflix.com/schemas/prebuilt-search-index.schema.json",
+  "title": "PrebuiltSearchIndex",
+  "description": "Contrato canônico do índice de busca prebuilt transportável (Gate G7).",
+  "type": "object",
+  "required": [
+    "searchIndexVersion",
+    "schemaVersion",
+    "normalizationVersion",
+    "generator",
+    "catalogSnapshotId",
+    "catalogVersion",
+    "documentCount",
+    "tokenCount",
+    "generatedAt",
+    "contentHash",
+    "documents",
+    "postings"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "searchIndexVersion": {
+      "type": "integer",
+      "const": 1,
+      "description": "Versão do formato do índice de busca (SEARCH_INDEX_VERSION=1)."
+    },
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1,
+      "description": "Versão do schema do índice."
+    },
+    "normalizationVersion": {
+      "type": "integer",
+      "const": 1,
+      "description": "Versão do algoritmo de normalização e tokenização (SEARCH_NORMALIZATION_VERSION=1)."
+    },
+    "generator": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Identificador do gerador externo do índice."
+    },
+    "catalogSnapshotId": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]+$",
+      "description": "Identificador único do snapshot de catálogo ao qual este índice pertence rigidamente."
+    },
+    "catalogVersion": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Versão semântica do catálogo correspondente."
+    },
+    "documentCount": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Quantidade total de documentos indexados (filmes e séries)."
+    },
+    "tokenCount": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Quantidade total de tokens únicos presentes no dicionário de postings."
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp ISO 8601 UTC da geração do índice."
+    },
+    "contentHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "Hash lógico determinístico SHA-256 do conteúdo do índice."
+    },
+    "documents": {
+      "type": "array",
+      "description": "Coleção de documentos indexados ordenados deterministicamente por id.",
+      "items": {
+        "type": "object",
+        "required": ["id", "kind", "title", "genreIds", "categoryIds"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "ID canônico do título no catálogo."
+          },
+          "kind": {
+            "type": "string",
+            "enum": ["movie", "series"],
+            "description": "Tipo de entidade indexada (SEARCH_DOCUMENT_KINDS=MOVIE_SERIES)."
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Título principal para exibição e busca."
+          },
+          "originalTitle": {
+            "type": "string",
+            "description": "Título original para correspondência auxiliar, quando disponível."
+          },
+          "year": {
+            "type": "integer",
+            "minimum": 1880,
+            "maximum": 2100,
+            "description": "Ano de lançamento para busca e filtro."
+          },
+          "genreIds": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "IDs dos gêneros associados ao título."
+          },
+          "categoryIds": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "IDs das categorias associadas ao título."
+          }
+        }
+      }
+    },
+    "postings": {
+      "type": "object",
+      "description": "Tabela de postings mapeando token normalizado para array de índices numéricos dos documentos.",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}
