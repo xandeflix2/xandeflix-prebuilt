@@ -7,6 +7,7 @@
 - `FUNCTIONAL_FLOWS_DEFINED=SIM`
 - `FSD_FRAMEWORK_ESTABLISHED=SIM`
 - `G3_FLOWS_FORMALIZED=SIM`
+- `G4_FLOWS_FORMALIZED=SIM`
 
 ---
 
@@ -41,9 +42,9 @@ Todo fluxo funcional futuro devera ser documentado utilizando rigorosamente o te
 
 Conforme os Gates forem abertos pelo Chat Mestre, as seguintes categorias de fluxos serao formalizadas:
 
-1. **Pipeline de Ingestao Externa** (Gate G3 - Definido abaixo);
-2. **Bootstrap e Aquisicao de Pacote** (Gate G4/G5);
-3. **Validacao e Ingestao de Pacote Local** (Gate G5);
+1. **Pipeline de Ingestao Externa** (Gate G3 - Formalizado);
+2. **Pacote de Provisionamento e Empacotamento** (Gate G4 - Formalizado abaixo);
+3. **Bootstrap e Ingestao de Pacote no Dispositivo** (Gate G5);
 4. **Navegacao e Catalogo UI** (Gate G6);
 5. **Mecanismo de Busca Local** (Gate G7);
 6. **Autenticacao de Fonte e Playback Direto** (Gate G8);
@@ -153,4 +154,137 @@ Conforme os Gates forem abertos pelo Chat Mestre, as seguintes categorias de flu
 - **OBSERVABILITY**: Log confirmando coincidência estrita de IDs e hash de snapshot.
 - **ACCEPTANCE_CRITERIA**: `snapshotIdRun1 === snapshotIdRun2`, `JSON.stringify(catalog1) === JSON.stringify(catalog2)`.
 - **TRACEABILITY**: Requisitos do Gate G3 seção 16 (Determinismo).
+
+---
+
+## 5. Fluxos Funcionais do Pacote de Provisionamento (Gate G4)
+
+### F-G4-001_PACKAGE_BUILD_SUCCESS — Construção Bem-Sucedida de Pacote de Provisionamento ZIP
+
+- **FLOW_ID**: `F-G4-001_PACKAGE_BUILD_SUCCESS`
+- **TRIGGER**: Execução do comando de build de provisionamento (`npm run provisioning:build`) ou chamada de `PackageBuilder.build(catalog)`.
+- **PRECONDITIONS**: `PrebuiltCatalog` v1 válido disponível em memória (fornecido pelo pipeline G3).
+- **MAIN_FLOW**:
+  1. O `PackageBuilder` recebe o catálogo e executa validação prévia contra o Data Contract v1 (`validateNormalizedCatalog`);
+  2. Serializa deterministicamente o catálogo em `catalog.json` UTF-8;
+  3. Calcula o hash SHA-256 dos bytes (`catalogSha256`) e obtém o tamanho exato (`catalogSizeBytes`);
+  4. Monta o descritor `manifest.json` com `packageFormatVersion=1`, `schemaVersion=1`, `catalogVersion`, `snapshotId` e calcula o hash lógico imutável `packageContentHash`;
+  5. Cria um arquivo ZIP em memória adicionando estritamente `manifest.json` e `catalog.json` com compressão `DEFLATE` nível 9;
+  6. Grava opcionalmente o arquivo ZIP em `tmp/provisioning/xandeflix-prebuilt-catalog.zip`;
+  7. Retorna `BuildPackageResult` com `success: true` e métricas sanitizadas.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: Se o catálogo de entrada for inválido contra o contrato de dados v1, aborta e retorna `success: false` com erros detalhados.
+- **TERMINAL_STATES**: `SUCCESS_PACKAGE_BUILT`.
+- **DATA_READ**: `PrebuiltCatalog` válido em memória.
+- **DATA_WRITE**: Arquivo ZIP temporário em `tmp/provisioning/` (gitignored).
+- **NETWORK**: Nenhuma conexão externa (`NO_NETWORK_ACCESS=SIM`).
+- **SECURITY**: Ausência de segredos ou credenciais no manifest e no catálogo; manifesto aponta unicamente para arquivo interno seguro.
+- **OBSERVABILITY**: Logs emitindo hashes SHA-256, tamanhos em bytes, taxa de compressão e tempo de execução.
+- **ACCEPTANCE_CRITERIA**: `result.success === true`, `packageBuffer` válido, `manifest.packageContentHash` coincidente com bytes calculados, `packageFormatVersion === 1`.
+- **TRACEABILITY**: Requisitos do Gate G4, Architecture Contract seção 4, `docs/PROVISIONING_PACKAGE.md`.
+
+---
+
+### F-G4-002_PACKAGE_VALIDATION_SUCCESS — Validação Completa de Integridade do Pacote
+
+- **FLOW_ID**: `F-G4-002_PACKAGE_VALIDATION_SUCCESS`
+- **TRIGGER**: Chamada de `PackageValidator.validate(packageSource)` em arquivo ZIP ou buffer.
+- **PRECONDITIONS**: Arquivo ZIP gerado pelo `PackageBuilder`.
+- **MAIN_FLOW**:
+  1. O `PackageValidator` descompacta a estrutura do arquivo ZIP via `JSZip`;
+  2. Inspeciona o conjunto de nomes de arquivos e certifica ausência de path traversal e ausência de arquivos extras (`UNKNOWN_PACKAGE_FILES=REJECT`);
+  3. Confirma presença exata de `manifest.json` e `catalog.json`;
+  4. Lê e faz parse do `manifest.json`;
+  5. Valida compatibilidade de `packageFormatVersion === 1` e `schemaVersion === 1`;
+  6. Extrai os bytes brutos do `catalog.json` e recalcula o SHA-256 e o tamanho em bytes;
+  7. Compara os valores com `catalogSha256` e `catalogSizeBytes` declarados no manifest;
+  8. Recalcula e valida o `packageContentHash`;
+  9. Faz parse do `catalog.json` e valida correspondência de `snapshotId`, `catalogVersion` e `schemaVersion`;
+  10. Executa `validateNormalizedCatalog` no catálogo recuperado contra o Data Contract v1;
+  11. Audita ausência de padrões de segredos no payload;
+  12. Retorna `valid: true`.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: Qualquer discrepância de hash, tamanho, versão ou contrato resulta em `valid: false` (fail-closed).
+- **TERMINAL_STATES**: `SUCCESS_PACKAGE_VALIDATED`.
+- **DATA_READ**: Buffer ou arquivo ZIP de provisionamento.
+- **DATA_WRITE**: Nenhum dado gravado.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Verificação criptográfica de integridade física e lógica antes de qualquer consumo futuro.
+- **OBSERVABILITY**: Resultado booleano de validação acompanhado de warnings e erros vazios.
+- **ACCEPTANCE_CRITERIA**: `result.valid === true`, `result.errors.length === 0`.
+- **TRACEABILITY**: Requisitos do Gate G4 seção 14 e 17.
+
+---
+
+### F-G4-003_PACKAGE_TAMPER_REJECTION — Detecção e Rejeição Imediata de Pacote Adulterado
+
+- **FLOW_ID**: `F-G4-003_PACKAGE_TAMPER_REJECTION`
+- **TRIGGER**: Submissão de pacote ZIP contendo `catalog.json` modificado após o build, manifest adulterado com hash incorreto ou tamanho divergente.
+- **PRECONDITIONS**: `PackageValidator` ativo.
+- **MAIN_FLOW**:
+  1. O validador extrai o `catalog.json` e recalcula seu SHA-256 e tamanho em bytes;
+  2. Constata discrepância com os valores registrados no `manifest.json`;
+  3. Registra erro `[HASH_MISMATCH]` e/ou `[SIZE_MISMATCH]`;
+  4. Interrompe a aprovação do pacote imediatamente (fail-closed);
+  5. Retorna `valid: false`.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: Rejeição determinística e controlada.
+- **TERMINAL_STATES**: `FAILED_PACKAGE_TAMPERED`.
+- **DATA_READ**: Arquivo ZIP adulterado.
+- **DATA_WRITE**: Nenhum dado gravado.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Bloqueio de qualquer ataque de modificação man-in-the-middle ou corrupção de armazenamento.
+- **OBSERVABILITY**: Emissão de log com hashes divergentes identificados.
+- **ACCEPTANCE_CRITERIA**: `result.valid === false`, `TAMPERED_CATALOG_REJECTED=PASS`, `HASH_MISMATCH_REJECTED=PASS`.
+- **TRACEABILITY**: Requisitos do Gate G4 seção 17 e 26.
+
+---
+
+### F-G4-004_PACKAGE_VERSION_REJECTION — Rejeição de Pacotes com Versões Incompatíveis
+
+- **FLOW_ID**: `F-G4-004_PACKAGE_VERSION_REJECTION`
+- **TRIGGER**: Pacote com `packageFormatVersion != 1`, `schemaVersion != 1` ou divergência entre versão no manifest e versão no catálogo.
+- **PRECONDITIONS**: `PackageValidator` ativo.
+- **MAIN_FLOW**:
+  1. O validador analisa as propriedades de versão do manifest;
+  2. Detecta versão não suportada pelo runtime atual (`packageFormatVersion` ou `schemaVersion`);
+  3. Ou detecta discrepância entre o `snapshotId`/`catalogVersion` declarado no manifest e o gravado dentro do `catalog.json`;
+  4. Registra erro `[PACKAGE_VERSION_MISMATCH]`, `[SCHEMA_VERSION_MISMATCH]` ou `[SNAPSHOT_MISMATCH]`;
+  5. Retorna `valid: false`.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: Rejeição fail-closed.
+- **TERMINAL_STATES**: `FAILED_VERSION_INCOMPATIBLE`.
+- **DATA_READ**: Manifest e catálogo do pacote.
+- **DATA_WRITE**: Nenhum.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Prevenção contra execução de esquemas depreciados ou incompatíveis com o dispositivo.
+- **OBSERVABILITY**: Log descrevendo a versão encontrada versus a versão esperada.
+- **ACCEPTANCE_CRITERIA**: `result.valid === false`, `PACKAGE_VERSION_MISMATCH_REJECTED=PASS`.
+- **TRACEABILITY**: Requisitos do Gate G4 seção 22 e 23.
+
+---
+
+### F-G4-005_PACKAGE_STRUCTURE_REJECTION — Rejeição por Violação Estrutural, Arquivo Extra ou Path Traversal
+
+- **FLOW_ID**: `F-G4-005_PACKAGE_STRUCTURE_REJECTION`
+- **TRIGGER**: Pacote contendo arquivo extra não autorizado, ausência de `manifest.json` ou `catalog.json`, ou entradas maliciosas com sequências de subida de diretório (`..`, `\`).
+- **PRECONDITIONS**: `PackageValidator` ativo.
+- **MAIN_FLOW**:
+  1. O validador lista todas as entradas do arquivo ZIP;
+  2. Detecta violação da política `UNKNOWN_PACKAGE_FILES=REJECT` (arquivo adicional desconhecido);
+  3. Ou detecta padrões de path traversal (`..`, `\`, caminhos absolutos);
+  4. Ou constata a ausência de um dos dois arquivos canônicos obrigatórios;
+  5. Registra o erro de violação estrutural (`[PATH_TRAVERSAL_DETECTED]`, `[EXTRA_FILE_REJECTED]`, `[MISSING_MANIFEST]` ou `[MISSING_CATALOG]`);
+  6. Aborta a inspeção e retorna `valid: false`.
+- **ALTERNATIVE_FLOW**: N/A.
+- **ERROR_FLOW**: Bloqueio sumário fail-closed.
+- **TERMINAL_STATES**: `FAILED_STRUCTURE_VIOLATION`.
+- **DATA_READ**: Entradas do arquivo ZIP.
+- **DATA_WRITE**: Nenhum.
+- **NETWORK**: Nenhuma.
+- **SECURITY**: Proteção ativa do sistema de arquivos do cliente contra arbitrariedades e injeção de arquivos parasitários.
+- **OBSERVABILITY**: Log especificando a entrada maliciosa ou anômala detectada.
+- **ACCEPTANCE_CRITERIA**: `result.valid === false`, `EXTRA_FILE_REJECTED=PASS`, `PATH_TRAVERSAL_REJECTED=PASS`.
+- **TRACEABILITY**: Requisitos do Gate G4 seção 15, 16 e 26.
+
 

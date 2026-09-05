@@ -28,24 +28,33 @@
 | `RAW_MODEL_SEPARATED_FROM_CANONICAL_CONTRACT` | `SIM` | Tipagem intermediaria bruta (RawSourceCatalog) estritamente isolada do contrato de saida PrebuiltCatalog v1. |
 | `VALIDATE_AFTER_NORMALIZE` | `REQUIRED` | Obrigatoriedade de aprovacao estrutural no JSON Schema canônico e integridade relacional antes de qualquer emissao de snapshot. |
 | `SYNTHETIC_FIRST_VALIDATION` | `REQUIRED` | Validacao preliminar compulsoria com fixtures sinteticas artificiais antes de qualquer exposicao a dados reais. |
+| `PROVISIONING_PACKAGE_FORMAT` | `ZIP` | Formato inicial canônico simples, auditável e universal de empacotamento com compressão DEFLATE. |
+| `PACKAGE_FORMAT_VERSION` | `1` | Versão canônica 1 da estrutura de invólucro do pacote de provisionamento. |
+| `PACKAGE_CONTENTS` | `manifest.json + catalog.json` | Conteúdo estrito do pacote no MVP: somente manifest e catálogo canônico na raiz. |
+| `CATALOG_HASH_ALGORITHM` | `SHA256` | Algoritmo criptográfico SHA-256 via node:crypto para integridade do arquivo catalog.json. |
+| `PACKAGE_CONTENT_HASH_ALGORITHM` | `SHA256` | Algoritmo criptográfico SHA-256 sobre propriedades imutáveis do manifest para hash lógico do pacote. |
+| `UNKNOWN_PACKAGE_FILES` | `REJECT` | Política estrita de rejeição sumária de qualquer arquivo extra não autorizado dentro do pacote ZIP. |
+| `PACKAGE_VALIDATION` | `FAIL_CLOSED` | Rejeição automática de pacotes com divergência de hash, tamanho, versão, path traversal ou contrato. |
+| `LOGICAL_PACKAGE_DETERMINISM` | `REQUIRED` | Obrigatoriedade de determinismo estrito na serialização lógica e recálculo estável de hashes de conteúdo. |
+| `ZIP_PATH_TRAVERSAL_PROTECTION` | `REQUIRED` | Rejeição ativa de entradas ZIP maliciosas contendo .., barras invertidas, letras de unidade ou caminhos absolutos. |
 
 ---
 
 ## 2. Decisoes Tecnicas em Aberto (DECISIONS_OPEN)
 
-1. `PROVISIONING_PACKAGE_FORMAT`: Definir se o pacote sera um arquivo ZIP contendo JSONs otimizados, base SQLite direta, arquivo compactado tar.gz ou formato binario customizado.
-2. `SEARCH_INDEX_TRANSPORTABILITY`: Avaliar viabilidade tecnica de gerar indices (ex: SQLite FTS, MiniSearch index dump) externamente para transporte direto ao cliente.
-3. `SEARCH_SEED_STRATEGY`: Estrategia de indexacao inicial no cliente caso o indice transportado apresente incompatibilidades.
-4. `PACKAGE_SIGNING_STRATEGY`: Protocolo criptografico para assinatura e verificacao de autoria do pacote (ECDSA, Ed25519).
-5. `PACKAGE_ENCRYPTION`: Necessidade, escopo e chaveamento de criptografia em repouso e em transito para os pacotes de provisionamento.
-6. `REAL_SOURCE_AUTH_STRATEGY`: Arquitetura de autenticacao com provedores de origem sem expor credenciais primarias ao cliente.
-7. `USER_SOURCE_BINDING`: Modelo de associacao entre credenciais de acesso da fonte e a distribuicao de pacotes personalizados.
-8. `INCREMENTAL_UPDATE_STRATEGY`: Algoritmo para geracao e aplicacao de deltas/diffs incrementais de catalogo sem necessidade de re-download completo.
-9. `SNAPSHOT_RETENTION`: Politica de retencao e expiracao de snapshots e versoes antigas de catalogos.
-10. `ROLLBACK`: Mecanismo de fallback no cliente caso a importacao de uma versao mais recente falhe ou resulte em inconsistencias.
+1. `PACKAGE_SIGNING_STRATEGY`: Protocolo criptografico para assinatura e verificacao de autoria do pacote (ECDSA, Ed25519) sem chave estática.
+2. `PACKAGE_ENCRYPTION`: Necessidade, escopo e algoritmo de criptografia em repouso e em trânsito para os pacotes de provisionamento.
+3. `USER_SOURCE_BINDING`: Modelo de associacao entre credenciais de acesso da fonte e a distribuicao de pacotes personalizados.
+4. `SNAPSHOT_RETENTION`: Politica de retencao e expiracao de snapshots e versoes antigas de catalogos.
+5. `ROLLBACK`: Mecanismo de fallback no cliente caso a importacao de uma versao mais recente falhe ou resulte em inconsistencias.
+6. `SIZE_LIMITS`: Limites contratuais de tamanho para o pacote de provisionamento e footprint de memoria (evidências empíricas atuais não são SLA).
+7. `SEARCH_INDEX_TRANSPORTABILITY`: Avaliar viabilidade tecnica de gerar indices (ex: SQLite FTS, MiniSearch index dump) externamente para transporte direto ao cliente.
+8. `SEARCH_SEED_STRATEGY`: Estrategia de indexacao inicial no cliente caso o indice transportado apresente incompatibilidades.
+9. `REAL_SOURCE_AUTH_STRATEGY`: Arquitetura de autenticacao com provedores de origem sem expor credenciais primarias ao cliente.
+10. `INCREMENTAL_UPDATE_STRATEGY`: Algoritmo para geracao e aplicacao de deltas/diffs incrementais de catalogo sem necessidade de re-download completo.
 11. `OFFLINE_POLICY`: Comportamento da aplicacao diante da ausencia prolongada de conexao com a internet apos o bootstrap inicial.
 12. `ARTWORK_CACHE_POLICY`: Politica de download, resolucao, compressao e expiracao de posters e imagens de catalogo.
-13. `SIZE_LIMITS`: Limites aceitaveis de tamanho para o pacote de provisionamento e footprint de memoria no dispositivo.
-14. `PERFORMANCE_SLA`: Metas empiricas de tempo de abertura e resposta que serao homologadas apenas no Gate G12.
+13. `PERFORMANCE_SLA`: Metas empiricas de tempo de abertura e resposta que serao homologadas apenas no Gate G12.
+
 
 

@@ -6,18 +6,20 @@
 
 - **PROJECT**: `XANDEFLIX_PREBUILT`
 - **PARENT_CONTEXT**: `MARCO_ZERO_CANONICO_XANDEFLIX_PREBUILT`
-- **LAST_CLOSED_GATE**: `G3`
+- **LAST_CLOSED_GATE**: `G4`
 - **G0_STATUS**: `PASS`
 - **G1_STATUS**: `PASS`
 - **G2_STATUS**: `PASS`
 - **G3_STATUS**: `PASS`
-- **MVP_PROGRESS_PERCENT**: `34`
-- **CURRENT_GATE**: `G4`
-- **G4_STATUS**: `NOT_STARTED`
-- **G4_STARTED**: `NAO`
-- **NEXT_GATE**: `XANDEFLIX_PREBUILT_G4_PROVISIONING_PACKAGE`
+- **G4_STATUS**: `PASS`
+- **MVP_PROGRESS_PERCENT**: `44`
+- **CURRENT_GATE**: `G5`
+- **G4_STARTED**: `SIM`
+- **G5_STATUS**: `NOT_STARTED`
+- **G5_STARTED**: `NAO`
+- **NEXT_GATE**: `XANDEFLIX_PREBUILT_G5_FAST_DEVICE_BOOTSTRAP`
 - **NEXT_GATE_STARTED**: `NAO`
-- **HISTORICAL_RECORD**: `G3_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM`
+- **HISTORICAL_RECORD**: `G4_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM`
 
 
 
@@ -43,24 +45,34 @@
 - `EXTERNAL_PREPROCESSING`: TARGET
 - `DEVICE_LOCAL_RUNTIME_CATALOG`: TARGET
 - `DEVICE_DIRECT_PLAYBACK`: TARGET
+- `DATA_CONTRACT_SCHEMA_VERSION`: 1
+- `EXTERNAL_PIPELINE_RUNTIME`: NODE_TYPESCRIPT
+- `INGESTION_ADAPTER_PATTERN`: REQUIRED
+- `INGESTION_ID_STRATEGY`: DETERMINISTIC
+- `PROVISIONING_PACKAGE_FORMAT`: ZIP
+- `PACKAGE_FORMAT_VERSION`: 1
+- `PACKAGE_CONTENTS`: manifest.json + catalog.json
+- `CATALOG_HASH_ALGORITHM`: SHA256
+- `PACKAGE_CONTENT_HASH_ALGORITHM`: SHA256
+- `UNKNOWN_PACKAGE_FILES`: REJECT
+- `PACKAGE_VALIDATION`: FAIL_CLOSED
 
 ---
 
 ## 4. Decisoes Abertas (DECISIONS_OPEN)
 
-- `PROVISIONING_PACKAGE_FORMAT`: Em aberto (ZIP, TAR.GZ, SQLite direto, SQLite comprimido).
-- `EXTERNAL_PIPELINE_RUNTIME`: Em aberto (Node.js/TypeScript, Python, Go, Cloudflare Workers / Supabase Edge Functions).
-- `SEARCH_INDEX_TRANSPORTABILITY`: Em aberto.
-- `SEARCH_SEED_STRATEGY`: Em aberto.
-- `PACKAGE_SIGNING_STRATEGY`: Em aberto.
+- `PACKAGE_SIGNING_STRATEGY`: Em aberto (ECDSA, Ed25519).
 - `PACKAGE_ENCRYPTION`: Em aberto.
 - `USER_SOURCE_BINDING`: Em aberto.
-- `INCREMENTAL_UPDATE_STRATEGY`: Em aberto.
 - `SNAPSHOT_RETENTION`: Em aberto.
 - `ROLLBACK`: Em aberto.
+- `SIZE_LIMITS`: Em aberto (evidência empírica não é SLA).
+- `SEARCH_INDEX_TRANSPORTABILITY`: Em aberto.
+- `SEARCH_SEED_STRATEGY`: Em aberto.
+- `REAL_SOURCE_AUTH_STRATEGY`: Em aberto.
+- `INCREMENTAL_UPDATE_STRATEGY`: Em aberto.
 - `OFFLINE_POLICY`: Em aberto.
 - `ARTWORK_CACHE_POLICY`: Em aberto.
-- `SIZE_LIMITS`: Em aberto.
 - `PERFORMANCE_SLA`: Em aberto.
 
 ---
@@ -103,7 +115,7 @@
 
 ## 10. Proximo Gate (NEXT_GATE)
 
-- **NEXT_GATE**: `XANDEFLIX_PREBUILT_G4_PROVISIONING_PACKAGE`
+- **NEXT_GATE**: `XANDEFLIX_PREBUILT_G5_FAST_DEVICE_BOOTSTRAP`
 - **NEXT_GATE_STARTED**: `NAO`
 
 ---
@@ -190,6 +202,35 @@
   - CURRENT_GATE avancado para G4 (NEXT_AUTHORIZABLE_GATE=G4);
   - G4 permanece NOT_STARTED (G4_STARTED=NAO, NEXT_GATE_STARTED=NAO);
   - Autorizacao expressa concedida para commit e push canonicos na branch origin/main.
+
+- **Ciclo G4 (Provisioning Package)**:
+  - Implementacao do formato de pacote inicial canônico em ZIP (`PROVISIONING_PACKAGE_FORMAT=ZIP`);
+  - Definicao de `PACKAGE_FORMAT_VERSION=1` e `SCHEMA_VERSION=1`;
+  - Estrutura interna minima estrita contendo exclusivamente `manifest.json` e `catalog.json`;
+  - Implementacao do calculo de integridade SHA-256 via `node:crypto` (`catalogSha256` e `packageContentHash`);
+  - Determinismo estrito comprovado via replay (`LOGICAL_PACKAGE_DETERMINISTIC=SIM`, `BYTE_IDENTICAL_ZIP=SIM`);
+  - Implementacao de construtor de pacote com fail-closed (`PackageBuilder`);
+  - Implementacao de validador completo (`PackageValidator`) com protecao contra path traversal (`ZIP_PATH_TRAVERSAL_PROTECTION=PASS`);
+  - Politica de rejeicao de arquivos desconhecidos (`UNKNOWN_PACKAGE_FILES=REJECT`);
+  - Adicao de scripts CLI `npm run provisioning:build` e `npm run provisioning:check`;
+  - Aprovacao da suite completa de 11 testes negativos obrigatorios (adulteracao, hash mismatch, size mismatch, versao incompativel, divergencia de snapshot, arquivo extra, ausencia de manifest/catalog e path traversal);
+  - Elaboracao da documentacao tecnica completa em `docs/PROVISIONING_PACKAGE.md`;
+  - Formalizacao de 5 fluxos funcionais em `docs/FSD.md` (`F-G4-001` a `F-G4-005`);
+  - Registro de decisoes arquiteturais fechadas em `docs/DECISIONS.md`;
+  - Auditoria de segredos e isolamento confirmada (sem chaves privadas, sem tokens de longa duracao, sem conexao Supabase, sem importacao no dispositivo cliente);
+  - Revalidacoes tecnicas completas com PASS (contract:check, ingestion:synthetic, ingestion:negative, provisioning:build, provisioning:check, typecheck, build web, android unit tests e assembleDebug);
+  - Registro historico: G4_STATUS=COMPLETE_PENDING_MASTER_ADJUDICATION.
+
+- **Adjudicacao G4 e Canonicalizacao (2026-09-05)**:
+  - G4 formalmente adjudicado pelo Chat Mestre como PASS;
+  - Artefato de provisionamento ZIP aprovado (versionado, determinístico, imutável e verificável);
+  - Observação de processo não-bloqueadora registrada em docs/ERRORS_AND_BLOCKERS.md (emissão de mensagem intermediária informativa sobre teste Gradle durante QUIET_UNTIL_FINAL_REPORT, com G4_PASS_INVALIDATED=NAO);
+  - MVP_PROGRESS_PERCENT atualizado de 34 para 44;
+  - CURRENT_GATE avançado para G5 (NEXT_AUTHORIZABLE_GATE=G5);
+  - G5 permanece NOT_STARTED (G5_STARTED=NAO, NEXT_GATE_STARTED=NAO);
+  - Autorização expressa concedida para commit e push canônicos na branch origin/main.
+
+
 
 
 

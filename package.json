@@ -10,7 +10,9 @@
     "typecheck": "tsc --noEmit",
     "contract:check": "node scripts/validate-data-contract.mjs",
     "ingestion:synthetic": "node scripts/run-ingestion-pipeline.mjs",
-    "ingestion:negative": "node scripts/run-ingestion-pipeline.mjs --negative"
+    "ingestion:negative": "node scripts/run-ingestion-pipeline.mjs --negative",
+    "provisioning:build": "node scripts/build-provisioning-package.mjs",
+    "provisioning:check": "node scripts/validate-provisioning-package.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^7.0.0",
@@ -25,6 +27,7 @@
     "@vitejs/plugin-react": "^4.3.4",
     "ajv": "^8.20.0",
     "ajv-formats": "^3.0.1",
+    "jszip": "^3.10.1",
     "typescript": "~5.6.3",
     "vite": "^6.0.0"
   }

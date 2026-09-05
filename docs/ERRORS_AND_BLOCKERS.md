@@ -62,3 +62,18 @@ Cada incidente, erro ou bloqueador tecnico devera ser registrado segundo o forma
 - **NOTAS_NORMATIVAS**:
   - `G3_PASS_INVALIDATED`: NAO
 
+### OCORRENCIA-004 — Emissão de Mensagem Intermediária durante QUIET_UNTIL_FINAL_REPORT no Gate G4
+
+- **DATE**: 2026-09-05
+- **GATE**: G4_PROVISIONING_PACKAGE
+- **CLASSIFICATION**: `PROCESS_OUTPUT_DEVIATION`
+- **DESCRIPTION**: O executor emitiu mensagem intermediária informando início/aguardo de teste Gradle antes do relatório terminal, apesar do modo QUIET_UNTIL_FINAL_REPORT.
+- **EVIDENCE**: Mensagem de texto intermediária informativa enviada durante a execução assíncrona do Gradle test antes do relatório terminal.
+- **ROOT_CAUSE**: Instrução de suporte do tooling de background task sobreposta involuntariamente à diretriz de modo silencioso.
+- **ROOT_CAUSE_CONFIDENCE**: HIGH
+- **IMPACT**: `NON_BLOCKING`
+- **RESOLUTION_STATUS**: `RESOLVED_BY_REINFORCED_EXECUTION_RULE`
+- **NOTAS_NORMATIVAS**:
+  - `G4_PASS_INVALIDATED`: NAO
+
+
