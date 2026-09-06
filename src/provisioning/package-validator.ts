@@ -47,12 +47,12 @@ export class PackageValidator {
   /**
    * Valida um pacote de provisionamento a partir de um arquivo em disco ou Buffer em memória.
    */
-  async validate(packageSource: string | Buffer): Promise<ValidatePackageDetailedResult> {
+  async validate(packageSource: string | Buffer | Uint8Array): Promise<ValidatePackageDetailedResult> {
     const errors: string[] = [];
     const warnings: string[] = [];
     const extractedFiles: string[] = [];
 
-    let zipBuffer: Buffer;
+    let zipBuffer: Buffer | Uint8Array;
     if (typeof packageSource === 'string') {
       if (!fs.existsSync(packageSource)) {
         return {
@@ -184,9 +184,10 @@ export class PackageValidator {
     }
 
     // 6. Carregar catalog.json em bytes estáveis
-    let catalogBuffer: Buffer;
+    let catalogBuffer: Buffer | Uint8Array;
     try {
-      catalogBuffer = await zip.file(CATALOG_FILENAME)!.async('nodebuffer');
+      const rawCatalog = await zip.file(CATALOG_FILENAME)!.async('uint8array');
+      catalogBuffer = typeof Buffer !== 'undefined' ? Buffer.from(rawCatalog) : rawCatalog;
     } catch (err) {
       return {
         valid: false,
@@ -231,9 +232,10 @@ export class PackageValidator {
 
       const indexEntry = zip.file(SEARCH_INDEX_FILENAME);
       if (indexEntry) {
-        let indexBuffer: Buffer;
+        let indexBuffer: Buffer | Uint8Array;
         try {
-          indexBuffer = await indexEntry.async('nodebuffer');
+          const rawIndex = await indexEntry.async('uint8array');
+          indexBuffer = typeof Buffer !== 'undefined' ? Buffer.from(rawIndex) : rawIndex;
           actualSearchIndexSha256 = calculateSha256(indexBuffer);
 
           if (!verifyChecksum(actualSearchIndexSha256, manifestV2.searchIndexSha256)) {
@@ -248,7 +250,11 @@ export class PackageValidator {
             );
           }
 
-          searchIndex = JSON.parse(indexBuffer.toString('utf8')) as PrebuiltSearchIndex;
+          const indexJsonText =
+            typeof TextDecoder !== 'undefined'
+              ? new TextDecoder('utf-8').decode(indexBuffer)
+              : (indexBuffer as any).toString('utf8');
+          searchIndex = JSON.parse(indexJsonText) as PrebuiltSearchIndex;
 
           // Validação fail-closed do searchIndex via SearchIndexValidator
           const indexValidation = this.searchIndexValidator.validate(searchIndex, {
@@ -314,7 +320,10 @@ export class PackageValidator {
     // 9. Parse e validação do catalog.json contra o contrato G2
     let catalog: PrebuiltCatalog;
     try {
-      const catalogJsonText = catalogBuffer.toString('utf8');
+      const catalogJsonText =
+        typeof TextDecoder !== 'undefined'
+          ? new TextDecoder('utf-8').decode(catalogBuffer)
+          : (catalogBuffer as any).toString('utf8');
       catalog = JSON.parse(catalogJsonText) as PrebuiltCatalog;
     } catch (err) {
       errors.push(`[INVALID_CATALOG_JSON] Falha ao parsear ${CATALOG_FILENAME}: ${(err as Error).message}`);
@@ -372,7 +381,10 @@ export class PackageValidator {
     }
 
     // 12. Auditoria de segurança no payload do pacote
-    const rawContent = catalogBuffer.toString('utf8');
+    const rawContent =
+      typeof TextDecoder !== 'undefined'
+        ? new TextDecoder('utf-8').decode(catalogBuffer)
+        : (catalogBuffer as any).toString('utf8');
     const secretPatterns = [
       /SUPABASE_SERVICE_ROLE/i,
       /service_role/i,

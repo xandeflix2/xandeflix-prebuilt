@@ -139,3 +139,26 @@ Cada incidente, erro ou bloqueador tecnico devera ser registrado segundo o forma
   - `PERFORMANCE_EVIDENCE_IS_NOT_SLA`: SIM
   - `REAL_DEVICE_INCREMENTAL_UPDATE_PROVEN`: NAO
   - `G9_PASS_INVALIDATED`: NAO
+
+### OCORRENCIA-007 — Gap de Provisionamento Físico e Descoberta ADB no Início do G11
+
+- **DATE**: 2026-09-06
+- **GATE**: G11_PHYSICAL_MULTI_DEVICE_TESTING
+- **CLASSIFICATION**: `PHYSICAL_TESTABILITY_GAP`
+- **STATUS**: `RESOLVED`
+- **DESCRIPTION**: No início da execução do Gate G11, o Tablet Samsung SM-X610 conectado fisicamente via USB não foi enumerado na sessão inicial do servidor ADB local (`TABLET_DEVICE_PRESENT=NAO`). Simultaneamente, identificou-se que o APK Android compilado não possuía âncora de confiança de teste em runtime nem mecanismo legítimo para invocar o `SecureArtifactImportService` para pacotes assinados em ambiente físico sem incorrer em bypass inaceitável de segurança do G10.
+- **EVIDENCE**:
+  - `INITIAL_RESULT`: `INCONCLUSIVE_PREBUILT_G11_REQUIRED_DEVICE_UNAVAILABLE`
+  - `SIGNED_SYNTHETIC_PACKAGE_IMPORT`: `NOT_EXECUTED_PROVISIONING_PATH_UNAVAILABLE`
+  - `ADB_KILL_START_SERVER`: Tablet detectado com sucesso (`RX2X301Q3KY device`, `SM-X610`, Android 16, API 36).
+- **ROOT_CAUSE**: Estado transitório de enumeração do servidor ADB Windows anterior ao ciclo e ausência prévia de um boundary exclusivo de depuração (`DEBUG_ONLY_TEST_TRUST_ANCHOR` e ponto de entrada de importação) sem vazamento de chaves ou enfraquecimento do trust model de release.
+- **ROOT_CAUSE_CONFIDENCE**: HIGH
+- **IMPACT**: `BLOCKING_RESOLVED` (Bloqueador do G11 resolvido e homologado via subciclo corretivo G11A).
+- **RESOLUTION_STATUS**: `RESOLVED`
+- **NOTAS_NORMATIVAS**:
+  - `TABLET_DISCOVERY_FIXED`: SIM (`adb kill-server / start-server` restabeleceu conexão imediata com o Tablet SM-X610).
+  - `DEBUG_TEST_TRUST_KEY_IMPLEMENTED`: SIM (`g11-physical-test-key-2026` injetada exclusivamente em debug builds).
+  - `RELEASE_ISOLATION_PROVEN`: SIM (`RELEASE_TEST_TRUST_KEY_PRESENT=NAO`, `RELEASE_DEBUG_IMPORT_ENTRYPOINT_PRESENT=NAO`, `RELEASE_DEBUG_PROVISIONER_BEHAVIOR=INERT_NO_IMPORT_CAPABILITY`).
+  - `PHYSICAL_IMPORT_PROVEN`: SIM (Tablet e Fire TV Stick provisionados e validados com 100% de sucesso).
+  - `G11A_STATUS`: `PASS`
+

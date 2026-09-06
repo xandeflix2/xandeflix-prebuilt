@@ -36,7 +36,7 @@ export class PackageImporter {
   }
 
   async importPackage(
-    packageSource: string | Buffer,
+    packageSource: string | Buffer | Uint8Array,
     options?: ImportPackageOptions
   ): Promise<ImportResult> {
     const totalStartTime = Date.now();
@@ -49,9 +49,10 @@ export class PackageImporter {
       stagingReadbackValidateMs: 0,
       promotionMs: 0,
       totalBootstrapMs: 0,
-      packageSizeBytes: Buffer.isBuffer(packageSource)
-        ? packageSource.length
-        : 0,
+      packageSizeBytes:
+        (typeof Buffer !== 'undefined' && Buffer.isBuffer(packageSource)) || packageSource instanceof Uint8Array
+          ? packageSource.length
+          : 0,
       catalogSizeBytes: 0,
       activeStorageSizeBytes: 0,
     };
@@ -142,8 +143,7 @@ export class PackageImporter {
       }
 
       // 4.3 Verificação de hash do conteúdo do catálogo serializado
-      const stagedCatalogBuffer = Buffer.from(JSON.stringify(stagingData.catalog, null, 2), 'utf8');
-      const stagedSha = calculateSha256(stagedCatalogBuffer);
+      const stagedSha = calculateSha256(JSON.stringify(stagingData.catalog, null, 2));
       if (stagedSha !== manifest.catalogSha256) {
         throw new Error('[STAGING_HASH_MISMATCH] Hash SHA-256 do catálogo em staging diverge do manifest');
       }
@@ -171,8 +171,7 @@ export class PackageImporter {
           );
         }
 
-        const stagedIndexBuffer = Buffer.from(JSON.stringify(stagingData.searchIndex, null, 2), 'utf8');
-        const stagedIndexSha = calculateSha256(stagedIndexBuffer);
+        const stagedIndexSha = calculateSha256(JSON.stringify(stagingData.searchIndex, null, 2));
         if (stagedIndexSha !== manifest.searchIndexSha256) {
           throw new Error(
             '[STAGING_SEARCH_INDEX_SHA_MISMATCH] Hash SHA-256 do search-index em staging diverge do manifest'

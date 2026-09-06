@@ -10,12 +10,14 @@
  */
 
 import crypto from 'node:crypto';
+import { calculateArtifactDigest } from '../security/artifact-hash.ts';
 
-export function calculateSha256(data: string | Buffer): string {
+export function calculateSha256(data: string | Buffer | Uint8Array): string {
   if (crypto && typeof crypto.createHash === 'function') {
     return crypto.createHash('sha256').update(data).digest('hex');
   }
-  throw new Error('Ambiente sem suporte a hashing SHA-256');
+  const bytes = typeof data === 'string' ? new TextEncoder().encode(data) : data;
+  return calculateArtifactDigest(bytes).sha256;
 }
 
 export interface PackageContentHashInput {

@@ -119,6 +119,12 @@
 | `RECOVERY_NETWORK` | `NONE` | Recuperação estritamente local; zero chamadas de rede ou downloads automatizados durante processos de recuperação. |
 | `MANUAL_ARBITRARY_ROLLBACK` | `OUT_OF_SCOPE_G10` | Reversão manual para pontos arbitrários do passado considerada fora do escopo do Gate G10. |
 | `PACKAGE_ENCRYPTION_MVP_REQUIREMENT` | `NOT_REQUIRED_FOR_CREDENTIAL_FREE_PROVISIONING_DATA` | Criptografia de pacotes em repouso considerada desnecessária no MVP devido à ausência estrita de dados secretos ou credenciais nos artefatos. |
+| `DEBUG_ONLY_TEST_TRUST_ANCHOR` | `SUPPORTED_DEBUG_ONLY` | Âncora pública de teste (`g11-physical-test-key-2026`) permitida exclusivamente em builds de depuração para viabilizar testes físicos com validação de assinatura, rigorosamente eliminada no release. |
+| `RELEASE_TEST_TRUST_KEY_PRESENT` | `PROHIBITED_NAO` | Proibição categórica de inclusão de chaves de teste ou âncoras de depuração no APK de produção. |
+| `PHYSICAL_PROVISIONING_ENTRYPOINT` | `DEBUG_ONLY_CAPACITOR_WINDOW_AND_NATIVE_INTENT_RECEIVER` | Ponto de entrada de provisionamento físico de teste via bridge WebView e Intent receiver nativo, presente estritamente no source-set debug. |
+| `RELEASE_DEBUG_PROVISIONER_BEHAVIOR` | `INERT_NO_IMPORT_CAPABILITY` | Stub inerte compilado em `src/release` sem capacidade de importação ou execução em produção. |
+| `PHYSICAL_IMPORT_VERIFICATION` | `SECURE_ARTIFACT_IMPORT_SERVICE_STRICT` | Validação criptográfica de assinatura (ECDSA P-256 / SHA-256) e de contrato estrutural obrigatória no dispositivo sem nenhum bypass. |
+| `PHONE_VALIDATION_STATUS` | `PENDING_REMAINING_FOR_G11B` | Validação em smartphone Android físico mantida como requisito remanescente para o subciclo G11B. |
 
 ---
 

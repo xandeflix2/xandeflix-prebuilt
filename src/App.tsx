@@ -32,6 +32,14 @@ import { SearchPage } from './ui/pages/SearchPage.tsx';
 import { MovieDetailPage } from './ui/pages/MovieDetailPage.tsx';
 import { SeriesDetailPage } from './ui/pages/SeriesDetailPage.tsx';
 
+declare const __XANDEFLIX_DEBUG_BUILD__: boolean;
+
+if (typeof __XANDEFLIX_DEBUG_BUILD__ !== 'undefined' && __XANDEFLIX_DEBUG_BUILD__) {
+  import('./debug/debug-import.ts').then(({ initDebugImport }) => {
+    initDebugImport();
+  });
+}
+
 export default function App(): React.JSX.Element {
   const {
     activeCatalog,

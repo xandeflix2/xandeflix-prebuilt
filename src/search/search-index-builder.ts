@@ -12,6 +12,7 @@
  */
 
 import crypto from 'node:crypto';
+import { calculateArtifactDigest } from '../security/artifact-hash.ts';
 import type { PrebuiltCatalog, Genre, Category } from '../contracts/catalog.ts';
 import {
   SEARCH_INDEX_VERSION,
@@ -35,7 +36,8 @@ export function calculateSearchIndexContentHash(canonicalPayload: unknown): stri
   if (crypto && typeof crypto.createHash === 'function') {
     return crypto.createHash('sha256').update(serialized).digest('hex');
   }
-  throw new Error('Ambiente sem suporte a hashing SHA-256');
+  const bytes = new TextEncoder().encode(serialized);
+  return calculateArtifactDigest(bytes).sha256;
 }
 
 export class SearchIndexBuilder {

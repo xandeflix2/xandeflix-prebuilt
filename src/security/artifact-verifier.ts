@@ -11,7 +11,7 @@
  * - TAMPERED ARTIFACT / SIGNATURE REJECTION: Falha explícita.
  */
 
-import { verify } from 'node:crypto';
+import crypto from 'node:crypto';
 import type {
   ArtifactSecurityEnvelope,
   CanonicalSigningPayloadInput,
@@ -23,6 +23,65 @@ import { calculateArtifactDigest } from './artifact-hash.ts';
 import { buildCanonicalSigningPayloadBytes } from './canonical-signing-payload.ts';
 import { TrustedPublicKeyStore } from './trusted-public-key-store.ts';
 
+function derToP1363(der: Uint8Array): Uint8Array {
+  let offset = 2;
+  if (der[offset] & 0x80) offset += (der[offset] & 0x7f) + 1;
+  offset += 2;
+  const rLen = der[offset - 1];
+  let r = der.subarray(offset, offset + rLen);
+  offset += rLen + 2;
+  const sLen = der[offset - 1];
+  let s = der.subarray(offset, offset + sLen);
+  if (r.length === 33 && r[0] === 0) r = r.subarray(1);
+  if (s.length === 33 && s[0] === 0) s = s.subarray(1);
+  const out = new Uint8Array(64);
+  out.set(r, 32 - r.length);
+  out.set(s, 64 - s.length);
+  return out;
+}
+
+function pemToSpki(pem: string): Uint8Array {
+  const b64 = pem.replace(/-----[^\n]+-----/g, '').replace(/\s+/g, '');
+  if (typeof Buffer !== 'undefined') {
+    return Buffer.from(b64, 'base64');
+  }
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) {
+    bytes[i] = bin.charCodeAt(i);
+  }
+  return bytes;
+}
+
+async function verifyWebCrypto(
+  payloadBytes: Uint8Array,
+  signatureDerBase64: string,
+  publicKeyPem: string
+): Promise<boolean> {
+  try {
+    const rawSigBase64 = typeof Buffer !== 'undefined'
+      ? Buffer.from(signatureDerBase64, 'base64')
+      : Uint8Array.from(atob(signatureDerBase64), (c) => c.charCodeAt(0));
+    const rawP1363 = derToP1363(rawSigBase64);
+    const spki = pemToSpki(publicKeyPem);
+    const key = await globalThis.crypto.subtle.importKey(
+      'spki',
+      spki,
+      { name: 'ECDSA', namedCurve: 'P-256' },
+      false,
+      ['verify']
+    );
+    return await globalThis.crypto.subtle.verify(
+      { name: 'ECDSA', hash: { name: 'SHA-256' } },
+      key,
+      rawP1363,
+      payloadBytes
+    );
+  } catch {
+    return false;
+  }
+}
+
 export class ArtifactVerifier {
   private keyStore: TrustedPublicKeyStore;
 
@@ -32,8 +91,8 @@ export class ArtifactVerifier {
 
   verify(
     artifactBytes: Buffer | Uint8Array,
-    rawEnvelope: ArtifactSecurityEnvelope | string
-  ): VerificationResult {
+    rawEnvelope: ArtifactSecurityEnvelope | string | null
+  ): VerificationResult | Promise<VerificationResult> {
     const totalStart = Date.now();
     const metrics: VerificationMetrics = {
       sha256Ms: 0,
@@ -57,7 +116,7 @@ export class ArtifactVerifier {
         };
       }
     } else {
-      envelope = rawEnvelope;
+      envelope = rawEnvelope as ArtifactSecurityEnvelope;
     }
 
     // 2. Validação estrutural do envelope
@@ -221,35 +280,74 @@ export class ArtifactVerifier {
 
     const payloadBytes = buildCanonicalSigningPayloadBytes(payloadInput);
 
-    let isSignatureValid = false;
-    try {
-      const signatureBuffer = Buffer.from(envelope.signature, 'base64');
-      isSignatureValid = verify('sha256', payloadBytes, {
-        key: trustedKey.publicKeyPem,
-        dsaEncoding: 'der',
-      }, signatureBuffer);
-    } catch {
-      isSignatureValid = false;
-    }
-    metrics.verifyMs = Date.now() - verifyStart;
-    metrics.totalVerifyMs = Date.now() - totalStart;
+    // Se no ambiente Node.js com node:crypto disponível, executar verificação síncrona
+    if (crypto && typeof crypto.verify === 'function') {
+      let isSignatureValid = false;
+      try {
+        const signatureBuffer = typeof Buffer !== 'undefined'
+          ? Buffer.from(envelope.signature, 'base64')
+          : Uint8Array.from(atob(envelope.signature), (c) => c.charCodeAt(0));
+        isSignatureValid = crypto.verify(
+          'sha256',
+          payloadBytes,
+          {
+            key: trustedKey.publicKeyPem,
+            dsaEncoding: 'der',
+          },
+          signatureBuffer
+        );
+      } catch {
+        isSignatureValid = false;
+      }
+      metrics.verifyMs = Date.now() - verifyStart;
+      metrics.totalVerifyMs = Date.now() - totalStart;
 
-    if (!isSignatureValid) {
+      if (!isSignatureValid) {
+        return {
+          valid: false,
+          errorCode: SecurityErrorCodes.SIGNATURE_INVALID,
+          errorMessage: 'Assinatura criptográfica inválida ou não corresponde aos dados/chave',
+          keyId: envelope.keyId,
+          envelope,
+          metrics,
+        };
+      }
+
       return {
-        valid: false,
-        errorCode: SecurityErrorCodes.SIGNATURE_INVALID,
-        errorMessage: 'Assinatura criptográfica inválida ou não corresponde aos dados/chave',
-        keyId: envelope.keyId,
+        valid: true,
         envelope,
+        keyId: envelope.keyId,
         metrics,
       };
     }
 
-    return {
-      valid: true,
-      envelope,
-      keyId: envelope.keyId,
-      metrics,
-    };
+    // Fallback assíncrono para WebCrypto (browser/WebView)
+    return (async () => {
+      const isSignatureValid = await verifyWebCrypto(
+        payloadBytes,
+        envelope.signature,
+        trustedKey.publicKeyPem
+      );
+      metrics.verifyMs = Date.now() - verifyStart;
+      metrics.totalVerifyMs = Date.now() - totalStart;
+
+      if (!isSignatureValid) {
+        return {
+          valid: false,
+          errorCode: SecurityErrorCodes.SIGNATURE_INVALID,
+          errorMessage: 'Assinatura criptográfica inválida ou não corresponde aos dados/chave',
+          keyId: envelope.keyId,
+          envelope,
+          metrics,
+        };
+      }
+
+      return {
+        valid: true,
+        envelope,
+        keyId: envelope.keyId,
+        metrics,
+      };
+    })();
   }
 }

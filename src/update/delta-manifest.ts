@@ -9,6 +9,7 @@
  */
 
 import crypto from 'node:crypto';
+import { calculateArtifactDigest } from '../security/artifact-hash.ts';
 import type { DeltaManifest, TargetPackageProfile } from './update.types.ts';
 
 export interface CreateDeltaManifestOptions {
@@ -73,7 +74,8 @@ export function calculateDeltaContentHash(input: {
   if (crypto && typeof crypto.createHash === 'function') {
     return crypto.createHash('sha256').update(canonicalPayload).digest('hex');
   }
-  throw new Error('Ambiente sem suporte a hashing SHA-256');
+  const bytes = new TextEncoder().encode(canonicalPayload);
+  return calculateArtifactDigest(bytes).sha256;
 }
 
 export function createDeltaManifest(options: CreateDeltaManifestOptions): DeltaManifest {

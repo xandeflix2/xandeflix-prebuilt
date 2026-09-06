@@ -21,12 +21,14 @@
 - **MVP_PROGRESS_PERCENT**: `94`
 - **CURRENT_GATE**: `G11`
 - **G10_STARTED**: `SIM`
-- **G11_STATUS**: `NOT_STARTED`
-- **G11_STARTED**: `NAO`
+- **G11_STATUS**: `IN_PROGRESS`
+- **G11A_STATUS**: `PASS`
+- **G11_STARTED**: `SIM`
+- **PHONE_VALIDATION_REMAINING**: `SIM`
 - **G12_STATUS**: `NOT_STARTED`
-- **NEXT_GATE**: `XANDEFLIX_PREBUILT_G11_PHYSICAL_MULTI_DEVICE_TESTING`
+- **NEXT_GATE**: `XANDEFLIX_PREBUILT_G11B_PHONE_AND_FINAL_PHYSICAL_MATRIX`
 - **NEXT_GATE_STARTED**: `NAO`
-- **HISTORICAL_RECORD**: `G5_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G5_ADJUDICATION_CLOSED_PASS=SIM; G6_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G6_ADJUDICATION_CLOSED_PASS=SIM; G7_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G7_ADJUDICATION_CLOSED_PASS=SIM; SEARCH_SCALE_PERFORMANCE_RISK=OPEN_NON_BLOCKING; G8_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G8_ADJUDICATION_CLOSED_PASS=SIM; G9_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G9_ADJUDICATION_CLOSED_PASS=SIM; UPDATE_SCALE_MEMORY_RISK=OPEN_NON_BLOCKING; G10_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G10_ADJUDICATION_CLOSED_PASS=SIM`
+- **HISTORICAL_RECORD**: `G5_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G5_ADJUDICATION_CLOSED_PASS=SIM; G6_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G6_ADJUDICATION_CLOSED_PASS=SIM; G7_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G7_ADJUDICATION_CLOSED_PASS=SIM; SEARCH_SCALE_PERFORMANCE_RISK=OPEN_NON_BLOCKING; G8_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G8_ADJUDICATION_CLOSED_PASS=SIM; G9_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G9_ADJUDICATION_CLOSED_PASS=SIM; UPDATE_SCALE_MEMORY_RISK=OPEN_NON_BLOCKING; G10_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G10_ADJUDICATION_CLOSED_PASS=SIM; G11_INITIAL_ATTEMPT=INCONCLUSIVE_REQUIRED_DEVICE_UNAVAILABLE; G11A_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G11A_ADJUDICATION_CLOSED_PASS=SIM`
 
 ---
 
@@ -452,5 +454,20 @@
   - CURRENT_GATE avançado para G11 (`NEXT_AUTHORIZABLE_GATE=G11`);
   - G11 permanece NOT_STARTED (`G11_STATUS=NOT_STARTED`, `G11_STARTED=NAO`, `NEXT_GATE_STARTED=NAO`);
   - Autorização expressa concedida para commit e push canônicos na branch origin/main.
+
+- **Subciclo G11A (Physical Provisioning & Device Discovery — 2026-09-06)**:
+  - Resolução do gap de testabilidade física e correção de descoberta de dispositivos via ADB;
+  - Diagnóstico e enumeração com sucesso do Tablet Samsung SM-X610 (`RX2X301Q3KY`, Android 16, API 36) e Fire TV Stick Lite (`G071EL1313720CJ0`, Android 9, API 28);
+  - Implementação de âncora de confiança de teste restrita a compilações de depuração (`DEBUG_ONLY_TEST_TRUST_ANCHOR`, `keyId: g11-physical-test-key-2026`);
+  - Ponto de entrada de teste físico implementado em camada WebView (`window.__XANDEFLIX_DEBUG_IMPORT__`) e Intent receiver nativo (`DebugProvisioner`), compilados exclusivamente no source set `src/debug`;
+  - Isolamento estrito de produção comprovado: no source set `src/release`, `DebugProvisioner` é um stub inerte (`RELEASE_DEBUG_PROVISIONER_BEHAVIOR=INERT_NO_IMPORT_CAPABILITY`), a chave de teste é puramente inexistente (`RELEASE_TEST_TRUST_KEY_PRESENT=NAO`), o entrypoint é omitido (`RELEASE_DEBUG_IMPORT_ENTRYPOINT_PRESENT=NAO`), e auditoria do APK de release comprovou ausência absoluta de chaves privadas (`PRIVATE_SIGNING_KEY_IN_APK=NAO`);
+  - Importação de pacote sintético assinado (Full Package v2 com catálogo e índice de busca) executada via `SecureArtifactImportService` com validação de assinatura ECDSA P-256 e digest SHA-256, staging, readback e promoção atômica com sucesso em ambos os dispositivos (`SIGNED_SYNTHETIC_PACKAGE_IMPORT=PASS`);
+  - Rejeição física comprovada de artefatos unsigned (`PHYSICAL_UNSIGNED_ARTIFACT_REJECTED=PASS`) e adulterados (`PHYSICAL_TAMPERED_ARTIFACT_REJECTED=PASS`);
+  - Validação funcional completa no Tablet SM-X610: Home, Filmes, Séries, Detalhes, Busca Local, touch, baseline D-pad, restart, persistência e prevenção de falso vazio (`TABLET_HOME=PASS`, `TABLET_SEARCH=PASS`, `TABLET_CRASH_COUNT=0`, `TABLET_ANR_COUNT=0`);
+  - Validação funcional completa no Fire TV Stick Lite: navegação direcional D-pad (UP, DOWN, LEFT, RIGHT, ENTER, BACK), anel de foco de alto contraste visível, sem focus traps, teclado virtual de busca e retorno sem falsos vazios (`FIRE_STICK_HOME=PASS`, `FIRE_STICK_DPAD=PASS`, `FIRE_STICK_SEARCH=PASS`, `FIRE_STICK_CRASH_COUNT=0`, `FIRE_STICK_ANR_COUNT=0`);
+  - Preservação da coexistência pacífica e isolamento do aplicativo protegido `com.xandeflix.app`;
+  - Adjudicação formal do subciclo pelo Chat Mestre: `RESULT=PASS_PREBUILT_G11A_PHYSICAL_PROVISIONING_AND_DEVICE_DISCOVERY_CLOSED`, `G11A_STATUS=PASS`, `G11_STATUS=IN_PROGRESS`, `MVP_PROGRESS_PERCENT=94`;
+  - Smartphone Android físico mantido pendente para o subciclo `G11B` (`PHONE_VALIDATION_REMAINING=SIM`).
+
 
 

@@ -24,18 +24,21 @@
 - **G9_STATUS**: `PASS`
 - **G10_STATUS**: `PASS`
 - **G10_STARTED**: `SIM`
-- **G11_STATUS**: `NOT_STARTED`
-- **G11_STARTED**: `NAO`
+- **G11_STATUS**: `IN_PROGRESS`
+- **G11A_STATUS**: `PASS`
+- **G11_STARTED**: `SIM`
+- **PHONE_VALIDATION_REMAINING**: `SIM`
 - **G12_STATUS**: `NOT_STARTED`
-- **NEXT_GATE**: `XANDEFLIX_PREBUILT_G11_PHYSICAL_MULTI_DEVICE_TESTING`
+- **G12_STARTED**: `NAO`
+- **NEXT_GATE**: `XANDEFLIX_PREBUILT_G11B_PHONE_AND_FINAL_PHYSICAL_MATRIX`
 - **NEXT_GATE_STARTED**: `NAO`
 - **REPOSITORY**: `xandeflix2/xandeflix-prebuilt`
 - **WORKSPACE**: `C:\Xandeflix\xandeflix-prebuilt`
 - **SUPABASE_PROJECT**: `cujbmyhitgomlgwfkaat`
 - **ANDROID_PACKAGE_ID**: `com.xandeflix.prebuilt`
 
-> *Nota explicativa*: O Gate G10 (`XANDEFLIX_PREBUILT_G10_SECURITY_AND_RECOVERY`) foi formalmente adjudicado pelo Chat Mestre como `PASS` (`RESULT=PASS_PREBUILT_G10_SECURITY_AND_RECOVERY_CLOSED`), elevando o progresso do MVP para 94%. Foram consolidados e homologados: autenticidade criptográfica de artefatos de provisionamento (pacotes completos v1/v2 e deltas) via envelope de segurança externo (`ArtifactSecurityEnvelope` V1, `ECDSA_P256_SHA256`) sem alteração dos formatos de dados congelados nos Gates G4, G7 e G9; separação estrita de chaves assimétricas mantendo a chave privada exclusivamente em ambiente seguro externo (`PRIVATE_SIGNING_KEY_LOCATION=EXTERNAL_ONLY`, `TEST_PRIVATE_KEY_PERSISTED=NAO`); trust anchor model com conjunto fixo de chaves públicas gerenciadas (`TRUST_ANCHOR_MODEL=PINNED_PUBLIC_KEY_SET`); rejeição fail-closed sumária de artefatos não assinados no boundary de produção (`UNSIGNED_NEW_ARTIFACT_IMPORT=REJECT`, `PRODUCTION_IMPORT_BYPASS=NAO`); proteção comprovada contra adulteração de artefato ou assinatura, chaves não confiáveis ou revogadas e confusão de algoritmo; validação profunda de inicialização (`STARTUP_ACTIVE_VALIDATION=REQUIRED`); arquitetura de recuperação resiliente com diário atômico (`prebuilt/recovery.json`), retenção mínima de 2 gerações (`RECOVERY_MINIMUM_GENERATIONS=2`, `RECOVERY_BASELINE=ACTIVE_PLUS_PREVIOUS_KNOWN_GOOD`) e promoção automática transparente da última geração íntegra conhecida (`AUTOMATIC_LAST_KNOWN_GOOD_RECOVERY=SUPPORTED`); prevenção absoluta de falso vazio (`RECOVERY_FALSE_EMPTY_PREVENTED=PASS`); recuperação estritamente local (`RECOVERY_NETWORK=NONE`); e decisão de não-requisito de criptografia de pacotes para metadados sem segredos (`PACKAGE_ENCRYPTION_MVP_REQUIREMENT=NOT_REQUIRED_FOR_CREDENTIAL_FREE_PROVISIONING_DATA`). O próximo Gate G11 (`XANDEFLIX_PREBUILT_G11_PHYSICAL_MULTI_DEVICE_TESTING`) permanece estritamente `NOT_STARTED` (`G11_STATUS=NOT_STARTED`, `G11_STARTED=NAO`, `NEXT_GATE_STARTED=NAO`).
-> *Histórico preservado*: `G10_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G10_ADJUDICATION_CLOSED_PASS=SIM; LAST_CLOSED_GATE=G10; MVP_PROGRESS_PERCENT=94; G11_STATUS=NOT_STARTED; G11_STARTED=NAO; NEXT_GATE_STARTED=NAO`.
+> *Nota explicativa*: O subciclo G11A (`XANDEFLIX_PREBUILT_G11A_PHYSICAL_PROVISIONING_AND_DEVICE_DISCOVERY_CORRECTION`) foi formalmente adjudicado pelo Chat Mestre como `PASS` (`RESULT=PASS_PREBUILT_G11A_PHYSICAL_PROVISIONING_AND_DEVICE_DISCOVERY_CLOSED`), mantendo o Gate G11 como `IN_PROGRESS` e o progresso do MVP em 94%. Foram diagnosticados, corrigidos e homologados fisicamente: a descoberta estável via ADB do Tablet (`SM-X610`, Android 16, API 36) e do Fire TV Stick (`AFTSSS`, Android 9, API 28); a implementação segura de âncora de confiança de teste restrita a builds de depuração (`DEBUG_ONLY_TEST_TRUST_ANCHOR`, `keyId: g11-physical-test-key-2026`); o isolamento arquitetural rigoroso comprovado no build Release (`RELEASE_TEST_TRUST_KEY_PRESENT=NAO`, `RELEASE_DEBUG_IMPORT_ENTRYPOINT_PRESENT=NAO`, `RELEASE_DEBUG_PROVISIONER_BEHAVIOR=INERT_NO_IMPORT_CAPABILITY`); o transporte e importação de pacotes sintéticos versionados via `SecureArtifactImportService` com validação de assinatura e rejeição fail-closed de artefatos unsigned ou adulterados; a ativação física de snapshots atômicos com busca invertida local em ambos os dispositivos; a navegação completa touch e D-pad em Home, Filmes, Séries, Detalhes e Busca Local com tempos de resposta instantâneos e zero requisições de rede; persistência comprovada pós-morte de processo e reinicialização com zero falsos vazios; ausência absoluta de crashes e ANRs; e integridade inviolada do app protegido pré-existente (`com.xandeflix.app`). A validação do Android Phone permanece pendente para o subciclo `G11B` (`PHONE_VALIDATION_REMAINING=SIM`). O Gate G11 permanece em aberto e o Gate G12 estritamente `NOT_STARTED` (`G12_STATUS=NOT_STARTED`, `G12_STARTED=NAO`, `NEXT_GATE_STARTED=NAO`).
+> *Histórico preservado*: `G11_INITIAL_ATTEMPT=INCONCLUSIVE_REQUIRED_DEVICE_UNAVAILABLE; G11A_EXECUTION_COMPLETE_PENDING_MASTER_ADJUDICATION=SIM; G11A_ADJUDICATION_CLOSED_PASS=SIM; LAST_CLOSED_GATE=G10; G11_STATUS=IN_PROGRESS; MVP_PROGRESS_PERCENT=94; PHONE_VALIDATION_REMAINING=SIM; G12_STATUS=NOT_STARTED; G12_STARTED=NAO; NEXT_GATE_STARTED=NAO`.
 
 ---
 
@@ -52,5 +55,6 @@
 - **G8_STATUS**: `PASS`
 - **G9_STATUS**: `PASS`
 - **G10_STATUS**: `PASS`
-- **G11_STATUS**: `NOT_STARTED`
+- **G11_STATUS**: `IN_PROGRESS`
+- **G11A_STATUS**: `PASS`
 - **G12_STATUS**: `NOT_STARTED`

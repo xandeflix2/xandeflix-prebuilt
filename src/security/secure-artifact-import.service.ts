@@ -66,7 +66,7 @@ export class SecureArtifactImportService {
     }
 
     // 2. Verificação criptográfica completa (Hash + KeyStatus + Signature)
-    const verification = this.verifier.verify(artifactBytes, envelope);
+    const verification = await this.verifier.verify(artifactBytes, envelope);
     if (!verification.valid) {
       return {
         success: false,
@@ -106,7 +106,9 @@ export class SecureArtifactImportService {
     // 4. Delegação segura para o PackageImporter existente (G4/G5)
     const importStart = Date.now();
     const innerResult = await this.packageImporter.importPackage(
-      Buffer.isBuffer(artifactBytes) ? artifactBytes : Buffer.from(artifactBytes),
+      (typeof Buffer !== 'undefined' && Buffer.isBuffer(artifactBytes))
+        ? artifactBytes
+        : (typeof Buffer !== 'undefined' ? Buffer.from(artifactBytes) : (artifactBytes as any)),
       options
     );
     const importMs = Date.now() - importStart;
@@ -154,7 +156,7 @@ export class SecureArtifactImportService {
     }
 
     // 2. Verificação criptográfica completa (Hash + KeyStatus + Signature)
-    const verification = this.verifier.verify(deltaZipBuffer, envelope);
+    const verification = await this.verifier.verify(deltaZipBuffer, envelope);
     if (!verification.valid) {
       return {
         success: false,
@@ -191,7 +193,9 @@ export class SecureArtifactImportService {
     // 4. Delegação segura para o IncrementalUpdateService existente (G9)
     const importStart = Date.now();
     const innerResult = await this.updateService.applyDelta(
-      Buffer.isBuffer(deltaZipBuffer) ? deltaZipBuffer : Buffer.from(deltaZipBuffer)
+      (typeof Buffer !== 'undefined' && Buffer.isBuffer(deltaZipBuffer))
+        ? deltaZipBuffer
+        : (typeof Buffer !== 'undefined' ? Buffer.from(deltaZipBuffer) : (deltaZipBuffer as any))
     );
     const importMs = Date.now() - importStart;
 
