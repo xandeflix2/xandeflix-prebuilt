@@ -322,6 +322,16 @@ export function normalizeRawCatalog(
     }))
     .sort((a, b) => a.id.localeCompare(b.id));
 
+  // Proveniência nasce dos itens já separados pelo classificador canônico.
+  // Categorias com mais de um kind permanecem deliberadamente ambíguas.
+  const categoryProvenance = Array.from(categoryMap.values())
+    .filter((category) => category.contentKinds.size === 1)
+    .map((category) => ({
+      categoryId: category.id,
+      canonicalKind: [...category.contentKinds][0],
+    }))
+    .sort((a, b) => a.categoryId.localeCompare(b.categoryId));
+
   const genres: Genre[] = Array.from(genreMap.values())
     .map((g) => ({
       id: g.id,
@@ -385,6 +395,9 @@ export function normalizeRawCatalog(
     episodes: episodesList,
     streams,
     artworks,
+    extensions: {
+      categoryProvenance,
+    },
   };
 
   const duration = Date.now() - startTime;

@@ -27,6 +27,9 @@ export interface ActivePointer {
   promotedAt: string;
   searchIndexVersion?: number;
   searchIndexContentHash?: string;
+  kind?: 'FIXTURE' | 'PREBUILT_FIXTURE' | 'REAL';
+  sourceId?: string;
+  sourceVersion?: number;
 }
 
 export interface ImportMetrics {
@@ -49,6 +52,22 @@ export interface ImportResult {
   metrics: ImportMetrics;
   errors: string[];
   warnings: string[];
+}
+
+export interface StagingResult {
+  success: boolean;
+  status: 'STAGED' | 'ALREADY_ACTIVE' | 'REJECTED';
+  snapshotId?: string;
+  catalogVersion?: string;
+  previousSnapshotId?: string;
+  metrics: ImportMetrics;
+  errors: string[];
+  warnings: string[];
+}
+
+export interface PromoteStagedPackageOptions {
+  expectedPreviousSnapshotId?: string;
+  stagingMetrics?: ImportMetrics;
 }
 
 export interface ImportPackageOptions {

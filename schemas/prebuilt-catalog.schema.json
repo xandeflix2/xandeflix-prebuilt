@@ -84,6 +84,11 @@
       "minLength": 1,
       "pattern": "^(?!.*://[^/]*:[^/]*@)https?://[A-Za-z0-9_.:~%#?&=/+-]+$"
     },
+    "DirectStreamUrl": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^https?://.+"
+    },
     "ContentKind": {
       "type": "string",
       "enum": ["movie", "series", "episode"]
@@ -222,7 +227,8 @@
         "sourceItemId": { "type": "string", "minLength": 1 },
         "contentKind": { "$ref": "#/$defs/ContentKind" },
         "containerExtension": { "type": "string", "minLength": 1 },
-        "qualityLabel": { "type": "string", "minLength": 1 }
+        "qualityLabel": { "type": "string", "minLength": 1 },
+        "directStreamUrl": { "$ref": "#/$defs/DirectStreamUrl" }
       }
     },
     "Movie": {

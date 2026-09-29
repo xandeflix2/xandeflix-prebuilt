@@ -8,7 +8,7 @@
  * - PLAYBACK DEFERRED: Reprodução de episódios desabilitada até o Gate G8.
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import type { CatalogReadModel } from '../../catalog/catalog-read-model.ts';
 import { getSeriesDetail } from '../../catalog/catalog-selectors.ts';
 import { Artwork } from '../components/Artwork.tsx';
@@ -26,11 +26,50 @@ export const SeriesDetailPage: React.FC<SeriesDetailPageProps> = ({
   onBack,
 }) => {
   const detail = getSeriesDetail(readModel, seriesId);
+  const [detailLoading, setDetailLoading] = useState(!detail);
 
   const seasons = detail?.seasons || [];
   const [selectedSeasonIndex, setSelectedSeasonIndex] = useState<number>(0);
   const [resolvingEpisodeId, setResolvingEpisodeId] = useState<string | null>(null);
-  const [episodeStatusNotice, setEpisodeStatusNotice] = useState<string | null>(null);
+    const [episodeStatusNotice, setEpisodeStatusNotice] = useState<string | null>(null);
+  const [episodesLoading, setEpisodesLoading] = useState<boolean>(false);
+  const [, setRefreshKey] = useState<number>(0);
+
+  useEffect(() => {
+    let active = true;
+    if (readModel.seriesById.has(seriesId)) {
+      setDetailLoading(false);
+      return () => { active = false; };
+    }
+    setDetailLoading(true);
+    void readModel.resolveSeriesById(seriesId).then(() => {
+      if (active) {
+        setDetailLoading(false);
+        setRefreshKey((value) => value + 1);
+      }
+    });
+    return () => { active = false; };
+  }, [readModel, seriesId]);
+
+  useEffect(() => {
+    let isMounted = true;
+    if (typeof (readModel as any).loadEpisodesForSeries === 'function') {
+      setEpisodesLoading(true);
+      (readModel as any).loadEpisodesForSeries(seriesId)
+        .then(() => {
+          if (isMounted) {
+            setEpisodesLoading(false);
+            setRefreshKey((k) => k + 1);
+          }
+        })
+        .catch(() => {
+          if (isMounted) setEpisodesLoading(false);
+        });
+    }
+    return () => {
+      isMounted = false;
+    };
+  }, [seriesId, readModel]);
 
   const handlePlayEpisode = useCallback(
     async (episodeId: string) => {
@@ -54,6 +93,10 @@ export const SeriesDetailPage: React.FC<SeriesDetailPageProps> = ({
     },
     [seriesId, readModel]
   );
+
+  if (!detail && detailLoading) {
+    return <main className="page-container detail-page"><p>Carregando detalhes da série...</p></main>;
+  }
 
   if (!detail) {
     return (
@@ -168,7 +211,9 @@ export const SeriesDetailPage: React.FC<SeriesDetailPageProps> = ({
 
           {currentSeason && (
             <div className="episodes-list">
-              {currentSeason.episodes.length === 0 ? (
+              {episodesLoading && currentSeason.episodes.length === 0 ? (
+                <p className="loading-episodes">Carregando episódios da temporada...</p>
+              ) : currentSeason.episodes.length === 0 ? (
                 <p className="no-episodes">Nenhum episódio cadastrado para esta temporada.</p>
               ) : (
                 currentSeason.episodes.map((ep) => (

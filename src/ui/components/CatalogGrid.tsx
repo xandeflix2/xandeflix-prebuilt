@@ -1,66 +1,15 @@
-/**
- * Xandeflix Prebuilt — CatalogGrid Component (Gate G6)
- *
- * Grid responsivo com renderização controlada em lotes para proteger o DOM.
- *
- * Princípios:
- * - UNBOUNDED_DOM_RENDER = PROHIBITED: Renderiza itens em lotes (GRID_BATCH_SIZE).
- * - RESPONSIVE: Adapta colunas para Phone (2), Tablet (3-4) e TV (5-6).
- */
-
-import React, { useState } from 'react';
-import {
-  type CatalogItemViewModel,
-  GRID_BATCH_SIZE,
-} from '../../catalog/catalog-view-model.ts';
+﻿import React, { useEffect, useState } from 'react';
+import { type CatalogItemViewModel, GRID_BATCH_SIZE } from '../../catalog/catalog-view-model.ts';
 import { MediaCard } from './MediaCard.tsx';
-
-interface CatalogGridProps {
-  items: CatalogItemViewModel[];
-  onItemClick: (item: CatalogItemViewModel) => void;
-  emptyMessage?: string;
-}
-
-export const CatalogGrid: React.FC<CatalogGridProps> = ({
-  items,
-  onItemClick,
-  emptyMessage = 'Nenhum item encontrado nesta seleção.',
-}) => {
-  const [visibleCount, setVisibleCount] = useState<number>(GRID_BATCH_SIZE);
-
+interface CatalogGridProps { items: CatalogItemViewModel[]; onItemClick: (item: CatalogItemViewModel) => void; emptyMessage?: string; hasMoreRemote?: boolean; isLoadingRemote?: boolean; onLoadMoreRemote?: () => void; }
+export const CatalogGrid: React.FC<CatalogGridProps> = ({ items, onItemClick, emptyMessage = 'Nenhum item encontrado nesta seleção.', hasMoreRemote, isLoadingRemote, onLoadMoreRemote }) => {
+  const [visibleCount, setVisibleCount] = useState(GRID_BATCH_SIZE);
+  useEffect(() => setVisibleCount(GRID_BATCH_SIZE), [items.length === 0]);
   const visibleItems = items.slice(0, visibleCount);
-  const hasMore = visibleCount < items.length;
-
-  const handleLoadMore = () => {
-    setVisibleCount((prev) => prev + GRID_BATCH_SIZE);
-  };
-
-  if (items.length === 0) {
-    return (
-      <div className="catalog-grid-empty">
-        <p>{emptyMessage}</p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="catalog-grid-container">
-      <div className="catalog-grid">
-        {visibleItems.map((item) => (
-          <MediaCard key={item.id} item={item} onClick={onItemClick} />
-        ))}
-      </div>
-      {hasMore && (
-        <div className="catalog-grid-actions">
-          <button
-            type="button"
-            className="focusable-item btn-secondary btn-load-more"
-            onClick={handleLoadMore}
-          >
-            Carregar Mais ({items.length - visibleCount} restantes)
-          </button>
-        </div>
-      )}
-    </div>
-  );
+  const hasMore = visibleCount < items.length || Boolean(hasMoreRemote);
+  const handleLoadMore = () => { if (visibleCount < items.length) setVisibleCount((previous) => previous + GRID_BATCH_SIZE); else onLoadMoreRemote?.(); };
+  if (items.length === 0 && !isLoadingRemote) return <div className="catalog-grid-empty"><p>{emptyMessage}</p></div>;
+  return <div className="catalog-grid-container"><div className="catalog-grid">{visibleItems.map((item, index) => <MediaCard key={item.id} item={item} onClick={onItemClick} onFocus={() => {
+    if (index === visibleItems.length - 1) { if (visibleCount < items.length) setVisibleCount((previous) => previous + GRID_BATCH_SIZE); else if (hasMoreRemote) onLoadMoreRemote?.(); }
+  }} />)}</div>{hasMore && <div className="catalog-grid-actions"><button type="button" className="focusable-item btn-secondary btn-load-more" onClick={handleLoadMore}>{isLoadingRemote ? 'Carregando...' : 'Carregar Mais'}</button></div>}</div>;
 };

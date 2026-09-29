@@ -20,6 +20,8 @@ import type {
   BootstrapSummary,
   ImportPackageOptions,
   ImportResult,
+  PromoteStagedPackageOptions,
+  StagingResult,
 } from './types.ts';
 
 export class BootstrapService {
@@ -62,6 +64,51 @@ export class BootstrapService {
       this.stateManager.setImportFailed();
     }
 
+    return result;
+  }
+
+  /**
+   * Materializa um pacote como candidato sem alterar o estado ativo.
+   */
+  async stagePackage(
+    packageSource: string | Buffer,
+    options?: ImportPackageOptions
+  ): Promise<StagingResult> {
+    return this.importer.stagePackage(packageSource, options);
+  }
+
+  /**
+   * Materializa artefatos diretamente na área de staging sem criar um arquivo ZIP intermediário.
+   */
+  async stageArtifacts(
+    manifest: ProvisioningManifest,
+    catalog: PrebuiltCatalog | string,
+    searchPayload?: PrebuiltSearchIndex | Buffer | Uint8Array | null,
+    liveCatalog?: import('../catalog/live/live-tv.types.ts').LiveCatalog | null,
+    options?: ImportPackageOptions,
+    rawCatalogJson?: string
+  ): Promise<StagingResult> {
+    return this.importer.stageArtifacts(manifest, catalog, searchPayload, liveCatalog, options, rawCatalogJson);
+  }
+
+  /**
+   * Executa a promoção somente quando chamada explicitamente pelo orquestrador.
+   */
+  async promoteStagedSnapshot(
+    snapshotId: string,
+    options?: PromoteStagedPackageOptions
+  ): Promise<ImportResult> {
+    const result = await this.importer.promoteStagedPackage(snapshotId, options);
+    if (result.success && result.status === 'PROMOTED') {
+      const pointer = await this.storage.readActivePointer();
+      if (pointer) {
+        this.stateManager.setImportSuccess(pointer);
+      } else {
+        this.stateManager.setImportFailed();
+      }
+    } else {
+      this.stateManager.setImportFailed();
+    }
     return result;
   }
 

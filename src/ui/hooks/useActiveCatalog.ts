@@ -16,6 +16,113 @@ import type { BootstrapStatus, BootstrapSummary } from '../../bootstrap/types.ts
 import { BootstrapService } from '../../bootstrap/bootstrap.service.ts';
 import { getClientBootstrapService } from '../../bootstrap/client.ts';
 import { CatalogReadModel } from '../../catalog/catalog-read-model.ts';
+import type { StreamRef, Episode, Season } from '../../contracts/catalog.ts';
+import { resolveSegmentRelativePath } from '../../bootstrap/storage/segment-path-resolver.ts';
+import { CanonicalItemResolver } from '../../catalog/canonical-item-resolver.ts';
+
+function createSegmentedStreamResolver(service: BootstrapService): (streamId: string) => Promise<StreamRef | undefined> {
+  let streamSegmentsPromise: Promise<string[]> | null = null;
+
+  const getStreamSegments = async (): Promise<string[]> => {
+    if (!streamSegmentsPromise) {
+      streamSegmentsPromise = (async () => {
+        const storage = service.getStorage();
+        const manifest = await storage.readActiveManifest();
+        const segments = (manifest as (typeof manifest & {
+          segments?: Array<{ kind: string; fileName: string }>;
+        }) | null)?.segments;
+        return Array.isArray(segments)
+          ? segments
+            .filter((segment) => segment.kind === 'streams')
+            .map((segment) => segment.fileName)
+          : [];
+      })();
+    }
+    return streamSegmentsPromise;
+  };
+
+  return async (streamId: string): Promise<StreamRef | undefined> => {
+    const readSegment = service.getStorage().readActiveSegment;
+    if (!readSegment || !streamId) return undefined;
+
+    for (const segmentPath of await getStreamSegments()) {
+      const raw = await readSegment.call(service.getStorage(), resolveSegmentRelativePath(segmentPath));
+      if (!raw) continue;
+      try {
+        const records = JSON.parse(raw) as StreamRef[];
+        if (!Array.isArray(records)) continue;
+        const match = records.find((record) => record?.id === streamId);
+        if (match) return match;
+      } catch {
+        // Um segmento inválido não deve impedir a leitura dos demais.
+      }
+    }
+    return undefined;
+  };
+}
+
+
+function createSegmentedEpisodeResolver(service: BootstrapService): (seriesId: string) => Promise<Episode[]> {
+  return async (seriesId: string): Promise<Episode[]> => {
+    const storage = service.getStorage();
+    const readSegment = storage.readActiveSegment;
+    if (!readSegment || !seriesId) return [];
+
+    const manifest = await storage.readActiveManifest();
+    const segments = (manifest as any)?.segments;
+    if (!Array.isArray(segments)) return [];
+
+    const episodeSegments = segments.filter((s) => s.kind === 'episodes');
+    const matched: Episode[] = [];
+
+    for (const seg of episodeSegments) {
+      const segPath = resolveSegmentRelativePath(seg.fileName);
+      const raw = await readSegment.call(storage, segPath);
+      if (!raw) continue;
+      try {
+        const records = JSON.parse(raw) as Episode[];
+        if (!Array.isArray(records)) continue;
+        for (const ep of records) {
+          if (ep && ep.seriesId === seriesId) {
+            matched.push(ep);
+          }
+        }
+      } catch {}
+    }
+    return matched;
+  };
+}
+
+function createSegmentedSeasonResolver(service: BootstrapService): (seriesId: string) => Promise<Season[]> {
+  return async (seriesId: string): Promise<Season[]> => {
+    const storage = service.getStorage();
+    const readSegment = storage.readActiveSegment;
+    if (!readSegment || !seriesId) return [];
+
+    const manifest = await storage.readActiveManifest();
+    const segments = (manifest as any)?.segments;
+    if (!Array.isArray(segments)) return [];
+
+    const seasonSegments = segments.filter((s) => s.kind === 'seasons');
+    const matched: Season[] = [];
+
+    for (const seg of seasonSegments) {
+      const segPath = resolveSegmentRelativePath(seg.fileName);
+      const raw = await readSegment.call(storage, segPath);
+      if (!raw) continue;
+      try {
+        const records = JSON.parse(raw) as Season[];
+        if (!Array.isArray(records)) continue;
+        for (const sea of records) {
+          if (sea && sea.seriesId === seriesId) {
+            matched.push(sea);
+          }
+        }
+      } catch {}
+    }
+    return matched;
+  };
+}
 
 export interface UseActiveCatalogReturn {
   status: BootstrapStatus;
@@ -35,6 +142,9 @@ export function useActiveCatalog(serviceOverride?: BootstrapService): UseActiveC
   const [summary, setSummary] = useState<BootstrapSummary | null>(null);
   const [activeCatalog, setActiveCatalog] = useState<PrebuiltCatalog | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const streamRefResolver = useMemo(() => createSegmentedStreamResolver(service), [service]);
+  const episodeResolver = useMemo(() => createSegmentedEpisodeResolver(service), [service]);
+  const seasonResolver = useMemo(() => createSegmentedSeasonResolver(service), [service]);
 
   const loadData = useCallback(async () => {
     setIsLoading(true);
@@ -76,8 +186,15 @@ export function useActiveCatalog(serviceOverride?: BootstrapService): UseActiveC
 
   const readModel = useMemo(() => {
     if (!activeCatalog) return null;
-    return new CatalogReadModel(activeCatalog);
-  }, [activeCatalog]);
+    const itemResolver = new CanonicalItemResolver(service.getStorage(), activeCatalog.metadata.snapshotId);
+    return new CatalogReadModel(activeCatalog, {
+      streamRefResolver,
+      episodeResolver,
+      seasonResolver,
+      movieResolver: (id) => itemResolver.resolveMovieById(id),
+      seriesResolver: (id) => itemResolver.resolveSeriesById(id),
+    });
+  }, [activeCatalog, episodeResolver, seasonResolver, service, streamRefResolver]);
 
   const isNoActiveCatalog = status === 'NO_ACTIVE_CATALOG';
 

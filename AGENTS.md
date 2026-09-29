@@ -7,7 +7,9 @@
 ## 1. Identidade Canonica do Repositorio
 
 - **PROJECT**: `XANDEFLIX_PREBUILT`
-- **LOCAL_WORKSPACE**: `C:\Xandeflix\xandeflix-prebuilt`
+- **LOCAL_WORKSPACE**: `C:\Xandeflix\xandeflix-prebuilt-c11-main`
+- **SOURCE_EVIDENCE_WORKSPACE**: `C:\Xandeflix\xandeflix-prebuilt` (evidencia historica somente leitura)
+- **WORKSPACE_ROLE**: `ACTIVE_ISOLATED_C11_CONTINUATION`
 - **EXPECTED_GIT_REPOSITORY**: `xandeflix2/xandeflix-prebuilt`
 - **EXPECTED_REMOTE_ORIGIN**: `https://github.com/xandeflix2/xandeflix-prebuilt.git`
 - **EXPECTED_BRANCH**: `main`
@@ -16,6 +18,10 @@
 - **NEW_SUPABASE_REGION**: `us-east-2`
 - **NEW_SUPABASE_GITHUB_REPOSITORY**: `xandeflix2/xandeflix-prebuilt`
 - **ANDROID_PACKAGE_ID**: `com.xandeflix.prebuilt`
+
+O `LOCAL_WORKSPACE` e o workspace ativo da continuacao C11 isolada na branch `main`. O `SOURCE_EVIDENCE_WORKSPACE` e preservado como evidencia historica e nao deve ser editado, buildado ou ter operacoes Git executadas nele.
+
+O worktree ativo pode permanecer dirty pelos arquivos pertencentes exclusivamente ao manifesto C11 previamente adjudicado; nao exigir `git status` limpo nem normalizar esse estado. Qualquer arquivo dirty fora do manifesto C11 conhecido, ou qualquer nova divergencia de proveniencia, continua exigindo parada imediata (`STOP_ON_CONFLICT=SIM`).
 
 ---
 
@@ -40,8 +46,8 @@ Antes de iniciar qualquer edicao no workspace, o agente DEVE executar e registra
 5. Confirmar HEAD (`git rev-parse HEAD 2>&1`);
 6. Confirmar status Git (`git status --short --branch`);
 7. Ler `AGENTS.md`;
-8. Ler [Architecture Contract](file:///c:/Xandeflix/xandeflix-prebuilt/docs/architecture/XANDEFLIX_PREBUILT_ARCHITECTURE_CONTRACT.md);
-9. Ler [Execution Contract](file:///c:/Xandeflix/xandeflix-prebuilt/docs/architecture/XANDEFLIX_PREBUILT_EXECUTION_CONTRACT.md);
+8. Ler [Architecture Contract](file:///c:/Xandeflix/xandeflix-prebuilt-c11-main/docs/architecture/XANDEFLIX_PREBUILT_ARCHITECTURE_CONTRACT.md);
+9. Ler [Execution Contract](file:///c:/Xandeflix/xandeflix-prebuilt-c11-main/docs/architecture/XANDEFLIX_PREBUILT_EXECUTION_CONTRACT.md);
 10. Identificar Gate ativo autorizado pelo Chat Mestre;
 11. Confirmar a allowlist estrita do Gate ativo;
 12. Confirmar se operacoes Git (commit/push/PR) foram explicitamente autorizadas (padrao: NAO autorizadas);

@@ -16,6 +16,8 @@
 import fs from 'node:fs';
 import JSZip from 'jszip';
 import type { PrebuiltCatalog } from '../contracts/catalog.ts';
+import type { LiveCatalog } from '../catalog/live/live-tv.types.ts';
+import { validateLiveCatalog } from '../catalog/live/live-catalog-validation.ts';
 import { validateNormalizedCatalog } from '../ingestion/validate.ts';
 import {
   PACKAGE_FORMAT_VERSION_V1,
@@ -24,17 +26,22 @@ import {
   MANIFEST_FILENAME,
   CATALOG_FILENAME,
   SEARCH_INDEX_FILENAME,
+  COMPACT_SEARCH_INDEX_FILENAME,
+  LIVE_CATALOG_FILENAME,
   type ProvisioningManifest,
   type ProvisioningManifestV2,
   type PackageValidationResult,
 } from './types.ts';
-import { calculateSha256, calculatePackageContentHash, verifyChecksum } from './integrity.ts';
+import { calculateSha256Async, calculatePackageContentHash, verifyChecksum } from './integrity.ts';
 import { SearchIndexValidator } from '../search/search-index-validator.ts';
 import type { PrebuiltSearchIndex } from '../search/search-index.types.ts';
+import { deserializeCompactIndexV2 } from '../experiments/search-compact-v2/compact-search-v2-serializer.ts';
 
 export interface ValidatePackageDetailedResult extends PackageValidationResult {
   catalog?: PrebuiltCatalog;
   searchIndex?: PrebuiltSearchIndex;
+  searchIndexBuffer?: Buffer | Uint8Array;
+  liveCatalog?: LiveCatalog;
   catalogSha256?: string;
   searchIndexSha256?: string;
   packageContentHash?: string;
@@ -112,7 +119,9 @@ export class PackageValidator {
       if (
         rawName !== MANIFEST_FILENAME &&
         rawName !== CATALOG_FILENAME &&
-        rawName !== SEARCH_INDEX_FILENAME
+        rawName !== SEARCH_INDEX_FILENAME &&
+        rawName !== COMPACT_SEARCH_INDEX_FILENAME &&
+        rawName !== LIVE_CATALOG_FILENAME
       ) {
         errors.push(`[EXTRA_FILE_REJECTED] Arquivo não autorizado no pacote de provisionamento: '${rawName}'`);
       }
@@ -173,17 +182,53 @@ export class PackageValidator {
 
     const isV2 = rawPackageFormatVersion === PACKAGE_FORMAT_VERSION_V2;
 
-    // Regra v1: se manifest for v1, search-index.json NÃO pode existir
-    if (!isV2 && zip.file(SEARCH_INDEX_FILENAME)) {
-      errors.push(`[EXTRA_FILE_REJECTED] Arquivo '${SEARCH_INDEX_FILENAME}' não é permitido em pacote v1`);
+    // Regra v1: se manifest for v1, search index NÃO pode existir
+    if (!isV2 && (zip.file(SEARCH_INDEX_FILENAME) || zip.file(COMPACT_SEARCH_INDEX_FILENAME))) {
+      errors.push(`[EXTRA_FILE_REJECTED] Arquivo de índice de busca não é permitido em pacote v1`);
     }
 
-    // Regra v2: se manifest for v2, search-index.json É OBRIGATÓRIO
-    if (isV2 && !zip.file(SEARCH_INDEX_FILENAME)) {
-      errors.push(`[MISSING_SEARCH_INDEX] Arquivo obrigatório '${SEARCH_INDEX_FILENAME}' ausente no pacote v2`);
+    // Regra v2: se manifest for v2, o arquivo de índice declarado no manifest É OBRIGATÓRIO
+    if (isV2) {
+      const manifestV2 = manifest as ProvisioningManifestV2;
+      const expectedSearchFile =
+        manifestV2.searchIndexVersion === 2
+          ? COMPACT_SEARCH_INDEX_FILENAME
+          : SEARCH_INDEX_FILENAME;
+      if (!zip.file(expectedSearchFile)) {
+        errors.push(`[MISSING_SEARCH_INDEX] Arquivo obrigatório '${expectedSearchFile}' ausente no pacote v2`);
+      }
     }
 
     // 6. Carregar catalog.json em bytes estáveis
+    const manifestV2ForLive = isV2 ? (manifest as ProvisioningManifestV2) : undefined;
+    const liveEntry = zip.file(LIVE_CATALOG_FILENAME);
+    if (!isV2 && liveEntry) {
+      errors.push(`[EXTRA_FILE_REJECTED] Arquivo '${LIVE_CATALOG_FILENAME}' nÃ£o Ã© permitido em pacote v1`);
+    }
+    if (isV2) {
+      const declaresLive = manifestV2ForLive?.liveCatalogFile !== undefined;
+      if (declaresLive && manifestV2ForLive?.liveCatalogFile !== LIVE_CATALOG_FILENAME) {
+        errors.push(
+          `[INVALID_MANIFEST_LIVE_CATALOG_FILE] liveCatalogFile incorreto. Esperado: '${LIVE_CATALOG_FILENAME}', recebido: '${manifestV2ForLive?.liveCatalogFile}'`,
+        );
+      }
+      if (declaresLive && !liveEntry) {
+        errors.push(`[MISSING_LIVE_CATALOG] Arquivo declarado '${LIVE_CATALOG_FILENAME}' ausente no pacote v2`);
+      }
+      if (!declaresLive && liveEntry) {
+        errors.push(`[LIVE_CATALOG_NOT_DECLARED] Arquivo '${LIVE_CATALOG_FILENAME}' presente sem declaraÃ§Ã£o no manifest`);
+      }
+      if (
+        declaresLive &&
+        (typeof manifestV2ForLive?.liveCatalogSha256 !== 'string' ||
+          typeof manifestV2ForLive?.liveCatalogSizeBytes !== 'number')
+      ) {
+        errors.push(
+          '[INVALID_LIVE_CATALOG_METADATA] liveCatalogSha256 e liveCatalogSizeBytes sÃ£o obrigatÃ³rios quando liveCatalogFile estÃ¡ presente',
+        );
+      }
+    }
+
     let catalogBuffer: Buffer | Uint8Array;
     try {
       const rawCatalog = await zip.file(CATALOG_FILENAME)!.async('uint8array');
@@ -199,7 +244,7 @@ export class PackageValidator {
     }
 
     // 7. Validar integridade física e tamanho do catalog.json
-    const actualCatalogSha256 = calculateSha256(catalogBuffer);
+    const actualCatalogSha256 = await calculateSha256Async(catalogBuffer);
     if (!verifyChecksum(actualCatalogSha256, manifest.catalogSha256)) {
       errors.push(
         `[HASH_MISMATCH] Checksum do catálogo divergente. Declarado: ${manifest.catalogSha256}, Recalculado: ${actualCatalogSha256}`
@@ -212,74 +257,159 @@ export class PackageValidator {
       );
     }
 
-    // 7.1 Processamento e validação de search-index.json se v2
+    // 7.1 Processamento e validação de search-index se v2
     let searchIndex: PrebuiltSearchIndex | undefined;
+    let searchIndexBuffer: Buffer | Uint8Array | undefined;
     let actualSearchIndexSha256: string | undefined;
 
     if (isV2) {
       const manifestV2 = manifest as ProvisioningManifestV2;
 
-      if (manifestV2.searchIndexFile !== SEARCH_INDEX_FILENAME) {
-        errors.push(
-          `[INVALID_MANIFEST_SEARCH_INDEX_FILE] searchIndexFile incorreto no manifest. Esperado: '${SEARCH_INDEX_FILENAME}', recebido: '${manifestV2.searchIndexFile}'`
-        );
-      }
-      if (manifestV2.searchIndexVersion !== 1) {
-        errors.push(
-          `[SEARCH_INDEX_VERSION_MISMATCH] searchIndexVersion inválido no manifest. Esperado: 1, recebido: ${manifestV2.searchIndexVersion}`
-        );
-      }
+      if (manifestV2.searchIndexVersion === 2) {
+        if (manifestV2.searchIndexFile !== COMPACT_SEARCH_INDEX_FILENAME) {
+          errors.push(
+            `[INVALID_MANIFEST_SEARCH_INDEX_FILE] searchIndexFile incorreto no manifest. Esperado: '${COMPACT_SEARCH_INDEX_FILENAME}', recebido: '${manifestV2.searchIndexFile}'`
+          );
+        }
 
-      const indexEntry = zip.file(SEARCH_INDEX_FILENAME);
-      if (indexEntry) {
-        let indexBuffer: Buffer | Uint8Array;
-        try {
-          const rawIndex = await indexEntry.async('uint8array');
-          indexBuffer = typeof Buffer !== 'undefined' ? Buffer.from(rawIndex) : rawIndex;
-          actualSearchIndexSha256 = calculateSha256(indexBuffer);
+        const indexEntry = zip.file(COMPACT_SEARCH_INDEX_FILENAME);
+        if (!indexEntry) {
+          errors.push(`[MISSING_SEARCH_INDEX] Arquivo '${COMPACT_SEARCH_INDEX_FILENAME}' ausente no pacote`);
+        } else {
+          try {
+            const rawIndex = await indexEntry.async('uint8array');
+            searchIndexBuffer = typeof Buffer !== 'undefined' ? Buffer.from(rawIndex) : rawIndex;
+            actualSearchIndexSha256 = await calculateSha256Async(searchIndexBuffer);
 
-          if (!verifyChecksum(actualSearchIndexSha256, manifestV2.searchIndexSha256)) {
-            errors.push(
-              `[SEARCH_INDEX_HASH_MISMATCH] Checksum do search-index divergente. Declarado: ${manifestV2.searchIndexSha256}, Recalculado: ${actualSearchIndexSha256}`
-            );
-          }
-
-          if (indexBuffer.length !== manifestV2.searchIndexSizeBytes) {
-            errors.push(
-              `[SEARCH_INDEX_SIZE_MISMATCH] Tamanho do search-index divergente. Declarado: ${manifestV2.searchIndexSizeBytes} bytes, Real: ${indexBuffer.length} bytes`
-            );
-          }
-
-          const indexJsonText =
-            typeof TextDecoder !== 'undefined'
-              ? new TextDecoder('utf-8').decode(indexBuffer)
-              : (indexBuffer as any).toString('utf8');
-          searchIndex = JSON.parse(indexJsonText) as PrebuiltSearchIndex;
-
-          // Validação fail-closed do searchIndex via SearchIndexValidator
-          const indexValidation = this.searchIndexValidator.validate(searchIndex, {
-            expectedSnapshotId: manifest.snapshotId,
-            expectedCatalogVersion: manifest.catalogVersion,
-          });
-
-          if (!indexValidation.valid) {
-            for (const err of indexValidation.errors) {
-              errors.push(err);
+            if (!verifyChecksum(actualSearchIndexSha256, manifestV2.searchIndexSha256)) {
+              errors.push(
+                `[SEARCH_INDEX_HASH_MISMATCH] Checksum do search-index divergente. Declarado: ${manifestV2.searchIndexSha256}, Recalculado: ${actualSearchIndexSha256}`
+              );
             }
-          }
 
-          if (searchIndex.contentHash !== manifestV2.searchIndexContentHash) {
-            errors.push(
-              `[SEARCH_INDEX_CONTENT_HASH_MISMATCH] searchIndexContentHash divergente entre manifest e searchIndex. Declarado no manifest: ${manifestV2.searchIndexContentHash}, no index: ${searchIndex.contentHash}`
-            );
+            if (searchIndexBuffer.length !== manifestV2.searchIndexSizeBytes) {
+              errors.push(
+                `[SEARCH_INDEX_SIZE_MISMATCH] Tamanho do search-index divergente. Declarado: ${manifestV2.searchIndexSizeBytes} bytes, Real: ${searchIndexBuffer.length} bytes`
+              );
+            }
+
+            const deserialized = deserializeCompactIndexV2(searchIndexBuffer);
+            if (deserialized.metadata.catalogSnapshotId !== manifest.snapshotId) {
+              errors.push(
+                `[SEARCH_INDEX_SNAPSHOT_MISMATCH] catalogSnapshotId divergente no índice V2. Declarado no manifest: ${manifest.snapshotId}, no índice: ${deserialized.metadata.catalogSnapshotId}`
+              );
+            }
+
+            if (deserialized.metadata.contentHash !== manifestV2.searchIndexContentHash) {
+              errors.push(
+                `[SEARCH_INDEX_CONTENT_HASH_MISMATCH] searchIndexContentHash divergente entre manifest e searchIndex. Declarado no manifest: ${manifestV2.searchIndexContentHash}, no index: ${deserialized.metadata.contentHash}`
+              );
+            }
+          } catch (err) {
+            errors.push(`[SEARCH_INDEX_READ_ERROR] Falha ao extrair ou validar ${COMPACT_SEARCH_INDEX_FILENAME}: ${(err as Error).message}`);
           }
-        } catch (err) {
-          errors.push(`[SEARCH_INDEX_READ_ERROR] Falha ao extrair ou parsear ${SEARCH_INDEX_FILENAME}: ${(err as Error).message}`);
+        }
+      } else {
+        if (manifestV2.searchIndexFile !== SEARCH_INDEX_FILENAME) {
+          errors.push(
+            `[INVALID_MANIFEST_SEARCH_INDEX_FILE] searchIndexFile incorreto no manifest. Esperado: '${SEARCH_INDEX_FILENAME}', recebido: '${manifestV2.searchIndexFile}'`
+          );
+        }
+        if (manifestV2.searchIndexVersion !== 1) {
+          errors.push(
+            `[SEARCH_INDEX_VERSION_MISMATCH] searchIndexVersion inválido no manifest. Esperado: 1 ou 2, recebido: ${manifestV2.searchIndexVersion}`
+          );
+        }
+
+        const indexEntry = zip.file(SEARCH_INDEX_FILENAME);
+        if (indexEntry) {
+          let indexBuffer: Buffer | Uint8Array;
+          try {
+            const rawIndex = await indexEntry.async('uint8array');
+            indexBuffer = typeof Buffer !== 'undefined' ? Buffer.from(rawIndex) : rawIndex;
+            actualSearchIndexSha256 = await calculateSha256Async(indexBuffer);
+
+            if (!verifyChecksum(actualSearchIndexSha256, manifestV2.searchIndexSha256)) {
+              errors.push(
+                `[SEARCH_INDEX_HASH_MISMATCH] Checksum do search-index divergente. Declarado: ${manifestV2.searchIndexSha256}, Recalculado: ${actualSearchIndexSha256}`
+              );
+            }
+
+            if (indexBuffer.length !== manifestV2.searchIndexSizeBytes) {
+              errors.push(
+                `[SEARCH_INDEX_SIZE_MISMATCH] Tamanho do search-index divergente. Declarado: ${manifestV2.searchIndexSizeBytes} bytes, Real: ${indexBuffer.length} bytes`
+              );
+            }
+
+            const indexJsonText =
+              typeof TextDecoder !== 'undefined'
+                ? new TextDecoder('utf-8').decode(indexBuffer)
+                : (indexBuffer as any).toString('utf8');
+            searchIndex = JSON.parse(indexJsonText) as PrebuiltSearchIndex;
+
+            // Validação fail-closed do searchIndex via SearchIndexValidator
+            const indexValidation = this.searchIndexValidator.validate(searchIndex, {
+              expectedSnapshotId: manifest.snapshotId,
+              expectedCatalogVersion: manifest.catalogVersion,
+            });
+
+            if (!indexValidation.valid) {
+              for (const err of indexValidation.errors) {
+                errors.push(err);
+              }
+            }
+
+            if (searchIndex.contentHash !== manifestV2.searchIndexContentHash) {
+              errors.push(
+                `[SEARCH_INDEX_CONTENT_HASH_MISMATCH] searchIndexContentHash divergente entre manifest e searchIndex. Declarado no manifest: ${manifestV2.searchIndexContentHash}, no index: ${searchIndex.contentHash}`
+              );
+            }
+          } catch (err) {
+            errors.push(`[SEARCH_INDEX_READ_ERROR] Falha ao extrair ou parsear ${SEARCH_INDEX_FILENAME}: ${(err as Error).message}`);
+          }
         }
       }
     }
 
     // 8. Validar hash de conteúdo lógico do pacote (packageContentHash)
+    let liveCatalog: LiveCatalog | undefined;
+    let actualLiveCatalogSha256: string | undefined;
+    if (isV2 && liveEntry) {
+      const manifestV2 = manifest as ProvisioningManifestV2;
+      try {
+        const rawLive = await liveEntry.async('uint8array');
+        const liveBuffer = typeof Buffer !== 'undefined' ? Buffer.from(rawLive) : rawLive;
+        actualLiveCatalogSha256 = await calculateSha256Async(liveBuffer);
+
+        if (!verifyChecksum(actualLiveCatalogSha256, manifestV2.liveCatalogSha256 || '')) {
+          errors.push(
+            `[LIVE_CATALOG_HASH_MISMATCH] Checksum do live catalog divergente. Declarado: ${manifestV2.liveCatalogSha256}, Recalculado: ${actualLiveCatalogSha256}`,
+          );
+        }
+        if (liveBuffer.length !== manifestV2.liveCatalogSizeBytes) {
+          errors.push(
+            `[LIVE_CATALOG_SIZE_MISMATCH] Tamanho do live catalog divergente. Declarado: ${manifestV2.liveCatalogSizeBytes} bytes, Real: ${liveBuffer.length} bytes`,
+          );
+        }
+
+        const liveJsonText =
+          typeof TextDecoder !== 'undefined'
+            ? new TextDecoder('utf-8').decode(liveBuffer)
+            : (liveBuffer as any).toString('utf8');
+        liveCatalog = JSON.parse(liveJsonText) as LiveCatalog;
+        const liveValidation = validateLiveCatalog(liveCatalog, {
+          expectedSnapshotId: manifest.snapshotId,
+        });
+        if (!liveValidation.valid) {
+          for (const err of liveValidation.errors) {
+            errors.push(`[LIVE_CATALOG_CONTRACT_ERROR] ${err}`);
+          }
+        }
+      } catch (err) {
+        errors.push(`[LIVE_CATALOG_READ_ERROR] Falha ao extrair ou parsear ${LIVE_CATALOG_FILENAME}: ${(err as Error).message}`);
+      }
+    }
+
     let expectedPackageContentHash: string;
     if (isV2) {
       const manifestV2 = manifest as ProvisioningManifestV2;
@@ -297,6 +427,9 @@ export class PackageValidator {
         searchIndexSha256: manifestV2.searchIndexSha256,
         searchIndexSizeBytes: manifestV2.searchIndexSizeBytes,
         searchIndexContentHash: manifestV2.searchIndexContentHash,
+        liveCatalogFile: manifestV2.liveCatalogFile,
+        liveCatalogSha256: manifestV2.liveCatalogSha256,
+        liveCatalogSizeBytes: manifestV2.liveCatalogSizeBytes,
       });
     } else {
       expectedPackageContentHash = calculatePackageContentHash({
@@ -382,9 +515,9 @@ export class PackageValidator {
 
     // 12. Auditoria de segurança no payload do pacote
     const rawContent =
-      typeof TextDecoder !== 'undefined'
+      (typeof TextDecoder !== 'undefined'
         ? new TextDecoder('utf-8').decode(catalogBuffer)
-        : (catalogBuffer as any).toString('utf8');
+        : (catalogBuffer as any).toString('utf8')) + (liveCatalog ? JSON.stringify(liveCatalog) : '');
     const secretPatterns = [
       /SUPABASE_SERVICE_ROLE/i,
       /service_role/i,
@@ -406,6 +539,8 @@ export class PackageValidator {
       manifest,
       catalog,
       searchIndex,
+      searchIndexBuffer,
+      liveCatalog,
       catalogSha256: actualCatalogSha256,
       searchIndexSha256: actualSearchIndexSha256,
       packageContentHash: expectedPackageContentHash,

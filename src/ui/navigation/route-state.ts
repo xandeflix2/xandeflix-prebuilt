@@ -8,7 +8,19 @@
  * - BACK_RETURNS_PREVIOUS_VIEW: Pilha de histórico para suporte a voltar/Escape/D-pad Back.
  */
 
-export type AppView = 'home' | 'movies' | 'series' | 'search' | 'movie-detail' | 'series-detail';
+export type AppView =
+  | 'home'
+  | 'movies'
+  | 'series'
+  | 'live'
+  | 'search'
+  | 'movie-detail'
+  | 'series-detail'
+  | 'debug-source-setup'
+  | 'activation'
+  | 'activate-device'
+  | 'manager-panel'
+  | 'portal';
 
 export interface RouteLocation {
   view: AppView;
@@ -21,6 +33,34 @@ export interface NavigationState {
 }
 
 export function createInitialRoute(): NavigationState {
+  if (typeof window !== 'undefined' && window.location && window.location.hash) {
+    const raw = window.location.hash.replace(/^#\/?/, '').trim();
+    const validViews: AppView[] = [
+      'home',
+      'movies',
+      'series',
+      'live',
+      'search',
+    'activation',
+    'activate-device',
+      'debug-source-setup',
+      'manager-panel',
+      'portal',
+    ];
+    if (raw.startsWith('portal')) {
+      return {
+        current: { view: 'portal' },
+        history: [],
+      };
+    }
+    if (validViews.includes(raw as AppView)) {
+      return {
+        current: { view: raw as AppView },
+        history: [],
+      };
+    }
+  }
+
   return {
     current: { view: 'home' },
     history: [],

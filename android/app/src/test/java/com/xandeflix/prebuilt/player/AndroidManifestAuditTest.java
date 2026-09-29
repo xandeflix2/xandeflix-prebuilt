@@ -31,8 +31,19 @@ public class AndroidManifestAuditTest {
                 manifestContent.contains("android:name=\".player.NativePlayerActivity\"")
                 && manifestContent.contains("android:exported=\"false\""));
 
-        // 3. Confirma que usesCleartextTraffic="true" NÃO está configurado globalmente
-        assertFalse("usesCleartextTraffic=\"true\" é proibido no baseline do Gate G8",
+        // 3. O transporte device-direct exige cleartext explícito e configuração de rede base.
+        assertTrue("usesCleartextTraffic=\"true\" deve estar alinhado ao transporte original",
                 manifestContent.contains("android:usesCleartextTraffic=\"true\""));
+        assertTrue("Manifest deve apontar para network_security_config",
+                manifestContent.contains("android:networkSecurityConfig=\"@xml/network_security_config\""));
+
+        File networkSecurityFile = new File("src/main/res/xml/network_security_config.xml");
+        if (!networkSecurityFile.exists()) {
+            networkSecurityFile = new File("android/app/src/main/res/xml/network_security_config.xml");
+        }
+        assertTrue("network_security_config.xml deve existir", networkSecurityFile.exists());
+        String networkSecurityContent = new String(Files.readAllBytes(networkSecurityFile.toPath()));
+        assertTrue("cleartextTrafficPermitted=\"true\" deve estar permitido na base",
+                networkSecurityContent.contains("cleartextTrafficPermitted=\"true\""));
     }
 }

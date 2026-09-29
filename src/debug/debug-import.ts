@@ -16,35 +16,12 @@ import { TrustedPublicKeyStore } from '../security/trusted-public-key-store.ts';
 import { getClientBootstrapService } from '../bootstrap/client.ts';
 import { DEBUG_TEST_PUBLIC_KEY } from './debug-keys.ts';
 import type { ArtifactSecurityEnvelope } from '../security/security.types.ts';
+import { installWebViewBufferCompatibility } from './webview-buffer-compatibility.ts';
+import { ManagedSourceStagingOrchestrator } from '../source/managed-source-staging.orchestrator.ts';
+import { CompactSearchIndexV2Builder } from '../experiments/search-compact-v2/compact-search-v2-builder.ts';
+import { serializeCompactIndexV2 } from '../experiments/search-compact-v2/compact-search-v2-serializer.ts';
 
-// Polyfill global Buffer para compatibilidade em runtime WebView
-if (typeof (globalThis as any).Buffer === 'undefined') {
-  const BufferPolyfill: any = function (arg: any) {
-    return new Uint8Array(arg);
-  };
-  BufferPolyfill.isBuffer = (val: any): boolean => {
-    return val instanceof Uint8Array || (val != null && val._isBuffer === true);
-  };
-  BufferPolyfill.from = (data: any, encoding?: string): Uint8Array => {
-    if (typeof data === 'string') {
-      if (encoding === 'base64') {
-        const bin = atob(data);
-        const u8 = new Uint8Array(bin.length);
-        for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
-        return u8;
-      }
-      return new TextEncoder().encode(data);
-    }
-    if (data instanceof Uint8Array) {
-      return new Uint8Array(data);
-    }
-    if (Array.isArray(data)) {
-      return new Uint8Array(data);
-    }
-    return new Uint8Array(0);
-  };
-  (globalThis as any).Buffer = BufferPolyfill;
-}
+installWebViewBufferCompatibility();
 
 declare global {
   interface Window {
@@ -52,6 +29,8 @@ declare global {
       artifactBase64: string,
       envelopeRaw: string | ArtifactSecurityEnvelope
     ) => Promise<string>;
+    __XANDEFLIX_DEBUG_MANAGED_STAGE__?: () => Promise<unknown>;
+    __XANDEFLIX_DEBUG_SERIALIZER_FIXTURE__?: () => Promise<unknown>;
   }
 }
 
@@ -114,5 +93,49 @@ export function initDebugImport(): void {
         errorMessage: (err as Error).message,
       });
     }
+  };
+
+  window.__XANDEFLIX_DEBUG_MANAGED_STAGE__ = async (): Promise<unknown> => {
+    const result = await new ManagedSourceStagingOrchestrator().stageManagedSource();
+    return {
+      success: result.success,
+      status: result.status,
+      errorCode: result.errorCode,
+      errorStage: result.errorStage,
+      sanitizedErrorClass: result.sanitizedErrorClass,
+      sourceVersion: result.sourceVersion,
+      rawItemCount: result.rawItemCount,
+      movieCount: result.movieCount,
+      seriesCount: result.seriesCount,
+      liveCount: result.liveCount,
+      unresolvedCount: result.unresolvedCount,
+      sourcePayloadSizeBytes: result.sourcePayloadSizeBytes,
+      snapshotId: result.snapshotId,
+      previousSnapshotId: result.previousSnapshotId,
+      transport: result.transport,
+    };
+  };
+
+  window.__XANDEFLIX_DEBUG_SERIALIZER_FIXTURE__ = async (): Promise<unknown> => {
+    const catalog = {
+      metadata: {
+        schemaVersion: 1 as const,
+        catalogVersion: 'r2f8u-physical-fixture',
+        snapshotId: 'r2f8u-physical-fixture',
+        generatedAt: '2026-09-14T00:00:00.000Z',
+        counts: { movies: 1, series: 0, seasons: 0, episodes: 0, categories: 1, genres: 1, streams: 1, artworks: 0 },
+      },
+      categories: [{ id: 'cat:movies', name: 'Filmes', contentKinds: ['movie' as const] }],
+      genres: [{ id: 'genre:1', name: 'Geral' }],
+      movies: [{ id: 'movie:1', title: 'Filme Fixture', genreIds: ['genre:1'], categoryIds: ['cat:movies'], artworkIds: [], streamIds: ['stream:1'] }],
+      series: [], seasons: [], episodes: [],
+      streams: [{ id: 'stream:1', sourceItemId: 'movie:1', contentKind: 'movie' as const, containerExtension: 'mp4' }],
+      artworks: [],
+    };
+    const index = new CompactSearchIndexV2Builder().build(catalog, {
+      deterministicGeneratedAt: '2026-09-14T00:00:00.000Z',
+    });
+    const serialized = serializeCompactIndexV2(index);
+    return { success: serialized.buffer.length > 64, serializedBytes: serialized.buffer.length };
   };
 }

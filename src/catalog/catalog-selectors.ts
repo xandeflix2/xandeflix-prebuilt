@@ -9,7 +9,7 @@
  * - SAFE SANITIZATION: Nenhum dado corrompido ou inesperado vaza para os componentes.
  */
 
-import type { Movie, Series } from '../contracts/catalog.ts';
+import type { Category, Movie, Series } from '../contracts/catalog.ts';
 import { CatalogReadModel } from './catalog-read-model.ts';
 import {
   type CatalogItemViewModel,
@@ -100,22 +100,36 @@ export function getHomeRails(readModel: CatalogReadModel): HomeRailViewModel[] {
     });
   }
 
-  // 3. Faixas por Categoria (que tenham itens)
-  for (const cat of readModel.catalog.categories) {
+  // 3. Faixas por Categoria tipadas pelos itens materializados.
+  // Uma categoria de origem mista gera uma faixa independente por kind.
+  for (const cat of readModel.getCategoriesForKind('movie')) {
     const catMovies = readModel.moviesByCategoryId.get(cat.id) || [];
-    const catSeries = readModel.seriesByCategoryId.get(cat.id) || [];
+    const movieItems = catMovies
+      .slice(0, HOME_RAIL_MAX_ITEMS_INITIAL)
+      .map((m) => movieToViewModel(readModel, m));
 
-    const combined: CatalogItemViewModel[] = [
-      ...catMovies.map((m) => movieToViewModel(readModel, m)),
-      ...catSeries.map((s) => seriesToViewModel(readModel, s)),
-    ].slice(0, HOME_RAIL_MAX_ITEMS_INITIAL);
-
-    if (combined.length > 0) {
+    if (movieItems.length > 0) {
       rails.push({
-        id: `rail-cat-${cat.id}`,
+        id: `rail-cat-${cat.id}-movie`,
         title: cat.name,
         kind: 'category',
-        items: combined,
+        items: movieItems,
+      });
+    }
+  }
+
+  for (const cat of readModel.getCategoriesForKind('series')) {
+    const catSeries = readModel.seriesByCategoryId.get(cat.id) || [];
+    const seriesItems = catSeries
+      .slice(0, HOME_RAIL_MAX_ITEMS_INITIAL)
+      .map((s) => seriesToViewModel(readModel, s));
+
+    if (seriesItems.length > 0) {
+      rails.push({
+        id: `rail-cat-${cat.id}-series`,
+        title: cat.name,
+        kind: 'category',
+        items: seriesItems,
       });
     }
   }
@@ -141,6 +155,56 @@ export function getHomeRails(readModel: CatalogReadModel): HomeRailViewModel[] {
   }
 
   return rails;
+}
+
+export function getMovieCategories(readModel: CatalogReadModel): Category[] {
+  return readModel.getCategoriesForKind('movie');
+}
+
+export function getSeriesCategories(readModel: CatalogReadModel): Category[] {
+  return readModel.getCategoriesForKind('series');
+}
+
+export function selectSeriesPageItems<T extends { kind: string }>(
+  items: readonly T[]
+): T[] {
+  return items.filter((item) => item.kind === 'series');
+}
+
+export interface SeriesPageProjection {
+  categories: Category[];
+  items: CatalogItemViewModel[];
+}
+
+export function getSeriesPageProjection(
+  readModel: CatalogReadModel,
+  filters?: { categoryId?: string }
+): SeriesPageProjection {
+  const typedSeriesItems = selectSeriesPageItems(
+    readModel.catalog.series.map((series) => seriesToViewModel(readModel, series))
+  );
+  const typedSeriesIds = new Set(typedSeriesItems.map((item) => item.id));
+  const typedSeriesEntities = readModel.catalog.series.filter((series) =>
+    typedSeriesIds.has(series.id)
+  );
+  const typedSeriesCategoryIds = new Set(
+    typedSeriesEntities.flatMap((series) => series.categoryIds)
+  );
+  const categories = readModel.getTrustedCategoriesForKind('series').filter((category) =>
+    typedSeriesCategoryIds.has(category.id)
+  );
+  const trustedSeriesCategoryIds = new Set(categories.map((category) => category.id));
+  const filteredSeriesEntities = filters?.categoryId
+    && trustedSeriesCategoryIds.has(filters.categoryId)
+    ? typedSeriesEntities.filter((series) => series.categoryIds.includes(filters.categoryId!))
+    : typedSeriesEntities;
+
+  return {
+    categories,
+    items: selectSeriesPageItems(
+      filteredSeriesEntities.map((series) => seriesToViewModel(readModel, series))
+    ),
+  };
 }
 
 /**

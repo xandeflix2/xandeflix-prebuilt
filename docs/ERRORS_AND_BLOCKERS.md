@@ -162,3 +162,32 @@ Cada incidente, erro ou bloqueador tecnico devera ser registrado segundo o forma
   - `PHYSICAL_IMPORT_PROVEN`: SIM (Tablet e Fire TV Stick provisionados e validados com 100% de sucesso).
   - `G11A_STATUS`: `PASS`
 
+### OCORRENCIA-008 - C11 bounded-memory real-source import fix
+
+- **DATE**: 2026-09-24
+- **GATE**: `C11_CANONICAL_BOUNDED_MEMORY_IMPORT_FIX_SM_X205`
+- **CLASSIFICATION**: `MEMORY_RETENTION_DEFECT`
+- **STATUS**: `OPEN_NON_BLOCKING_PENDING_FINAL_CLEAN_INSTALL_E2E`
+- **ROOT_CAUSE_CONFIRMED**: `SIM`
+- **DESCRIPTION**: O transporte M3U ja era incremental, mas o parser mantinha em `seriesMap` objetos brutos de todos os episodios ate o fim da leitura. A agregacao posterior criava novas entidades `Episode`/`StreamRef`; o indice Search V2 tambem copiava arrays por documento; e catalogo era serializado novamente durante o staging. Esse conjunto reteve objetos e copias redundantes no mesmo ciclo.
+- **FIX_APPLIED**: `SIM`
+  - Episodio e referencia de stream canonicos sao criados incrementalmente e deduplicados por temporada.
+  - Acumuladores de series sao liberados antes da indexacao final.
+  - Search V2 reutiliza arrays imutaveis de ids, sem copia por documento.
+  - A serializacao canonica do catalogo e reutilizada pelo staging.
+- **SYNTHETIC_250K**: `PASS`
+  - `SOURCE_RECORDS=250000`, `PARSED_RECORDS=250000`, `MOVIES=225000`, `SERIES=1000`, `EPISODES=12500`, `LIVE=12500`.
+  - Accounting, relacoes de series, Search V2 e `directStreamUrl`: `PASS`.
+  - Checkpoints MEM01-MEM09 registrados; as medicoes sao evidencia observacional, nao SLA.
+- **PHYSICAL_UPDATE_IN_PLACE**: `PASS`
+  - APK instalado com `adb install -r`, sem uninstall e sem reset de dados.
+  - Identidade, display code e estado local permaneceram consistentes: `AUTHORIZED`, `SELF_SERVICE`, `TRIAL`.
+  - App abriu e o shell WebView ficou responsivo; nao houve novo crash/ANR apos a instalacao deste APK.
+  - Observacao nao-bloqueante: houve um `Uncaught TypeError` de WebView envolvendo `triggerEvent` durante a inicializacao; os marcos T2/T3/T4/T7/T5/T6 foram alcancados e o processo permaneceu vivo.
+  - O `dumpsys activity exit-info` preserva crashes nativos anteriores a instalacao, entre 23:06 e 23:19, com renderer WebView historico chegando a aproximadamente 1,5 GB RSS; esses eventos sao evidencia da regressao anterior, nao do boot desta instalacao.
+- **PHYSICAL_REAL_SOURCE_IMPORT**: `BLOCKED_SOURCE_NOT_BOUND`
+  - A propria tela e a resolucao de boot retornaram `Nenhuma fonte ativa vinculada a este dispositivo`.
+  - Nao foi executado provisionamento manual, write remoto, migration ou bypass para nao alterar o estado comercial canonico.
+- **APK_SHA256**: `E5D927082F958553F4D6B872CB4E84106FAE1EB5C06F6C875CCD6707D5A5A1BB`
+- **NEXT_DECISION**: Repetir a validacao fisica quando a autoridade retornar `SOURCE_READY` para o mesmo dispositivo; manter C11 aberto ate o E2E final de clean install autorizado.
+

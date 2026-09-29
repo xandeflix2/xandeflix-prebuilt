@@ -7,6 +7,8 @@
 import React from 'react';
 import type { AppView } from '../navigation/route-state.ts';
 
+declare const __XANDEFLIX_DEBUG_BUILD__: boolean;
+
 interface HeaderProps {
   currentView: AppView;
   onNavigate: (view: AppView) => void;
@@ -25,7 +27,8 @@ export const Header: React.FC<HeaderProps> = ({
   catalogVersion,
 }) => {
   return (
-    <header className="app-header">
+    <>
+      <header className="app-header">
       <div className="header-left">
         {canGoBack && onBack && (
           <button
@@ -73,11 +76,46 @@ export const Header: React.FC<HeaderProps> = ({
         </button>
         <button
           type="button"
+          className={`focusable-item nav-link ${currentView === 'live' ? 'active' : ''}`}
+          onClick={() => onNavigate('live')}
+        >
+          📺 Canais
+        </button>
+        <button
+          type="button"
           className={`focusable-item nav-link ${currentView === 'search' ? 'active' : ''}`}
           onClick={() => onNavigate('search')}
         >
           Busca
         </button>
+        <button
+          type="button"
+          className={`focusable-item nav-link ${currentView === 'activation' ? 'active' : ''}`}
+          onClick={() => onNavigate('activation')}
+          style={{ color: '#38bdf8' }}
+        >
+          🔑 Ativação
+        </button>
+        {typeof __XANDEFLIX_DEBUG_BUILD__ !== 'undefined' && __XANDEFLIX_DEBUG_BUILD__ && (
+          <>
+            <button
+              type="button"
+              className={`focusable-item nav-link ${currentView === 'debug-source-setup' ? 'active' : ''}`}
+              onClick={() => onNavigate('debug-source-setup')}
+              style={{ color: '#f87171' }}
+            >
+              ⚙️ Fonte (Debug)
+            </button>
+            <button
+              type="button"
+              className={`focusable-item nav-link ${currentView === 'manager-panel' ? 'active' : ''}`}
+              onClick={() => onNavigate('manager-panel')}
+              style={{ color: '#a855f7' }}
+            >
+              🛡️ Gestor (Lab)
+            </button>
+          </>
+        )}
       </nav>
 
       <div className="header-right">
@@ -89,5 +127,63 @@ export const Header: React.FC<HeaderProps> = ({
         )}
       </div>
     </header>
+
+    <nav className="mobile-bottom-nav" aria-label="Navegação Mobile Inferior">
+      <button
+        type="button"
+        className={`focusable-item mobile-nav-btn ${currentView === 'home' ? 'active' : ''}`}
+        onClick={() => onNavigate('home')}
+        aria-label="Ir para Início"
+      >
+        <span className="mobile-nav-icon">🏠</span>
+        <span className="mobile-nav-label">Início</span>
+      </button>
+      <button
+        type="button"
+        className={`focusable-item mobile-nav-btn ${currentView === 'movies' ? 'active' : ''}`}
+        onClick={() => onNavigate('movies')}
+        aria-label="Ir para Filmes"
+      >
+        <span className="mobile-nav-icon">🎬</span>
+        <span className="mobile-nav-label">Filmes</span>
+      </button>
+      <button
+        type="button"
+        className={`focusable-item mobile-nav-btn ${currentView === 'series' ? 'active' : ''}`}
+        onClick={() => onNavigate('series')}
+        aria-label="Ir para Séries"
+      >
+        <span className="mobile-nav-icon">📺</span>
+        <span className="mobile-nav-label">Séries</span>
+      </button>
+      <button
+        type="button"
+        className={`focusable-item mobile-nav-btn ${currentView === 'live' ? 'active' : ''}`}
+        onClick={() => onNavigate('live')}
+        aria-label="Ir para Canais ao Vivo"
+      >
+        <span className="mobile-nav-icon">📡</span>
+        <span className="mobile-nav-label">Canais</span>
+      </button>
+      <button
+        type="button"
+        className={`focusable-item mobile-nav-btn ${currentView === 'search' ? 'active' : ''}`}
+        onClick={() => onNavigate('search')}
+        aria-label="Ir para Busca"
+      >
+        <span className="mobile-nav-icon">🔍</span>
+        <span className="mobile-nav-label">Busca</span>
+      </button>
+      <button
+        type="button"
+        className={`focusable-item mobile-nav-btn ${currentView === 'activation' ? 'active' : ''}`}
+        onClick={() => onNavigate('activation')}
+        aria-label="Ir para Ativação"
+      >
+        <span className="mobile-nav-icon">🔑</span>
+        <span className="mobile-nav-label">Ativação</span>
+      </button>
+    </nav>
+  </>
   );
 };

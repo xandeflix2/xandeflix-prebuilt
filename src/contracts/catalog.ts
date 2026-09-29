@@ -54,6 +54,12 @@ export interface StreamRef {
   contentKind: ContentKind;
   containerExtension?: string;
   qualityLabel?: string;
+  /**
+   * Referência final fornecida pela source para reprodução direta no device.
+   * Sensível: só pode existir no snapshot/runtime privado e nunca em busca,
+   * metadados públicos, telemetria ou logs.
+   */
+  directStreamUrl?: string;
 }
 
 export interface Category {

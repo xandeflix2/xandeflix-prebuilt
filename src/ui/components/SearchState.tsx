@@ -24,6 +24,24 @@ export const SearchState: React.FC<SearchStateProps> = ({ status, query }) => {
         </div>
       );
 
+    case 'SEARCH_PREPARING':
+      return (
+        <div className="search-state-container" role="status" aria-live="polite">
+          <div className="search-state-spinner" />
+          <p className="search-state-title">Preparando busca...</p>
+          <p className="search-state-subtitle">Indexando catálogo local...</p>
+        </div>
+      );
+
+    case 'SEARCH_FAILED':
+      return (
+        <div className="search-state-container search-state-warning" role="alert">
+          <span className="search-state-icon" aria-hidden="true">⚠️</span>
+          <p className="search-state-title">Busca temporariamente indisponível</p>
+          <p className="search-state-subtitle">O catálogo local continua disponível. Tente novamente mais tarde.</p>
+        </div>
+      );
+
     case 'SEARCH_INDEX_UNAVAILABLE':
       return (
         <div className="search-state-container search-state-notice" role="status">

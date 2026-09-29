@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Xandeflix Prebuilt — Ingestion Catalog Validator
  *
  * Valida o catálogo gerado pela normalização contra o JSON Schema canônico Draft 2020-12
@@ -27,6 +27,7 @@ const validateSchema = ajv.compile(schemaContent);
 
 export function validateNormalizedCatalog(catalog: PrebuiltCatalog): ValidationResult {
   const errors: string[] = [];
+  const isSegmented = Boolean((catalog as any).extensions?.isSegmented);
 
   // 1. Validação JSON Schema Draft 2020-12
   const isSchemaValid = validateSchema(catalog);
@@ -58,10 +59,18 @@ export function validateNormalizedCatalog(catalog: PrebuiltCatalog): ValidationR
   for (const coll of collections) {
     const actual = Array.isArray(catalog[coll]) ? catalog[coll].length : -1;
     const declared = counts[coll];
-    if (actual !== declared) {
-      errors.push(
-        `Contagem divergente para '${coll}': declarada=${declared}, real=${actual}`
-      );
+    if (isSegmented) {
+      if (actual > declared) {
+        errors.push(
+          `Contagem excedente para '${coll}': declarada=${declared}, real=${actual}`
+        );
+      }
+    } else {
+      if (actual !== declared) {
+        errors.push(
+          `Contagem divergente para '${coll}': declarada=${declared}, real=${actual}`
+        );
+      }
     }
   }
 
@@ -126,45 +135,57 @@ export function validateNormalizedCatalog(catalog: PrebuiltCatalog): ValidationR
     }
   }
 
-  // Temporadas
-  for (const sea of catalog.seasons || []) {
-    if (!series.has(sea.seriesId)) {
-      errors.push(`Season '${sea.id}' referencia series inexistente '${sea.seriesId}'`);
-    }
-    for (const epId of sea.episodeIds || []) {
-      if (!episodes.has(epId)) {
-        errors.push(`Season '${sea.id}' referencia episode inexistente '${epId}'`);
+  if (!isSegmented) {
+    // Temporadas
+    for (const sea of catalog.seasons || []) {
+      if (!series.has(sea.seriesId)) {
+        errors.push(`Season '${sea.id}' referencia series inexistente '${sea.seriesId}'`);
+      }
+      for (const epId of sea.episodeIds || []) {
+        if (!episodes.has(epId)) {
+          errors.push(`Season '${sea.id}' referencia episode inexistente '${epId}'`);
+        }
+      }
+      for (const aId of sea.artworkIds || []) {
+        if (!artworks.has(aId)) {
+          errors.push(`Season '${sea.id}' referencia artwork inexistente '${aId}'`);
+        }
       }
     }
-    for (const aId of sea.artworkIds || []) {
-      if (!artworks.has(aId)) {
-        errors.push(`Season '${sea.id}' referencia artwork inexistente '${aId}'`);
+
+    // Episodios
+    for (const ep of catalog.episodes || []) {
+      if (!series.has(ep.seriesId)) {
+        errors.push(`Episode '${ep.id}' referencia series inexistente '${ep.seriesId}'`);
+      }
+      if (!seasons.has(ep.seasonId)) {
+        errors.push(`Episode '${ep.id}' referencia season inexistente '${ep.seasonId}'`);
+      }
+      for (const aId of ep.artworkIds || []) {
+        if (!artworks.has(aId)) {
+          errors.push(`Episode '${ep.id}' referencia artwork inexistente '${aId}'`);
+        }
+      }
+      for (const sId of ep.streamIds || []) {
+        if (!streams.has(sId)) {
+          errors.push(`Episode '${ep.id}' referencia stream inexistente '${sId}'`);
+        }
+      }
+    }
+  } else {
+    for (const ep of catalog.episodes || []) {
+      if (series.size > 0 && !series.has(ep.seriesId)) {
+        errors.push(`Episode '${ep.id}' referencia series inexistente '${ep.seriesId}'`);
+      }
+      if (seasons.size > 0 && !seasons.has(ep.seasonId)) {
+        errors.push(`Episode '${ep.id}' referencia season inexistente '${ep.seasonId}'`);
       }
     }
   }
-
-  // Episódios
-  for (const ep of catalog.episodes || []) {
-    if (!series.has(ep.seriesId)) {
-      errors.push(`Episode '${ep.id}' referencia series inexistente '${ep.seriesId}'`);
-    }
-    if (!seasons.has(ep.seasonId)) {
-      errors.push(`Episode '${ep.id}' referencia season inexistente '${ep.seasonId}'`);
-    }
-    for (const aId of ep.artworkIds || []) {
-      if (!artworks.has(aId)) {
-        errors.push(`Episode '${ep.id}' referencia artwork inexistente '${aId}'`);
-      }
-    }
-    for (const sId of ep.streamIds || []) {
-      if (!streams.has(sId)) {
-        errors.push(`Episode '${ep.id}' referencia stream inexistente '${sId}'`);
-      }
-    }
-  }
-
   return {
     valid: errors.length === 0,
     errors,
   };
 }
+
+

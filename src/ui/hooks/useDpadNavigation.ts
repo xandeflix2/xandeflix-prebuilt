@@ -64,6 +64,16 @@ export function useDpadNavigation(options: UseDpadNavigationOptions = {}): void 
         }
       }
 
+      // 1.1. Trata DPAD_CENTER / Enter / Espaço em elementos focáveis
+      if (key === 'Enter' || (event as any).keyCode === 23 || key === ' ') {
+        const active = document.activeElement as HTMLElement;
+        if (active && active.classList.contains('focusable-item')) {
+          active.click();
+          event.preventDefault();
+          return;
+        }
+      }
+
       // 2. Teclas direcionais
       if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(key)) {
         return;

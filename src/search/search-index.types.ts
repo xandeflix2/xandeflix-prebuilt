@@ -15,7 +15,7 @@ export const SEARCH_INDEX_VERSION = 1;
 export const SEARCH_NORMALIZATION_VERSION = 1;
 export const SEARCH_INDEX_FILENAME = 'search-index.json';
 
-export type SearchDocumentKind = 'movie' | 'series';
+export type SearchDocumentKind = 'movie' | 'series' | 'live';
 
 export interface SearchDocument {
   id: string;
@@ -43,7 +43,7 @@ export interface PrebuiltSearchIndex {
 }
 
 export interface SearchFilter {
-  kind?: 'movie' | 'series' | 'all';
+  kind?: 'movie' | 'series' | 'live' | 'all';
   genreId?: string;
   year?: number;
 }
@@ -77,6 +77,8 @@ export type SearchStatus =
   | 'SEARCH_NO_ACTIVE_CATALOG'
   | 'SEARCH_INDEX_UNAVAILABLE'
   | 'SEARCH_INDEX_LOADING'
+  | 'SEARCH_PREPARING'
+  | 'SEARCH_FAILED'
   | 'SEARCH_READY'
   | 'SEARCH_INDEX_INVALID'
   | 'SEARCH_QUERY_EMPTY'

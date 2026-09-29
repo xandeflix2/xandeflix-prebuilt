@@ -14,6 +14,9 @@ import { PlaybackError } from './playback-errors.ts';
 
 export interface RuntimeSourceContext {
   readonly sourceId: string;
+  readonly sourceVersion?: number;
+  readonly sourceStatus?: 'ACTIVE' | 'DISABLED';
+  readonly protocol?: 'M3U' | 'XTREAM';
   readonly providerKind: SourceProviderKind;
   readonly baseUrl: string;
   readonly sessionMaterial?: Record<string, string>;

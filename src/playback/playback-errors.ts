@@ -43,6 +43,41 @@ export class PlaybackError extends Error {
     );
   }
 
+  static sourceActionRequired(): PlaybackError {
+    return new PlaybackError(
+      'SOURCE_ACTION_REQUIRED',
+      'A configuraÃ§Ã£o local da fonte requer provisionamento.',
+    );
+  }
+
+  static localSourceConfigNotFound(): PlaybackError {
+    return new PlaybackError(
+      'LOCAL_SOURCE_CONFIG_NOT_FOUND',
+      'A configuraÃ§Ã£o local da fonte nÃ£o foi encontrada.',
+    );
+  }
+
+  static localSourceConfigUnavailable(): PlaybackError {
+    return new PlaybackError(
+      'LOCAL_SOURCE_CONFIG_UNAVAILABLE',
+      'A configuraÃ§Ã£o local segura estÃ¡ indisponÃ­vel.',
+    );
+  }
+
+  static localSourceConfigVersionMismatch(): PlaybackError {
+    return new PlaybackError(
+      'LOCAL_SOURCE_CONFIG_VERSION_MISMATCH',
+      'A versÃ£o local da configuraÃ§Ã£o diverge da autorizaÃ§Ã£o remota.',
+    );
+  }
+
+  static localSourceConfigProtocolMismatch(): PlaybackError {
+    return new PlaybackError(
+      'LOCAL_SOURCE_CONFIG_PROTOCOL_MISMATCH',
+      'O protocolo local da configuraÃ§Ã£o diverge da autorizaÃ§Ã£o remota.',
+    );
+  }
+
   static unsupportedScheme(scheme: string): PlaybackError {
     return new PlaybackError(
       'UNSUPPORTED_SCHEME',
@@ -75,6 +110,20 @@ export class PlaybackError extends Error {
     return new PlaybackError(
       'PLAYER_INIT_FAILED',
       `Falha na inicialização do player nativo: ${detail || 'Erro desconhecido'}`
+    );
+  }
+
+  static concurrentSessionLimit(maxConcurrent?: number): PlaybackError {
+    return new PlaybackError(
+      'CONCURRENT_SESSION_LIMIT',
+      `Limite de telas simultâneas atingido para esta licença${maxConcurrent ? ` (máximo: ${maxConcurrent})` : ''}.`
+    );
+  }
+
+  static licenseAccessDenied(reason?: string): PlaybackError {
+    return new PlaybackError(
+      'LICENSE_ACCESS_DENIED',
+      `Acesso de reprodução negado pela licença${reason ? `: ${reason}` : ''}.`
     );
   }
 }

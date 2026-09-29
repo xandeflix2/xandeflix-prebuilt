@@ -19,20 +19,41 @@ import type {
 } from './search-index.types.ts';
 import { SearchEngine } from './search-engine.ts';
 import { SearchIndexValidator } from './search-index-validator.ts';
+import { DeferredSearchIndexCoordinator } from './deferred-search-index-coordinator.ts';
+import { CompactSearchEngineV2Pruned } from '../experiments/search-compact-v2-pruned/compact-search-v2-pruned-engine.ts';
+import { Filesystem, Directory } from '@capacitor/filesystem';
 
 export type SearchStateListener = (status: SearchStatus, results: SearchResultItem[]) => void;
 
 export class SearchService {
   private storage: LocalCatalogStorage;
   private engine = new SearchEngine();
+  private prunedEngine: CompactSearchEngineV2Pruned | null = null;
   private validator = new SearchIndexValidator();
   private currentStatus: SearchStatus = 'SEARCH_NO_ACTIVE_CATALOG';
   private currentResults: SearchResultItem[] = [];
   private listeners = new Set<SearchStateListener>();
   private activeSnapshotId: string | null = null;
 
+  private readonly onSearchBuildStarted = (): void => {
+    this.setStatus('SEARCH_PREPARING', []);
+  };
+
+  private readonly onSearchBuildCompleted = (): void => {
+    void this.initialize();
+  };
+
+  private readonly onSearchBuildFailed = (): void => {
+    this.setStatus('SEARCH_FAILED', []);
+  };
+
   constructor(storage: LocalCatalogStorage) {
     this.storage = storage;
+    if (typeof window !== 'undefined') {
+      window.addEventListener('xandeflix:search-index-building', this.onSearchBuildStarted);
+      window.addEventListener('xandeflix:search-index-updated', this.onSearchBuildCompleted);
+      window.addEventListener('xandeflix:search-index-failed', this.onSearchBuildFailed);
+    }
   }
 
   getActiveSnapshotId(): string | null {
@@ -51,9 +72,44 @@ export class SearchService {
     }
 
     this.activeSnapshotId = pointer.snapshotId;
+    if (DeferredSearchIndexCoordinator.isBuilding(pointer.snapshotId)) {
+      this.setStatus('SEARCH_PREPARING', []);
+      return this.currentStatus;
+    }
     this.setStatus('SEARCH_INDEX_LOADING', []);
 
-    // Lê o search-index.json persistido no snapshot ativo
+    // 1. Tenta carregar CompactSearchIndexV2 binário de alta performance
+    if (typeof window !== 'undefined' && (window as any).Capacitor?.convertFileSrc) {
+      try {
+        let binStat = await Filesystem.getUri({
+          path: `prebuilt/snapshots/${pointer.snapshotId}/compact-search-index-v2.bin`,
+          directory: Directory.Data,
+        }).catch(() => null);
+
+        if (!binStat?.uri) {
+          binStat = await Filesystem.getUri({
+            path: 'compact-search-index-v2.bin',
+            directory: Directory.Data,
+          }).catch(() => null);
+        }
+
+        if (binStat?.uri) {
+          const webUrl = (window as any).Capacitor.convertFileSrc(binStat.uri);
+          const res = await fetch(webUrl);
+          if (res.ok) {
+            const buf = await res.arrayBuffer();
+            this.prunedEngine = new CompactSearchEngineV2Pruned();
+            this.prunedEngine.load(new Uint8Array(buf));
+            this.setStatus('SEARCH_READY', []);
+            return this.currentStatus;
+          }
+        }
+      } catch {
+        // Continua para fallback
+      }
+    }
+
+    // 2. Fallback: Lê o search-index.json persistido no snapshot ativo
     let searchIndex: PrebuiltSearchIndex | null = null;
     try {
       searchIndex = await this.storage.readActiveSearchIndex();
@@ -63,7 +119,10 @@ export class SearchService {
     }
 
     if (!searchIndex) {
-      // Pacote v1 ou pacote sem busca: busca indisponível mas catálogo continua
+      if (DeferredSearchIndexCoordinator.isBuilding(pointer.snapshotId)) {
+        this.setStatus('SEARCH_PREPARING', []);
+        return this.currentStatus;
+      }
       this.setStatus('SEARCH_INDEX_UNAVAILABLE', []);
       return this.currentStatus;
     }
@@ -75,7 +134,6 @@ export class SearchService {
     });
 
     if (!validation.valid) {
-      // Índice corrompido ou com divergência de snapshot: busca indisponível
       this.setStatus('SEARCH_INDEX_INVALID', []);
       return this.currentStatus;
     }
@@ -95,7 +153,9 @@ export class SearchService {
     }
     if (
       this.currentStatus === 'SEARCH_INDEX_UNAVAILABLE' ||
-      this.currentStatus === 'SEARCH_INDEX_INVALID'
+      this.currentStatus === 'SEARCH_INDEX_INVALID' ||
+      this.currentStatus === 'SEARCH_PREPARING' ||
+      this.currentStatus === 'SEARCH_FAILED'
     ) {
       return [];
     }
@@ -106,7 +166,13 @@ export class SearchService {
       return [];
     }
 
-    const results = this.engine.query(trimmed, filter);
+    let results: SearchResultItem[] = [];
+    if (this.prunedEngine && this.prunedEngine.isReady()) {
+      const prunedRes = this.prunedEngine.query(trimmed, { topK: 50, filter });
+      results = prunedRes.items;
+    } else {
+      results = this.engine.query(trimmed, filter);
+    }
 
     if (results.length === 0) {
       this.setStatus('SEARCH_NO_RESULTS', []);

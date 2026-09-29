@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Xandeflix Prebuilt — Local Catalog Storage Interface
  *
  * Contrato abstrato de persistência local para o catálogo e ponteiro ativo.
@@ -8,12 +8,55 @@
  * - ACTIVE_GENERATION_SAFETY = REQUIRED
  * - APP_PRIVATE_STORAGE = SIM
  * - STAGING_GENERATION = REQUIRED
+ * - SEGMENTED_CATALOG_STORAGE = SUPPORTED
  */
 
 import type { PrebuiltCatalog } from '../../contracts/catalog.ts';
 import type { ProvisioningManifest } from '../../provisioning/types.ts';
 import type { PrebuiltSearchIndex } from '../../search/search-index.types.ts';
+import type { LiveCatalog } from '../../catalog/live/live-tv.types.ts';
 import type { ActivePointer } from '../types.ts';
+
+export interface CatalogSegmentEntry {
+  fileName: string;
+  kind: 'movies' | 'series' | 'seasons' | 'episodes' | 'streams' | 'artworks' | 'live';
+  recordCount: number;
+  byteSize: number;
+  sha256?: string;
+}
+
+export interface SegmentedCatalogProvenance {
+  kind: 'REAL';
+  sourceId: string;
+  sourceVersion: number;
+}
+
+export interface SegmentedCatalogManifest {
+  snapshotId: string;
+  classificationProfileVersion: number;
+  generatedAt: string;
+  totalRecords: number;
+  catalogSizeBytes: number;
+  catalogSha256: string;
+  /**
+   * Para a materialização segmentada sem compressão, o conteúdo lógico do
+   * pacote é exatamente o catálogo delimitado representado por catalogSha256.
+   */
+  packageContentHash: string;
+  metadata?: SegmentedCatalogProvenance;
+  counts: {
+    movies: number;
+    series: number;
+    seasons: number;
+    episodes: number;
+    live: number;
+    streams: number;
+    artworks: number;
+    categories: number;
+    genres: number;
+  };
+  segments: CatalogSegmentEntry[];
+}
 
 export interface LocalCatalogStorage {
   /**
@@ -32,8 +75,9 @@ export interface LocalCatalogStorage {
   writeStaging(
     snapshotId: string,
     manifest: ProvisioningManifest,
-    catalog: PrebuiltCatalog,
-    searchIndex?: PrebuiltSearchIndex | null
+    catalog: PrebuiltCatalog | string,
+    searchIndex?: PrebuiltSearchIndex | Buffer | Uint8Array | null,
+    liveCatalog?: LiveCatalog | null
   ): Promise<void>;
 
   /**
@@ -44,7 +88,10 @@ export interface LocalCatalogStorage {
   ): Promise<{
     manifest: ProvisioningManifest;
     catalog: PrebuiltCatalog;
+    rawCatalogJson?: string;
     searchIndex?: PrebuiltSearchIndex | null;
+    searchIndexBuffer?: Buffer | Uint8Array | null;
+    liveCatalog?: LiveCatalog | null;
   } | null>;
 
   /**
@@ -68,6 +115,16 @@ export interface LocalCatalogStorage {
   readActiveSearchIndex(): Promise<PrebuiltSearchIndex | null>;
 
   /**
+   * Lê o índice compacto binário ativo quando presente. O método é opcional
+   * para manter compatibilidade com stores de laboratório que só persistem o
+   * índice JSON legado.
+   */
+  readActiveSearchIndexBuffer?(): Promise<Buffer | Uint8Array | null>;
+
+  /** Persiste o índice compacto gerado após a promoção do snapshot ativo. */
+  writeActiveSearchIndex?(snapshotId: string, index: Buffer | Uint8Array): Promise<void>;
+
+  /**
    * Limpa artefatos temporários da área de staging.
    */
   cleanupStaging(snapshotId?: string): Promise<void>;
@@ -81,6 +138,26 @@ export interface LocalCatalogStorage {
    * Calcula o espaço físico em bytes ocupado pelo snapshot atualmente ativo.
    */
   calculateActiveStorageSize(): Promise<number>;
+
+  /**
+   * Escreve um segmento delimitado de catálogo na área de staging.
+   */
+  writeStagingSegment?(snapshotId: string, segmentPath: string, data: string): Promise<void>;
+
+  /**
+   * Lê um segmento delimitado da área de staging.
+   */
+  readStagingSegment?(snapshotId: string, segmentPath: string): Promise<string | null>;
+
+  /**
+   * Lê um segmento delimitado do snapshot ativo.
+   */
+  readActiveSegment?(segmentPath: string): Promise<string | null>;
+
+  /**
+   * Lista os segmentos do snapshot ativo.
+   */
+  listActiveSegments?(): Promise<string[]>;
 
   /**
    * Lê o RecoveryJournal persistido (ou null se inexistente).
@@ -99,5 +176,7 @@ export interface LocalCatalogStorage {
     manifest: ProvisioningManifest;
     catalog: PrebuiltCatalog;
     searchIndex?: PrebuiltSearchIndex | null;
+    searchIndexBuffer?: Buffer | Uint8Array | null;
+    liveCatalog?: LiveCatalog | null;
   } | null>;
 }

@@ -503,3 +503,29 @@
   - Segurança de release e isolamento contra colisões com repositório original `timbocorrea/xandeflix-2.0` integralmente verificados;
   - Autorização expressa concedida pelo Chat Mestre para commit e push canônicos na branch origin/main.
 
+
+- **Ciclo C11 - Canonical Bounded-Memory Import Fix (2026-09-24)**:
+  - Forense do pipeline confirmou que o transporte M3U ja era incremental; o defeito estava na retencao de acumuladores brutos de episodios, na recriacao posterior de entidades canonicas, na copia de arrays no Search V2 e na serializacao duplicada do catalogo durante staging;
+  - Correcao minima aplicada em `real-source-importer.service.ts`, `compact-search-v2-builder.ts` e `managed-source-staging.orchestrator.ts`, com teste sintetico on-the-fly de 250.000 registros em `scripts/test-c11-bounded-memory-import.mjs`;
+  - Accounting completo, relacoes de series, Search V2, direct streams, staging e promocao atomica: `PASS`;
+  - Typecheck, build web, unit tests Android, APK debug e suites de self-service, licenca, boot sync, C9, direct stream, import memory, large transport e real/live: `PASS`;
+  - Instalacao fisica update-in-place no SM-X205 preservou identidade e ativacao `AUTHORIZED`/`SELF_SERVICE`/`TRIAL`; APK SHA-256: `E5D927082F958553F4D6B872CB4E84106FAE1EB5C06F6C875CCD6707D5A5A1BB`;
+  - O boot fisico alcancou o shell sem novo crash/ANR apos a instalacao; houve apenas uma observacao de console WebView `triggerEvent` sem interrupcao do boot; o `exit-info` preservou crashes nativos anteriores e pico historico do renderer WebView de aproximadamente 1,5 GB RSS; a autoridade respondeu `SOURCE_NOT_BOUND`, o import real nao foi forjado e C11 permanece `OPEN_PENDING_FINAL_CLEAN_INSTALL_E2E`;
+  - Nenhum commit, push, PR, migration, write remoto ou uninstall foi executado; o proximo gate nao foi iniciado.
+- **Ciclo R17D — Fechamento do Gate A Funcional e Live Fullscreen (2026-09-29)**:
+  - Resolução definitiva da tela preta na transição do Live TV de preview inline para fullscreen;
+  - Auditoria física confirmou a causa raiz: máscara preta opaca `view.setBackgroundColor(Color.BLACK)` no `PlayerView` e camada de hardware do `SurfaceView` subjacente à janela da WebView;
+  - Correção cirúrgica aplicada em `NativeAndroidPlayerPlugin.java`: `view.setBackgroundColor(Color.TRANSPARENT)` e `((SurfaceView) surfaceView).setZOrderMediaOverlay(true)`;
+  - Instrumentação temporária de observabilidade adicionada com callbacks de `SurfaceHolder` (`surfaceCreated`, `surfaceChanged`, `surfaceDestroyed`) e `Player.Listener` (`onRenderedFirstFrame`, `onVideoSizeChanged`, `onPlaybackStateChanged`);
+  - Teste físico no dispositivo real Amazon Fire TV Stick Lite (`AFTSS`, Serial `G071CQ070344374G`, Android 9 / API 28) homologado com SUCESSO ABSOLUTO:
+    - Vídeo e áudio fluidos em tela cheia (1920x1080);
+    - Transição sem interrupção de frames ou recriação anômala de codecs;
+    - Tecla Voltar (Back) do controle remoto retornou com precisão para o layout inline (760x428);
+    - Zero crashes, zero ANRs e zero travamentos;
+  - Gate A Funcional formalmente adjudicado como PASS (`GATE_A_FUNCTIONAL_STATUS=PASS`, `LIVE_FULLSCREEN=PASS`, `R17D_STATUS=PASS`);
+  - Higiene e limpeza de artefatos de diagnóstico concluída com sucesso (`FINAL_NON_DIAGNOSTIC_APK_REQUIRED=SIM`, `FINAL_NON_DIAGNOSTIC_APK_STATUS=PASS`):
+    - Remoção de todos os blocos de log e listeners de observabilidade temporária em `NativeAndroidPlayerPlugin.java`;
+    - Preservação estrita da transparência (`Color.TRANSPARENT`), elevação de hardware (`setZOrderMediaOverlay(true)`) e failover de candidatos (`onPlayerError`);
+    - Exclusão do diretório de quarentena de assets residuais (`android/app/src/main/assets/public.__c11_r7b_quarantine/`);
+    - Validação de testes unitários: 82 tasks executadas com sucesso sem regressão (`BUILD SUCCESSFUL`);
+    - APK final gerado: `android/app/build/outputs/apk/debug/app-debug.apk` (`9019470` bytes, SHA-256: `06C6C5276565B77E6E088D3689F22C4749AE88C96CF6D52EE9F18180C0EE8933`).

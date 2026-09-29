@@ -25,7 +25,7 @@ export interface StreamResolver {
    */
   resolve(
     streamRef: StreamRef,
-    runtimeSourceContext: RuntimeSourceContext,
+    runtimeSourceContext?: RuntimeSourceContext,
     options?: ResolveOptions
   ): Promise<ResolvedPlaybackRequest>;
 }

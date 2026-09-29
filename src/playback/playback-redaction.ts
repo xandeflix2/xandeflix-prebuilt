@@ -69,7 +69,7 @@ export function validatePlaybackUri(uri: string): void {
   try {
     parsed = new URL(trimmed);
   } catch {
-    throw PlaybackError.resolutionFailed(`Formato de URI malformado: ${trimmed.slice(0, 32)}...`);
+    throw PlaybackError.resolutionFailed('Formato de URI malformado.');
   }
 
   // Validação de scheme

@@ -24,6 +24,18 @@ export function createActivePointer(
     pointer.searchIndexContentHash = manifest.searchIndexContentHash;
   }
 
+  if (manifest.metadata) {
+    if (typeof manifest.metadata.kind === 'string') {
+      pointer.kind = manifest.metadata.kind as ActivePointer['kind'];
+    }
+    if (typeof manifest.metadata.sourceId === 'string') {
+      pointer.sourceId = manifest.metadata.sourceId;
+    }
+    if (typeof manifest.metadata.sourceVersion === 'number') {
+      pointer.sourceVersion = manifest.metadata.sourceVersion;
+    }
+  }
+
   return pointer;
 }
 
@@ -38,7 +50,7 @@ export function isValidActivePointer(pointer: unknown): pointer is ActivePointer
     typeof p.schemaVersion === 'number' &&
     p.schemaVersion > 0 &&
     typeof p.packageContentHash === 'string' &&
-    p.packageContentHash.length === 64 &&
+    /^[0-9a-f]{64}$/i.test(p.packageContentHash) &&
     typeof p.promotedAt === 'string' &&
     p.promotedAt.length > 0
   );
@@ -48,7 +60,7 @@ export function isSameActiveGeneration(
   current: ActivePointer | null,
   manifest: ProvisioningManifest
 ): boolean {
-  if (!current) return false;
+  if (!current || !isValidActivePointer(current)) return false;
   return (
     current.snapshotId === manifest.snapshotId &&
     current.packageContentHash.toLowerCase() === manifest.packageContentHash.toLowerCase()

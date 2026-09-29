@@ -1,23 +1,27 @@
 /**
- * Xandeflix Prebuilt — Capacitor Filesystem Catalog Storage
+ * Xandeflix Prebuilt � Capacitor Filesystem Catalog Storage
  *
- * Implementação de LocalCatalogStorage persistida em Directory.Data (app private storage).
+ * Implementa��o de LocalCatalogStorage persistida em Directory.Data (app private storage).
  *
- * Princípios:
+ * Princ�pios:
  * - APP_PRIVATE_STORAGE = SIM (Directory.Data privado do aplicativo)
  * - LOCAL_STORAGE_STRATEGY = CAPACITOR_FILESYSTEM_CANONICAL_JSON
  * - STAGING_GENERATION = prebuilt/staging/<snapshotId>/
  * - SNAPSHOT_GENERATION = prebuilt/snapshots/<snapshotId>/
  * - ACTIVE_POINTER = prebuilt/active.json
+ * - MAX_SINGLE_STORAGE_WRITE_ESTIMATE = 256_KB
  */
 
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
 import type { PrebuiltCatalog } from '../../contracts/catalog.ts';
 import type { ProvisioningManifest } from '../../provisioning/types.ts';
 import type { PrebuiltSearchIndex } from '../../search/search-index.types.ts';
+import type { LiveCatalog } from '../../catalog/live/live-tv.types.ts';
 import type { ActivePointer } from '../types.ts';
-import type { LocalCatalogStorage } from './storage.interface.ts';
+import type { LocalCatalogStorage, CatalogSegmentEntry } from './storage.interface.ts';
+import { calculateSha256 } from '../../provisioning/integrity.ts';
 import type { RecoveryJournalData } from '../../recovery/recovery.types.ts';
+import { resolveSegmentRelativePath } from './segment-path-resolver.ts';
 
 const PREBUILT_DIR = 'prebuilt';
 const ACTIVE_POINTER_FILE = `${PREBUILT_DIR}/active.json`;
@@ -36,7 +40,7 @@ export class CapacitorFilesystemStorage implements LocalCatalogStorage {
         recursive: true,
       });
     } catch {
-      // Diretório já existente, ignorar erro
+      // Diret�rio j� existente, ignorar erro
     }
   }
 
@@ -64,36 +68,186 @@ export class CapacitorFilesystemStorage implements LocalCatalogStorage {
     });
   }
 
+  private async writeLargeFile(
+    path: string,
+    content: string,
+    chunkSize = 256 * 1024
+  ): Promise<void> {
+    if (content.length <= chunkSize) {
+      await Filesystem.writeFile({
+        path,
+        data: content,
+        directory: this.baseDir,
+        encoding: Encoding.UTF8,
+      });
+      return;
+    }
+
+    const firstChunk = content.slice(0, chunkSize);
+    await Filesystem.writeFile({
+      path,
+      data: firstChunk,
+      directory: this.baseDir,
+      encoding: Encoding.UTF8,
+    });
+
+    for (let offset = chunkSize; offset < content.length; offset += chunkSize) {
+      const chunk = content.slice(offset, offset + chunkSize);
+      await Filesystem.appendFile({
+        path,
+        data: chunk,
+        directory: this.baseDir,
+        encoding: Encoding.UTF8,
+      });
+    }
+  }
+
+  private async readTextFileSafely(path: string): Promise<string | null> {
+    if (typeof window !== 'undefined' && (window as any).Capacitor?.convertFileSrc) {
+      try {
+        const stat = await Filesystem.getUri({
+          path,
+          directory: this.baseDir,
+        });
+        const webUri = (window as any).Capacitor.convertFileSrc(stat.uri);
+        const res = await fetch(webUri);
+        if (res.ok) {
+          return await res.text();
+        }
+      } catch {
+        // Fallback para readFile tradicional
+      }
+    }
+
+    try {
+      const file = await Filesystem.readFile({
+        path,
+        directory: this.baseDir,
+        encoding: Encoding.UTF8,
+      });
+      return typeof file.data === 'string' ? file.data : null;
+    } catch {
+      return null;
+    }
+  }
+
+  private async writeBinaryFile(
+    path: string,
+    buffer: Buffer | Uint8Array,
+  ): Promise<void> {
+    if (typeof Buffer !== 'undefined' && Buffer.isBuffer(buffer)) {
+      await Filesystem.writeFile({
+        path,
+        data: buffer.toString('base64'),
+        directory: this.baseDir,
+      });
+      return;
+    }
+    const uint8 = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
+    let binary = '';
+    const len = uint8.byteLength;
+    const chunkSize = 32768;
+    for (let i = 0; i < len; i += chunkSize) {
+      const chunk = uint8.subarray(i, Math.min(i + chunkSize, len));
+      binary += String.fromCharCode.apply(null, chunk as any);
+    }
+    const base64Data = btoa(binary);
+    await Filesystem.writeFile({
+      path,
+      data: base64Data,
+      directory: this.baseDir,
+    });
+  }
+
+  private async readBinaryFileSafely(path: string): Promise<Uint8Array | null> {
+    if (typeof window !== 'undefined' && (window as any).Capacitor?.convertFileSrc) {
+      try {
+        const stat = await Filesystem.getUri({
+          path,
+          directory: this.baseDir,
+        });
+        const webUri = (window as any).Capacitor.convertFileSrc(stat.uri);
+        const res = await fetch(webUri);
+        if (res.ok) {
+          const buf = await res.arrayBuffer();
+          return new Uint8Array(buf);
+        }
+      } catch {
+        // Fallback para readFile tradicional
+      }
+    }
+
+    try {
+      const file = await Filesystem.readFile({
+        path,
+        directory: this.baseDir,
+      });
+      if (typeof file.data === 'string') {
+        if (typeof Buffer !== 'undefined') {
+          return Buffer.from(file.data, 'base64');
+        }
+        const binaryString = atob(file.data);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+        return bytes;
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  }
+
   async writeStaging(
     snapshotId: string,
     manifest: ProvisioningManifest,
-    catalog: PrebuiltCatalog,
-    searchIndex?: PrebuiltSearchIndex | null
+    catalog: PrebuiltCatalog | string,
+    searchIndex?: PrebuiltSearchIndex | Buffer | Uint8Array | null,
+    liveCatalog?: LiveCatalog | null
   ): Promise<void> {
     const stagingSnapDir = `${STAGING_DIR}/${snapshotId}`;
     await this.ensureDir(stagingSnapDir);
 
-    await Filesystem.writeFile({
-      path: `${stagingSnapDir}/manifest.json`,
-      data: JSON.stringify(manifest, null, 2),
-      directory: this.baseDir,
-      encoding: Encoding.UTF8,
-    });
+    await this.writeLargeFile(
+      `${stagingSnapDir}/manifest.json`,
+      JSON.stringify(manifest, null, 2)
+    );
 
-    await Filesystem.writeFile({
-      path: `${stagingSnapDir}/catalog.json`,
-      data: JSON.stringify(catalog, null, 2),
-      directory: this.baseDir,
-      encoding: Encoding.UTF8,
-    });
+    await this.writeLargeFile(
+      `${stagingSnapDir}/catalog.json`,
+      typeof catalog === 'string' ? catalog : JSON.stringify(catalog, null, 2)
+    );
 
-    if (searchIndex) {
-      await Filesystem.writeFile({
-        path: `${stagingSnapDir}/search-index.json`,
-        data: JSON.stringify(searchIndex, null, 2),
+    const isBuffer =
+      (typeof Buffer !== 'undefined' && Buffer.isBuffer(searchIndex)) ||
+      searchIndex instanceof Uint8Array;
+
+    if (isBuffer) {
+      await this.writeBinaryFile(
+        `${stagingSnapDir}/compact-search-index-v2.bin`,
+        searchIndex as Buffer | Uint8Array
+      );
+    } else if (searchIndex) {
+      await this.writeLargeFile(
+        `${stagingSnapDir}/search-index.json`,
+        JSON.stringify(searchIndex, null, 2)
+      );
+    }
+
+    try {
+      await Filesystem.deleteFile({
+        path: `${stagingSnapDir}/live_catalog.json`,
         directory: this.baseDir,
-        encoding: Encoding.UTF8,
       });
+    } catch {
+      // Arquivo opcional inexistente.
+    }
+    if (liveCatalog) {
+      await this.writeLargeFile(
+        `${stagingSnapDir}/live_catalog.json`,
+        JSON.stringify(liveCatalog, null, 2)
+      );
     }
   }
 
@@ -102,87 +256,303 @@ export class CapacitorFilesystemStorage implements LocalCatalogStorage {
   ): Promise<{
     manifest: ProvisioningManifest;
     catalog: PrebuiltCatalog;
+    rawCatalogJson?: string;
     searchIndex?: PrebuiltSearchIndex | null;
+    searchIndexBuffer?: Buffer | Uint8Array | null;
+    liveCatalog?: LiveCatalog | null;
   } | null> {
     const stagingSnapDir = `${STAGING_DIR}/${snapshotId}`;
     try {
-      const manifestFile = await Filesystem.readFile({
-        path: `${stagingSnapDir}/manifest.json`,
-        directory: this.baseDir,
-        encoding: Encoding.UTF8,
-      });
-      const catalogFile = await Filesystem.readFile({
-        path: `${stagingSnapDir}/catalog.json`,
-        directory: this.baseDir,
-        encoding: Encoding.UTF8,
-      });
+      const manifestData = await this.readTextFileSafely(`${stagingSnapDir}/manifest.json`);
+      const catalogData = await this.readTextFileSafely(`${stagingSnapDir}/catalog.json`);
 
-      if (typeof manifestFile.data !== 'string' || typeof catalogFile.data !== 'string') {
+      if (!manifestData || !catalogData) {
         return null;
       }
 
-      const manifest = JSON.parse(manifestFile.data) as ProvisioningManifest;
-      const catalog = JSON.parse(catalogFile.data) as PrebuiltCatalog;
+      const manifest = JSON.parse(manifestData) as ProvisioningManifest;
+      const catalog = JSON.parse(catalogData) as PrebuiltCatalog;
 
       let searchIndex: PrebuiltSearchIndex | null = null;
-      try {
-        const indexFile = await Filesystem.readFile({
-          path: `${stagingSnapDir}/search-index.json`,
-          directory: this.baseDir,
-          encoding: Encoding.UTF8,
-        });
-        if (typeof indexFile.data === 'string') {
-          searchIndex = JSON.parse(indexFile.data) as PrebuiltSearchIndex;
+      let searchIndexBuffer: Uint8Array | Buffer | null = null;
+
+      const indexData = await this.readTextFileSafely(`${stagingSnapDir}/search-index.json`);
+      if (indexData) {
+        try {
+          searchIndex = JSON.parse(indexData) as PrebuiltSearchIndex;
+        } catch {
+          // search-index opcional para pacotes v1
         }
-      } catch {
-        // search-index opcional para pacotes v1
       }
 
-      return { manifest, catalog, searchIndex };
+      searchIndexBuffer = await this.readBinaryFileSafely(`${stagingSnapDir}/compact-search-index-v2.bin`);
+
+      let liveCatalog: LiveCatalog | null = null;
+      const liveData = await this.readTextFileSafely(`${stagingSnapDir}/live_catalog.json`);
+      if (liveData) {
+        try {
+          liveCatalog = JSON.parse(liveData) as LiveCatalog;
+        } catch {
+          // live_catalog opcional para pacotes sem Live.
+        }
+      }
+
+      return {
+        manifest,
+        catalog,
+        rawCatalogJson: catalogData,
+        searchIndex,
+        searchIndexBuffer,
+        liveCatalog,
+      };
     } catch {
       return null;
     }
   }
 
-  async promoteStaging(snapshotId: string): Promise<void> {
-    const targetSnapDir = `${SNAPSHOTS_DIR}/${snapshotId}`;
+  async writeStagingSegment(snapshotId: string, segmentPath: string, data: string): Promise<void> {
+    const rel = resolveSegmentRelativePath(segmentPath);
+    const fullPath = `${STAGING_DIR}/${snapshotId}/${rel}`;
+    const dir = fullPath.substring(0, fullPath.lastIndexOf('/'));
+    await this.ensureDir(dir);
+    await this.writeLargeFile(fullPath, data, 256 * 1024);
+  }
 
-    const stagingData = await this.readStaging(snapshotId);
-    if (!stagingData) {
-      throw new Error(`[STORAGE_PROMOTION_ERROR] Conteúdo de staging não encontrado para ${snapshotId}`);
-    }
+  async readStagingSegment(snapshotId: string, segmentPath: string): Promise<string | null> {
+    const rel = resolveSegmentRelativePath(segmentPath);
+    return this.readTextFileSafely(`${STAGING_DIR}/${snapshotId}/${rel}`);
+  }
 
-    await this.ensureDir(targetSnapDir);
+  async readActiveSegment(segmentPath: string): Promise<string | null> {
+    const pointer = await this.readActivePointer();
+    if (!pointer) return null;
+    const rel = resolveSegmentRelativePath(segmentPath);
+    return this.readTextFileSafely(`${SNAPSHOTS_DIR}/${pointer.snapshotId}/${rel}`);
+  }
 
-    await Filesystem.writeFile({
-      path: `${targetSnapDir}/manifest.json`,
-      data: JSON.stringify(stagingData.manifest, null, 2),
-      directory: this.baseDir,
-      encoding: Encoding.UTF8,
-    });
-
-    await Filesystem.writeFile({
-      path: `${targetSnapDir}/catalog.json`,
-      data: JSON.stringify(stagingData.catalog, null, 2),
-      directory: this.baseDir,
-      encoding: Encoding.UTF8,
-    });
-
-    if (stagingData.searchIndex) {
-      await Filesystem.writeFile({
-        path: `${targetSnapDir}/search-index.json`,
-        data: JSON.stringify(stagingData.searchIndex, null, 2),
+  async listActiveSegments(): Promise<string[]> {
+    const pointer = await this.readActivePointer();
+    if (!pointer) return [];
+    try {
+      const res = await Filesystem.readdir({
+        path: `${SNAPSHOTS_DIR}/${pointer.snapshotId}/segments`,
         directory: this.baseDir,
-        encoding: Encoding.UTF8,
       });
+      return (res.files || []).map((f) => `segments/${typeof f === 'string' ? f : f.name}`);
+    } catch {
+      return [];
     }
   }
 
-  async readActiveCatalog(): Promise<PrebuiltCatalog | null> {
+    async promoteStaging(snapshotId: string): Promise<void> {
+    const stagingSnapDir = `${STAGING_DIR}/${snapshotId}`;
+    const targetSnapDir = `${SNAPSHOTS_DIR}/${snapshotId}`;
+
+    const manifestData = await this.readTextFileSafely(`${stagingSnapDir}/manifest.json`);
+    if (!manifestData) {
+      throw new Error(`[STORAGE_PROMOTION_ERROR] manifest.json não encontrado em staging para ${snapshotId}`);
+    }
+    const manifest = JSON.parse(manifestData) as ProvisioningManifest;
+
+    await this.ensureDir(targetSnapDir);
+
+    try {
+      // 1. Cópia obrigatória do manifest
+      await Filesystem.copy({
+        from: `${stagingSnapDir}/manifest.json`,
+        to: `${targetSnapDir}/manifest.json`,
+        directory: this.baseDir,
+        toDirectory: this.baseDir,
+      });
+
+      // 2. Cópia obrigatória do catalog header
+      await Filesystem.copy({
+        from: `${stagingSnapDir}/catalog.json`,
+        to: `${targetSnapDir}/catalog.json`,
+        directory: this.baseDir,
+        toDirectory: this.baseDir,
+      });
+
+      // 3. Arquivos opcionais (apenas se presentes em staging)
+      try {
+        await Filesystem.copy({
+          from: `${stagingSnapDir}/search-index.json`,
+          to: `${targetSnapDir}/search-index.json`,
+          directory: this.baseDir,
+          toDirectory: this.baseDir,
+        });
+      } catch {
+        // opcional
+      }
+      try {
+        await Filesystem.copy({
+          from: `${stagingSnapDir}/compact-search-index-v2.bin`,
+          to: `${targetSnapDir}/compact-search-index-v2.bin`,
+          directory: this.baseDir,
+          toDirectory: this.baseDir,
+        });
+      } catch {
+        // opcional
+      }
+      try {
+        await Filesystem.copy({
+          from: `${stagingSnapDir}/compact-search-index-v2.bin`,
+          to: `compact-search-index-v2.bin`,
+          directory: this.baseDir,
+          toDirectory: this.baseDir,
+        });
+      } catch {
+        // opcional
+      }
+      try {
+        await Filesystem.copy({
+          from: `${stagingSnapDir}/live_catalog.json`,
+          to: `${targetSnapDir}/live_catalog.json`,
+          directory: this.baseDir,
+          toDirectory: this.baseDir,
+        });
+      } catch {
+        // opcional
+      }
+
+      // 4. Se o manifest declara segmentos, a verificação e cópia é ESTRITA e MANIFEST-DRIVEN
+      const declaredSegments: CatalogSegmentEntry[] = Array.isArray((manifest as any).segments)
+        ? (manifest as any).segments
+        : [];
+
+      if (declaredSegments.length > 0) {
+        const expectedCount = declaredSegments.length;
+        await this.ensureDir(`${targetSnapDir}/segments`);
+        let copiedCount = 0;
+
+        for (const seg of declaredSegments) {
+          const rel = resolveSegmentRelativePath(seg.fileName);
+          const fileName = rel.replace(/^segments\//, '');
+          const stagingSegmentPath = `${stagingSnapDir}/${rel}`;
+          const targetSegmentPath = `${targetSnapDir}/${rel}`;
+
+          // Verifica se existe em staging antes de copiar
+          try {
+            await Filesystem.stat({
+              path: stagingSegmentPath,
+              directory: this.baseDir,
+            });
+          } catch (statErr) {
+            throw new Error(
+              `[PROMOTION_SEGMENT_MISSING_IN_STAGING] Segmento obrigatório '${fileName}' ausente em staging: ${(statErr as Error).message}`
+            );
+          }
+
+          // Executa cópia do segmento (qualquer erro é FATAL)
+          try {
+            await Filesystem.copy({
+              from: stagingSegmentPath,
+              to: targetSegmentPath,
+              directory: this.baseDir,
+              toDirectory: this.baseDir,
+            });
+          } catch (copyErr) {
+            throw new Error(
+              `[PROMOTION_SEGMENT_COPY_FAILED] Falha ao copiar segmento obrigatório '${fileName}': ${(copyErr as Error).message}`
+            );
+          }
+
+          // Verifica se existe no target após cópia
+          let targetStat;
+          try {
+            targetStat = await Filesystem.stat({
+              path: targetSegmentPath,
+              directory: this.baseDir,
+            });
+          } catch (targetStatErr) {
+            throw new Error(
+              `[PROMOTION_SEGMENT_ABSENT_IN_TARGET] Segmento '${fileName}' ausente no diretório target após cópia: ${(targetStatErr as Error).message}`
+            );
+          }
+
+          // Validação de tamanho se disponível no manifest
+          if (typeof seg.byteSize === 'number' && seg.byteSize > 0) {
+            if (typeof targetStat.size === 'number' && targetStat.size > 0 && targetStat.size !== seg.byteSize) {
+              throw new Error(
+                `[PROMOTION_SEGMENT_SIZE_MISMATCH] Tamanho divergente no segmento '${fileName}': esperado=${seg.byteSize}, real=${targetStat.size}`
+              );
+            }
+          }
+
+          // Validação de hash se disponível no manifest
+          if (typeof seg.sha256 === 'string' && seg.sha256.trim() !== '') {
+            const targetContent = await this.readTextFileSafely(targetSegmentPath);
+            if (!targetContent) {
+              throw new Error(
+                `[PROMOTION_SEGMENT_READ_FAILED] Falha ao ler segmento target '${fileName}' para verificação de hash`
+              );
+            }
+            const targetSha = calculateSha256(targetContent);
+            if (targetSha !== seg.sha256) {
+              throw new Error(
+                `[PROMOTION_SEGMENT_HASH_MISMATCH] Hash divergente no segmento '${fileName}': esperado=${seg.sha256}, real=${targetSha}`
+              );
+            }
+          }
+
+          copiedCount++;
+        }
+
+        if (copiedCount !== expectedCount) {
+          throw new Error(
+            `[PROMOTION_SEGMENT_COUNT_MISMATCH] Contagem de segmentos copiados divergente do manifest: esperado=${expectedCount}, copiado=${copiedCount}`
+          );
+        }
+
+        // Dupla checagem física via readdir no target
+        const targetReaddir = await Filesystem.readdir({
+          path: `${targetSnapDir}/segments`,
+          directory: this.baseDir,
+        });
+        const physicalCount = (targetReaddir.files || []).length;
+        if (physicalCount !== expectedCount) {
+          throw new Error(
+            `[PROMOTION_TARGET_SEGMENT_COUNT_MISMATCH] Contagem física no target divergente do manifest: esperado=${expectedCount}, encontrado=${physicalCount}`
+          );
+        }
+      }
+    } catch (err) {
+      try {
+        await Filesystem.rmdir({
+          path: targetSnapDir,
+          directory: this.baseDir,
+          recursive: true,
+        });
+      } catch {
+        // Ignora falha secundária de limpeza do target
+      }
+      throw err;
+    }
+  }
+
+async readActiveCatalog(): Promise<PrebuiltCatalog | null> {
     const pointer = await this.readActivePointer();
     if (!pointer) return null;
 
     try {
+      if (typeof window !== 'undefined' && (window as any).Capacitor?.convertFileSrc) {
+        try {
+          const stat = await Filesystem.getUri({
+            path: `${SNAPSHOTS_DIR}/${pointer.snapshotId}/catalog.json`,
+            directory: this.baseDir,
+          });
+          if (stat?.uri) {
+            const webUrl = (window as any).Capacitor.convertFileSrc(stat.uri);
+            const res = await fetch(webUrl);
+            if (res.ok) {
+              return (await res.json()) as PrebuiltCatalog;
+            }
+          }
+        } catch {
+          // Fallback para Filesystem.readFile
+        }
+      }
+
       const catalogFile = await Filesystem.readFile({
         path: `${SNAPSHOTS_DIR}/${pointer.snapshotId}/catalog.json`,
         directory: this.baseDir,
@@ -229,6 +599,19 @@ export class CapacitorFilesystemStorage implements LocalCatalogStorage {
     }
   }
 
+  async readActiveSearchIndexBuffer(): Promise<Buffer | Uint8Array | null> {
+    const pointer = await this.readActivePointer();
+    if (!pointer) return null;
+    return this.readBinaryFileSafely(
+      `${SNAPSHOTS_DIR}/${pointer.snapshotId}/compact-search-index-v2.bin`
+    );
+  }
+
+  async writeActiveSearchIndex(snapshotId: string, index: Buffer | Uint8Array): Promise<void> {
+    await this.ensureDir(`${SNAPSHOTS_DIR}/${snapshotId}`);
+    await this.writeBinaryFile(`${SNAPSHOTS_DIR}/${snapshotId}/compact-search-index-v2.bin`, index);
+  }
+
   async cleanupStaging(snapshotId?: string): Promise<void> {
     try {
       if (snapshotId) {
@@ -245,7 +628,7 @@ export class CapacitorFilesystemStorage implements LocalCatalogStorage {
         });
       }
     } catch {
-      // Ignorar se já não existia
+      // Ignorar se j� n�o existia
     }
   }
 
@@ -287,10 +670,54 @@ export class CapacitorFilesystemStorage implements LocalCatalogStorage {
         });
         indexSize = indexStat.size || 0;
       } catch {
-        // Sem índice no snapshot
+        // Sem �ndice no snapshot
+      }
+      try {
+        const binStat = await Filesystem.stat({
+          path: `${SNAPSHOTS_DIR}/${pointer.snapshotId}/compact-search-index-v2.bin`,
+          directory: this.baseDir,
+        });
+        indexSize += binStat.size || 0;
+      } catch {
+        // Sem �ndice bin�rio no snapshot
       }
 
-      return (pointerStat.size || 0) + (manifestStat.size || 0) + (catalogStat.size || 0) + indexSize;
+      let liveSize = 0;
+      try {
+        const liveStat = await Filesystem.stat({
+          path: `${SNAPSHOTS_DIR}/${pointer.snapshotId}/live_catalog.json`,
+          directory: this.baseDir,
+        });
+        liveSize = liveStat.size || 0;
+      } catch {
+        // Sem live catalog no snapshot.
+      }
+
+      let segmentsSize = 0;
+      try {
+        const segs = await Filesystem.readdir({
+          path: `${SNAPSHOTS_DIR}/${pointer.snapshotId}/segments`,
+          directory: this.baseDir,
+        });
+        if (segs?.files) {
+          for (const f of segs.files) {
+            const fileName = typeof f === 'string' ? f : f.name;
+            try {
+              const segStat = await Filesystem.stat({
+                path: `${SNAPSHOTS_DIR}/${pointer.snapshotId}/segments/${fileName}`,
+                directory: this.baseDir,
+              });
+              segmentsSize += segStat.size || 0;
+            } catch {
+              // ignore
+            }
+          }
+        }
+      } catch {
+        // ignore
+      }
+
+      return (pointerStat.size || 0) + (manifestStat.size || 0) + (catalogStat.size || 0) + indexSize + liveSize + segmentsSize;
     } catch {
       return 0;
     }
@@ -324,6 +751,8 @@ export class CapacitorFilesystemStorage implements LocalCatalogStorage {
     manifest: ProvisioningManifest;
     catalog: PrebuiltCatalog;
     searchIndex?: PrebuiltSearchIndex | null;
+    searchIndexBuffer?: Buffer | Uint8Array | null;
+    liveCatalog?: LiveCatalog | null;
   } | null> {
     const targetSnapDir = `${SNAPSHOTS_DIR}/${snapshotId}`;
     try {
@@ -359,9 +788,26 @@ export class CapacitorFilesystemStorage implements LocalCatalogStorage {
         // search-index opcional para pacotes v1
       }
 
-      return { manifest, catalog, searchIndex };
+      const searchIndexBuffer = await this.readBinaryFileSafely(`${targetSnapDir}/compact-search-index-v2.bin`);
+
+      let liveCatalog: LiveCatalog | null = null;
+      try {
+        const liveFile = await Filesystem.readFile({
+          path: `${targetSnapDir}/live_catalog.json`,
+          directory: this.baseDir,
+          encoding: Encoding.UTF8,
+        });
+        if (typeof liveFile.data === 'string') {
+          liveCatalog = JSON.parse(liveFile.data) as LiveCatalog;
+        }
+      } catch {
+        // live_catalog opcional para snapshots sem Live.
+      }
+
+      return { manifest, catalog, searchIndex, searchIndexBuffer, liveCatalog };
     } catch {
       return null;
     }
   }
 }
+

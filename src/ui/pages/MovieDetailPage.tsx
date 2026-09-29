@@ -8,7 +8,7 @@
  * - PLAYBACK DEFERRED: Botão "Assistir" desabilitado com aviso explicativo do Gate G8.
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import type { CatalogReadModel } from '../../catalog/catalog-read-model.ts';
 import { getMovieDetail } from '../../catalog/catalog-selectors.ts';
 import { Artwork } from '../components/Artwork.tsx';
@@ -22,9 +22,27 @@ interface MovieDetailPageProps {
 
 export const MovieDetailPage: React.FC<MovieDetailPageProps> = ({ movieId, readModel, onBack }) => {
   const detail = getMovieDetail(readModel, movieId);
+  const [detailLoading, setDetailLoading] = useState(!detail);
+  const [, setResolvedVersion] = useState(0);
   const [isResolving, setIsResolving] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [statusKind, setStatusKind] = useState<'info' | 'error' | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    if (readModel.moviesById.has(movieId)) {
+      setDetailLoading(false);
+      return () => { active = false; };
+    }
+    setDetailLoading(true);
+    void readModel.resolveMovieById(movieId).then(() => {
+      if (active) {
+        setDetailLoading(false);
+        setResolvedVersion((value) => value + 1);
+      }
+    });
+    return () => { active = false; };
+  }, [movieId, readModel]);
 
   const handlePlayMovie = useCallback(async () => {
     setIsResolving(true);
@@ -50,6 +68,10 @@ export const MovieDetailPage: React.FC<MovieDetailPageProps> = ({ movieId, readM
       setIsResolving(false);
     }
   }, [movieId, readModel]);
+
+  if (!detail && detailLoading) {
+    return <main className="page-container detail-page"><p>Carregando detalhes do filme...</p></main>;
+  }
 
   if (!detail) {
     return (

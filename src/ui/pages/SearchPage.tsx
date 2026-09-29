@@ -147,7 +147,14 @@ export const SearchPage: React.FC<SearchPageProps> = ({
         </div>
       </div>
 
-      <div className="search-page-body">
+      <div
+        className="search-page-body"
+        onTouchMove={() => {
+          if (document.activeElement instanceof HTMLElement) {
+            document.activeElement.blur();
+          }
+        }}
+      >
         {showResults ? (
           <SearchResults
             results={results}

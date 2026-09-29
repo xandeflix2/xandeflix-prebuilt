@@ -16,8 +16,22 @@ export function calculateSha256(data: string | Buffer | Uint8Array): string {
   if (crypto && typeof crypto.createHash === 'function') {
     return crypto.createHash('sha256').update(data).digest('hex');
   }
-  const bytes = typeof data === 'string' ? new TextEncoder().encode(data) : data;
-  return calculateArtifactDigest(bytes).sha256;
+  return calculateArtifactDigest(data).sha256;
+}
+
+export async function calculateSha256Async(data: string | Buffer | Uint8Array): Promise<string> {
+  if (crypto && typeof crypto.createHash === 'function') {
+    return crypto.createHash('sha256').update(data).digest('hex');
+  }
+  const runtimeCrypto = typeof globalThis !== 'undefined' ? (globalThis.crypto as unknown as { subtle?: SubtleCrypto }) : undefined;
+  if (runtimeCrypto?.subtle && typeof runtimeCrypto.subtle.digest === 'function') {
+    const bytes = typeof data === 'string' ? new TextEncoder().encode(data) : data;
+    const arrayBuffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+    const hashBuf = await runtimeCrypto.subtle.digest('SHA-256', arrayBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuf));
+    return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('').toLowerCase();
+  }
+  return calculateSha256(data);
 }
 
 export interface PackageContentHashInput {
@@ -34,6 +48,9 @@ export interface PackageContentHashInput {
   searchIndexSha256?: string;
   searchIndexSizeBytes?: number;
   searchIndexContentHash?: string;
+  liveCatalogFile?: string;
+  liveCatalogSha256?: string;
+  liveCatalogSizeBytes?: number;
 }
 
 /**
@@ -58,6 +75,9 @@ export function calculatePackageContentHash(input: PackageContentHashInput): str
       searchIndexSha256: input.searchIndexSha256,
       searchIndexSizeBytes: input.searchIndexSizeBytes,
       searchIndexContentHash: input.searchIndexContentHash,
+      liveCatalogFile: input.liveCatalogFile,
+      liveCatalogSha256: input.liveCatalogSha256,
+      liveCatalogSizeBytes: input.liveCatalogSizeBytes,
     });
   } else {
     canonicalPayload = JSON.stringify({
