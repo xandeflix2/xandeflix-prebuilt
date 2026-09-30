@@ -29,7 +29,14 @@ export function movieToViewModel(readModel: CatalogReadModel, movie: Movie): Cat
     originalTitle: movie.originalTitle,
     yearFormatted: readModel.formatYear(movie.year),
     overviewSnippet: movie.overview,
-    posterUri: readModel.resolveArtworkUri(movie.artworkIds, 'poster'),
+    posterUri:
+      (movie as any).posterUri ||
+      (movie as any).posterUrl ||
+      (movie as any).logo ||
+      (movie as any).cover ||
+      (movie as any).poster ||
+      (movie as any).stream_icon ||
+      readModel.resolveArtworkUri(movie.artworkIds, 'poster'),
     backdropUri: readModel.resolveArtworkUri(movie.artworkIds, 'backdrop'),
     genreLabels: readModel.resolveGenreLabels(movie.genreIds),
     categoryLabels: readModel.resolveCategoryLabels(movie.categoryIds),
@@ -45,7 +52,14 @@ export function seriesToViewModel(readModel: CatalogReadModel, series: Series): 
     originalTitle: series.originalTitle,
     yearFormatted: readModel.formatYear(series.year),
     overviewSnippet: series.overview,
-    posterUri: readModel.resolveArtworkUri(series.artworkIds, 'poster'),
+    posterUri:
+      (series as any).posterUri ||
+      (series as any).posterUrl ||
+      (series as any).logo ||
+      (series as any).cover ||
+      (series as any).poster ||
+      (series as any).stream_icon ||
+      readModel.resolveArtworkUri(series.artworkIds, 'poster'),
     backdropUri: readModel.resolveArtworkUri(series.artworkIds, 'backdrop'),
     genreLabels: readModel.resolveGenreLabels(series.genreIds),
     categoryLabels: readModel.resolveCategoryLabels(series.categoryIds),

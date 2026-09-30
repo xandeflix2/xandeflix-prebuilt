@@ -80,7 +80,7 @@ public class MainActivity extends BridgeActivity {
         super.onCreate(savedInstanceState);
         applyAppSystemUiPolicy(getWindow());
         if (getBridge() != null && getBridge().getWebView() != null) {
-            getBridge().getWebView().getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
+            getBridge().getWebView().getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
             bindSafeInsets(getBridge().getWebView());
         }
         Log.i(

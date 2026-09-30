@@ -15,18 +15,23 @@ interface MediaRailProps {
   onItemClick: (item: CatalogItemViewModel) => void;
 }
 
-export const MediaRail: React.FC<MediaRailProps> = ({ id, title, items, onItemClick }) => {
+export const MediaRail = React.memo<MediaRailProps>(function MediaRail({
+  id,
+  title,
+  items,
+  onItemClick,
+}) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: -320, behavior: 'smooth' });
+      scrollContainerRef.current.scrollBy({ left: -320, behavior: 'auto' });
     }
   };
 
   const scrollRight = () => {
     if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: 320, behavior: 'smooth' });
+      scrollContainerRef.current.scrollBy({ left: 320, behavior: 'auto' });
     }
   };
 
@@ -43,7 +48,8 @@ export const MediaRail: React.FC<MediaRailProps> = ({ id, title, items, onItemCl
         <div className="media-rail-controls">
           <button
             type="button"
-            className="focusable-item rail-scroll-btn"
+            className="rail-scroll-btn"
+            tabIndex={-1}
             onClick={scrollLeft}
             aria-label={`Rolar ${title} para esquerda`}
           >
@@ -51,7 +57,8 @@ export const MediaRail: React.FC<MediaRailProps> = ({ id, title, items, onItemCl
           </button>
           <button
             type="button"
-            className="focusable-item rail-scroll-btn"
+            className="rail-scroll-btn"
+            tabIndex={-1}
             onClick={scrollRight}
             aria-label={`Rolar ${title} para direita`}
           >
@@ -66,4 +73,4 @@ export const MediaRail: React.FC<MediaRailProps> = ({ id, title, items, onItemCl
       </div>
     </section>
   );
-};
+});

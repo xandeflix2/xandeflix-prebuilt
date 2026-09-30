@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Xandeflix Prebuilt â€” Cinematic Design System & Styles (Gate G6)
  *
  * PrincÃ­pios:
@@ -62,15 +62,17 @@ html, body {
 .focusable-item {
   outline: none;
   cursor: pointer;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .focusable-item:focus-visible,
-.focusable-item:focus {
-  outline: 3px solid var(--border-focus);
-  outline-offset: 2px;
-  box-shadow: 0 0 0 5px var(--accent-glow), 0 8px 24px rgba(0, 0, 0, 0.8);
-  transform: scale(1.04);
+.focusable-item:focus,
+.media-card:focus,
+.is-focused {
+  outline: 3px solid #ffffff !important;
+  outline-offset: 2px !important;
+  transform: none !important;
+  box-shadow: none !important;
+  position: relative;
   z-index: 10;
 }
 
@@ -82,7 +84,7 @@ html, body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background: radial-gradient(circle at 50% 0%, #151d32 0%, var(--bg-dark) 70%);
+  background-color: #0b0e14;
 }
 
 .app-content {
@@ -116,8 +118,7 @@ html, body {
   align-items: center;
   justify-content: space-between;
   padding: max(1rem, env(safe-area-inset-top, 0px)) max(2rem, env(safe-area-inset-right, 0px)) 1rem max(2rem, env(safe-area-inset-left, 0px));
-  background: rgba(8, 12, 20, 0.88);
-  backdrop-filter: blur(16px);
+  background: #080c14;
   border-bottom: 1px solid var(--border-subtle);
 }
 
@@ -380,6 +381,7 @@ html, body {
 
 .media-rail {
   margin-bottom: 2.5rem;
+  /* optimized TV layout */
 }
 
 .media-rail-header {
@@ -418,7 +420,7 @@ html, body {
   display: flex;
   gap: 1.25rem;
   overflow-x: auto;
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
   padding: 0.5rem 0.25rem 1rem;
   scrollbar-width: none;
 }
@@ -469,8 +471,7 @@ html, body {
   position: absolute;
   top: 8px;
   left: 8px;
-  background: rgba(8, 12, 20, 0.85);
-  backdrop-filter: blur(4px);
+  background: rgba(8, 12, 20, 0.95);
   color: var(--text-main);
   font-size: 0.625rem;
   font-weight: 800;

@@ -5,6 +5,8 @@
  *
  * Princípios:
  * - RESILIENT FALLBACK: Se uri falhar ou for ausente, renderiza placeholder gráfico local.
+ * - SANITIZED URI: Remove barras duplicadas em URLs malformadas sem quebrar o protocolo.
+ * - RESET ON URI CHANGE: Reseta o estado de erro quando a URI do item é atualizada.
  * - ZERO EXTERNAL FETCH: Não consulta provedores de arte de terceiros em runtime.
  */
 
@@ -17,15 +19,25 @@ interface ArtworkProps {
   className?: string;
 }
 
-export const Artwork: React.FC<ArtworkProps> = ({
+export const Artwork = React.memo<ArtworkProps>(function Artwork({
   uri,
   title,
   kind = 'poster',
   className = '',
-}) => {
+}) {
   const [hasError, setHasError] = useState(false);
+  const [lastUri, setLastUri] = useState(uri);
 
-  const showFallback = !uri || hasError;
+  if (uri !== lastUri) {
+    setLastUri(uri);
+    setHasError(false);
+  }
+
+  let cleanUri = uri ? uri.replace(/([^:])\/\//g, '$1/') : undefined;
+  if (cleanUri && cleanUri.startsWith('http://') && (cleanUri.includes('tmdb.org') || cleanUri.includes('themoviedb.org'))) {
+    cleanUri = cleanUri.replace(/^http:\/\//, 'https://');
+  }
+  const showFallback = !cleanUri || hasError;
 
   if (showFallback) {
     return (
@@ -43,11 +55,12 @@ export const Artwork: React.FC<ArtworkProps> = ({
 
   return (
     <img
-      src={uri}
+      src={cleanUri}
       alt={title}
       className={`artwork-img artwork-${kind} ${className}`}
       loading="lazy"
+      decoding="async"
       onError={() => setHasError(true)}
     />
   );
-};
+});

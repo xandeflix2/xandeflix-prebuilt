@@ -940,6 +940,10 @@ export class RealSourceImporterService {
         artworkIds: [],
         seasonIds,
       };
+      if (s.logo) {
+        (seriesObj as any).posterUrl = s.logo;
+        (seriesObj as any).posterUri = s.logo;
+      }
       currentSeriesBatch.push(seriesObj);
       if (firstFoldSeries.length < 100) {
         firstFoldSeries.push(seriesObj);
