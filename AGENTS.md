@@ -8,8 +8,9 @@
 
 - **PROJECT**: `XANDEFLIX_PREBUILT`
 - **LOCAL_WORKSPACE**: `C:\Xandeflix\xandeflix-prebuilt-c11-main`
-- **SOURCE_EVIDENCE_WORKSPACE**: `C:\Xandeflix\xandeflix-prebuilt` (evidencia historica somente leitura)
-- **WORKSPACE_ROLE**: `ACTIVE_ISOLATED_C11_CONTINUATION`
+- **SOURCE_EVIDENCE_WORKSPACE**: `C:\Xandeflix\xandeflix-prebuilt` (evidencia historica opcional, somente leitura; nao e dependencia operacional)
+- **WORKSPACE_ROLE**: `ACTIVE_INDEPENDENT_C11_CLONE`
+- **GIT_STORAGE**: `C:\Xandeflix\xandeflix-prebuilt-c11-main\.git` (diretorio proprio; sem Git comum externo)
 - **EXPECTED_GIT_REPOSITORY**: `xandeflix2/xandeflix-prebuilt`
 - **EXPECTED_REMOTE_ORIGIN**: `https://github.com/xandeflix2/xandeflix-prebuilt.git`
 - **EXPECTED_BRANCH**: `main`
@@ -19,9 +20,9 @@
 - **NEW_SUPABASE_GITHUB_REPOSITORY**: `xandeflix2/xandeflix-prebuilt`
 - **ANDROID_PACKAGE_ID**: `com.xandeflix.prebuilt`
 
-O `LOCAL_WORKSPACE` e o workspace ativo da continuacao C11 isolada na branch `main`. O `SOURCE_EVIDENCE_WORKSPACE` e preservado como evidencia historica e nao deve ser editado, buildado ou ter operacoes Git executadas nele.
+O `LOCAL_WORKSPACE` e o clone independente ativo da C11 na branch `main`, vinculado ao mesmo repositorio esperado. Nao depende da pasta historica para executar Git, desenvolver ou compilar. O `SOURCE_EVIDENCE_WORKSPACE` e preservado como evidencia historica opcional e nao deve ser editado, buildado ou ter operacoes Git executadas nele. Sua exclusao depende de autorizacao futura; backup privado e procedimento em `docs/architecture/C11_INDEPENDENT_GIT_MIGRATION.md`.
 
-O worktree ativo pode permanecer dirty pelos arquivos pertencentes exclusivamente ao manifesto C11 previamente adjudicado; nao exigir `git status` limpo nem normalizar esse estado. Qualquer arquivo dirty fora do manifesto C11 conhecido, ou qualquer nova divergencia de proveniencia, continua exigindo parada imediata (`STOP_ON_CONFLICT=SIM`).
+O workspace ativo pode permanecer dirty pelos arquivos pertencentes exclusivamente ao manifesto C11 previamente adjudicado e aos registros locais da migracao independente autorizada; nao exigir `git status` limpo nem normalizar esse estado. Qualquer arquivo dirty fora do manifesto C11 conhecido, ou qualquer nova divergencia de proveniencia, continua exigindo parada imediata (`STOP_ON_CONFLICT=SIM`).
 
 ---
 

@@ -1,5 +1,33 @@
 # Relatorio de Evolucao (Evolution Report)
 
+## 2026-10-05 — Autorização de publicação dos registros independentes
+
+Usuário aprovou nominalmente commit e push para alinhamento de C11/main. Emenda
+prévia limita publicação aos oito documentos da migração/consolidação; histórico
+retido, nenhuma mudança funcional. Git próprio e remoto canônico confirmados,
+parentfd2f561; GitHub permite push e não tem workflows. Candidatos sem segredos
+de alta confiança, lock49+9 PASS e548 hashes fora da allowlist preservados;
+manifesto/segredos staged precedem commit/push normal; sucesso depende da
+conferência posterior de refs/árvore/status. Sem outra ref, PR, deploy, exclusão,
+APK/reset/aparelhos ou novo Gate. Operacionais/backups permanecem locais.
+[Plano](architecture/C11_INDEPENDENT_GIT_MIGRATION.md).
+
+## 2026-10-05 — Migração administrativa para clone independente
+
+Autorização explícita para migrar sem perder arquivos locais, formalizada em
+spec prévia. Backup completo de C11 e pasta histórica, incluindo arquivos
+ignorados/diretórios vazios/Git antigo; hashes de todas as cópias e fontes PASS.
+Clone HTTPS do mesmo checkpoint, sem checkout/shared/reference, fsck PASS;
+índice read-tree sem -u e troca recuperável apenas de metadata, não da árvore
+de trabalho. Git-dir/common-dir agora C11/.git, uma worktree, main/origin/HEAD
+inalterados; zero apontamento a Git externo. Pasta antiga preservada em leitura.
+AGENTS e notas de sucessão atualizados, sem apagar histórico de consolidação.
+Lock antes/depois49+9, chave16, fonte31, playback11, typecheck e build414 PASS;
+output separado, cinco arquivos byte-idênticos ao dist local. APK e operacionais
+intactos. Sem commit/push/PR, backend, Android/aparelhos ou novo Gate. Histórico
+exclusivamente local antigo retido no backup, não importado automaticamente.
+[Evidência e retenção](evidence/C11_INDEPENDENT_GIT_MIGRATION.md).
+
 ## 2026-10-05 — Checkpoint adicional e análise de deploy em leitura
 
 Pedido nominal de commit local; emenda/allowlist21 antes de staging. Revisão das

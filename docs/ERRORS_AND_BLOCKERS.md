@@ -1,5 +1,55 @@
 # Registro de Erros e Bloqueadores (Errors and Blockers)
 
+## 2026-10-05 — INDEPENDENT_GIT_RECORDS_PUBLICATION_AUTHORIZED
+
+Nova autorização explícita de commit/push, oito documentos somente; parent/remoto
+fd2f561, Git próprio correto, zero hooks ativos/workflows. Nenhum conflito de
+proveniência detectado. O sucesso do ciclo de migração anterior não dispensa
+revisão do manifesto/segredos/refs; divergir/falhar exige STOP, sem force ou teste
+relaxado. Candidatos sem segredos de alta confiança, lock49+9/548 hashes PASS.
+Avisos LF→CRLF preexistentes serão tratados como warning com exitcodes
+conferidos, não redirecionados em PowerShell/Stop. Nenhuma correção funcional,
+limpeza, backend/deploy ou novo Gate autorizado; backups/operacionais privados.
+[Plano vigente](architecture/C11_INDEPENDENT_GIT_MIGRATION.md).
+
+## 2026-10-05 — INDEPENDENT_GIT_MIGRATION_LOCAL_VALIDATIONS
+
+Dependência física da C11 ao Git histórico removida por migração autorizada,
+com backups completos verificados e troca apenas de metadata. Nenhuma falha
+de cópia, hash, clone, fsck, attachment, lock, typecheck ou build observada.
+Consultas auxiliares read-only usaram três nomes inexistentes: EVOLUTION.md,
+test-c11-catalog-promotion-directory-fix.mjs e tsconfig.node.json. Não considerar
+essas consultas válidas: catálogo/lock e arquivos existentes reconferidos com
+EVOLUTION_REPORT.md, test-c11-catalog-promotion-directories.mjs e tsconfig.json
+(noEmit=true); nenhuma alteração funcional motivada por esses erros de consulta.
+Prebuild lock49+9 PASS após AGENTS, build414 sem crypto externalized; avisos
+preexistentes node:fs/node:path provisioning, mixed imports/chunk grande mantidos.
+Git informa futura conversão LF→CRLF em docs conforme core.autocrlf=true,
+preservado; diff --check PASS, sem normalização global. Checagem auxiliar final
+`git diff --name-only 2>$null` foi interrompida pelo PowerShell/Stop ao tratar
+esse warning stderr como NativeCommandError, não por falha de Git/migração.
+Não contar essa tentativa como allowlist PASS; reexecução sem redirecionar stderr
+confirmou exit0, seis docs na allowlist, dois novos registros e sete operacionais
+preservados; backup ignorado/índice sem staging PASS. Testes específicos chave16,
+fonte31/playback11 PASS; teste legado manager-form14/15 permanece pendência
+preexistente, não reexecutado nem relaxado nesta migração administrativa.
+APK/dist/arquivos locais preservados, backup privado e pasta histórica retidos.
+Sem novo commit/push/PR, deploy/db write, aparelho/reset, exclusão ou novo Gate.
+[Evidência](evidence/C11_INDEPENDENT_GIT_MIGRATION.md).
+
+## 2026-10-05 — PUSH_TREE_QUOTING_AUXILIARY_RESOLVED
+
+Usuário autorizou envio dos quatro commits; push normal aceito exit0 e remoto
+fd2f561 confirmado. Verificação auxiliar posterior usou HEAD^{tree} sem aspas:
+PowerShell interpretou scriptblock/adicionou -encodedCommand; resultado inválido
+e comando git falhou. Não classificar essa tentativa como checagem de árvore PASS.
+Reexecução read-only com referências entre aspas e exitcodes conferidos confirmou
+árvore4311479d4d7d37ce71dfccc844f661764ab34665 local/tracking/GitHub idêntica,
+quatro SHAs publicados presentes e ahead/behind0/0. Nenhum novo push/commit, reset
+ou correção funcional. Registros desta entrega permanecem LOCAIS, não publicados
+como quinto commit. Sem backend/deploy/aparelhos/Gate; APK/runtime preservados.
+[Evidência](evidence/C11_GIT_CONSOLIDATION.md).
+
 ## 2026-10-05 — PUSH_ADMINISTRATIVE_EVIDENCE_RECEIVED
 
 Supabase Deploy to production aparece OFF nas capturas da configuração enviadas

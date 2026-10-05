@@ -1,5 +1,47 @@
 # C11 — Consolidação Git no repositório existente — 2026-10-05
 
+## Publicação dos registros da migração — autorização atual — 2026-10-05
+
+Usuário autorizou novo commit e push normal de main dos oito documentos no
+[plano de publicação](C11_INDEPENDENT_GIT_MIGRATION.md). Essa emenda supersede
+somente a retenção local dos registros nos ciclos anteriores abaixo. Sem código,
+APK, backend/deploy, exclusão, PR ou novo Gate; sete operacionais/backups privados
+permanecem fora do Git. Resultado verificado depois do envio, sem antecipar sucesso.
+
+## Sucessão administrativa — Git independente na C11 — 2026-10-05
+
+A dependência física da worktree descrita nas seções históricas abaixo foi
+substituída pela [migração local autorizada](C11_INDEPENDENT_GIT_MIGRATION.md).
+Somente metadata Git da C11 trocada, com backups integrais verificados; pasta
+histórica retida, sem edição/exclusão. Mesmo main/HEAD/origin, sem novo commit,
+push, PR ou deploy. Esta sucessão não autoriza apagar a pasta histórica nem
+publicar os registros locais. [Evidência](../evidence/C11_INDEPENDENT_GIT_MIGRATION.md).
+
+## Emenda vigente — envio autorizado dos quatro commits — 2026-10-05
+
+Usuário respondeu "prossiga" à pergunta expressa sobre enviar os quatro commits
+para main de xandeflix2/xandeflix-prebuilt. GIT_PUSH_AUTHORIZED=SIM, somente
+push normal origin main, HEAD fd2f561f55aa002534b4f724f5b557755d486a95;
+GIT_COMMIT_AUTHORIZED=NAO_NOVO_COMMIT_NESTE_CICLO; GIT_PR_AUTHORIZED=NAO;
+CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO. Sucede a retenção histórica abaixo.
+
+Preflight relido nesta entrega: C11/toplevel correto, origin esperado, main,
+índice/tracked limpos, quatro commits revisados sobre main remoto e99f830,
+sete operacionais locais preservados. SHA remoto vivo igual ao esperado e
+ancestral do HEAD; STOP em divergência/colisão ou falha de verificação.
+Integrações avaliadas anteriormente e capturas administrativas do usuário
+esclarecem deploy de produção desligado; não alterar integrações/branch policies.
+
+Allowlist desta entrega: metadata Git da worktree para push/verificação e somente
+este plano, sua evidência e ERRORS_AND_BLOCKERS para registro LOCAL de autorização,
+resultado e eventual erro auxiliar. Não
+staging/commit adicional dos registros: enviar exatamente os quatro checkpoints
+aprovados, não um quinto. Sem patch/build/APK/backend/migração/deploy/aparelho/PR/
+reset/limpeza/novo Gate. Publicar arquivos de funções/migrations não é executá-los.
+Após envio confirmar main remoto==HEAD, tracking sem ahead/behind, árvore remota
+e quatro commits presentes, somente estes registros locais modificados e
+sete operacionais não rastreados. Relatar explicitamente registros não publicados.
+
 ## Emenda vigente — novo commit local e análise do push — 2026-10-05
 
 Pedido explícito do usuário: "prossiga com o commit e analise para o push".

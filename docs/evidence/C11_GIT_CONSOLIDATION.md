@@ -1,5 +1,68 @@
 # C11 — Checkpoint Git local e análise de publicação — 2026-10-05
 
+## Sucessão autorizada — publicação documental — 2026-10-05
+
+Novo pedido nominal de commit/push autoriza agora publicar os oito registros
+da migração independente, conforme [plano vigente](../architecture/C11_INDEPENDENT_GIT_MIGRATION.md).
+Afirmações de registros "LOCAIS/não publicados" abaixo eram verdadeiras nos ciclos
+anteriores, não proibição permanente. Só main/origin normal; nenhum patch funcional,
+backend/deploy, APK, aparelho, exclusão ou novo Gate. Resultado do envio será
+conferido por refs/árvore/status; arquivos operacionais e backups não entram.
+
+## Atualização de armazenamento local — 2026-10-05
+
+As advertências abaixo sobre Git compartilhado documentam a situação anterior.
+A C11 recebeu `.git` próprio na [migração administrativa autorizada](C11_INDEPENDENT_GIT_MIGRATION.md),
+com o mesmo checkpoint publicado e todos os arquivos locais preservados em backup.
+A pasta histórica continua retida, mas não é mais dependência da C11. Nenhuma
+nova publicação Git/deploy nem autorização de exclusão neste ciclo.
+
+## Entrega Git autorizada — registro local — 2026-10-05
+
+Usuário autorizou nominalmente enviar os quatro commits à main do repo esperado.
+Spec de entrega no plano antes do push; GIT_PUSH_AUTHORIZED=SIM;
+GIT_COMMIT_AUTHORIZED=NAO_NOVO_COMMIT; GIT_PR_AUTHORIZED=NAO;
+CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO. Registros desta entrega mantidos
+localmente, sem criar/publicar um quinto commit. Seções abaixo são checkpoints
+anteriores e não devem ser interpretadas como retenção vigente desta autorização.
+
+Preflight C11/main/origin esperado, HEAD fd2f561f55aa002534b4f724f5b557755d486a95;
+tracked/índice limpos antes do registro e sete operacionais preservados. Remoto
+vivo e99f830a24b5de6dd74b4397f1ed6f0995bc8483, ancestral do HEAD: fast-forward.
+Quatro commits revisados:0eb3272,f0fdb68,995de5f,fd2f561. Nenhuma edição funcional,
+teste relaxado, novo build ou instalação; validações anteriores não reexecutadas.
+Skill Supabase separa publicação dos arquivos históricos de migrations/funções
+de aplicação no ambiente real: não executar db push/repair/deploy nem alterar
+integrações. Nenhuma declaração de beta>100, Fire<=60s ou HTTP403 resolvido.
+
+### Resultado fechado — envio dos quatro commits
+
+Push normal origin refs/heads/main:refs/heads/main aceito, exit0:
+e99f830..fd2f561, Done. Sem force, amend, novo commit, PR ou outra ref.
+git ls-remote e GitHub REST confirmam main
+fd2f561f55aa002534b4f724f5b557755d486a95; origin/main==HEAD e ahead/behind0/0.
+Os quatro SHAs conferidos individualmente via GitHub; árvore do último commit
+4311479d4d7d37ce71dfccc844f661764ab34665 igual à árvore local/tracking.
+Verificação posterior GitHub:0 check-runs,0 workflow runs,0 deployments retornados.
+Não é promessa de ausência universal de efeitos futuros em serviços externos.
+
+Checagem auxiliar inicial git rev-parse HEAD^{tree} sem aspas foi interpretada
+pelo PowerShell como scriptblock e adicionou -encodedCommand; não retornou árvore
+válida. Push já tinha terminado com sucesso; nenhuma nova escrita/novo push.
+Reexecução com 'HEAD^{tree}'/'origin/main^{tree}', exitcodes verificados e consulta
+GitHub independente confirmaram a árvore correta. Falha registrada também em
+ERRORS_AND_BLOCKERS; allowlist documental estendida antes desse registro.
+
+433 hashes reconferidos:405 runtime e sete operacionais byte-idênticos à baseline
+validada; demais candidatos funcionais preservados. Diferenças somente registros
+documentais. APK8785127bytes/SHA256
+F58BC34DA5B30ADC1E8C0D443086ACB286BEA47E4E4CEE9D23F261B6808881F8 intacto.
+Índice vazio; sete operacionais não rastreados continuam fora do repo. Plano,
+evidência e memória do erro auxiliar são alterações LOCAIS desta entrega, não
+entraram nos quatro commits publicados; nenhum quinto commit criado/solicitado.
+Nenhum db push/repair/function deploy, backend write, instalação/reset, rebuild,
+limpeza ou novo Gate. Pasta do Git comum preservada, não apagar após publicação.
+
 ## Novo checkpoint das duas entregas recentes — 2026-10-05
 
 Pedido atual: "prossiga com o commit e analise para o push"; commit local

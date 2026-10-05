@@ -1,5 +1,31 @@
 # Status Operacional — Xandeflix Prebuilt
 
+## Publicação dos registros da migração autorizada — 2026-10-05
+
+Pedido explícito de commit/push para alinhar C11/main ao repo canônico. Escopo
+documental de oito arquivos; Git independente confirmado, remoto no parentfd2f561,
+zero workflows Actions configurados. Candidatos sem segredos de alta confiança,
+lock49+9 PASS,548 hashes fora da allowlist idênticos; staging literal/revisão dos
+blobs precedem envio, resultado será confirmado por refs/árvore/status.
+Código/APK/dist e sete operacionais preservados; backups privados ignorados.
+Sem rebuild/backend/deploy/instalação/reset/exclusão/PR ou próximo Gate.
+[Autorização e limites](architecture/C11_INDEPENDENT_GIT_MIGRATION.md).
+
+## C11 com Git próprio; arquivos locais preservados — 2026-10-05
+
+Migração administrativa expressamente autorizada, spec antes da execução.
+Backups integrais das duas pastas verificados por tamanho/SHA256, incluindo
+ignorados, APKs, sete operacionais e metadata Git antiga; zero divergências.
+Troca somente do `.git` apontador da C11 por Git próprio, mesma main/HEAD/origin;
+git-dir/common-dir locais, worktree única, sem alternates/dependência histórica.
+Primeira auditoria pós-troca:8.669 arquivos de trabalho e9.594 históricos idênticos.
+AGENTS atualizado; pasta antiga/backup retidos, nenhuma exclusão autorizada.
+Lock antes/depois49+9, chave16, fonte31, playback11 e typecheck/build414 PASS.
+Web build isolado dentro do backup; cinco outputs idênticos ao dist preservado,
+APK8785127bytes intacto. Sem código/Android/dependências/backend/aparelhos/Gate.
+Nenhum novo commit/push/PR; registros administrativos continuam somente locais.
+[Procedimento e evidência](evidence/C11_INDEPENDENT_GIT_MIGRATION.md).
+
 ## Novo checkpoint local das entregas recentes; análise do push — 2026-10-05
 
 Commit local expressamente autorizado: fonte exclusiva por aparelho, acesso à
