@@ -211,6 +211,8 @@ export class SearchEngine {
         year: doc.year,
         score,
         matchClass,
+        posterUri: (doc as any).posterUri || (doc as any).posterUrl,
+        posterUrl: (doc as any).posterUrl || (doc as any).posterUri,
       });
     }
 

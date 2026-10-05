@@ -124,9 +124,7 @@ export const AsyncCategoryRail = React.memo<AsyncCategoryRailProps>(function Asy
                 ? movieToViewModel(readModel, record as Movie)
                 : seriesToViewModel(readModel, record as Series);
 
-            const seriesPoster = kind === 'series' ? browseService.getSeriesPoster(record.id) : undefined;
             const resolvedPoster =
-              seriesPoster ||
               (record as any).posterUri ||
               (record as any).posterUrl ||
               (record as any).logo ||

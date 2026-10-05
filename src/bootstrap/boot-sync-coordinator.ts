@@ -325,6 +325,18 @@ export class BootSyncCoordinator {
 
     // 1. Checagem de ativação local
     let activation = await this.deviceContext.loadActivationState().catch(() => null);
+
+    if (
+      !activation || activation.status !== 'AUTHORIZED'
+    ) {
+      const res: BootSyncResult = {
+        outcome: 'DEVICE_NOT_AUTHORIZED',
+        syncState: 'IDLE',
+      };
+      this.setState('IDLE', res, 'Aguardando ativação para iniciar o catálogo...');
+      return res;
+    }
+
     const identity = await this.deviceContext.getOrCreateIdentity().catch(() => null);
     const activePointer = await this.bootstrapService.getActivePointer().catch(() => null);
     const hasActiveCatalog = await this.bootstrapService.getStorage().hasActiveCatalog().catch(() => false);

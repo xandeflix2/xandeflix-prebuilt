@@ -86,3 +86,12 @@ Os seguintes aspectos tecnicos permanecem em status **NAO PROVADO** e dependem d
 5. `INCREMENTAL_UPDATE_FINAL_FORMAT`: O mecanismo para atualizacoes delta de catalogos (diff JSON, migracao SQLite incremental, patching binario) ainda nao foi validado.
 6. `PACKAGE_ENCRYPTION_REQUIREMENT`: A necessidade e viabilidade tecnica de criptografia do pacote de provisionamento permanece sob avaliacao.
 7. `PACKAGE_SIGNING_FINAL_MECHANISM`: O mecanismo de assinatura digital (ECDSA, Ed25519) e verificacao de integridade/autoria no dispositivo sera definido e medido nos Gates de seguranca.
+
+## 6. Invariante consolidada C11 — novos dispositivos
+
+Instalacao limpa deve gerar identidade/chave local persistente, ficar pendente
+sem falso erro de licenca e, apos autorizacao real, importar/promover catalogo
+sem depender de diretorios preexistentes. Mudancas devem preservar esse fluxo
+sob [C11_NEW_DEVICE_ACTIVATION_AND_CATALOG_LOCK_V1](C11_NEW_DEVICE_ACTIVATION_LOCK.md).
+Playback permanece independente, device-to-source e sujeito a autorizacao;
+falha de reproducao nao autoriza recriar identidade/chave nem contornar licenca.

@@ -5,8 +5,6 @@
  * Implementação puramente streaming para compatibilidade com browser/WebView sem estourar memória.
  */
 
-import crypto from 'node:crypto';
-
 export interface ArtifactDigest {
   sha256: string;
   sizeBytes: number;
@@ -190,22 +188,12 @@ export function hashBytesPure(bytes: Uint8Array): string {
 
 export function calculateArtifactDigest(buffer: Buffer | Uint8Array | string): ArtifactDigest {
   if (typeof buffer === 'string') {
-    if (crypto && typeof crypto.createHash === 'function') {
-      const hash = crypto.createHash('sha256').update(buffer, 'utf8').digest('hex');
-      const sizeBytes = Buffer.byteLength(buffer, 'utf8');
-      return { sha256: hash.toLowerCase(), sizeBytes };
-    }
     const hash = hashStringPure(buffer);
     const sizeBytes = getUtf8ByteLength(buffer);
     return { sha256: hash.toLowerCase(), sizeBytes };
   }
 
-  let hash: string;
-  if (crypto && typeof crypto.createHash === 'function') {
-    hash = crypto.createHash('sha256').update(buffer).digest('hex');
-  } else {
-    hash = hashBytesPure(buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer));
-  }
+  const hash = hashBytesPure(buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer));
   return {
     sha256: hash.toLowerCase(),
     sizeBytes: buffer.length,

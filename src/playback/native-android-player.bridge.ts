@@ -56,12 +56,19 @@ export interface NativePreviewFullscreenChangedEvent {
   fullscreen: boolean;
 }
 
+export interface NativePreviewTapEvent {
+  previewId: string;
+}
+
 export interface NativeAndroidBackButtonEvent {}
 
 export interface NativePlayerResumeEvent {
   positionMs?: number;
   ended?: boolean;
   errorCode?: string;
+  errorCategory?: 'HTTP_ERROR' | 'NETWORK_TIMEOUT' | 'DECODER_ERROR' | 'SOURCE_UNAVAILABLE'
+    | 'MEDIA_PARSER_FAILURE' | 'MEDIA_ERROR' | 'UNKNOWN';
+  httpStatus?: number;
 }
 
 export interface NativeAndroidPlayerPlugin {
@@ -75,6 +82,7 @@ export interface NativeAndroidPlayerPlugin {
   addListener(eventName: 'resume', listenerFunc: (event: NativePlayerResumeEvent) => void): Promise<PluginListenerHandle>;
   addListener(eventName: 'nativePreviewError', listenerFunc: (event: NativePreviewErrorEvent) => void): Promise<PluginListenerHandle>;
   addListener(eventName: 'nativePreviewFullscreenChanged', listenerFunc: (event: NativePreviewFullscreenChangedEvent) => void): Promise<PluginListenerHandle>;
+  addListener(eventName: 'nativePreviewTap', listenerFunc: (event: NativePreviewTapEvent) => void): Promise<PluginListenerHandle>;
   addListener(eventName: 'androidBackButton', listenerFunc: (event: NativeAndroidBackButtonEvent) => void): Promise<PluginListenerHandle>;
 }
 
@@ -390,6 +398,14 @@ export async function addNativePreviewFullscreenListener(
 ): Promise<PluginListenerHandle> {
   const plugin = pluginInstance || NativeAndroidPlayer;
   return plugin.addListener('nativePreviewFullscreenChanged', listener);
+}
+
+export async function addNativePreviewTapListener(
+  listener: (event: NativePreviewTapEvent) => void,
+  pluginInstance?: NativeAndroidPlayerPlugin
+): Promise<PluginListenerHandle> {
+  const plugin = pluginInstance || NativeAndroidPlayer;
+  return plugin.addListener('nativePreviewTap', listener);
 }
 
 function readNativeErrorCode(err: unknown): NativeAndroidPlayerErrorCode | undefined {

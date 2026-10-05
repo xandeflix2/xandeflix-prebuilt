@@ -1,4 +1,4 @@
-﻿import assert from 'node:assert/strict';
+import assert from 'node:assert/strict';
 
 import {
   RealSourceImporterService,
@@ -106,8 +106,8 @@ assert.equal(result.success, true, `Import bounded-memory falhou: ${result.error
 assert.equal(result.metrics?.rawItemCount, SOURCE_RECORDS, 'T1 failed: rawItemCount != 250000');
 console.log('TEST_T1=PASS');
 
-// T2 maximum batch remains bounded
-assert.equal(IMPORT_BATCH_SIZE, 1000, 'T2 failed: IMPORT_BATCH_SIZE != 1000');
+// T2 maximum batch remains bounded (elevated to 2500 for I/O reduction)
+assert.ok(IMPORT_BATCH_SIZE >= 1000 && IMPORT_BATCH_SIZE <= 3000, `T2 failed: IMPORT_BATCH_SIZE ${IMPORT_BATCH_SIZE} out of bounded range [1000, 3000]`);
 console.log('TEST_T2=PASS');
 
 // T3 no unbounded movies accumulation

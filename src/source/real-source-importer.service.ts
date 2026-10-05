@@ -31,7 +31,7 @@ import {
 } from './source-classification-profile.ts';
 import { iterateUtf8Lines } from './m3u-line-stream.ts';
 import { parseM3uEpisodeIdentity, parseM3uExtInfLine } from './m3u-extinf-parser.ts';
-import { bootTelemetry, yieldToEventLoop } from '../diagnostics/boot-telemetry.ts';
+import { bootTelemetry } from '../diagnostics/boot-telemetry.ts';
 import type {
   LocalCatalogStorage,
   SegmentedCatalogManifest,
@@ -377,7 +377,7 @@ export class RealSourceImporterService {
           containerExtension: m.container_extension || 'mp4',
         });
 
-        firstFoldMovies.push({
+        const movieObj: Movie = {
           id: movieId,
           title,
           year,
@@ -386,7 +386,13 @@ export class RealSourceImporterService {
           artworkIds: m.stream_icon ? [artworkId] : [],
           streamIds: [streamId],
           externalIds: { sourceItemId: String(m.stream_id) },
-        });
+        };
+        if (m.stream_icon) {
+          (movieObj as any).posterUrl = String(m.stream_icon);
+          (movieObj as any).posterUri = String(m.stream_icon);
+          (movieObj as any).cover = String(m.stream_icon);
+        }
+        firstFoldMovies.push(movieObj);
       }
     }
 
@@ -409,7 +415,7 @@ export class RealSourceImporterService {
           firstFoldArtworks.push({ id: artworkId, kind: 'poster', uri: String(s.cover) });
         }
 
-        firstFoldSeries.push({
+        const seriesObj: Series = {
           id: seriesId,
           title,
           year,
@@ -418,7 +424,13 @@ export class RealSourceImporterService {
           artworkIds: s.cover ? [artworkId] : [],
           seasonIds: [],
           externalIds: { sourceItemId: String(s.series_id) },
-        });
+        };
+        if (s.cover) {
+          (seriesObj as any).posterUrl = String(s.cover);
+          (seriesObj as any).posterUri = String(s.cover);
+          (seriesObj as any).cover = String(s.cover);
+        }
+        firstFoldSeries.push(seriesObj);
       }
     }
 
@@ -545,7 +557,7 @@ export class RealSourceImporterService {
     bootTelemetry.mark('IMPORT_FETCH_STARTED');
 
     let transportObservation: SanitizedTransportObservation | undefined;
-    let chunkIterator: AsyncIterable<Uint8Array>;
+    let chunkIterator: AsyncIterable<Uint8Array | string>;
     let getSourcePayloadSizeBytes: (() => number | undefined) | undefined;
     const tFetchStart = performance.now();
 
@@ -812,6 +824,13 @@ export class RealSourceImporterService {
           artworkIds: artwork ? [artId] : [],
           streamIds: [streamId],
         };
+        if (safeLogo) {
+          (episode as any).posterUrl = safeLogo;
+          (episode as any).posterUri = safeLogo;
+          (episode as any).thumbnailUri = safeLogo;
+          (episode as any).thumbnailUrl = safeLogo;
+          (episode as any).logo = safeLogo;
+        }
 
         writer.addEpisode(episode, stream, artwork);
       } else if (classification.canonicalKind === 'movie') {
@@ -846,6 +865,14 @@ export class RealSourceImporterService {
           streamIds: [streamId],
           durationSeconds: extInf.duration > 0 ? extInf.duration : undefined,
         };
+        if (safeLogo) {
+          (movie as any).posterUrl = safeLogo;
+          (movie as any).posterUri = safeLogo;
+          (movie as any).backdropUrl = safeLogo;
+          (movie as any).backdropUri = safeLogo;
+          (movie as any).logo = safeLogo;
+          (movie as any).cover = safeLogo;
+        }
 
         writer.addMovie(movie, stream, artwork);
       } else if (classification.canonicalKind === 'unresolved') {
@@ -899,7 +926,7 @@ export class RealSourceImporterService {
     });
 
     const tNormStart = performance.now();
-    const BATCH_SIZE = 1000;
+    const BATCH_SIZE = 2500;
     let currentSeriesBatch: Series[] = [];
     let currentSeasonsBatch: Season[] = [];
     const firstFoldSeries: Series[] = [];
@@ -927,7 +954,6 @@ export class RealSourceImporterService {
         if (currentSeasonsBatch.length >= BATCH_SIZE) {
           await writer.writeSeasonsBatch(currentSeasonsBatch);
           currentSeasonsBatch = [];
-          await yieldToEventLoop();
         }
       }
 
@@ -943,6 +969,10 @@ export class RealSourceImporterService {
       if (s.logo) {
         (seriesObj as any).posterUrl = s.logo;
         (seriesObj as any).posterUri = s.logo;
+        (seriesObj as any).backdropUrl = s.logo;
+        (seriesObj as any).backdropUri = s.logo;
+        (seriesObj as any).cover = s.logo;
+        (seriesObj as any).logo = s.logo;
       }
       currentSeriesBatch.push(seriesObj);
       if (firstFoldSeries.length < 100) {
@@ -951,7 +981,6 @@ export class RealSourceImporterService {
       if (currentSeriesBatch.length >= BATCH_SIZE) {
         await writer.writeSeriesBatch(currentSeriesBatch);
         currentSeriesBatch = [];
-        await yieldToEventLoop();
       }
     }
 

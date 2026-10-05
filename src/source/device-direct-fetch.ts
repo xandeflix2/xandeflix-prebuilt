@@ -109,10 +109,10 @@ const DEFAULT_CONNECT_TIMEOUT_MS = 20_000;
 const DEFAULT_READ_TIMEOUT_MS = 20_000;
 const DEFAULT_MAX_RESPONSE_BYTES = 50 * 1024 * 1024;
 export const DEFAULT_MAX_SOURCE_FILE_BYTES = 256 * 1024 * 1024;
-const NATIVE_READ_CHUNK_BYTES = 256 * 1024;
+const NATIVE_READ_CHUNK_BYTES = 2 * 1024 * 1024; // 2 MB por chunk (reduz viagens de 100+ para ~12)
 
 export interface DeviceDirectM3uStreamHandle {
-  readChunks(): AsyncIterable<Uint8Array>;
+  readChunks(): AsyncIterable<Uint8Array | string>;
   cleanup(): Promise<void>;
   cancel(): Promise<void>;
 }
@@ -196,12 +196,11 @@ function toHeaderRecord(headers: HeadersInit | undefined): Record<string, string
 }
 
 function decodeBase64Chunk(value: string): Uint8Array {
-  const binary = atob(value);
-  const bytes = new Uint8Array(binary.length);
-  for (let index = 0; index < binary.length; index += 1) {
-    bytes[index] = binary.charCodeAt(index);
+  if (typeof Buffer !== 'undefined') {
+    return Buffer.from(value, 'base64');
   }
-  return bytes;
+  const binary = atob(value);
+  return Uint8Array.from(binary, (c) => c.charCodeAt(0));
 }
 
 function markNativeFileBackedObservation(observation: SanitizedTransportObservation): void {
@@ -526,7 +525,7 @@ export async function fetchDeviceDirectM3uStream(
       const downloadId = result.downloadId;
       let finished = false;
       const stream: DeviceDirectM3uStreamHandle = {
-        async *readChunks(): AsyncIterable<Uint8Array> {
+        async *readChunks(): AsyncIterable<Uint8Array | string> {
           while (!finished) {
             const chunk = await nativeTransport.readChunk({
               downloadId,
@@ -536,12 +535,16 @@ export async function fetchDeviceDirectM3uStream(
               finished = true;
               return;
             }
-            if (!chunk.dataBase64 || chunk.bytesRead <= 0) {
+            if ((!chunk.dataText && !chunk.dataBase64) || chunk.bytesRead <= 0) {
               markTransportFailure(observation, chunk.errorCode || 'INVALID_NATIVE_RESPONSE', chunk.stage || 'FILE_READ', chunk.retryable);
               finished = true;
               throw new Error('NATIVE_CHUNK_READ_FAILED');
             }
-            yield decodeBase64Chunk(chunk.dataBase64);
+            if (typeof chunk.dataText === 'string') {
+              yield chunk.dataText;
+            } else if (chunk.dataBase64) {
+              yield decodeBase64Chunk(chunk.dataBase64);
+            }
           }
         },
         async cleanup(): Promise<void> {
@@ -617,7 +620,7 @@ export async function fetchDeviceDirectM3uStream(
       return { success: false, observation };
     }
     const stream: DeviceDirectM3uStreamHandle = {
-      async *readChunks(): AsyncIterable<Uint8Array> {
+      async *readChunks(): AsyncIterable<Uint8Array | string> {
         yield new TextEncoder().encode(bufferedBody);
       },
       async cleanup(): Promise<void> {},
@@ -637,7 +640,7 @@ export async function fetchDeviceDirectM3uStream(
   let finished = false;
   const reader = body.getReader();
   const stream: DeviceDirectM3uStreamHandle = {
-    async *readChunks(): AsyncIterable<Uint8Array> {
+    async *readChunks(): AsyncIterable<Uint8Array | string> {
       try {
         while (!finished) {
           const next = await withTimeout(reader.read(), readTimeoutMs, () => controller?.abort());

@@ -58,14 +58,23 @@ export const MANAGED_SOURCE_CLASSIFICATION_PROFILE_V1 = {
  * Extrai somente a famÃ­lia estrutural do group-title para a regra do perfil.
  * O texto original da categoria nunca Ã© reescrito no catÃ¡logo.
  */
+let lastRawGroup: string | undefined;
+let lastNormalizedGroup: string | undefined;
+
 export function normalizeSourceGroupFamily(groupName: string): string {
-  return groupName
+  if (groupName === lastRawGroup && lastNormalizedGroup !== undefined) {
+    return lastNormalizedGroup;
+  }
+  const result = groupName
     .trim()
     .split('|', 1)[0]
     .trim()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .toUpperCase();
+  lastRawGroup = groupName;
+  lastNormalizedGroup = result;
+  return result;
 }
 
 export function getManagedSourceClassificationProfile(sourceId?: string): SourceClassificationProfile | undefined {
@@ -78,8 +87,9 @@ function strongStructuralKind(input: CanonicalSourceContentInput): SourceProfile
   const normalizedPath = (input.streamUrl || '').trim().toLowerCase().split(/[?#]/, 1)[0];
 
   if (normalizedPath.includes('/movie/')) return 'movie';
-  if (normalizedPath.includes('/series/') || parseM3uEpisodeIdentity(input.title || '')) return 'series';
+  if (normalizedPath.includes('/series/')) return 'series';
   if (normalizedPath.includes('/live/') || normalizedPath.endsWith('.m3u8')) return 'live';
+  if (parseM3uEpisodeIdentity(input.title || '')) return 'series';
   return undefined;
 }
 

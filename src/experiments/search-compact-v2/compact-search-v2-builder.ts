@@ -10,7 +10,6 @@
  * 6. Suporte a construção incremental verdadeiramente bounded (Blocker A fix)
  */
 
-import crypto from 'node:crypto';
 import type { PrebuiltCatalog, Genre, Category } from '../../contracts/catalog.ts';
 import {
   normalizeSearchText,
@@ -24,6 +23,7 @@ import {
 import { StringPoolBuilder, StringPool } from './string-pool.ts';
 import { encodeDeltaPosting } from './codec.ts';
 import { serializeCompactIndexV2 } from './compact-search-v2-serializer.ts';
+import { hashBytesPure } from '../../security/artifact-hash.ts';
 
 import type { LiveCatalog } from '../../catalog/live/live-tv.types.ts';
 
@@ -41,14 +41,7 @@ export interface IncrementalCompactSearchIndexOptions {
 }
 
 export function calculateCompactIndexV2ContentHash(buffer: Buffer | Uint8Array): string {
-  if (crypto && typeof crypto.createHash === 'function') {
-    return crypto.createHash('sha256').update(buffer).digest('hex');
-  }
-  let hash = 0;
-  for (let i = 0; i < buffer.length; i++) {
-    hash = (hash * 31 + buffer[i]) >>> 0;
-  }
-  return hash.toString(16).padStart(64, '0');
+  return hashBytesPure(buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer));
 }
 
 type CompactDocItem = {

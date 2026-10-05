@@ -32,7 +32,14 @@ function isFocusable(el: Element | null): el is HTMLElement {
   return true;
 }
 
-function findNextDpadTarget(current: HTMLElement, key: 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight'): HTMLElement | null {
+function findNextDpadTarget(current: HTMLElement, key: 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight', previousContent: HTMLElement | null): HTMLElement | null {
+  const sideShell = current.closest('.app-shell--side-nav');
+  const sideMenu = sideShell && !current.closest('.modal-content, .player-overlay')
+    ? sideShell.querySelector<HTMLElement>('.header-nav .nav-link.active') || sideShell.querySelector<HTMLElement>('.header-nav .focusable-item')
+    : null;
+  if (sideMenu && key === 'ArrowLeft' && current.closest('[data-dpad-region="live-categories"]')) return sideMenu;
+  const pageBack = sideMenu ? sideShell?.querySelector<HTMLElement>('.page-back-row .focusable-item') : null;
+  if (pageBack && key === 'ArrowUp' && current.closest('.filter-bar, .hero-actions')) return pageBack;
   // 1. FAST-PATH: Trilhas Horizontais de Mídia (.media-rail-track)
   const railTrack = current.closest('.media-rail-track');
   if (railTrack) {
@@ -50,7 +57,7 @@ function findNextDpadTarget(current: HTMLElement, key: 'ArrowUp' | 'ArrowDown' |
       if (currentIdx > 0) {
         return currentCards[currentIdx - 1];
       }
-      return null;
+      return sideMenu;
     }
 
     if (key === 'ArrowDown') {
@@ -115,6 +122,24 @@ function findNextDpadTarget(current: HTMLElement, key: 'ArrowUp' | 'ArrowDown' |
   // 2. FAST-PATH: Header / Navegação Superior (.header-nav, .app-header)
   const headerNav = current.closest('.header-nav, .app-header');
   if (headerNav) {
+    if (sideShell) {
+      const panel = sideShell.querySelector('.app-header');
+      const items = Array.from(panel?.querySelectorAll('.focusable-item') || []).filter(isFocusable);
+      const index = items.indexOf(current);
+      if (key === 'ArrowUp') return index > 0 ? items[index - 1] : null;
+      if (key === 'ArrowDown') return index >= 0 && index + 1 < items.length ? items[index + 1] : null;
+      if (key === 'ArrowLeft') return null;
+      const content = sideShell.querySelector('.app-content');
+      if (previousContent?.isConnected && isFocusable(previousContent) && content?.contains(previousContent)
+        && previousContent.getClientRects().length > 0) return previousContent;
+      return content?.querySelector<HTMLElement>('[data-dpad-region="live-categories"] .active-group.focusable-item:not([disabled])')
+        || content?.querySelector<HTMLElement>('[data-dpad-region="live-categories"] .focusable-item:not([disabled])')
+        || content?.querySelector<HTMLElement>('.hero-actions .focusable-item:not([disabled])')
+        || content?.querySelector<HTMLElement>('.media-rail-track .focusable-item:not([disabled])')
+        || content?.querySelector<HTMLElement>('main .focusable-item:not([disabled])')
+        || content?.querySelector<HTMLElement>(':scope > :not(.page-back-row) .focusable-item:not([disabled])')
+        || content?.querySelector<HTMLElement>('.focusable-item:not([disabled])') || null;
+    }
     const items = Array.from(headerNav.querySelectorAll('.focusable-item')).filter(isFocusable);
     const idx = items.indexOf(current);
 
@@ -168,13 +193,16 @@ function findNextDpadTarget(current: HTMLElement, key: 'ArrowUp' | 'ArrowDown' |
     const index = cards.indexOf(current);
 
     if (index >= 0) {
-      const columns = window.innerWidth >= 1280 ? 6 : window.innerWidth >= 1024 ? 5 : window.innerWidth >= 640 ? 4 : 2;
+      const fallbackColumns = window.innerWidth >= 1280 ? 6 : window.innerWidth >= 1024 ? 5 : window.innerWidth >= 640 ? 4 : 2;
+      const template = sideShell ? window.getComputedStyle(grid).gridTemplateColumns : '';
+      const columns = template && template !== 'none' ? template.trim().split(/\s+/).length : fallbackColumns;
 
       if (key === 'ArrowRight' && index + 1 < cards.length) {
         return cards[index + 1];
       }
-      if (key === 'ArrowLeft' && index - 1 >= 0) {
-        return cards[index - 1];
+      if (key === 'ArrowLeft') {
+        if (sideMenu && index % columns === 0) return sideMenu;
+        if (index - 1 >= 0) return cards[index - 1];
       }
       if (key === 'ArrowDown') {
         if (index + columns < cards.length) {
@@ -189,6 +217,7 @@ function findNextDpadTarget(current: HTMLElement, key: 'ArrowUp' | 'ArrowDown' |
         }
         const firstFilter = document.querySelector<HTMLElement>('.filter-bar .focusable-item');
         if (firstFilter && isFocusable(firstFilter)) return firstFilter;
+        if (pageBack && isFocusable(pageBack)) return pageBack;
 
         const headerFirst = document.querySelector<HTMLElement>('.header-nav .focusable-item');
         if (headerFirst && isFocusable(headerFirst)) return headerFirst;
@@ -197,7 +226,8 @@ function findNextDpadTarget(current: HTMLElement, key: 'ArrowUp' | 'ArrowDown' |
   }
 
   // 5. FALLBACK: Busca Espacial Escopada (modais, formulários, telas avulsas)
-  const scope = current.closest('.modal-content, .player-overlay, main, body') || document.body;
+  const scope = current.closest('.modal-content, .player-overlay, main')
+    || (sideShell ? current.closest('.app-content') : null) || document.body;
   const currentRect = current.getBoundingClientRect();
   const cX = currentRect.left + currentRect.width / 2;
   const cY = currentRect.top + currentRect.height / 2;
@@ -234,12 +264,18 @@ function findNextDpadTarget(current: HTMLElement, key: 'ArrowUp' | 'ArrowDown' |
     }
   }
 
-  return best;
+  return best || (key === 'ArrowLeft' && current.closest('.app-content') ? sideMenu : null);
 }
 
 export function useDpadNavigation(options: UseDpadNavigationOptions = {}): void {
   const { onBack, enabled = true, autoFocusFirst = true } = options;
   const lastKeyTimeRef = useRef<number>(0);
+  const previousContentRef = useRef<HTMLElement | null>(null);
+
+  // Release a departed page; one remembered control must not retain its DOM tree.
+  useEffect(() => {
+    if (previousContentRef.current && !previousContentRef.current.isConnected) previousContentRef.current = null;
+  });
 
   // Foco inicial rápido
   useEffect(() => {
@@ -293,6 +329,12 @@ export function useDpadNavigation(options: UseDpadNavigationOptions = {}): void 
         return;
       }
 
+      const focused = document.activeElement as HTMLElement | null;
+      if ((key === 'ArrowLeft' || key === 'ArrowRight') && focused?.closest('.app-shell--side-nav')
+        && (focused instanceof HTMLInputElement || focused instanceof HTMLTextAreaElement || focused.isContentEditable)) {
+        return;
+      }
+
       // Interrompe imediatamente o scroll nativo concorrente do WebView!
       event.preventDefault();
 
@@ -322,8 +364,26 @@ export function useDpadNavigation(options: UseDpadNavigationOptions = {}): void 
         return;
       }
 
-      const target = findNextDpadTarget(current, key as 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight');
+      const sideShell = current.closest('.app-shell--side-nav');
+      if (sideShell && current.closest('.app-content') && !current.closest('.modal-content, .player-overlay')) {
+        previousContentRef.current = current;
+      }
+      const target = findNextDpadTarget(current, key as 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight', previousContentRef.current);
       if (target) {
+        if (sideShell && target.closest('.app-header')) {
+          target.focus({ preventScroll: true });
+          const panel = target.closest<HTMLElement>('.app-header')!;
+          const bounds = panel.getBoundingClientRect();
+          const rect = target.getBoundingClientRect();
+          if (rect.top < bounds.top + 6) panel.scrollTop -= bounds.top + 6 - rect.top;
+          else if (rect.bottom > bounds.bottom - 6) panel.scrollTop += rect.bottom - bounds.bottom + 6;
+          return;
+        }
+        if (sideShell && current.closest('.app-header')) {
+          target.focus({ preventScroll: true });
+          target.scrollIntoView({ behavior: 'auto', block: 'nearest', inline: 'nearest' });
+          return;
+        }
         target.focus();
 
         if (key === 'ArrowDown' || key === 'ArrowUp') {

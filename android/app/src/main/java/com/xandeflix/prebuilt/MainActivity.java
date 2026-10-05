@@ -1,5 +1,8 @@
 package com.xandeflix.prebuilt;
 
+import android.app.Activity;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -22,6 +25,28 @@ import com.xandeflix.prebuilt.security.PendingDeviceReactivationStorePlugin;
 import com.xandeflix.prebuilt.source.LargeSourceTransportPlugin;
 
 public class MainActivity extends BridgeActivity {
+    public static int phoneUiOrientation(int smallestScreenWidthDp, int uiMode, boolean fullscreen) {
+        if (smallestScreenWidthDp <= 0 || smallestScreenWidthDp >= 600
+                || (uiMode & Configuration.UI_MODE_TYPE_MASK) == Configuration.UI_MODE_TYPE_TELEVISION) {
+            return ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
+        }
+        return fullscreen ? ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+                : ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+    }
+
+    public static void applyPhoneUiOrientation(Activity activity, boolean fullscreen) {
+        if (activity == null) return;
+        try {
+            Configuration configuration = activity.getResources().getConfiguration();
+            int orientation = phoneUiOrientation(configuration.smallestScreenWidthDp, configuration.uiMode, fullscreen);
+            if (orientation != ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+                    && activity.getRequestedOrientation() != orientation) {
+                activity.setRequestedOrientation(orientation);
+            }
+        } catch (Exception ignored) {
+        }
+    }
+
     public static void applyAppSystemUiPolicy(Window window) {
         if (window == null) {
             return;
@@ -72,6 +97,7 @@ public class MainActivity extends BridgeActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        applyPhoneUiOrientation(this, false);
         registerPlugin(NativeAndroidPlayerPlugin.class);
         registerPlugin(NativePlayerPlugin.class);
         registerPlugin(LocalSecureSourceStorePlugin.class);

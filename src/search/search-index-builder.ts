@@ -11,7 +11,6 @@
  * - DATA_MINIMIZATION = REQUIRED (somente entidades e campos autorizados)
  */
 
-import crypto from 'node:crypto';
 import { calculateArtifactDigest } from '../security/artifact-hash.ts';
 import type { PrebuiltCatalog, Genre, Category } from '../contracts/catalog.ts';
 import {
@@ -33,9 +32,6 @@ export interface BuildSearchIndexOptions {
  */
 export function calculateSearchIndexContentHash(canonicalPayload: unknown): string {
   const serialized = JSON.stringify(canonicalPayload);
-  if (crypto && typeof crypto.createHash === 'function') {
-    return crypto.createHash('sha256').update(serialized).digest('hex');
-  }
   const bytes = new TextEncoder().encode(serialized);
   return calculateArtifactDigest(bytes).sha256;
 }

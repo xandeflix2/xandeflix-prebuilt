@@ -73,3 +73,15 @@ Antes de iniciar qualquer edicao no workspace, o agente DEVE executar e registra
 - `LATEST_REGRESSION_WINS=SIM`: Qualquer regressao identificada em teste ou auditoria anula afirmacoes anteriores de sucesso.
 - `PERFORMANCE_EVIDENCE_IS_NOT_SLA=SIM`: Medicoes preliminares de performance sao apenas dados empiricos, nao SLAs contratuais do produto.
 - `NEXT_GATE_STARTED=NAO`: Ao final de cada ciclo, o proximo Gate NUNCA deve ser iniciado pelo executor sem autorizacao expressa do Chat Mestre.
+
+## 5. Lock canonico de ativacao de novos dispositivos (C11)
+
+Antes de alterar identidade, ativacao, boot, App/UI de ativacao, source delivery,
+storage, Capacitor, backup Android ou build, ler integralmente
+`docs/architecture/C11_NEW_DEVICE_ACTIVATION_LOCK.md` e executar
+`npm run c11:new-device:lock` antes/depois da mudanca e antes de entregar APK.
+`LOCK_ID=C11_NEW_DEVICE_ACTIVATION_AND_CATALOG_LOCK_V1`.
+Nao remover/contornar prebuild nem relaxar testes para aceitar regressao sem
+autorizacao expressa do usuario e emenda canonica. Falha bloqueia entrega.
+Ativacao/catalogo consolidados nao certificam playback: diagnosticar essa
+fronteira separadamente, sem rotacionar identidade/chave ou relaxar licenca.

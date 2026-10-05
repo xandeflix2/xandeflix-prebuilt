@@ -8,7 +8,7 @@
  *
  * Princípios:
  * - PRESERVE_R6A_FIX: Derivação defensiva em memória de channelsByGroup; zero TypeError; zero tela preta.
- * - DETERMINISTIC_SELECTION: Auto-seleção do 1º grupo e 1º canal ao montar e ao trocar de grupo.
+ * - DETERMINISTIC_SELECTION: Seleção inicial do 1º canal; navegar grupos não troca o canal ativo.
  * - DIRECT_PLAYBACK: O player conecta diretamente da URL efêmera resolvida localmente sem proxies.
  * - SAFE_FALLBACK_EPG: Fallback visual seguro ("Guia de programação indisponível no momento.") sem dados fabricados.
  * - SAFE_STREAM_ERROR: Erro de reprodução exibido localmente no preview sem desmontar a página.
@@ -21,6 +21,7 @@ import { LiveCatalogService, resolveCanonicalLiveTotal, type LiveChannelPage } f
 import {
   addNativePreviewErrorListener,
   addNativePreviewFullscreenListener,
+  addNativePreviewTapListener,
   enterNativeAndroidPreviewFullscreen,
   exitNativeAndroidPreviewFullscreen,
   startNativeAndroidPreview,
@@ -44,14 +45,14 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onOpenSourceSetu
   const [groupPage, setGroupPage] = useState<LiveChannelPage>(EMPTY_LIVE_PAGE);
   const [isGroupPageLoading, setIsGroupPageLoading] = useState(false);
   const [selectedGroupId, setSelectedGroupId] = useState<string>('');
-  const [selectedChannelId, setSelectedChannelId] = useState<string>('');
+  const [selectedChannel, setSelectedChannel] = useState<LiveChannel | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [streamError, setStreamError] = useState<string | null>(null);
   const [channelFilter, setChannelFilter] = useState<string>('');
   const [previewRetryNonce, setPreviewRetryNonce] = useState(0);
   const [isPreviewFullscreen, setIsPreviewFullscreen] = useState(false);
   const [isMobile, setIsMobile] = useState<boolean>(() => typeof window !== 'undefined' && window.innerWidth < 600);
-  const [mobileTab, setMobileTab] = useState<'groups' | 'channels' | 'player'>('channels');
+  const [mobileTab, setMobileTab] = useState<'groups' | 'channels'>('channels');
 
   useEffect(() => {
     const handleResize = () => {
@@ -72,6 +73,7 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onOpenSourceSetu
 
   const previewContainerRef = useRef<HTMLDivElement | null>(null);
   const previewIdRef = useRef<string | null>(null);
+  const fullscreenRequestIdRef = useRef<string | null>(null);
 
   const getPreviewBounds = useCallback(() => {
     const element = previewContainerRef.current;
@@ -122,7 +124,7 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onOpenSourceSetu
             cat.channels?.filter((c) => c.groupId === firstGroupId) ||
             [];
           if (groupChs.length > 0) {
-            setSelectedChannelId(groupChs[0].id);
+            setSelectedChannel((current) => current ?? groupChs[0]);
           }
         }
         setIsLoading(false);
@@ -152,7 +154,9 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onOpenSourceSetu
       .then((page) => {
         if (cancelled) return;
         setGroupPage(page);
-        setSelectedChannelId(page.channels[0]?.id || '');
+        if (effectiveGroupId === liveCatalog.groups[0]?.id) {
+          setSelectedChannel((current) => current ?? page.channels[0] ?? null);
+        }
       })
       .catch(() => { if (!cancelled) setGroupPage(EMPTY_LIVE_PAGE); })
       .finally(() => { if (!cancelled) setIsGroupPageLoading(false); });
@@ -173,7 +177,6 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onOpenSourceSetu
     void LiveCatalogService.loadChannelPageForGroup(effectiveGroupId, groupPage.nextOffset, LIVE_GROUP_PAGE_SIZE)
       .then((page) => {
         setGroupPage(page);
-        setSelectedChannelId(page.channels[0]?.id || '');
       })
       .finally(() => setIsGroupPageLoading(false));
   }, [effectiveGroupId, groupPage.nextOffset, isGroupPageLoading]);
@@ -185,28 +188,22 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onOpenSourceSetu
     return currentGroupChannels.filter((c) => c.name.toLowerCase().includes(q));
   }, [currentGroupChannels, channelFilter]);
 
-  // Canal selecionado efetivo
-  const selectedChannel = useMemo<LiveChannel | null>(() => {
-    if (filteredChannels.length === 0 && currentGroupChannels.length === 0) return null;
-    const found = currentGroupChannels.find((c) => c.id === selectedChannelId);
-    return found || currentGroupChannels[0] || null;
-  }, [currentGroupChannels, filteredChannels, selectedChannelId]);
+  // O canal em reprodução independe da categoria, página ou filtro em navegação.
+  const hasPreviewSurface = selectedChannel !== null;
 
-  // Handler de troca de grupo: atualiza grupo e auto-seleciona primeiro canal
+  // Troca somente a lista de canais; preserva player, sessão e erro atuais.
   const handleGroupSelect = useCallback(
     (groupId: string) => {
-      setSelectedGroupId(groupId);
-      bootTelemetry.mark('LIVE_CHANNEL_SELECTED');
       setChannelFilter('');
-      setStreamError(null);
-
-      setGroupPage(EMPTY_LIVE_PAGE);
-      setSelectedChannelId('');
+      if (groupId !== effectiveGroupId) {
+        setSelectedGroupId(groupId);
+        setGroupPage(EMPTY_LIVE_PAGE);
+      }
       if (isMobile) {
         setMobileTab('channels');
       }
     },
-    [isMobile]
+    [effectiveGroupId, isMobile]
   );
 
   // Expande o PlayerView/ExoPlayer inline existente; não abre uma segunda Activity/player.
@@ -220,9 +217,12 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onOpenSourceSetu
       setStreamError('LIVE_PREVIEW_NATIVE_UNAVAILABLE');
       return;
     }
+    if (fullscreenRequestIdRef.current === previewId) return;
+    fullscreenRequestIdRef.current = previewId;
 
     try {
       const result = await enterNativeAndroidPreviewFullscreen({ previewId });
+      if (previewIdRef.current !== previewId) return;
 
       if (!result.success) {
         setStreamError('LIVE_PREVIEW_FULLSCREEN_FAILED');
@@ -232,9 +232,31 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onOpenSourceSetu
       setIsPreviewFullscreen(true);
       setStreamError(null);
     } catch {
-      setStreamError('LIVE_PREVIEW_FULLSCREEN_FAILED');
+      if (previewIdRef.current === previewId) setStreamError('LIVE_PREVIEW_FULLSCREEN_FAILED');
+    } finally {
+      if (fullscreenRequestIdRef.current === previewId) fullscreenRequestIdRef.current = null;
     }
   }, []);
+
+  // O toque da camada Android usa o mesmo fullscreen do preview autorizado.
+  useEffect(() => {
+    let disposed = false;
+    let listenerHandle: { remove: () => Promise<void> } | null = null;
+    void addNativePreviewTapListener((event) => {
+      if (disposed || !selectedChannel || !event.previewId
+        || event.previewId !== previewIdRef.current) return;
+      void handleNativeLivePlayback(selectedChannel);
+    }).then((handle) => {
+      if (disposed) void handle.remove();
+      else listenerHandle = handle;
+    }).catch(() => {
+      // Confirmação pela lista permanece disponível se o gesto não existir.
+    });
+    return () => {
+      disposed = true;
+      if (listenerHandle) void listenerHandle.remove();
+    };
+  }, [handleNativeLivePlayback, selectedChannel]);
 
   // Escuta somente códigos sanitizados emitidos pelo ExoPlayer inline.
   useEffect(() => {
@@ -439,23 +461,20 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onOpenSourceSetu
       window.removeEventListener('orientationchange', updateGeometry);
       window.removeEventListener('scroll', updateGeometry, true);
     };
-  }, [getPreviewBounds]);
+  }, [getPreviewBounds, hasPreviewSurface]);
 
   // Handler de seleção de canal
   const handleChannelSelect = useCallback((channel: LiveChannel) => {
-    setSelectedChannelId(channel.id);
-    setStreamError(null);
-    if (isMobile) {
-      setMobileTab('player');
+    if (selectedChannel?.id === channel.id) {
+      if (previewIdRef.current) void handleNativeLivePlayback(channel);
+      return;
     }
-  }, [isMobile]);
+    setSelectedChannel(channel);
+    setStreamError(null);
+  }, [handleNativeLivePlayback, selectedChannel]);
 
   const handleBackNavigation = useCallback(() => {
     if (isMobile) {
-      if (mobileTab === 'player') {
-        setMobileTab('channels');
-        return;
-      }
       if (mobileTab === 'channels') {
         setMobileTab('groups');
         return;
@@ -530,6 +549,7 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onOpenSourceSetu
 
   return (
     <div
+      className={`live-tv-page${isMobile ? ' live-tv-page--mobile' : ''}`}
       style={{
         display: 'flex',
         flexDirection: 'column',
@@ -541,6 +561,7 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onOpenSourceSetu
     >
       {/* 1. BARRA SUPERIOR (HEADER) */}
       <div
+        className="live-page-header"
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -554,7 +575,7 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onOpenSourceSetu
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <button
             type="button"
-            className="focusable-item"
+            className="focusable-item live-page-back"
             onClick={handleBackNavigation}
             style={{
               background: '#1e293b',
@@ -586,15 +607,6 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onOpenSourceSetu
           </span>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', fontSize: '0.8rem', color: '#94a3b8' }}>
-          <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#22c55e', display: 'inline-block' }} />
-            CONEXÃO DIRETA À FONTE
-          </span>
-          <span style={{ backgroundColor: '#1e293b', padding: '0.2rem 0.6rem', borderRadius: '4px', color: '#cbd5e1' }}>
-            {isMobile ? 'MOBILE FLUXO' : 'THREE-PANE PREVIEW'}
-          </span>
-        </div>
       </div>
 
       {/* TABS DE NAVEGAÇÃO MOBILE EM SMARTPHONE */}
@@ -611,6 +623,7 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onOpenSourceSetu
             type="button"
             className={`focusable-item ${mobileTab === 'groups' ? 'active-tab' : ''}`}
             onClick={() => setMobileTab('groups')}
+            aria-pressed={mobileTab === 'groups'}
             style={{
               flex: 1,
               padding: '0.65rem 0.5rem',
@@ -629,6 +642,7 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onOpenSourceSetu
             type="button"
             className={`focusable-item ${mobileTab === 'channels' ? 'active-tab' : ''}`}
             onClick={() => setMobileTab('channels')}
+            aria-pressed={mobileTab === 'channels'}
             style={{
               flex: 1,
               padding: '0.65rem 0.5rem',
@@ -643,32 +657,15 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onOpenSourceSetu
           >
             📺 Canais ({currentGroupTotal})
           </button>
-          <button
-            type="button"
-            className={`focusable-item ${mobileTab === 'player' ? 'active-tab' : ''}`}
-            onClick={() => setMobileTab('player')}
-            style={{
-              flex: 1,
-              padding: '0.65rem 0.5rem',
-              background: mobileTab === 'player' ? '#1e293b' : 'transparent',
-              color: mobileTab === 'player' ? '#38bdf8' : '#94a3b8',
-              border: 'none',
-              borderBottom: mobileTab === 'player' ? '2px solid #38bdf8' : '2px solid transparent',
-              fontWeight: mobileTab === 'player' ? 700 : 500,
-              fontSize: '0.85rem',
-              cursor: 'pointer',
-            }}
-          >
-            ▶ Player
-          </button>
         </div>
       )}
 
       {/* 2. THREE-PANE CONTAINER (LAYOUT RESPONSIVO DESKTOP OU MOBILE) */}
-      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+      <div className="live-columns" style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         {/* PAINEL 1: COLUNA DE CATEGORIAS / GRUPOS */}
         {(!isMobile || mobileTab === 'groups') && (
           <div
+            data-dpad-region="live-categories"
             style={{
               width: isMobile ? '100%' : '240px',
               minWidth: isMobile ? '100%' : '240px',
@@ -692,7 +689,7 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onOpenSourceSetu
             Categorias ({liveCatalog.groups ? liveCatalog.groups.length : 0})
           </div>
 
-          <div style={{ flex: 1, overflowY: 'auto', padding: '0.5rem' }}>
+          <div className="live-category-list" style={{ flex: 1, overflowY: 'auto', padding: '0.5rem' }}>
             {(liveCatalog.groups || []).map((group) => {
               const isSelected = group.id === effectiveGroupId;
               const count = canonicalGroupCounts?.[group.id];
@@ -745,6 +742,7 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onOpenSourceSetu
         {/* PAINEL 2: COLUNA DE CANAIS DO GRUPO */}
         {(!isMobile || mobileTab === 'channels') && (
           <div
+            className="live-channel-column"
             style={{
               width: isMobile ? '100%' : '320px',
               minWidth: isMobile ? '100%' : '320px',
@@ -754,28 +752,6 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onOpenSourceSetu
               backgroundColor: '#0c1220',
             }}
           >
-            {isMobile && (
-              <div style={{ padding: '0.5rem 1rem', borderBottom: '1px solid #1e293b', backgroundColor: '#090d16' }}>
-                <button
-                  type="button"
-                  className="focusable-item"
-                  onClick={() => setMobileTab('groups')}
-                  style={{
-                    background: 'transparent',
-                    border: 'none',
-                    color: '#38bdf8',
-                    fontSize: '0.8rem',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.35rem',
-                    padding: '0.25rem 0',
-                  }}
-                >
-                  ← Trocar Categoria
-                </button>
-              </div>
-            )}
           {/* Cabeçalho da coluna central com contador e filtro */}
           <div
             style={{
@@ -831,7 +807,7 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onOpenSourceSetu
           </div>
 
           {/* Lista de Canais */}
-          <div style={{ flex: 1, overflowY: 'auto', padding: '0.5rem' }}>
+          <div className="live-channel-list" style={{ flex: 1, overflowY: 'auto', padding: '0.5rem' }}>
             {filteredChannels.length === 0 ? (
               <div style={{ color: '#64748b', padding: '2rem 1rem', textAlign: 'center', fontSize: '0.85rem' }}>
                 Nenhum canal encontrado.
@@ -948,8 +924,8 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onOpenSourceSetu
         )}
 
         {/* PAINEL 3: PREVIEW DO CANAL + GUIA EPG */}
-        {(!isMobile || mobileTab === 'player') && (
           <div
+            className="live-preview-panel"
             style={{
               flex: 1,
               width: isMobile ? '100%' : undefined,
@@ -959,40 +935,20 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onOpenSourceSetu
               overflowY: 'auto',
             }}
           >
-            {isMobile && (
-              <div style={{ padding: '0.5rem 1rem', borderBottom: '1px solid #1e293b', backgroundColor: '#090d16' }}>
-                <button
-                  type="button"
-                  className="focusable-item"
-                  onClick={() => setMobileTab('channels')}
-                  style={{
-                    background: 'transparent',
-                    border: 'none',
-                    color: '#38bdf8',
-                    fontSize: '0.8rem',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.35rem',
-                    padding: '0.25rem 0',
-                  }}
-                >
-                  ← Voltar para Lista de Canais
-                </button>
-              </div>
-            )}
           {selectedChannel ? (
             <>
               {/* SEÇÃO SUPERIOR: PREVIEW PLAYER */}
               <div
+                className="live-preview-section"
                 style={{
                   padding: '1.25rem 1.5rem 0.75rem',
                   borderBottom: '1px solid #1e293b',
                   backgroundColor: '#0b101d',
                 }}
               >
-                {/* Cabeçalho do preview com nome do canal e botão tela cheia */}
+                {/* Identificação do preview; tela cheia por confirmação/toque. */}
                 <div
+                  className="live-preview-controls"
                   style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -1000,8 +956,9 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onOpenSourceSetu
                     marginBottom: '0.75rem',
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', overflow: 'hidden' }}>
+                  <div className="live-preview-legacy-title" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', overflow: 'hidden' }}>
                     <span
+                      className="live-preview-live-badge"
                       style={{
                         backgroundColor: '#dc2626',
                         color: '#ffffff',
@@ -1029,35 +986,12 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onOpenSourceSetu
                     </h2>
                   </div>
 
-                  <button
-                    type="button"
-                    className="focusable-item"
-                    onClick={() => {
-                      if (selectedChannel) {
-                        void handleNativeLivePlayback(selectedChannel);
-                      }
-                    }}
-                    style={{
-                      backgroundColor: '#2563eb',
-                      color: '#ffffff',
-                      border: 'none',
-                      padding: '0.45rem 0.9rem',
-                      borderRadius: '4px',
-                      fontWeight: 600,
-                      fontSize: '0.8rem',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.35rem',
-                      flexShrink: 0,
-                    }}
-                  >
-                    <span>⛶</span> Player Nativo
-                  </button>
                 </div>
 
                 {/* Superfície nativa inline; o PlayerView Android é sobreposto via geometria segura. */}
                 <div
+                  className="live-preview-surface"
+                  data-preview-fullscreen={isPreviewFullscreen}
                   ref={previewContainerRef}
                   style={{
                     width: '100%',
@@ -1158,8 +1092,9 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onOpenSourceSetu
               </div>
 
               {/* SEÇÃO INFERIOR: GUIA DE PROGRAMAÇÃO (EPG) */}
-              <div style={{ padding: '1.25rem 1.5rem', flex: 1 }}>
+              <div className="live-epg-section" style={{ padding: '1.25rem 1.5rem', flex: 1 }}>
                 <div
+                  className="live-epg-header"
                   style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -1190,12 +1125,13 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onOpenSourceSetu
                       borderRadius: '4px',
                     }}
                   >
-                    {selectedChannel.groupName || currentGroupName}
+                    {selectedChannel.groupName || liveCatalog.groups.find((group) => group.id === selectedChannel.groupId)?.name || ''}
                   </span>
                 </div>
 
                 {/* Informações detalhadas do canal selecionado */}
                 <div
+                  className="live-channel-summary"
                   style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -1236,7 +1172,7 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onOpenSourceSetu
                     </div>
                   )}
 
-                  <div style={{ flex: 1 }}>
+                  <div className="live-channel-details" style={{ flex: 1 }}>
                     <div style={{ fontWeight: 700, fontSize: '0.95rem', color: '#f8fafc' }}>
                       {selectedChannel.name}
                     </div>
@@ -1244,10 +1180,12 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onOpenSourceSetu
                       Identificador: {selectedChannel.id} • Formato: {selectedChannel.streamRef.containerExtension?.toUpperCase() || 'TS'}
                     </div>
                   </div>
+                  <span className="live-channel-live-badge">● AO VIVO</span>
                 </div>
 
                 {/* Box do Guia EPG com Fallback Seguro */}
                 <div
+                  className="live-epg-fallback"
                   style={{
                     backgroundColor: '#0c1220',
                     border: '1px dashed #334155',
@@ -1290,7 +1228,6 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onOpenSourceSetu
             </div>
           )}
         </div>
-        )}
       </div>
 
     </div>

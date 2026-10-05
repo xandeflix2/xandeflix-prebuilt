@@ -9,20 +9,13 @@
  * - LOGICAL_PACKAGE_DETERMINISTIC=SIM (createdAt não afeta o packageContentHash)
  */
 
-import crypto from 'node:crypto';
 import { calculateArtifactDigest } from '../security/artifact-hash.ts';
 
 export function calculateSha256(data: string | Buffer | Uint8Array): string {
-  if (crypto && typeof crypto.createHash === 'function') {
-    return crypto.createHash('sha256').update(data).digest('hex');
-  }
   return calculateArtifactDigest(data).sha256;
 }
 
 export async function calculateSha256Async(data: string | Buffer | Uint8Array): Promise<string> {
-  if (crypto && typeof crypto.createHash === 'function') {
-    return crypto.createHash('sha256').update(data).digest('hex');
-  }
   const runtimeCrypto = typeof globalThis !== 'undefined' ? (globalThis.crypto as unknown as { subtle?: SubtleCrypto }) : undefined;
   if (runtimeCrypto?.subtle && typeof runtimeCrypto.subtle.digest === 'function') {
     const bytes = typeof data === 'string' ? new TextEncoder().encode(data) : data;

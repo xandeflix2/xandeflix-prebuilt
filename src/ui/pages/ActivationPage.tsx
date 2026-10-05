@@ -44,6 +44,8 @@ import {
 } from '../../control-plane/client/device-pairing.service.ts';
 import { getDeviceActivationService } from '../../control-plane/client/device-activation.service.ts';
 import { reconcileAuthorizedActivationState } from '../../device/authorization-reconciliation.ts';
+import { ensurePendingDeviceActivationRequest, syncPendingDeviceActivation } from '../../control-plane/client/device-activation-sync.service.ts';
+import { activationDeadline } from '../../control-plane/client/activation-timeout.ts';
 
 
 interface ActivationPageProps {
@@ -77,6 +79,8 @@ export const ActivationPage: React.FC<ActivationPageProps> = ({
 
   // A1: ativação externa por código + chave única do dispositivo
   const [deviceActivationKey, setDeviceActivationKey] = useState<string>('');
+  const [localKeyState, setLocalKeyState] = useState<'LOADING' | 'READY' | 'ERROR'>('LOADING');
+  const [activationAttempt, setActivationAttempt] = useState(0);
   const [isCheckingDeviceActivation, setIsCheckingDeviceActivation] = useState(false);
   const [deviceActivationFeedback, setDeviceActivationFeedback] = useState<string | null>(null);
 
@@ -156,13 +160,23 @@ export const ActivationPage: React.FC<ActivationPageProps> = ({
   // Carrega identidade do dispositivo e estado prévio persistido
   useEffect(() => {
     let isMounted = true;
+    let localReady = false;
+    setLocalKeyState('LOADING');
     (async () => {
-      const identity = await DeviceIdentityService.getOrCreateIdentity();
+      const [identity, , keyInfo] = await Promise.all([
+        DeviceIdentityService.getOrCreateIdentity(),
+        DeviceIdentityService.getOrCreateInstallationIdentity(),
+        DeviceIdentityService.getOrCreateDeviceActivationKey(),
+      ]);
       if (!isMounted) return;
+      localReady = true;
       setDeviceId(identity.deviceId);
       setDisplayCode(identity.displayCode);
       setDeviceType(identity.deviceType);
       setDeviceLabel(identity.deviceLabel);
+      setDeviceActivationKey(keyInfo.rawActivationKey);
+      setLocalKeyState('READY');
+      setDeviceActivationFeedback('Chave local pronta. Conecte-se à internet para concluir a ativação.');
 
       try {
         const pendingPairing = getDevicePairingService().getPendingPairing();
@@ -171,7 +185,7 @@ export const ActivationPage: React.FC<ActivationPageProps> = ({
           setPairingId(pendingPairing.pairingId);
         }
 
-        const pendingHandle = await reactivationServiceRef.current.loadPending(identity);
+        const pendingHandle = await activationDeadline(() => reactivationServiceRef.current.loadPending(identity));
         if (isMounted && pendingHandle) {
           reactivationHandleRef.current = pendingHandle;
           setReactivationHandle(pendingHandle);
@@ -194,13 +208,13 @@ export const ActivationPage: React.FC<ActivationPageProps> = ({
 
       // 1. Se local estiver stale ou ausente, sincroniza se o dispositivo já estiver AUTHORIZED remotamente
       let activeState = savedState;
-      if (!activeState || activeState.status !== 'AUTHORIZED') {
+      if (activeState && activeState.status !== 'AUTHORIZED') {
         const client = getControlPlaneClient();
         try {
-          const remoteMeta = await client.resolveSource({
+          const remoteMeta = await activationDeadline(() => client.resolveSource({
             deviceId: identity.deviceId,
             deviceAuthToken: tokenInfo.rawDeviceToken,
-          });
+          }));
           if (remoteMeta.status === 'SOURCE_READY') {
             const reconciledState = reconcileAuthorizedActivationState({
               identity,
@@ -222,43 +236,11 @@ export const ActivationPage: React.FC<ActivationPageProps> = ({
       // o registro remoto recebe somente o hash.
       if (!activeState || activeState.status !== 'AUTHORIZED') {
         try {
-          const activationService = getDeviceActivationService();
-          const keyInfo = await activationService.getOrCreateActivationKey();
-          if (isMounted) setDeviceActivationKey(keyInfo.rawActivationKey);
-
-          const pendingActivation = activationService.getPendingActivation();
-          let pendingIsUsable = pendingActivation?.deviceId === identity.deviceId;
-          if (pendingIsUsable && pendingActivation) {
-            const pendingStatus = await activationService.checkStatus(
-              pendingActivation.activationId,
-              identity.deviceId,
-              pendingActivation.activationStatusSecret,
-            );
-            pendingIsUsable = pendingStatus.success && String(pendingStatus.status) === 'PENDING';
-          }
-          if (pendingIsUsable) {
-            if (isMounted) {
-              setDeviceActivationFeedback('Solicitação A1 aguardando confirmação na página externa.');
-            }
-          } else {
-            const installation = await DeviceIdentityService.getOrCreateInstallationIdentity();
-            const request = await activationService.requestActivation({
-              installationId: installation.installationId,
-              deviceId: identity.deviceId,
-              displayCode: identity.displayCode,
-              deviceTokenHash: tokenInfo.deviceTokenHash,
-              activationKeyHash: keyInfo.activationKeyHash,
-              deviceType: identity.deviceType,
-              deviceLabel: identity.deviceLabel,
-            });
-            if (isMounted) {
-              setDeviceActivationFeedback(
-                request.success
-                  ? 'Chave A1 pronta. Informe o código e a chave na página externa; depois cadastre a fonte.'
-                  : `A1 indisponível: ${request.code || 'ERRO_REMOTO'}`,
-              );
-            }
-          }
+          const registered = await ensurePendingDeviceActivationRequest();
+          if (isMounted) setDeviceActivationFeedback(registered
+            ? 'Chave A1 registrada. Informe o código e a chave na página externa; depois cadastre a fonte.'
+            : 'Registro A1 indisponível. A chave local foi preservada; tente novamente com internet.');
+          activeState = await DeviceIdentityService.loadActivationState();
         } catch {
           if (isMounted) setDeviceActivationFeedback('A1 indisponível no momento. A chave local foi preservada.');
         }
@@ -283,64 +265,43 @@ export const ActivationPage: React.FC<ActivationPageProps> = ({
       } else {
         setStatus(activeState.status);
       }
-    })();
+    })().catch(() => {
+      if (!isMounted) return;
+      if (!localReady) {
+        setLocalKeyState('ERROR');
+        setDeviceActivationFeedback('Não foi possível salvar a identidade local. Verifique o armazenamento e tente novamente.');
+      } else {
+        setDeviceActivationFeedback('Serviço de ativação indisponível. Código e chave local foram preservados.');
+      }
+    });
 
     return () => {
       isMounted = false;
     };
-  }, [deliverManagedSource, runAuthPreflight]);
+  }, [deliverManagedSource, runAuthPreflight, activationAttempt]);
+
+  useEffect(() => {
+    const retry = () => setActivationAttempt((attempt) => attempt + 1);
+    window.addEventListener('online', retry);
+    return () => window.removeEventListener('online', retry);
+  }, []);
 
   const handleCheckDeviceActivation = useCallback(async () => {
     const pending = getDeviceActivationService().getPendingActivation();
     if (!pending || pending.deviceId !== deviceId) {
-      setDeviceActivationFeedback('Ainda não existe uma solicitação A1 ativa para este dispositivo.');
+      setActivationAttempt((attempt) => attempt + 1);
       return;
     }
 
     setIsCheckingDeviceActivation(true);
     try {
-      const result = await getDeviceActivationService().checkStatus(
-        pending.activationId,
-        deviceId,
-        pending.activationStatusSecret,
-      );
-
-      if (!result.success) {
-        setDeviceActivationFeedback(result.message || result.code || 'Status A1 indisponível.');
+      const state = await syncPendingDeviceActivation();
+      if (!state) {
+        setDeviceActivationFeedback('Ativação ainda não confirmada. Verifique a conexão e tente novamente.');
         return;
       }
-
-      if (result.status !== 'CONSUMED') {
-        setDeviceActivationFeedback('Aguardando a confirmação da ativação na página externa.');
-        return;
-      }
-
-      const tokenInfo = await getDevicePairingService().getOrCreateDeviceToken();
-      let resolvedMode = mode || 'SELF_SERVICE';
-      try {
-        const remoteMeta = await getControlPlaneClient().resolveSource({
-          deviceId,
-          deviceAuthToken: tokenInfo.rawDeviceToken,
-        });
-        resolvedMode = remoteMeta.mode || resolvedMode;
-      } catch {
-        // O status A1 já confirmou o claim; a sincronização da fonte pode ocorrer depois.
-      }
-
-      await DeviceIdentityService.saveActivationState({
-        deviceId,
-        displayCode,
-        deviceType,
-        deviceLabel,
-        status: 'AUTHORIZED',
-        licenseMode: resolvedMode,
-        licenseId: result.licenseId,
-        licenseStatus: result.licenseStatus,
-        deviceAuthToken: tokenInfo.rawDeviceToken,
-        activatedAtIso: new Date().toISOString(),
-      });
       setStatus('AUTHORIZED');
-      setMode(resolvedMode);
+      setMode(state.licenseMode);
       setDeviceActivationFeedback('Dispositivo ativado. Atualizando a fonte autorizada...');
       await runAuthPreflight();
       await deliverManagedSource();
@@ -349,7 +310,7 @@ export const ActivationPage: React.FC<ActivationPageProps> = ({
     } finally {
       setIsCheckingDeviceActivation(false);
     }
-  }, [deviceId, displayCode, deviceType, deviceLabel, mode, deliverManagedSource, runAuthPreflight]);
+  }, [deviceId, deliverManagedSource, runAuthPreflight]);
 
   const openExternalActivationPage = useCallback(async () => {
     const runtimeEnv = (import.meta as ImportMeta & {
@@ -385,7 +346,8 @@ export const ActivationPage: React.FC<ActivationPageProps> = ({
   useEffect(() => {
     if (!deviceId || status === 'AUTHORIZED') return;
     const interval = window.setInterval(() => {
-      void handleCheckDeviceActivation();
+      // A pending report is not a reason to restart the local initialization effect.
+      if (getDeviceActivationService().getPendingActivation()) void handleCheckDeviceActivation();
     }, 5000);
     return () => window.clearInterval(interval);
   }, [deviceId, status, handleCheckDeviceActivation]);
@@ -895,7 +857,8 @@ export const ActivationPage: React.FC<ActivationPageProps> = ({
                     marginTop: '0.25rem',
                   }}
                 >
-                  {deviceActivationKey || 'Gerando chave...'}
+                  {localKeyState === 'READY' ? deviceActivationKey
+                    : localKeyState === 'ERROR' ? 'Falha ao preparar a chave local.' : 'Gerando chave...'}
                 </code>
               </div>
 
@@ -905,11 +868,12 @@ export const ActivationPage: React.FC<ActivationPageProps> = ({
                   className="focusable-item"
                   onClick={() => {
                     if (deviceActivationKey && navigator.clipboard) {
-                      void navigator.clipboard.writeText(deviceActivationKey);
-                      setDeviceActivationFeedback('Chave copiada.');
+                      void navigator.clipboard.writeText(deviceActivationKey)
+                        .then(() => setDeviceActivationFeedback('Chave copiada.'))
+                        .catch(() => setDeviceActivationFeedback('Não foi possível copiar. Anote a chave exibida.'));
                     }
                   }}
-                  disabled={!deviceActivationKey}
+                  disabled={localKeyState !== 'READY'}
                   style={{ padding: '0.65rem 1rem', backgroundColor: '#7e22ce', color: '#fff', border: 'none', borderRadius: '5px', cursor: deviceActivationKey ? 'pointer' : 'not-allowed', fontWeight: 700 }}
                 >
                   Copiar chave
@@ -932,6 +896,11 @@ export const ActivationPage: React.FC<ActivationPageProps> = ({
                   {isCheckingDeviceActivation ? 'Verificando...' : 'Verificar ativação'}
                 </button>
               </div>
+
+              <button type="button" className="focusable-item" onClick={() => setActivationAttempt((attempt) => attempt + 1)}
+                disabled={localKeyState === 'LOADING'} style={{ marginTop: '0.75rem', padding: '0.65rem 1rem' }}>
+                Tentar novamente
+              </button>
 
               {deviceActivationFeedback && (
                 <div style={{ marginTop: '0.75rem', fontSize: '0.8rem', color: deviceActivationFeedback.includes('pronta') || deviceActivationFeedback.includes('ativado') || deviceActivationFeedback.includes('copiada') ? '#34d399' : '#cbd5e1' }}>

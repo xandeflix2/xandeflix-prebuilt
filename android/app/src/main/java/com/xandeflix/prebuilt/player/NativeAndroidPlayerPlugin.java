@@ -1,8 +1,11 @@
 package com.xandeflix.prebuilt.player;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,6 +73,11 @@ public class NativeAndroidPlayerPlugin extends Plugin {
 
     private static final Set<String> VALID_KINDS = Collections.unmodifiableSet(new HashSet<>(
             java.util.Arrays.asList("live", "movie", "series", "vod")
+    ));
+
+    private static final Set<String> PLAYBACK_ERROR_CATEGORIES = Collections.unmodifiableSet(new HashSet<>(
+            java.util.Arrays.asList("HTTP_ERROR", "NETWORK_TIMEOUT", "DECODER_ERROR", "SOURCE_UNAVAILABLE",
+                    "MEDIA_PARSER_FAILURE", "MEDIA_ERROR", "UNKNOWN")
     ));
 
     // Estado transitório em memória do preview nativo (sem persistência de URL, headers ou payload)
@@ -418,6 +426,7 @@ public class NativeAndroidPlayerPlugin extends Plugin {
                 );
             }
 
+            previewView.setBackgroundColor(Color.BLACK);
             FrameLayout.LayoutParams fullscreenParams = new FrameLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT
@@ -432,6 +441,7 @@ public class NativeAndroidPlayerPlugin extends Plugin {
 
             previewView.requestLayout();
             this.previewFullscreen = true;
+            MainActivity.applyPhoneUiOrientation(activity, true);
             MainActivity.applyAppSystemUiPolicy(activity.getWindow());
             notifyPreviewFullscreenChanged(true);
         }
@@ -587,7 +597,56 @@ public class NativeAndroidPlayerPlugin extends Plugin {
 
         view.setClickable(false);
         view.setFocusable(false);
+        Configuration configuration = getSafeContext().getResources().getConfiguration();
+        if ("live".equals(currentPreviewKind)
+                && isTouchPreviewTapEnabled(configuration.smallestScreenWidthDp, configuration.uiMode)) {
+            GestureDetector taps = new GestureDetector(getSafeContext(), new GestureDetector.SimpleOnGestureListener() {
+                @Override
+                public boolean onDown(MotionEvent event) {
+                    return true;
+                }
+
+                @Override
+                public boolean onSingleTapUp(MotionEvent event) {
+                    notifyPreviewTap();
+                    return true;
+                }
+            });
+            taps.setOnDoubleTapListener(null);
+            view.setOnTouchListener((target, event) -> {
+                if (previewFullscreen) return false;
+                taps.onTouchEvent(event);
+                return true;
+            });
+        }
         return view;
+    }
+
+    public static boolean isTouchPreviewTapEnabled(int smallestScreenWidthDp, int uiMode) {
+        return smallestScreenWidthDp > 0
+                && (uiMode & Configuration.UI_MODE_TYPE_MASK) != Configuration.UI_MODE_TYPE_TELEVISION;
+    }
+
+    public static Map<String, Object> buildPreviewTapData(
+            @Nullable String previewId, boolean active, boolean fullscreen) {
+        Map<String, Object> payload = new LinkedHashMap<>();
+        if (active && !fullscreen && previewId != null && !previewId.isEmpty()) {
+            payload.put("previewId", previewId);
+        }
+        return payload;
+    }
+
+    private void notifyPreviewTap() {
+        Map<String, Object> data = buildPreviewTapData(currentPreviewId, isPreviewActive, previewFullscreen);
+        if (data.isEmpty()) return;
+        JSObject payload = new JSObject();
+        for (Map.Entry<String, Object> entry : data.entrySet()) {
+            payload.put(entry.getKey(), entry.getValue());
+        }
+        try {
+            notifyListeners("nativePreviewTap", payload);
+        } catch (Exception ignored) {
+        }
     }
 
     private void attachPreviewListener() {
@@ -699,6 +758,9 @@ public class NativeAndroidPlayerPlugin extends Plugin {
         }
 
         android.app.Activity activity = getPluginActivity();
+        if (previewView != null) {
+            previewView.setBackgroundColor(Color.TRANSPARENT);
+        }
         if (previewView != null && previewInlineLayoutParams != null) {
             previewView.setLayoutParams(previewInlineLayoutParams);
             View surfaceView = previewView.getVideoSurfaceView();
@@ -712,6 +774,7 @@ public class NativeAndroidPlayerPlugin extends Plugin {
         }
         previewFullscreen = false;
         notifyPreviewFullscreenChanged(false);
+        MainActivity.applyPhoneUiOrientation(getPluginActivity(), false);
         return true;
     }
 
@@ -720,11 +783,31 @@ public class NativeAndroidPlayerPlugin extends Plugin {
      * NUNCA inclui: URL, headers, token, credentials.
      */
     public static JSObject buildResumePayload(long positionMs, boolean ended, @Nullable String errorCode) {
+        return buildResumePayload(positionMs, ended, errorCode, null, null);
+    }
+
+    public static JSObject buildResumePayload(long positionMs, boolean ended, @Nullable String errorCode,
+            @Nullable String errorCategory, @Nullable String httpStatus) {
         JSObject payload = new JSObject();
-        payload.put("positionMs", Math.max(0, positionMs));
+        for (Map.Entry<String, Object> entry : buildResumeData(positionMs, ended, errorCode, errorCategory, httpStatus).entrySet()) {
+            payload.put(entry.getKey(), entry.getValue());
+        }
+        return payload;
+    }
+
+    /** Plain values make the exact IPC allowlist testable without Android JSON stubs. */
+    public static Map<String, Object> buildResumeData(long positionMs, boolean ended, @Nullable String errorCode,
+            @Nullable String errorCategory, @Nullable String httpStatus) {
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("positionMs", Math.max(0L, positionMs));
         payload.put("ended", ended);
         if (errorCode != null && !errorCode.trim().isEmpty()) {
             payload.put("errorCode", sanitizeErrorCode(errorCode));
+            String category = PLAYBACK_ERROR_CATEGORIES.contains(errorCategory) ? errorCategory : "UNKNOWN";
+            payload.put("errorCategory", category);
+            if ("HTTP_ERROR".equals(category) && httpStatus != null && httpStatus.matches("[45][0-9]{2}")) {
+                payload.put("httpStatus", Integer.parseInt(httpStatus));
+            }
         }
         return payload;
     }
@@ -733,7 +816,12 @@ public class NativeAndroidPlayerPlugin extends Plugin {
      * Notifica os ouvintes web do evento "resume" com payload estritamente sanitizado.
      */
     public void emitResumeEvent(long positionMs, boolean ended, @Nullable String errorCode) {
-        JSObject sanitizedPayload = buildResumePayload(positionMs, ended, errorCode);
+        emitResumeEvent(positionMs, ended, errorCode, null, null);
+    }
+
+    public void emitResumeEvent(long positionMs, boolean ended, @Nullable String errorCode,
+            @Nullable String errorCategory, @Nullable String httpStatus) {
+        JSObject sanitizedPayload = buildResumePayload(positionMs, ended, errorCode, errorCategory, httpStatus);
         try {
             if (getBridge() != null) {
                 notifyListeners("resume", sanitizedPayload);
@@ -744,9 +832,14 @@ public class NativeAndroidPlayerPlugin extends Plugin {
 
     /** Chamado pela Activity nativa para devolver apenas o estado terminal sanitizado. */
     public static void notifyPlaybackTerminal(long positionMs, boolean ended, @Nullable String errorCode) {
+        notifyPlaybackTerminal(positionMs, ended, errorCode, null, null);
+    }
+
+    public static void notifyPlaybackTerminal(long positionMs, boolean ended, @Nullable String errorCode,
+            @Nullable String errorCategory, @Nullable String httpStatus) {
         NativeAndroidPlayerPlugin plugin = activePlugin;
         if (plugin != null) {
-            plugin.emitResumeEvent(positionMs, ended, errorCode);
+            plugin.emitResumeEvent(positionMs, ended, errorCode, errorCategory, httpStatus);
         }
     }
 

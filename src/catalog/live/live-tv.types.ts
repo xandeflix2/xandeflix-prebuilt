@@ -28,6 +28,10 @@ export interface LiveChannel {
   groupId: string;
   groupName?: string;
   logoUrl?: string;
+  posterUrl?: string;
+  posterUri?: string;
+  logo?: string;
+  cover?: string;
   tvgId?: string;
   tvgName?: string;
   streamId: string;

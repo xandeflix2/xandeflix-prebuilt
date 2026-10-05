@@ -1,5 +1,574 @@
 # Relatorio de Evolucao (Evolution Report)
 
+## 2026-10-05 — Preparação da consolidação C11 no Git existente
+
+Pedido de seguir plano de consolidação em xandeflix2/xandeflix-prebuilt, sem
+novo backend/banco. Preflight main/ahead2; manifesto108 e backup Git verificado.
+Revisão de segurança e regressões locais/build PASS; APK e fonte funcional
+preservados, única edição de runtime é EOF vazio. Sete arquivos operacionais
+ficam locais. Usuário não conhece integrações automáticas: push retido apesar
+de GitHub não apresentar Actions/deployments. Webhooks inacessíveis e histórico
+de migrações remoto/local diverge; não sincronizar banco. Checkpoint local não
+certifica beta>100 ou Fire<=60s, nem permite apagar a pasta Git comum da worktree.
+[Evidência](evidence/C11_GIT_CONSOLIDATION.md); nenhum novo Gate/PR/reset/limpeza.
+
+## 2026-10-05 — Capturas removidas manualmente; preservação integral auditada
+
+Após guia em duas etapas no Explorador, usuário confirmou "feito".16/16 alvos
+ausentes em auditoria independente;405/405 consolidados e inventário/hash de
+7991 preservados idênticos ao pré-ciclo. Pasta scratch/dois scripts,154 PNGs
+forensics/718 tmp/26 recursos Android e dois APKs raiz intactos.21732500bytes
+é o tamanho anterior dos alvos, não medição de espaço livre; Lixeira não
+inspecionada e recuperação depende de permanecerem nela. Agente não repetiu
+exclusão automática nem contornou rejeição histórica. Somente cinco documentos
+de manutenção; sem código/build/testes novos/instalação/Git/backend/dispositivos/
+ativação/player/novo Gate. Limpeza da allowlist de16 capturas concluída.
+
+## 2026-10-05 — Capturas avulsas autorizadas, exclusão bloqueada antes do início
+
+Spec literal antes de tentar excluir três PNGs raiz+13 scratch,21732500bytes,
+sem diretórios.405/405 consolidados iguais; novo inventário preservado7991
+arquivos (contexto atual somente dois APKs após consulta de retenção anterior).
+Tentativa normal não-recursiva rejeitada por blocked by policy antes de iniciar.
+16/16 imagens confirmadas presentes, zero exclusão/espaço liberado; dois scripts
+scratch e APK atual intactos. Não contornar; somente docs de manutenção. Nenhum
+código/build/Git/backend/dispositivo/novo Gate. Ciclo anterior de caches concluído
+não é invalidado; a nova exclusão de capturas permanece pendente.
+
+## 2026-10-05 — Limpeza manual da allowlist concluída, preservados byte-idênticos
+
+Usuário pediu guia manual após bloqueio da exclusão automatizada e confirmou
+etapas PowerShell em sequência. Agente não repetiu exclusão via tools. Conferência
+independente confirma199 alvos ausentes,405/405 consolidados e8023 preservados
+idênticos por inventário/hash,918 PNGs/92 relatórios/18 APKs intactos. ~3,1GB
+nos alvos segundo auditoria anterior; espaço livre do volume não medido.
+Lock49+9/typecheck PASS pós-limpeza, sem recriar caches/intermediários por build.
+Documentação atualizada somente na allowlist; nenhum código/Git/backend/dispositivo/
+reset/novo Gate. Manutenção concluída; registro de bloqueio anterior histórico.
+
+## 2026-10-05 — Preparação da limpeza segura; exclusão bloqueada sem executar
+
+Usuário autorizou limpeza passo a passo. Spec/allowlist documentadas antes da
+primeira tentativa: somente caches sintéticos/intermediários/cópia APK duplicada.
+Preflight/lock49+9 PASS,405/405 consolidados iguais;8023 arquivos preservados
+inventariados por fingerprint agregado em RAM. Terminal rejeitou primeira
+exclusão antes do início por blocked by policy. Zero arquivos/bytes removidos;
+193 caches/cinco alvos nativos/cópia APK confirmados presentes depois. Não
+contornar bloqueio; demais etapas não iniciadas. Somente docs de manutenção.
+Sem Git/backend/dispositivo/build/novo Gate; limpeza pendente de liberação legítima.
+
+## 2026-10-05 — Detalhes phone recebem altura64px e Back somente ícone à direita
+
+Spec antes do código; duas rotas omitidas do seletor anterior incluídas no Shell,
+com CSS max599 para margem automática quando não há Início. Header/páginas de
+detalhes/controle de conteúdo/player/ativação/native preservados por401/405 hashes.
+Negativo baseline reproduzido;30 novos+250 anteriores=280 checks/zero erros.
+Skills browser/React direcionaram navegação real/histórico, a11y e classe derivada
+sem efeitos. Lock49+9/guards/build/sync/Gradle PASS, assets/config/package/cert iguais.
+APK EE BE/9062069bytes validado e backup0665 recuperável. "sim" autoriza entrega
+sem limpeza celular -> Fire -> tablet; primeiro instalado com privados4/catálogo508
+iguais/abertura normal. Fire instalado segundo e tablet reconectado por último,
+mesmo APKEEBE/abertura Status:ok nos três. Privados4/catálogos436/505 iguais nos
+dois últimos, antes de abrir;405/405 hashes finais locais iguais após entrega,
+diff --check PASS, sem pendência nos três. Sem Git/backend/Settings/novo Gate/60s.
+
+## 2026-10-05 — APK de quatro ícones entregue celular, Fire e tablet nessa ordem
+
+Nova autoridade explícita documentada antes das instalações; sem rebuild/patch.
+APK06655653...CD4A964/mesmo package/cert confirmado nos três, install-r sem reset.
+Privados4/catálogos508/436/505 iguais em RAM antes/depois; abertura normal nos três.
+Lock49+9 PASS;405/405 arquivos locais byte-idênticos após entrega. Tablet ausente
+inicialmente reconectou durante consolidação após solicitação ao usuário e foi
+instalado por último, concluindo ordem autorizada. Sem Git/backend/Settings/
+rotação/novo Gate/60s; nenhuma pendência de instalação deste artefato nos três.
+
+## 2026-10-05 — Navegação phone reduzida a quatro ícones, Início no topo interno
+
+Spec antes do código: quatro ações mobile32px sem labels visíveis/nomes acessíveis;
+Início somente quatro rotas solicitadas no topo ao lado de Back, Home sem ambos.
+Tablet/Fire preservados. Status durante ativação compactado sem perder texto
+acessível para não sobrepor dois alvos44px em320px; negativo reproduzido antes
+desse refinamento. Nenhum hook/estado/IO/histórico/ativação/player/Java alterado.
+250 checks/zero erros, lock49+9/guards/typecheck/build/sync/Gradle PASS;
+400/405 hashes préviosCE39 iguais. APK06655653...CD4A964/9062043bytes validado,
+backupCE39 mantido. Versão gerada, não instalada; consulta de entrega sem resposta.
+Skills visual/React direcionaram story real de navegação e a11y sem novos efeitos.
+Sem ADB/Git/backend/gestor/Settings/reset/novo Gate.
+
+## 2026-10-05 — Altura da Home phone igualada às três rotas
+
+Pedido adicional executado por uma linha no seletor mobile de64px+safe-area,
+sem botão Home. Novo assert rejeitou5C34 antes do patch;209 checks/zero erros,
+lock49+9/build/sync/Gradle PASS. CSS/harness/APK são únicas mudanças (402/405
+hashes prévios iguais); nenhum TSX/Java/ativação/Live alterado. APK CE39CA71...
+AFBCC6C/9062044bytes/package/cert/assets conferidos, backup5C34 mantido.
+Celular e Fire receberam install-r sem limpeza, quatro privados/catálogo
+preservados e hash/abertura confirmados. Tablet reconectado pelo usuário recebeu
+também CE39, quatro privados/505 arquivos idênticos/hash/abertura confirmados.
+Artefato final igual nos três, sem Git/backend/Settings/novo Gate.
+
+## 2026-10-05 — Home sem retorno universal e Header mobile refinado entregues
+
+Pedido posterior substituiu manutenção de Back na Home tablet/Fire: guards de
+render no Shell suprimem somente controles Home, sem alterar histórico/hardware.
+Outro pedido acrescentou64px/safe-area e SVG centralizado nas três rotas phone
+Filmes/Séries/Busca, ícone/glifo dos demais layouts preservado. Spec prévia,
+negativos Home/altura rejeitaram B3B; final209 checks/zero erros, lock49+9/guards/
+build/sync/Gradle PASS. Skills de verificação guiaram gut-check/retorno/centragem,
+revisão React preservou callbacks/aria e evitou state/effect/listener novos.
+400/405 hashes B3B iguais, Java/config/ativação/Live/catalog byte-idênticos.
+APK5C34E11D...7052AFC/9062044bytes assinado/assets conferidos, backupB3B novo.
+Celular e Fire atualizados, depois tablet reconectado atualizado; quatro privados/
+catálogo preservados em RAM, hash instalado/abertura confirmados nos três.
+Sem reset/Git/backend/Settings/novo Gate; homologação física de mídia para usuário.
+
+## 2026-10-05 — Header phone corrigido e entrega in-place concluída nos três
+
+Spec prévia: classe visual só Filmes/Séries/Busca e CSS mobile adicional para
+reordenar botão existente à direita, ocultar rótulo visível e manter44px/aria/
+callback. Marca não desloca; Home/Live/outros layouts/rotas intactos. Novo
+teste35 rejeitou baseline, final202 checks/zero erros; um gutter artificial
+no teste tablet corrigido para regra computada existente, sem mudar o produto.
+Skills browser/verify/verification guiaram UI/retorno isolados sem API/env/mídia.
+Lock49+9/guards/build/sync/Gradle PASS; Java/testes preservados,401/405 hashes
+idênticos. APK B3B0D71E...4D3623/9061967bytes/assinatura/assets conferidos,
+backup recuperável9FF mantido. Novo IP Fire103 informado pelo usuário; tablet e
+Fire atualizados, depois celular reconectado atualizado. Install-r/mesmo package,
+quatro privados/catálogos505/436/508 iguais, abertura normal em todos. Nenhum
+reset/Git/backend/Settings/novo Gate; mídia/gestos físicos ainda para teste usuário.
+
+## 2026-10-05 — Entrega parcial do APK final aos três aparelhos autorizados
+
+Sem novo código/build: usuário autorizou atualizar celular, tablet e Fire Stick,
+celular primeiro, sem limpeza. Spec prévia ampliada antes da instalação. Celular
+recebeu APK9FF23801...F9CF80 por install-r; mesmo package/certificado, hash
+instalado confirmado, quatro privados/508 arquivos de catálogo preservados em
+comparação efêmera. Abriu normalmente e processo/Activity confirmados. Tablet
+ausente; Fire ADB recusado10061, nenhum dos dois instalado. Reconexão solicitada.
+Lock49+9 PASS,405/405 hashes atuais idênticos; somente documentação de entrega
+alterada. Não homologar reprodução/gestos físicos nem afirmar atualização total.
+
+## 2026-10-05 — Seleção Live independente da categoria e Home phone sem Back
+
+Objeto do canal ativo separado da página navegada; categoria/filtro/paginação
+não reiniciam player/sessão, erro mantém visibilidade e grupo do ativo correto.
+Inicialização automática/seleção explícita/fullscreen/Back guardados por teste
+novo43 checks. Resseleção do mesmo grupo deixa página intacta. Pedido adicional
+suprime Back visual apenas Home<600, sem mudar histórico; teste novo14 checks
+rejeitou baseline e preservou Back de outras rotas/tablet/Fire. React review
+orientou referência estável/setState funcional/cleanup e classe visual, sem refactor.
+Browser total43+14+26+25+59/zero erros; lock49+9/guards/build/sync/Gradle PASS.
+400/405 byte-idênticos, só três produção/harness/APK; Java/config/ativação iguais.
+APK9FF23801...F9CF80 gerado/assinado/assets conferidos, backup4B66... mantido.
+NÃO instalado, aguardando resposta de atualização; sem reset/Git/backend/Gate/60s.
+[Provas e incidentes](evidence/C11_LIVE_MOBILE_ALWAYS_VISIBLE_PREVIEW.md).
+
+## 2026-10-05 — Entrega in-place primeiro no celular
+
+Autorização posterior refletida no contrato antes de instalar APK4B66D7BF...
+FF835A existente. Samsung SM-S926B/RXGYB03FL4W atualizado -r, mesmo package/
+assinatura. Identidade/chave/instalação/ativação e508 arquivos do catálogo iguais
+imediatamente antes/depois, comparação RAM sem publicar valores privados.
+Abertura normal/processo/Activity foreground confirmados;405/405 hashes locais
+iguais e lock49+9 PASS. Sem novo patch/build/Git/backend/reset/outro aparelho.
+Teste de versão limpa não antecipado; rotação/fullscreen físico segue pendente.
+[Entrega e limites](evidence/C11_LIVE_MOBILE_ALWAYS_VISIBLE_PREVIEW.md).
+
+## 2026-10-05 — Live mobile permanente, gestos e orientação phone
+
+Pedidos sucessivos especificados antes de cada patch: duas abas/vídeo visível,
+limpeza Header/Back; retirar ação nativa, touch no telefone; edge-to-edge e UI
+phone portrait/fullscreen landscape. Mesmo preview/C9/ativação, sem outro player.
+Geometria passa a observar montagem assíncrona; React review/skills orientaram
+prova de ref/session persistentes e cleanup, não refactor. Matriz59/mobile26/
+interações25, Java102, lock49+9/guards/build/assets/assinatura PASS.
+APK4B66D7BF...FF835A gerado, backup6F1C... mantido. NÃO instalado; confirmação
+física pendente/sem autorização nova.393/401 iguais, só recorte permitido;
+CSS prefixo recupera hash antigo ao restaurar1CRLF de contexto em RAM.
+Sem alterações fonte/ativação/ponte/VOD/backend/Git ou próximo Gate/60s.
+[Entrega/autoridade/limites](evidence/C11_LIVE_MOBILE_ALWAYS_VISIBLE_PREVIEW.md).
+
+## 2026-10-04 — Correção nativa mínima das faixas vazadas em fullscreen
+
+Imagem do tablet e código mostraram PlayerView transparente após MATCH_PARENT.
+Spec prévia autorizou só preto no enter e transparência no exit; FIT/mesmo
+player/Back/gestos/inline/source/ativação preservados. Inversão do patch com
+restauração de três EOL do contexto em RAM recupera hash nativo byte-exato.
+Guard estático novo e cinco negativos, browser58+24, Java96, lock49+9/guards,
+build/assets/assinatura PASS.399/401 baseline iguais, somente nativo/APK.
+APK6F1C4F36...54994B instalado -r Fire primeiro/Samsung depois; privados/catálogos
+preservados. Skills de verificação exigiram prova visual além de estado DOM:
+SurfaceView2560x1440 centralizado em2560x1600, extremos comprovadamente fora
+do vídeo têm100% pixels pretos; somente PNGs desses recortes foram gravados.
+Geometria inicial transitória deu inconclusivo, único reteste bounded PASS;
+nenhuma alteração de produto motivada por tooling/captura. Sem Gate/60s.
+[Entrega, incidentes e limites](evidence/C11_LIVE_FULLSCREEN_OPAQUE_BACKDROP.md).
+
+## 2026-10-04 — Gestos Live consolidados e rolagem isolada
+
+Spec antes do código: segundo clique no canal ativo e tap nativo tablet
+reutilizam promoção do preview autorizado, sem novo player/session/source.
+Lock de comando/stale/cleanup testados. Emenda de scroll limita só Shell Live
+em paisagem e isola três áreas: controle negativo reproduziu176px externos,
+matriz corrigida PASS. Último pedido remove botão visível/foco/espaço no
+modo lateral via CSS, preservando celular/retrato/handlers e mesma superfície.
+Skills browser verificaram história/UI; review React conteve patch sem refactor.
+58 layout+24 interações, Java96, lock49+9/guards/build/assinatura/assets PASS.
+APK finalED324AF7...02B5F09,9062241 bytes, dois backups novos recuperáveis.
+Fire primeiro/tablet segundo -r, quatro privados e436/505 arquivos preservados.
+Samsung tap/Back/swipe PASS; Fire primeiro timeout com rota alterada, causa
+aberta, único reteste instrumentado Enter/click/fullscreen/Back PASS sem patch.
+394/401 baseline iguais; Git/backend/reset/next Gate/performance fora do ciclo.
+[Entrega e limitações](evidence/C11_LIVE_FULLSCREEN_GESTURES.md).
+
+## 2026-10-04 — Prévia Live conforme referência, preservando três colunas
+
+Emenda anterior ao código definiu refinamento só de apresentação: largura total
+16:9, identificação/programação compactas abaixo, badge à direita e mesma ação
+nativa visível. Sem inventar EPG ou alterar seleção/fonte/Media3/C9/ativação.
+Auditoria recupera exatamente JSX/CSS baseline removendo apenas marcas novas;
+397/401 arquivos iguais. Browser 53/zero erros, lock 49+9 e guards/build PASS.
+Skills de browser orientaram fluxo isolado e inspeção visual, mais confirmação
+DOM física. APK 3B3673C8...A75E07, 8784293 bytes, backup intermediário preservado.
+Update -r Fire primeiro/Samsung segundo, quatro privados e 436/505 arquivos
+canônicos preservados; base.apk exato. DOM confirma largura/ordem/controle nos
+dois, processos 8711/12616 preservados; crops Samsung inspecionados. Fire sem
+nova captura devido limite da etapa anterior, forwards limpos. Não homologa
+playback real/estabilidade universal ou retoma performance/novo Gate.
+[Entrega final e limites](evidence/C11_LIVE_PREVIEW_REFERENCE_LAYOUT.md).
+
+## 2026-10-04 — Controles Live abaixo e refinamento visual posterior
+
+Classes/badge/CSS mantiveram handlers/ref/C9/Media3 intactos, auditoria exata
+recupera baseline. Browser 53/zero erros, lock 49+9, C9 10/VOD 12/Live 17 e
+build/assinatura/assets PASS. APK 457E21EE...8749802 bytes instalado nos dois
+alvos, quatro privados e catálogo 436/505 preservados; DOM físico PASS. Captura
+Fire timeout, única repetição DOM-only PASS com mesmo PID; Samsung crops PASS.
+397/401 arquivos baseline iguais, demais apenas Live/CSS/teste/APK. Usuário
+depois enviou referência visual para somente a coluna de prévia, preservando
+categorias/canais/sidebar; documentar nova spec antes do novo refinamento.
+[Evidência da etapa](evidence/C11_LIVE_PREVIEW_CONTROLS_LAYOUT.md).
+
+## 2026-10-04 — APK do cabeçalho Live instalado no Fire e Samsung
+
+Usuário autorizou instalação/confirmacão e respondeu especificamente sim para
+Samsung também. Spec emendada antes da execução: Fire primeiro, tablet segundo,
+package/assinatura iguais e install -r sem reset. APK existente 9B12B0C1...
+(8780976 bytes) confirmado por SHA-256 público instalado nos dois alvos. Quatro
+privados de cada aparelho e 436 arquivos canônicos Fire/505 Samsung preservados
+durante instalação; comparações privadas somente em RAM. Lock 49+9 PASS.
+
+MainActivity abriu normalmente. Skill de browser orientou snapshot/ação/DOM e
+PNG recortado: cabeçalhos físicos sem badges técnicos, título/contador/Voltar
+mantidos, sidebar ícones/categorias presentes, processos estáveis nos probes.
+Forwards exclusivos removidos. 401 hashes iguais, sem novo patch/build, outros
+alvos, reset/backend/Git ou teste homologado de reprodução/performance 60s.
+Supersede não instalado da entrega anterior.
+[Evidência](evidence/C11_LIVE_HEADER_TECHNICAL_BADGES_REMOVAL.md).
+
+## 2026-10-04 — Remoção dos dois badges técnicos de Canais
+
+Pedido explícito atendido removendo só o div informativo de LiveTvPage,
+incluindo alternativa MOBILE FLUXO. Spec prévia, hash previsto de remoção exata
+confirmado; título/contador/Voltar/tabs/foco e lógica de canais/player intactos.
+Skills de browser/verificação orientaram DOM/console/imagens e fronteira local,
+sem API/backend. Fixture completa 41 checks/zero erros, lock 49+9 antes e depois
+pelo prebuild, tsc/Vite/sync/assemble e assinatura/package/cinco assets PASS.
+
+APK raiz 9B12B0C1... 8780976 bytes; backup recuperável do anterior A806C1B2...
+criado sem colidir com histórico. 398/401 baseline byte-idênticos, só produção
+Live, teste browser e APK mudaram além dos docs/outputs previstos. Primeiro
+browser abriu em branco/timeout sem causa confirmada; único reteste integral
+PASS sem patch adicional. Não instalado em aparelhos, não homologado playback
+físico, sem reset/backend/Git ou retomada 60s.
+[Evidência](evidence/C11_LIVE_HEADER_TECHNICAL_BADGES_REMOVAL.md).
+
+## 2026-10-04 — Tablet Samsung atualizado; detalhes de Clube da Luta estáveis
+
+Após autorização explícita, instalado -r no SM-X610 o APK existente A806C1B2...
+(8748328 bytes), sem rebuild/uninstall/reset. Quatro arquivos privados e todos
+os 505 arquivos do catálogo preservados byte a byte durante a instalação.
+Sidebar física somente ícones/80px à esquerda em paisagem 1365x853 confirmada.
+
+Caso solicitado pela Busca: nome completo e digitação por caractere, um filme
+exato, detalhes em ~2s, processo estável por 45s; logs filtrados sem OOM/crash
+renderer/rejeição no intervalo. Segunda seleção já em cache, sem iniciar player.
+Queixa original NÃO reproduzida, causa NÃO confirmada; riscos de hidratação
+concorrente e erros de resolução sem catch continuam apenas diagnóstico.
+
+Lock 49+9 rerodado PASS, 401 hashes de produção/scripts/config/package/APK
+inalterados. Mudanças desta rodada documentais e artefatos sanitizados somente.
+Skills orientaram snapshot/logs primeiro e fallback CDP observado, sem inferir
+causa a partir da troca de versão. Sem patch funcional/backend/Git/outros
+aparelhos ou performance 60s. [Evidência](evidence/C11_TABLET_APK_UPDATE_AND_SEARCH_DETAIL_DIAGNOSIS.md).
+
+## 2026-10-04 — Voltar fora da sidebar, superior direito e sem linha acima do título
+
+Refinamento solicitado: controle de histórico no canto superior direito, na
+altura do cabeçalho, sem empurrar título. CSS lateral somente; mesmo callback
+AppShell, botão Live existente com duas classes visuais. D-pad cima alcança
+Voltar, entrada de sidebar preserva conteúdo/categoria. Celular inalterado.
+
+Rodada final browser 39 checks/zero erros e policy/hook PASS; lock 49+9,
+profile/live, C9/VOD, build/sync e 90 nativos/12 suites/155 tarefas PASS.
+APK A806C1B2... 8748328 bytes instalado -r SOMENTE Fire Stick, mesma assinatura,
+quatro privados preservados e hash físico correto. Probe PID 12030: posição/
+título sem deslocamento, cima->Back->histórico e Canais direita->categoria,
+esquerda->menu->direita PASS; próprio Back Live à direita sem duplicação.
+388 baseline intactos; retirar três marcadores visuais Live em memória recupera
+hash baseline exato, nenhuma lógica alterada. Sem reset/backend/Git/outros
+aparelhos; meta 60s adiada. Etapas antigas permanecem evidência histórica.
+[Evidência e limites](evidence/C11_LANDSCAPE_SIDE_NAVIGATION.md).
+
+## 2026-10-04 — Regressão Canais: sidebar entra em Categoria no Fire Stick
+
+Usuário constatou foco preso no menu Canais. Negativo reproduzido com LiveTvPage
+real no browser e APK anterior no Fire. Root div não era alcançado por fallback
+main. Patch D-pad lateral usa app-content e entrada categoria ativa; um único
+landmark visual no Live, removível para reproduzir hash baseline exato. Nenhum
+hook, player/sessão/C9 ou seleção/paginação Live alterado.
+
+Browser completo 34 checks/zero erros, policy/hook, profile/live, C9 e lock
+prebuild PASS; build/sync/Gradle 155 tarefas/90 nativos/assinatura/assets PASS.
+APK A3073378... 8747961 bytes instalado -r no Fire, hash físico correto e quatro
+arquivos privados intactos. Teclas nativas direita->categoria, esquerda->menu,
+direita->retorno PASS, PID 3981 estável. 388 baseline byte-idênticos; nenhuma
+alteração fora da allowlist. Supersede APK 187C6BD8... e confiança incompleta
+anterior. Sem reset/backend/Git/outros aparelhos, performance 60s segue adiada.
+[Evidência corrigida](evidence/C11_LANDSCAPE_SIDE_NAVIGATION.md).
+
+## 2026-10-04 — Navegação lateral compacta, ícones e Fire Stick atualizado
+
+Usuário adiou performance e solicitou sidebar em paisagem não-phone, depois
+somente ícones e instalação primeiro no Fire Stick. Spec/emendas precederam
+mudanças. Shell/Header/CSS/policy visual e D-pad apenas: rail de 80px, callbacks
+originais, nomes acessíveis; celulares/retrato mantêm textos/layout anterior.
+Esquerda no primeiro card alcança menu sem subir Home, direita retorna ao card.
+Ref de foco transitória, cleanup de listeners e DOM estável na rotação.
+
+18 políticas/hook real, browser completo 32 checks/zero erros, lock 49+9 e guards
+source/C11/player PASS. Build/sync, Gradle fresh 155 tarefas/90 testes nativos,
+package/signer/config/assets PASS. APK final 187C6BD8... 8747852 bytes instalado
+-r somente no Fire AFTSSS; quatro arquivos privados intactos antes/depois e
+hash APK físico confere. Layout real 960x540, 80px sem overlap/overflow; native
+D-pad agregado PASS, mesma categoria/card e PID 29724. Timeout de screenshot
+documentado, restante validado sem repetir fluxo completo ou limpar dados.
+
+401 arquivos auditados (baseline 394): 389 inalterados, somente quatro runtime
+originais/APK modificados e sete arquivos novos permitidos. Backup 85EB23B5...
+preservado. Sem Git/backend/instalação no tablet/celular. Primeira carga <=60s
+continua aberta e adiada; não inferir performance pelo am start nem pelo cache.
+[Evidência completa](evidence/C11_LANDSCAPE_SIDE_NAVIGATION.md).
+
+## 2026-10-04 — Retenção residual da ponte: catálogo físico completo, meta 60s aberta
+
+Usuário autorizou prosseguir sem reset da nova ativação. Config baseline debug
+habilitava logs de payloads; ponte real sintética reteve ~96 MiB com logging e
+~4 MiB sem, mantendo 49 roundtrips/erro/diagnósticos de aplicação. Quatro controles
+negativos de config PASS. Única alteração runtime: loggingBehavior=none no
+capacitor.config.ts; HTTPS/Http/mixed content e toda ativação/player intactos.
+
+Lock 49+9, suites disponíveis de source/C11/player, build/sync e 90 testes Java
+PASS; APK 85EB23B5... 8745587 bytes, mesmo package/signer, assets conferidos.
+Install -r scoped ao Fire AFTSSS preservou bytes de identidade/chave/ativação.
+Baseline aberto antes da atualização caiu de novo em ~96s; relato "fechou
+novamente" ocorreu enquanto APK novo ainda compilava. Não era falha do patch novo.
+
+Novo APK concluiu 208 segmentos/223660 episódios/17124 filmes/8911 séries e Home,
+busca completa; heap amostrado importação ~16..26 MiB e pós-busca ~7 MiB. Sem OOM
+até ~4m49s do time origin. Sync -> promoção 145,684s; Activity -> promoção 154,233s,
+Home observada até 158,893s. Meta 60s FAIL; parse/persistência ~124,5s é gargalo
+restante. Reabertura com cache não medida: comando stop foi bloqueado pelo
+ambiente antes de executar, sem contorno. Sem novo uninstall/limpeza/Git/backend.
+Proveniência: somente config/APK mudaram entre 393 hashes, um teste novo.
+[Evidência e cautelas](evidence/C11_FIRE_STICK_BRIDGE_RETENTION_FIX.md).
+
+## 2026-10-04 — Teste físico limpo: ativação passou, importação ainda falhou
+
+Usuário autorizou uninstall/reinstall no Fire Stick AFTSSS/API 28. Package único
+removido sem -k, ausente verificado, APK 0450304141... instalado/confirmado por
+hash. Antes de abrir havia somente cache/code_cache, sem files nem identidade
+restaurada. Activity exibida em 6,215s; tela A1 com código/chave prontos e HTTPS.
+Usuário ativou no painel gestor; fluxo normal iniciou source/importação.
+
+T8 às 13:15:45.672 UTC-3; download ~11,378s; V8 OOM às 13:17:22.520, GC ainda
+~224 MB, SIGTRAP do host às 13:17:27.384. Sync -> OOM 96,847s, -> host 101,711s;
+sem promoção/Home/cards, staging parcial ~104 MiB. Relato usuário ~1min30.
+Meta <=60s FALHOU neste teste, mesmo excluindo espera humana de ativação.
+
+Latest regression wins: patch sintético não homologou correção física. Nenhum
+novo patch/build/retry/reset/backend/Git; nova ativação permanece. Consulta CDP
+sanitizada sem segredos, forward próprio removido. performance.memory estático
+descartado; próximo retentor individual ainda precisa ser comprovado.
+[Relatório completo](evidence/C11_FIRE_STICK_CLEAN_INSTALL_TEST.md).
+
+## 2026-10-04 — Fire Stick: correção local de memória e redução de I/O
+
+Usuário agora solicita <=60s, requisito explícito e não conversão automática de
+medição antiga em SLA. Spec/allowlist precederam código. Reader/parsers reais
+retinham ~48 MB por 24 títulos sintéticos no caminho dataText; patch materializa
+linhas, preservando texto, e reduz retenção para <0,1 MB. Batch 2500 diminui
+episodes/streams de 200 para 80 arquivos por 100 mil episódios, catálogo inteiro.
+
+Novo teste inclui negativo real, dataText nativo simulado, sink bounded e hashes/
+relações; regressões C11 de 250 mil records, profile/live, ativação e reprodução
+PASS. Três comandos legados indisponíveis por arquivos baseline ausentes foram
+registrados sem fake PASS. Build web/lock/sync/Gradle PASS; testes nativos
+reexecutados 90/90. APK raiz 0450304141F162E0C3C912D416407B40A3B0620F1CB72D458B43C77E6EAC3781,
+mesmo package/certificado, cinco assets por hash e HTTPS conferidos; backup
+D601864B... recuperável. Audit de 386 arquivos sem alteração inesperada.
+
+Nenhum patch de ativação, backend/Git, reset, Home parcial ou instalação física.
+Meta de 60s não comprovada; aguardando marco/atualização in-place e teste físico.
+[Evidência completa](evidence/C11_FIRE_STICK_STARTUP_MEMORY_PERFORMANCE_FIX.md).
+
+## 2026-10-04 — Fire Stick Wi-Fi: causa da queda confirmada
+
+Conexão explicitamente autorizada, AFTSSS/API 28. APK instalado por hash é o
+anterior 8828F120..., não o aviso novo D601864B... preservado na raiz. Crash
+histórico mostrava perda do renderer sem motivo primário retido no buffer.
+Usuário reabriu manualmente e confirmou sincronização/fechamento. Nova tentativa
+capturou V8 javascript OOM (Reached heap limit), GC ainda com cerca de 225 MB
+ocupados, após gravação de episódios/streams 221..229. Renderer morre e app
+recebe SIGTRAP por perda de WebView não tratada, cerca de 169s após start.
+
+Classe de causa física confirmada; não é diagnóstico de licença nem erro do
+player. Objeto retentor/pico RSS não comprovados. Nenhum patch/build/instalação,
+reset, backend ou Git write; somente memória documental. Redução de memória da
+importação/tratamento controlado requer escopo funcional aprovado e lock de
+ativação preservado. [Relatório causal](evidence/C11_FIRE_STICK_STARTUP_DIAGNOSIS.md).
+
+## 2026-10-04 — Diagnóstico inicial do relato de fechamento no Fire Stick
+
+Usuário relata ativação/Home abaixo de 60s no celular, aproximadamente 90s no
+tablet e fechamento após cerca de 150s no Fire Stick, antes de abrir a Home.
+Não convertido em benchmark/SLA nem confundido com erro de reprodução terminal.
+Preflight C11/origin/main/HEAD corretos; nenhum próximo Gate/Git write autorizado.
+
+ADB lista somente SM-X610. Amostra local datada de 3/outubro contém marcadores
+IMPORT_STREAM_PARSE/IMPORT_BATCH_PERSISTED, sem fatal/OOM/perda do renderer e sem
+modelo identificado; não prova causa ou ausência de crash neste novo teste.
+APK raiz continua D601864B2E79292980869F47B6CBB34440E2E7F63DCE6C3C353A1AD3CD753385;
+APK instalado no Fire Stick ainda não foi verificado. Solicitados conexão ADB/IP
+e estágio antes de fechar. Código, ativação e APK preservados; somente documentos
+atualizados, diagnóstico físico pendente. Scripts preexistentes não executados.
+
+## 2026-10-04 — Correção autorizada do erro silencioso de reprodução
+
+Especificação precedeu o patch: categoria/status HTTP permitidos do Media3
+atravessam resume até um aviso português acessível na tela de retorno. APIs
+legadas, fallback, finish/idempotência e cleanup C9 preservados. O aviso aparece
+antes do cleanup, acompanha rolagem e sai por Fechar aviso/RESOLVING. Nenhuma
+mudança de identidade, ativação, boot, storage, licença, URLs ou autoridade.
+
+Lock 49+9, aviso 11, C9 10, VOD 12 e Android 90: PASS; typecheck/build/sync/assemble
+PASS. APK raiz recompilado com mesmo package/certificado, backup anterior
+verificado. SHA-256 final:
+`D601864B2E79292980869F47B6CBB34440E2E7F63DCE6C3C353A1AD3CD753385`.
+Sem instalação/Git/backend/novo Gate. Browser visual indisponível; fixture HTTP e
+SSR testados, aviso físico pendente. Causa dos 404 históricos/cache não corrigida.
+[Proveniência e aceitação local](evidence/C11_PLAYBACK_ERROR_NOTICE_FIX.md).
+
+## 2026-10-04 — Reteste confirmado no celular, sem patch de código
+
+SM-S926B reconectado, mesmo APK e Wi-Fi atual. 9-1-1 T1E1 e Clube da Luta
+receberam dados/primeiro frame e READY; filme avançou posição. Referências
+privadas correlacionadas ao log, sem URLs/credenciais expostas. Usuário confirmou
+ambos reproduzindo no mesmo Wi-Fi e retorno manual após o teste.
+
+Falha não reproduzível agora nos dois aparelhos para esses títulos; causa dos
+404 históricos ainda não isolada. Nenhum ajuste de runtime, identidade/ativação,
+licença, fonte, APK ou backend foi aplicado pelo agente. Apenas memória documental
+atualizada. Defeitos locais de cache/erro silencioso permanecem separados e não
+corrigidos. [Evidências e limites](evidence/C11_ACTIVATION_LOCK_AND_PLAYBACK_DIAGNOSIS.md).
+
+## 2026-10-04 — Reprodução confirmada de dois títulos no tablet
+
+Usuário esclareceu que vários conteúdos antes funcionavam neste mesmo player.
+SM-X610 conectado, com mesmo APK standalone: teste atual de 9-1-1 T1E1 recebeu
+dados/primeiro frame e READY; Clube da Luta também, com posição avançando. Ambos
+confirmados pelo usuário. Referência do filme corresponde ao fingerprint das
+requisições 404 históricas do celular: não assumir endereço permanentemente
+inválido nem estender aquele erro a todos os conteúdos/dispositivos.
+
+Causa da falha original continua aberta; necessária reprodução atual no aparelho
+afetado com episódio/rede identificados. Logs orientaram contraprova, não patch
+especulativo. Apenas memória documental alterada; runtime, ativação, APK e
+autoridade preservados, sem Git writes/backend/novo Gate.
+[Evidência completa](evidence/C11_ACTIVATION_LOCK_AND_PLAYBACK_DIAGNOSIS.md).
+
+## 2026-10-04 — Diagnóstico físico read-only do retorno do player
+
+SM-S926B reconhecido no ADB; hash do APK instalado coincide com o standalone
+entregue. Duas falhas do log foram correlacionadas ao stream privado de Clube
+da Luta: HTTP 404, code 2004, antes de dados/primeiro frame. Isso substitui a
+ausência de evidência física anterior, sem atribuir a falha ao cache pré-player
+ou a codec. O motivo do 404 na origem permanece não determinado.
+
+Código confirma finish após erro/candidato esgotado e perda da causa na UI de
+retorno. Apenas evidências/documentação atualizadas; runtime, testes, ativação,
+licença e APK não alterados. Sem instalação, reset, backend, commit/push/PR ou
+novo Gate. [Relatório sanitizado](evidence/C11_ACTIVATION_LOCK_AND_PLAYBACK_DIAGNOSIS.md).
+
+## 2026-10-03 — Canonização da ativação e investigação de playback seletivo
+
+Usuário confirmou ativação/carregamento nos novos aparelhos. Registrado como
+USER_REPORTED_SUCCESS, sem converter relato em homologação de playback. Lock
+canônico incluído em AGENTS/Architecture/Execution e prebuild; 22 casos de
+ativação (agora com dois dispositivos isolados) e 27 de promoção passaram, com
+9 controles negativos do guard. Build executou lock antes de tsc/Vite e passou.
+
+Runtime de produção e APK preservados. Suites de playback 10/10 e 12 casos
+passaram em fixtures. Diagnóstico reproduziu cache stale da lista de segmentos
+do hook: lookup pode falhar após cache vazio/troca de geração, sem chamar player.
+Não confirma causa física: alguns filmes abrem; Clube da Luta falha. Sem adb
+conectado nem mensagem/erro físico, aguardando esse dado antes de corrigir.
+Nenhuma mudança no player, sessão comercial, backend ou dados dos aparelhos.
+
+[Contrato](architecture/C11_NEW_DEVICE_ACTIVATION_LOCK.md) ·
+[Relatório](evidence/C11_ACTIVATION_LOCK_AND_PLAYBACK_DIAGNOSIS.md).
+
+## 2026-10-03 — Correção dos diretórios de promoção do catálogo
+
+Expansão local explicitamente aprovada pelo usuário após as capturas mostrarem
+AUTHORIZED/SOURCE_READY/STORED com PROMOTION_FAILED/Missing parent directory.
+Especificação/allowlist escrita antes do código. ensureDir deixou de ser no-op:
+mkdir recursivo confirma diretórios existentes com stat e propaga erros reais.
+Guarda impede apagar/sobrescrever a geração apontada pelo active.json.
+Rename/copy e pipeline bounded-memory preservados, sem alterações de licença,
+identidade, UI, backend ou regras de autorização.
+
+27 testes focados e 21 de ativação passaram. Importação sintética 250k passou
+(79 checkpoints até T83); suíte histórica passou 11 casos e parou em T12 por
+dependência ausente também no HEAD, registrada sem mascarar falha.
+Build/sync/assembleDebug passaram. Assets e patch conferidos no APK standalone;
+mesmo package/certificado debug permitem atualização sobre o artefato anterior.
+Validação física nos dois aparelhos permanece pendente; nenhum dispositivo foi
+resetado, desvinculado ou reinstalado. Nenhum commit/push/PR ou novo Gate.
+
+[Especificação](architecture/C11_CATALOG_PROMOTION_DIRECTORY_FIX.md) ·
+[Evidências e artefato](evidence/C11_CATALOG_PROMOTION_DIRECTORY_FIX.md).
+
+## 2026-10-03 — Correção da identidade/chave em instalação nova
+
+Patch local autorizado pelo usuário no workspace isolado C11. Identidade,
+instalação, token e chave usam geração serializada e persistência verificada.
+SHA-256 puro cobre Web Crypto ausente/rejeitado/pendente, sem import Node no
+serviço de identidade. A tela exibe código/chave antes de consultas remotas e
+permite retry. Boot não autorizado permanece IDLE sem resolver fonte/licença.
+Boot e tela compartilham registro A1; status indeterminado não cancela a sessão.
+Os arquivos canônicos e WebView foram excluídos de backup/transferência Android,
+sem desativar o backup dos demais dados.
+
+21 testes focados e 57 de contrato passaram. Build/sync/assembleDebug passaram;
+APK raiz inspecionado e assinatura v1/v2 verificada. Não houve commit, push, PR,
+escrita no backend, limpeza de dados ou instalação em aparelho. O E2E físico em
+celular novo permanece pendente. Testes legados com fixtures desatualizadas não
+foram normalizados fora da allowlist; comparações HEAD/current estão na evidência.
+
+[Especificação](architecture/C11_NEW_DEVICE_ACTIVATION_FIX.md) ·
+[Evidência](evidence/C11_NEW_DEVICE_ACTIVATION_FIX.md).
+
 ---
 
 ## 1. Identidade e Contexto de Evolucao

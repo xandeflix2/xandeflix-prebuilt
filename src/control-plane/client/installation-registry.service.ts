@@ -13,6 +13,7 @@
 import { Capacitor } from '@capacitor/core';
 import { DeviceIdentityService } from '../../device/device-identity.service.ts';
 import { getSupabaseBrowserClient } from '../../integrations/supabase/client.ts';
+import { activationDeadline } from './activation-timeout.ts';
 import type {
   AppInstallationReportPayload,
   AppInstallationReportResponse,
@@ -22,13 +23,24 @@ export const CANONICAL_PACKAGE_NAME = 'com.xandeflix.prebuilt';
 
 export class InstallationRegistryService {
   private static lastReportedAtMs = 0;
+  private static reportPromise: Promise<AppInstallationReportResponse | null> | null = null;
 
   /**
    * Reporta a instalação atual de forma idempotente e segura durante o ciclo de boot.
    *
    * Garantia: Nunca lança exceção em caso de erro.
    */
-  static async reportInstallationBestEffort(): Promise<AppInstallationReportResponse | null> {
+  static reportInstallationBestEffort(): Promise<AppInstallationReportResponse | null> {
+    if (this.reportPromise) return this.reportPromise;
+    const promise = this.reportInstallation();
+    this.reportPromise = promise;
+    void promise.finally(() => {
+      if (this.reportPromise === promise) this.reportPromise = null;
+    }).catch(() => undefined);
+    return promise;
+  }
+
+  private static async reportInstallation(): Promise<AppInstallationReportResponse | null> {
     try {
       // 1. Assegura a identidade da instalação e a identidade do dispositivo
       const [installation, identity] = await Promise.all([
@@ -57,9 +69,9 @@ export class InstallationRegistryService {
       };
 
       // 4. Executa a RPC pública sanitizada
-      const { data, error } = await supabase.rpc('rpc_report_app_installation', {
+      const { data, error } = await activationDeadline((signal) => supabase.rpc('rpc_report_app_installation', {
         p_payload: payload,
-      });
+      }).abortSignal(signal));
 
       if (error) {
         // Falha no backend ou rejeição: não é fatal

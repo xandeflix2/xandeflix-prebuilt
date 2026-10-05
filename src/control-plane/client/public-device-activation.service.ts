@@ -1,5 +1,6 @@
 import { getSupabaseBrowserClient, parseSanitizedFunctionError } from '../../integrations/supabase/client.ts';
 import type { LicenseStatus } from '../control-plane.types.ts';
+import { activationDeadline } from './activation-timeout.ts';
 
 export interface PublicDeviceActivationSession {
   sessionToken: string;
@@ -39,9 +40,10 @@ export class PublicDeviceActivationService {
     if (!client) return { success: false, code: 'CLIENT_UNAVAILABLE', message: 'Serviço de ativação indisponível.' };
 
     try {
-      const { data, error } = await client.functions.invoke('device-public-activation', {
+      const { data, error } = await activationDeadline((signal) => client.functions.invoke('device-public-activation', {
         body: { operation: 'REGISTER_KEY', ...params },
-      });
+        signal,
+      }));
       if (error) {
         const parsed = await parseSanitizedFunctionError(error);
         return { success: false, code: parsed.code || 'REMOTE_ERROR', message: parsed.message };

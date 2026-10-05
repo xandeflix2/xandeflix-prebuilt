@@ -63,6 +63,8 @@ export interface SearchResultItem {
   year?: number;
   score: number;
   matchClass: SearchMatchClass;
+  posterUri?: string;
+  posterUrl?: string;
 }
 
 export interface SearchIndexValidationResult {

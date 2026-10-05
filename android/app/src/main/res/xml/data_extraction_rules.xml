@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="file" path="device_identity.json" />
+        <exclude domain="file" path="app_installation.json" />
+        <exclude domain="file" path="device_activation_key.json" />
+        <exclude domain="file" path="device_activation.json" />
+        <exclude domain="file" path="pending_device_token.json" />
+        <exclude domain="root" path="app_webview" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="file" path="device_identity.json" />
+        <exclude domain="file" path="app_installation.json" />
+        <exclude domain="file" path="device_activation_key.json" />
+        <exclude domain="file" path="device_activation.json" />
+        <exclude domain="file" path="pending_device_token.json" />
+        <exclude domain="root" path="app_webview" />
+    </device-transfer>
+</data-extraction-rules>

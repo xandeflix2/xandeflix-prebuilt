@@ -269,6 +269,23 @@ export function getMovieDetail(
   const movie = readModel.moviesById.get(movieId);
   if (!movie) return null;
 
+  const posterUri =
+    (movie as any).posterUrl ||
+    (movie as any).posterUri ||
+    (movie as any).logo ||
+    (movie as any).cover ||
+    (movie as any).stream_icon ||
+    readModel.resolveArtworkUri(movie.artworkIds, 'poster') ||
+    '';
+
+  const backdropUri =
+    (movie as any).backdropUrl ||
+    (movie as any).backdropUri ||
+    (movie as any).posterUrl ||
+    (movie as any).posterUri ||
+    readModel.resolveArtworkUri(movie.artworkIds, 'backdrop') ||
+    posterUri;
+
   return {
     id: movie.id,
     title: movie.title,
@@ -276,8 +293,8 @@ export function getMovieDetail(
     yearFormatted: readModel.formatYear(movie.year),
     overview: movie.overview,
     durationFormatted: readModel.formatDuration(movie.durationSeconds),
-    posterUri: readModel.resolveArtworkUri(movie.artworkIds, 'poster'),
-    backdropUri: readModel.resolveArtworkUri(movie.artworkIds, 'backdrop'),
+    posterUri,
+    backdropUri,
     genreLabels: readModel.resolveGenreLabels(movie.genreIds),
     categoryLabels: readModel.resolveCategoryLabels(movie.categoryIds),
     playbackState: 'PLAYBACK_AVAILABLE_IN_G8',
@@ -294,6 +311,23 @@ export function getSeriesDetail(
   const series = readModel.seriesById.get(seriesId);
   if (!series) return null;
 
+  const seriesPoster =
+    (series as any).posterUrl ||
+    (series as any).posterUri ||
+    (series as any).logo ||
+    (series as any).cover ||
+    (series as any).stream_icon ||
+    readModel.resolveArtworkUri(series.artworkIds, 'poster') ||
+    '';
+
+  const seriesBackdrop =
+    (series as any).backdropUrl ||
+    (series as any).backdropUri ||
+    (series as any).posterUrl ||
+    (series as any).posterUri ||
+    readModel.resolveArtworkUri(series.artworkIds, 'backdrop') ||
+    seriesPoster;
+
   const rawSeasons = readModel.seasonsBySeriesId.get(seriesId) || [];
 
   const seasons: SeasonViewModel[] = rawSeasons.map((season) => {
@@ -305,7 +339,15 @@ export function getSeriesDetail(
       title: ep.title,
       overview: ep.overview,
       durationFormatted: readModel.formatDuration(ep.durationSeconds),
-      thumbnailUri: readModel.resolveArtworkUri(ep.artworkIds, 'thumbnail'),
+      thumbnailUri:
+        (ep as any).thumbnailUri ||
+        (ep as any).thumbnailUrl ||
+        (ep as any).posterUri ||
+        (ep as any).posterUrl ||
+        (ep as any).logo ||
+        seriesPoster ||
+        readModel.resolveArtworkUri(ep.artworkIds, 'thumbnail') ||
+        '',
       playbackState: 'PLAYBACK_AVAILABLE_IN_G8',
     }));
 
@@ -324,8 +366,8 @@ export function getSeriesDetail(
     originalTitle: series.originalTitle,
     yearFormatted: readModel.formatYear(series.year),
     overview: series.overview,
-    posterUri: readModel.resolveArtworkUri(series.artworkIds, 'poster'),
-    backdropUri: readModel.resolveArtworkUri(series.artworkIds, 'backdrop'),
+    posterUri: seriesPoster,
+    backdropUri: seriesBackdrop,
     genreLabels: readModel.resolveGenreLabels(series.genreIds),
     categoryLabels: readModel.resolveCategoryLabels(series.categoryIds),
     seasons,

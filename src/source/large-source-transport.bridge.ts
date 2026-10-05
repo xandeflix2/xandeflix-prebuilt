@@ -64,6 +64,7 @@ export interface LargeSourceDownloadStartResult {
 export interface LargeSourceDownloadChunkResult {
   done: boolean;
   dataBase64?: string;
+  dataText?: string;
   bytesRead: number;
   stage?: LargeSourceTransportStage;
   errorCode?: LargeSourceTransportErrorCode;

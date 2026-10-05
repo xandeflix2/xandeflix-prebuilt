@@ -2326,9 +2326,523 @@ html, body {
 }
 
 
+.playback-error-notice {
+  position: sticky;
+  top: var(--ui-header-height, 4rem);
+  z-index: 200;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border: 1px solid #b45353;
+  border-radius: 0.75rem;
+  background: #291820;
+}
+.playback-error-notice h2 { font-size: 1.125rem; }
+.playback-error-notice p { overflow-wrap: anywhere; }
+.playback-error-notice button { flex-shrink: 0; }
+
 /* C11 catalog-completeness: reserva espaço ao label Live sem alterar a densidade global. */
 @media (min-width: 900px) and (max-width: 1100px) and (orientation: landscape) and (max-height: 600px) and (min-aspect-ratio: 16/10) {
   .app-content > div[style*="height: 100vh"] > div:nth-child(2) > div:first-child > div:nth-child(2) > button { padding-left: 2px !important; padding-right: 2px !important; gap: 1px !important; }
   .app-content > div[style*="height: 100vh"] > div:nth-child(2) > div:first-child > div:nth-child(2) > button > span:last-child { margin-left: 1px !important; }
+}
+
+/* C11: visual-only landscape navigation. Phone/portrait keep all existing rules. */
+.nav-icon, .brand-mark { display: none; }
+
+.app-shell--side-nav {
+  --side-nav-width: 80px;
+  padding-left: calc(var(--side-nav-width) + env(safe-area-inset-left, 0px));
+}
+
+.app-shell--side-nav .app-header {
+  position: fixed !important;
+  inset: 0 auto 0 0;
+  width: calc(var(--side-nav-width) + env(safe-area-inset-left, 0px));
+  height: 100vh !important;
+  min-height: 0 !important;
+  max-height: 100vh !important;
+  display: flex;
+  flex-direction: column !important;
+  flex-wrap: nowrap !important;
+  align-items: stretch !important;
+  justify-content: flex-start;
+  gap: 1.25rem;
+  padding: max(1rem, env(safe-area-inset-top, 0px)) 0.5rem max(1rem, env(safe-area-inset-bottom, 0px)) max(0.5rem, env(safe-area-inset-left, 0px)) !important;
+  overflow-y: auto;
+  border-bottom: 0;
+  border-right: 1px solid var(--border-subtle);
+}
+
+.app-shell--side-nav .header-left {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.75rem !important;
+  flex-shrink: 0;
+}
+
+.app-shell--side-nav .brand-container {
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+.app-shell--side-nav .brand-logo,
+.app-shell--side-nav .brand-sub,
+.app-shell--side-nav .nav-label,
+.app-shell--side-nav .back-label { display: none; }
+.app-shell--side-nav .brand-mark { display: inline-flex; color: var(--accent-primary); }
+.app-shell--side-nav .nav-icon { display: inline-flex; align-items: center; justify-content: center; }
+.app-shell--side-nav .nav-icon svg { display: block; }
+.app-shell--side-nav .btn-back { text-align: center; }
+
+.app-shell--side-nav .header-nav {
+  display: flex !important;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.375rem !important;
+  flex-shrink: 0;
+}
+
+.app-shell--side-nav .nav-link {
+  min-height: 48px !important;
+  padding: 0.65rem 0.875rem !important;
+  font-size: 0.875rem !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.app-shell--side-nav .nav-link.active {
+  box-shadow: inset 3px 0 0 var(--accent-primary);
+}
+
+.app-shell--side-nav .header-right { margin-top: auto; flex-shrink: 0; justify-content: center; }
+.app-shell--side-nav .header-catalog-badge { width: fit-content; max-width: 100%; }
+.app-shell--side-nav .badge-text { display: none; }
+.app-shell--side-nav .app-content { min-width: 0; position: relative; }
+.app-shell--side-nav .page-back-row {
+  position: absolute;
+  top: var(--ui-page-gap, 1.5rem);
+  right: var(--tv-page-gutter, 1.5rem);
+  z-index: 5;
+  display: flex;
+}
+.app-shell--side-nav .page-back-row + main .page-header { padding-right: 8rem; }
+.app-shell--side-nav .page-back-row + .search-page-container .search-page-heading { margin-right: 8rem; }
+.app-shell--side-nav .app-content .live-page-header { position: relative; padding-right: 8rem !important; }
+.app-shell--side-nav .live-page-header .live-page-back {
+  position: absolute;
+  right: var(--tv-page-gutter, 1.5rem);
+  top: 50%;
+  transform: translateY(-50%);
+}
+.app-shell--side-nav .mobile-bottom-nav { display: none !important; }
+
+/* C11: live preview presentation only; phone/portrait retain the original controls. */
+.live-channel-live-badge { display: none; }
+
+#root .app-shell--side-nav .live-preview-panel {
+  min-width: 0;
+  padding: 0 !important;
+}
+#root .app-shell--side-nav .live-preview-section,
+#root .app-shell--side-nav .live-epg-section {
+  display: contents;
+}
+#root .app-shell--side-nav .live-preview-surface {
+  order: 1;
+  flex-shrink: 0;
+  width: 100% !important;
+  height: auto !important;
+  max-height: none !important;
+  aspect-ratio: 16 / 9 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+#root .app-shell--side-nav .live-preview-controls {
+  /* Fullscreen is reached from the selected channel or tablet native tap. */
+  display: none !important;
+}
+.app-shell--side-nav .live-preview-legacy-title { display: none !important; }
+#root .app-shell--side-nav .live-channel-summary {
+  order: 2;
+  flex-shrink: 0;
+  gap: 0.65rem !important;
+  padding: 0.65rem 0.85rem 0.4rem !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+#root .app-shell--side-nav .live-channel-summary > :first-child {
+  flex-shrink: 0;
+  width: 32px !important;
+  height: 32px !important;
+}
+.app-shell--side-nav .live-channel-summary .live-channel-details {
+  min-width: 0;
+}
+.app-shell--side-nav .live-channel-details > div:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.app-shell--side-nav .live-channel-details > div:last-child,
+.app-shell--side-nav .live-epg-header,
+.app-shell--side-nav .live-epg-fallback > div:first-child,
+.app-shell--side-nav .live-epg-fallback > div:last-child {
+  display: none !important;
+}
+#root .app-shell--side-nav .live-epg-fallback {
+  order: 3;
+  flex-shrink: 0;
+  padding: 0 0.85rem 0.65rem !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  text-align: left !important;
+}
+#root .app-shell--side-nav .live-epg-fallback > div:nth-child(2) {
+  margin: 0 !important;
+  color: #94a3b8 !important;
+  font-size: 0.8rem !important;
+  font-weight: 400 !important;
+}
+.app-shell--side-nav .live-channel-live-badge {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-left: auto;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  background-color: #dc2626;
+  color: #ffffff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+/* C11 Live only: keep the page frame fixed while each column scrolls locally. */
+#root .app-shell--side-nav.app-shell--live-view {
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+#root .app-shell--live-view > .app-content {
+  min-height: 0;
+  overflow: hidden;
+  padding-bottom: 0 !important;
+}
+#root .app-shell--live-view .app-content > .page-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  padding: 0 !important;
+  overflow: hidden;
+}
+#root .app-shell--live-view .live-tv-page {
+  flex: 1;
+  height: 100% !important;
+  min-height: 0;
+}
+#root .app-shell--live-view .live-columns,
+#root .app-shell--live-view [data-dpad-region="live-categories"],
+#root .app-shell--live-view .live-channel-column {
+  min-height: 0;
+  overflow: hidden;
+}
+#root .app-shell--live-view .live-category-list,
+#root .app-shell--live-view .live-channel-list,
+#root .app-shell--live-view .live-preview-panel {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* C11: show sync state, never a catalog version indicator. */
+.header-sync-status {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #4ade80;
+  font-size: 0.75rem;
+}
+.app-shell--side-nav .header-sync-status .badge-text { display: none; }
+
+/* C11 narrow Live: one native surface above two tabs; lists scroll locally. */
+@media (max-width: 599px) {
+  #root .app-shell--live-page {
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+  }
+  #root .app-shell--live-page > .app-content {
+    min-height: 0;
+    overflow: hidden;
+    padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  #root .app-shell--live-page .page-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    padding: 0 !important;
+    overflow: hidden;
+  }
+  #root .app-shell--live-page .app-footer { display: none; }
+  #root .live-tv-page--mobile {
+    flex: 1;
+    height: 100% !important;
+    min-height: 0;
+  }
+  #root .live-tv-page--mobile .live-page-header { padding: 0.5rem 0.65rem !important; }
+  #root .live-tv-page--mobile .live-page-header > div {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.2rem 0.5rem !important;
+    width: 100%;
+  }
+  #root .live-tv-page--mobile .live-page-header h1 {
+    grid-column: 1;
+    grid-row: 1;
+    font-size: 1rem !important;
+    white-space: nowrap;
+  }
+  #root .live-tv-page--mobile .live-page-header > div > span {
+    grid-column: 1;
+    grid-row: 2;
+    justify-self: start;
+    white-space: nowrap;
+  }
+  #root .live-tv-page--mobile .live-page-back {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    align-self: center;
+    padding: 0.45rem 0.6rem !important;
+  }
+  #root .live-tv-page--mobile .live-columns,
+  #root .live-tv-page--mobile .live-preview-panel { display: contents !important; }
+  #root .live-tv-page--mobile .live-preview-section {
+    order: 1;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    padding: 0 !important;
+    border: 0 !important;
+  }
+  #root .live-tv-page--mobile .live-preview-surface {
+    order: 1;
+    flex-shrink: 0;
+    width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    aspect-ratio: 16 / 9;
+    box-sizing: border-box;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+  #root .live-tv-page--mobile .live-preview-controls {
+    order: 2;
+    gap: 0.4rem;
+    margin: 0 !important;
+    padding: 0.3rem 0.65rem;
+  }
+  #root .live-tv-page--mobile .live-preview-legacy-title {
+    min-width: 0;
+    gap: 0.35rem !important;
+  }
+  #root .live-tv-page--mobile .live-preview-legacy-title h2 { font-size: 0.8rem !important; }
+  #root .live-tv-page--mobile .live-preview-live-badge { flex-shrink: 0; }
+  #root .live-tv-page--mobile .mobile-live-tabs { order: 2; flex-shrink: 0; }
+  #root .live-tv-page--mobile [data-dpad-region="live-categories"],
+  #root .live-tv-page--mobile .live-channel-column {
+    order: 3;
+    flex: 1;
+    min-height: 60px;
+    overflow: hidden;
+  }
+  #root .live-tv-page--mobile .live-category-list,
+  #root .live-tv-page--mobile .live-channel-list {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  #root .live-tv-page--mobile .live-epg-section {
+    order: 4;
+    flex: 0 1 auto !important;
+    min-height: 0;
+    max-height: 44px;
+    padding: 0.5rem 0.65rem !important;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  #root .live-tv-page--mobile .live-epg-header > span { display: none; }
+  #root .live-tv-page--mobile .live-epg-header h3 {
+    font-size: 0.75rem !important;
+    white-space: nowrap;
+  }
+}
+@media (max-width: 599px) and (max-height: 650px) {
+  #root .live-tv-page--mobile .live-preview-controls {
+    padding-top: 0.2rem;
+    padding-bottom: 0.2rem;
+  }
+  #root .live-tv-page--mobile .live-channel-column > div:first-child {
+    padding: 0.2rem 0.65rem !important;
+  }
+  #root .live-tv-page--mobile .live-channel-column > div:first-child > div:first-child {
+    margin-bottom: 0 !important;
+  }
+  #root .live-tv-page--mobile .live-epg-section {
+    max-height: 28px;
+    padding: 0.25rem 0.65rem !important;
+  }
+}
+
+/* A Home do celular não exibe retorno; histórico e outras páginas ficam intactos. */
+@media (max-width: 599px) {
+  #root .app-shell--home-page .app-header .btn-back {
+    display: none;
+  }
+}
+
+/* Filmes, Séries e Busca no celular: marca à esquerda, retorno só ícone à direita. */
+@media (max-width: 599px) {
+  #root .app-shell--phone-header-back .app-header .header-left {
+    flex: 1;
+    min-width: 0;
+    gap: 0.5rem;
+  }
+  #root .app-shell--phone-header-back .app-header .btn-back {
+    order: 1;
+    margin-left: auto;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+    min-height: 44px !important;
+    padding: 0 !important;
+    font-size: 1.25rem;
+  }
+  #root .app-shell--phone-header-back .app-header .btn-back .back-label {
+    display: none;
+  }
+}
+
+/* O glifo legado continua nos outros layouts; só o Header phone usa SVG. */
+.btn-back .back-arrow-icon {
+  display: none;
+}
+@media (max-width: 599px) {
+  #root .app-shell--home-page .app-header,
+  #root .app-shell--phone-header-back .app-header {
+    height: calc(64px + env(safe-area-inset-top, 0px)) !important;
+    min-height: calc(64px + env(safe-area-inset-top, 0px)) !important;
+    max-height: none !important;
+  }
+  #root .app-shell--phone-header-back .app-header .btn-back .back-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+  #root .app-shell--phone-header-back .app-header .btn-back .back-arrow-glyph {
+    display: none;
+  }
+  #root .app-shell--phone-header-back .app-header .btn-back .back-arrow-icon {
+    display: block;
+  }
+}
+
+/* Phone: quatro atalhos grandes; Início junto ao retorno nas páginas internas. */
+.header-home-button {
+  display: none;
+}
+@media (max-width: 599px) {
+  #root .mobile-bottom-nav .mobile-nav-label {
+    display: none;
+  }
+  #root .mobile-bottom-nav .nav-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #root .mobile-bottom-nav .nav-icon svg {
+    display: block;
+    width: 32px;
+    height: 32px;
+  }
+  #root .app-shell--phone-header-back .header-home-button {
+    order: 1;
+    margin-left: auto;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+    min-height: 44px !important;
+    padding: 0 !important;
+    color: var(--text-main);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border-subtle);
+    border-radius: 6px;
+  }
+  #root .app-shell--phone-header-back .header-home-button .nav-icon {
+    display: inline-flex;
+  }
+  #root .app-shell--phone-header-back .header-home-button svg {
+    display: block;
+  }
+  #root .app-shell--phone-header-back .app-header .btn-back {
+    order: 2;
+    margin-left: 0;
+  }
+  #root .app-shell--phone-header-back .app-header .header-right {
+    flex-shrink: 0;
+  }
+  #root .app-shell--phone-header-back .header-sync-status {
+    gap: 0;
+  }
+  #root .app-shell--phone-header-back .header-sync-status .badge-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+@media (max-width: 359px) {
+  #root .app-shell--phone-header-back .brand-logo {
+    font-size: 1rem !important;
+  }
+}
+
+/* Detalhes phone não têm Início: o único retorno continua na borda direita. */
+@media (max-width: 599px) {
+  #root .app-shell--phone-detail-page .app-header .btn-back {
+    margin-left: auto;
+  }
 }
 

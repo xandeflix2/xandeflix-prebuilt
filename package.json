@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "prebuild": "npm run c11:new-device:lock",
     "build": "tsc && vite build",
+    "c11:new-device:lock": "node scripts/test-c11-new-device-activation-lock.mjs",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "contract:check": "node scripts/validate-data-contract.mjs",

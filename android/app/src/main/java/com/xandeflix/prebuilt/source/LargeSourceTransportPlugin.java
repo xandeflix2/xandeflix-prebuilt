@@ -62,7 +62,7 @@ public final class LargeSourceTransportPlugin extends Plugin {
     private static final long DEFAULT_MAX_SOURCE_FILE_BYTES = 256L * 1024L * 1024L;
     private static final long MIN_SAFE_FILE_BYTES = 16L * 1024L * 1024L;
     private static final int DOWNLOAD_BUFFER_BYTES = 64 * 1024;
-    private static final int READ_CHUNK_MAX_BYTES = 256 * 1024;
+    private static final int READ_CHUNK_MAX_BYTES = 4 * 1024 * 1024; // 4 MB máximo suportado
     private static final int DEFAULT_CONNECT_TIMEOUT_MS = 20_000;
     private static final int DEFAULT_READ_TIMEOUT_MS = 20_000;
 
@@ -135,7 +135,7 @@ public final class LargeSourceTransportPlugin extends Plugin {
             return;
         }
 
-        int requested = call.getInt("maxBytes") == null ? READ_CHUNK_MAX_BYTES : call.getInt("maxBytes");
+        int requested = call.getInt("maxBytes") == null ? 2 * 1024 * 1024 : call.getInt("maxBytes");
         int maxBytes = Math.max(1, Math.min(READ_CHUNK_MAX_BYTES, requested));
         executor.execute(() -> readChunkInternal(call, session, maxBytes));
     }
@@ -374,7 +374,7 @@ public final class LargeSourceTransportPlugin extends Plugin {
                     result.put("bytesRead", 0);
                 } else {
                     result.put("done", false);
-                    result.put("dataBase64", Base64.getEncoder().encodeToString(copyOf(buffer, read)));
+                    result.put("dataText", new String(buffer, 0, read, java.nio.charset.StandardCharsets.UTF_8));
                     result.put("bytesRead", read);
                 }
                 result.put("stage", "FILE_READ");

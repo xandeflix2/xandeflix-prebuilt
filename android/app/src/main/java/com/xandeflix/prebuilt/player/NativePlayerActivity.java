@@ -361,12 +361,12 @@ public class NativePlayerActivity extends AppCompatActivity {
                 return;
             } else {
                 Log.w(TAG, "Todos os candidatos de streaming foram esgotados. Fallback indisponÃ­vel.");
-                emitTerminalEvent(false, "NATIVE_ERROR");
+                emitTerminalEvent(false, "NATIVE_ERROR", category, statusCode);
                 finish();
             }
         } else {
             Log.w(TAG, "Erro da categoria " + category + " nÃ£o Ã© elegÃ­vel para fallback automÃ¡tico de candidato.");
-            emitTerminalEvent(false, "NATIVE_ERROR");
+            emitTerminalEvent(false, "NATIVE_ERROR", category, statusCode);
             finish();
         }
     }
@@ -691,12 +691,17 @@ public class NativePlayerActivity extends AppCompatActivity {
     }
 
     private void emitTerminalEvent(boolean ended, @Nullable String errorCode) {
+        emitTerminalEvent(ended, errorCode, null, null);
+    }
+
+    private void emitTerminalEvent(boolean ended, @Nullable String errorCode,
+            @Nullable String errorCategory, @Nullable String httpStatus) {
         if (terminalEventEmitted) {
             return;
         }
         terminalEventEmitted = true;
         long positionMs = player != null ? Math.max(0L, player.getCurrentPosition()) : 0L;
-        NativeAndroidPlayerPlugin.notifyPlaybackTerminal(positionMs, ended, errorCode);
+        NativeAndroidPlayerPlugin.notifyPlaybackTerminal(positionMs, ended, errorCode, errorCategory, httpStatus);
     }
 
     // Getters para validaÃ§Ã£o e testes unitÃ¡rios

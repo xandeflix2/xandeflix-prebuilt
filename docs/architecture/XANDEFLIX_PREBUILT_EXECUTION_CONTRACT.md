@@ -72,3 +72,13 @@ Antes de gerar ou sobrescrever arquivos criticos, o agente deve validar se ha co
 
 ### 2.19. ONE_GATE_AT_A_TIME
 O agente foca exclusivamente no Gate ativo. E terminantemente proibido iniciar a implementacao do Gate subsequente antes da homologacao e emissao formal do novo Gate pelo Chat Mestre (`NEXT_GATE_STARTED=NAO`).
+
+### 2.20. NEW_DEVICE_ACTIVATION_REGRESSION_LOCK
+
+O fluxo C11 de instalacao limpa, chave permanente, ativacao e promocao do catalogo
+e protegido por [contrato canônico](C11_NEW_DEVICE_ACTIVATION_LOCK.md),
+`LOCK_ID=C11_NEW_DEVICE_ACTIVATION_AND_CATALOG_LOCK_V1`.
+Rodar `npm run c11:new-device:lock` antes/depois de alteracoes no escopo do lock
+e antes de entrega de APK. Prebuild obrigatorio; nao contornar lifecycle nem
+reduzir criterios sem autorizacao expressa e emenda. Falhas bloqueiam entrega.
+O relato de sucesso em ativacao/catalogo nao prova reproducao de midia.

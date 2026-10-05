@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="pt-BR">
+<meta charset="utf-8">
+<title>C11 isolated activation verification</title>
+<body style="background:#0f172a;color:#fff;margin:0"><div id="root"></div>
+<script type="module">
+  import React from 'react';
+  import { createRoot } from 'react-dom/client';
+  import { FilesystemWeb } from '@capacitor/filesystem/dist/esm/web.js';
+  import { setSupabaseBrowserClientInstance } from '/src/integrations/supabase/client.ts';
+  import { ActivationPage } from '/src/ui/pages/ActivationPage.tsx';
+
+  // Isolated browser profile/origin only. No external account, backend or source.
+  const mode = new URL(location.href).searchParams.get('mode') || 'offline';
+  const fixture = window.activationFixture = { mode, remotes: 0, sources: 0, failStorage: mode === 'failure' };
+  const realFetch = window.fetch.bind(window);
+  window.fetch = (input, options) => {
+    const url = new URL(typeof input === 'string' ? input : input.url, location.href);
+    if (url.origin !== location.origin) throw new Error('Fixture blocks external requests');
+    return realFetch(input, options);
+  };
+  const originalSetItem = Storage.prototype.setItem;
+  Storage.prototype.setItem = function(key, value) {
+    if (fixture.failStorage && key.startsWith('__xandeflix')) throw new Error('Fixture storage failure');
+    return originalSetItem.call(this, key, value);
+  };
+  const originalWrite = FilesystemWeb.prototype.writeFile;
+  FilesystemWeb.prototype.writeFile = function(options) {
+    if (fixture.failStorage) return Promise.reject(new Error('Fixture flash failure'));
+    return originalWrite.call(this, options);
+  };
+  if (mode === 'rejected-digest') Object.defineProperty(window, 'crypto', { value: {
+    getRandomValues: crypto.getRandomValues.bind(crypto),
+    randomUUID: crypto.randomUUID.bind(crypto),
+    subtle: { digest: async () => { throw new Error('Fixture Web Crypto rejected'); } },
+  } });
+  setSupabaseBrowserClientInstance({
+    rpc(name, params) { return { abortSignal(signal) {
+      fixture.remotes++;
+      if (mode === 'hung') return new Promise(() => {});
+      if (mode !== 'online') return Promise.resolve({ data: null, error: { code: 'FIXTURE_OFFLINE', message: 'Offline' } });
+      let data = { success: true };
+      if (name === 'rpc_request_device_activation') {
+        fixture.request = params;
+        data = { success: true, activationId: 'fixture-a1', activationStatusSecret: 'fixture-capability' };
+      }
+      if (name === 'rpc_check_device_activation_status') data = { success: true, status: 'PENDING' };
+      return Promise.resolve({ data, error: null });
+    } }; },
+    functions: { async invoke(name, options) {
+      fixture.registered = options.body.operation === 'REGISTER_KEY';
+      return { data: { success: true }, error: null };
+    } },
+  });
+  const root = createRoot(document.getElementById('root'));
+  fixture.remount = () => {
+    root.render(null);
+    setTimeout(() => root.render(React.createElement(ActivationPage, { onBack() {} })), 0);
+  };
+  root.render(React.createElement(ActivationPage, { onBack() {} }));
+</script>
+</body>
+</html>

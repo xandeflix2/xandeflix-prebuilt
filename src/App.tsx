@@ -25,6 +25,7 @@ import {
 } from './ui/navigation/route-state.ts';
 import type { CatalogItemViewModel } from './catalog/catalog-view-model.ts';
 import { AppShell } from './ui/components/AppShell.tsx';
+import { PlaybackErrorNotice } from './ui/components/PlaybackErrorNotice.tsx';
 import { LoadingState } from './ui/components/LoadingState.tsx';
 import { NoActiveCatalogState } from './ui/components/NoActiveCatalogState.tsx';
 import { EmptyState } from './ui/components/EmptyState.tsx';
@@ -55,6 +56,7 @@ import {
   finishNativeAndroidApp,
 } from './playback/native-android-player.bridge.ts';
 import { defaultPlaybackService } from './playback/playback.service.ts';
+import { handleNativePlayerReturn } from './playback/native-playback-error-notice.ts';
 import { InstallationRegistryService } from './control-plane/client/installation-registry.service.ts';
 import { DeviceIdentityService } from './device/device-identity.service.ts';
 import { bootTelemetry } from './diagnostics/boot-telemetry.ts';
@@ -92,6 +94,7 @@ export default function App(): React.JSX.Element {
     getBootSyncCoordinator().getProgress()
   );
   const [bootSyncError, setBootSyncError] = useState<string | undefined>();
+  const [nativePlaybackErrorNotice, setNativePlaybackErrorNotice] = useState<string | null>(null);
 
   const [routeState, setRouteState] = useState<NavigationState>(createInitialRoute());
   const [authorizationGate, setAuthorizationGate] = useState<'CHECKING' | 'UNAUTHORIZED' | 'AUTHORIZED'>('CHECKING');
@@ -203,7 +206,7 @@ export default function App(): React.JSX.Element {
     let listenerHandle: { remove: () => Promise<void> } | null = null;
     void addNativePlayerResumeListener((event) => {
       if (disposed) return;
-      void defaultPlaybackService.stopPlayback(event.errorCode ? 'MEDIA_ERROR' : event.ended ? 'COMPLETION' : 'USER_EXIT');
+      void handleNativePlayerReturn(event, (reason) => defaultPlaybackService.stopPlayback(reason), setNativePlaybackErrorNotice);
     })
       .then((handle) => {
         if (disposed) {
@@ -222,6 +225,11 @@ export default function App(): React.JSX.Element {
     };
   }, []);
 
+  // A new attempt clears only the prior playback notice, not activation/catalog state.
+  useEffect(() => defaultPlaybackService.subscribe((session) => {
+    if (session.state === 'RESOLVING') setNativePlaybackErrorNotice(null);
+  }), []);
+
   // Registro best-effort de instalação no boot (C2 Installation Registry)
   useEffect(() => {
     void InstallationRegistryService.reportInstallationBestEffort().catch(() => {});
@@ -237,10 +245,15 @@ export default function App(): React.JSX.Element {
       if (!disposed) void syncPendingDeviceActivation().catch(() => {});
     };
     void ensurePendingDeviceActivationRequest().then(sync).catch(() => {});
+    const retry = () => {
+      if (!disposed) void ensurePendingDeviceActivationRequest().then(sync).catch(() => {});
+    };
+    window.addEventListener('online', retry);
     const interval = window.setInterval(sync, 5000);
     return () => {
       disposed = true;
       window.clearInterval(interval);
+      window.removeEventListener('online', retry);
     };
   }, []);
 
@@ -529,6 +542,7 @@ export default function App(): React.JSX.Element {
         catalogVersion={activeCatalog?.metadata.catalogVersion}
         warningNotice={importWarning}
       >
+        <PlaybackErrorNotice message={nativePlaybackErrorNotice} onDismiss={() => setNativePlaybackErrorNotice(null)} />
         <EmptyState />
       </AppShell>
     );
@@ -557,6 +571,7 @@ export default function App(): React.JSX.Element {
       catalogVersion={isExistingRealCatalog ? activeCatalog?.metadata.catalogVersion : 'Sincronizando...'}
       warningNotice={importWarning}
     >
+      <PlaybackErrorNotice message={nativePlaybackErrorNotice} onDismiss={() => setNativePlaybackErrorNotice(null)} />
       {renderCurrentView()}
     </AppShell>
   );

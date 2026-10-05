@@ -85,6 +85,12 @@ export interface Movie {
   artworkIds: string[];
   streamIds: string[];
   externalIds?: ExternalIds;
+  posterUrl?: string;
+  posterUri?: string;
+  backdropUrl?: string;
+  backdropUri?: string;
+  logo?: string;
+  cover?: string;
 }
 
 export interface Series {
@@ -98,6 +104,12 @@ export interface Series {
   artworkIds: string[];
   seasonIds: string[];
   externalIds?: ExternalIds;
+  posterUrl?: string;
+  posterUri?: string;
+  backdropUrl?: string;
+  backdropUri?: string;
+  logo?: string;
+  cover?: string;
 }
 
 export interface Season {
@@ -120,6 +132,11 @@ export interface Episode {
   artworkIds: string[];
   streamIds: string[];
   externalIds?: ExternalIds;
+  posterUrl?: string;
+  posterUri?: string;
+  thumbnailUri?: string;
+  thumbnailUrl?: string;
+  logo?: string;
 }
 
 export interface PrebuiltCatalog {

@@ -40,7 +40,13 @@ export function classifyCanonicalSourceContent({
   const hasMovieExtension = urlPath.endsWith('.mp4') || urlPath.endsWith('.mkv');
 
   // 2. Evidência estrutural forte de Series: path /series/ ou SxxExx no título
-  const hasEpisodeIdentity = Boolean(parseM3uEpisodeIdentity(cleanTitle));
+  let _hasEpisodeIdentity: boolean | undefined;
+  const getHasEpisodeIdentity = () => {
+    if (_hasEpisodeIdentity === undefined) {
+      _hasEpisodeIdentity = Boolean(parseM3uEpisodeIdentity(cleanTitle));
+    }
+    return _hasEpisodeIdentity;
+  };
   const hasSeriesPath = urlPath.includes('/series/');
 
   // 3. Evidência de Live / Canal
@@ -74,7 +80,7 @@ export function classifyCanonicalSourceContent({
     if (hasStrongMoviePath) {
       return 'movie';
     }
-    if (hasSeriesPath || (hasEpisodeIdentity && !hasLivePath)) {
+    if (hasSeriesPath || (!hasLivePath && getHasEpisodeIdentity())) {
       return 'series';
     }
     // Na ausência de movie/series estrutural, é LIVE
@@ -91,7 +97,7 @@ export function classifyCanonicalSourceContent({
     return 'movie';
   }
 
-  if (hasSeriesPath || hasEpisodeIdentity) {
+  if (hasSeriesPath || getHasEpisodeIdentity()) {
     return 'series';
   }
 

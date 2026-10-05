@@ -1,8 +1,9 @@
+import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
 import type { Movie, Series, Season, Episode, ArtworkRef, StreamRef, Category, Genre, PrebuiltCatalog } from '../contracts/catalog.ts';
 import type { LiveCatalog, LiveGroup, LiveChannel } from '../catalog/live/live-tv.types.ts';
 import { LiveCatalogService } from '../catalog/live/live-catalog.service.ts';
-import { createSha256Stream, getUtf8ByteLength } from '../security/artifact-hash.ts';
-import { calculateSha256 } from '../provisioning/integrity.ts';
+import { createSha256Stream } from '../security/artifact-hash.ts';
+import { calculateSha256Async } from '../provisioning/integrity.ts';
 import { CURRENT_CLASSIFICATION_PROFILE_VERSION } from './source-classification-profile.ts';
 import { resolveSegmentRelativePath } from '../bootstrap/storage/segment-path-resolver.ts';
 import { bootTelemetry, yieldToEventLoop } from '../diagnostics/boot-telemetry.ts';
@@ -13,7 +14,9 @@ import type {
   SegmentedCatalogProvenance,
 } from '../bootstrap/storage/storage.interface.ts';
 
-export const IMPORT_BATCH_SIZE = 1000;
+// Bounded like the normalization batches; fewer WebView/filesystem round trips
+// without retaining a whole source or changing the catalog's record contents.
+export const IMPORT_BATCH_SIZE = 2500;
 export const SERIES_MEMORY_STRATEGY = 'COMPACT_ACCUMULATOR_METADATA';
 export const FULL_CATALOG_JSON_STRINGIFY_REMOVED = true;
 export const FULL_STAGING_JSON_PARSE_REMOVED = true;
@@ -46,14 +49,12 @@ export class M3uBoundedStagingWriter {
   private currentBatchMovies: Movie[] = [];
   private currentBatchEpisodes: Episode[] = [];
   private currentBatchStreams: StreamRef[] = [];
-  private currentBatchArtworks: ArtworkRef[] = [];
   private currentBatchLive: LiveChannel[] = [];
   private batchItemCount = 0;
 
   readonly firstFoldMovies: Movie[] = [];
   readonly firstFoldEpisodes: Episode[] = [];
   readonly firstFoldStreams: StreamRef[] = [];
-  readonly firstFoldArtworks: ArtworkRef[] = [];
   readonly firstFoldLive: LiveChannel[] = [];
 
   constructor(options: BoundedStagingWriterOptions) {
@@ -62,17 +63,32 @@ export class M3uBoundedStagingWriter {
     this.batchSize = options.batchSize || IMPORT_BATCH_SIZE;
   }
 
-  addMovie(movie: Movie, stream: StreamRef, artwork?: ArtworkRef): void {
+
+  private async writeSegment(fileName: string, json: string): Promise<void> {
+    const relPath = resolveSegmentRelativePath(fileName);
+    if (this.storage?.writeStagingSegment) {
+      await this.storage.writeStagingSegment(this.snapshotId, relPath, json);
+    } else if (typeof window !== 'undefined') {
+      console.log(`[FILESYSTEM] writeFile: prebuilt/staging/${this.snapshotId}/${relPath}`);
+      await Filesystem.writeFile({
+        path: `prebuilt/staging/${this.snapshotId}/${relPath}`,
+        data: json,
+        directory: Directory.Data,
+        encoding: Encoding.UTF8,
+        recursive: true,
+      });
+    }
+  }
+
+  addMovie(movie: Movie, stream: StreamRef, _artwork?: ArtworkRef): void {
     this.currentBatchMovies.push(movie);
     this.currentBatchStreams.push(stream);
-    if (artwork) this.currentBatchArtworks.push(artwork);
     this.batchItemCount++;
   }
 
-  addEpisode(episode: Episode, stream: StreamRef, artwork?: ArtworkRef): void {
+  addEpisode(episode: Episode, stream: StreamRef, _artwork?: ArtworkRef): void {
     this.currentBatchEpisodes.push(episode);
     this.currentBatchStreams.push(stream);
-    if (artwork) this.currentBatchArtworks.push(artwork);
     this.batchItemCount++;
   }
 
@@ -96,14 +112,14 @@ export class M3uBoundedStagingWriter {
 
     if (this.currentBatchMovies.length > 0) {
       const json = JSON.stringify(this.currentBatchMovies);
-      const byteSize = getUtf8ByteLength(json);
+      const bytes = this.encoder.encode(json);
+      const byteSize = bytes.byteLength;
       this.totalCatalogBytes += byteSize;
-      this.streamingHash.update(this.encoder.encode(json));
+      this.streamingHash.update(bytes);
+      const sha256 = await calculateSha256Async(bytes);
       const fileName = `movies_${seqStr}.json`;
-      if (this.storage?.writeStagingSegment) {
-        await this.storage.writeStagingSegment(this.snapshotId, resolveSegmentRelativePath(fileName), json);
-      }
-      this.segmentEntries.push({ fileName, kind: 'movies', recordCount: this.currentBatchMovies.length, byteSize, sha256: calculateSha256(json) });
+      await this.writeSegment(fileName, json);
+      this.segmentEntries.push({ fileName, kind: 'movies', recordCount: this.currentBatchMovies.length, byteSize, sha256 });
       if (this.firstFoldMovies.length < 100) {
         this.firstFoldMovies.push(...this.currentBatchMovies.slice(0, 100 - this.firstFoldMovies.length));
       }
@@ -112,14 +128,14 @@ export class M3uBoundedStagingWriter {
 
     if (this.currentBatchEpisodes.length > 0) {
       const json = JSON.stringify(this.currentBatchEpisodes);
-      const byteSize = getUtf8ByteLength(json);
+      const bytes = this.encoder.encode(json);
+      const byteSize = bytes.byteLength;
       this.totalCatalogBytes += byteSize;
-      this.streamingHash.update(this.encoder.encode(json));
+      this.streamingHash.update(bytes);
+      const sha256 = await calculateSha256Async(bytes);
       const fileName = `episodes_${seqStr}.json`;
-      if (this.storage?.writeStagingSegment) {
-        await this.storage.writeStagingSegment(this.snapshotId, resolveSegmentRelativePath(fileName), json);
-      }
-      this.segmentEntries.push({ fileName, kind: 'episodes', recordCount: this.currentBatchEpisodes.length, byteSize, sha256: calculateSha256(json) });
+      await this.writeSegment(fileName, json);
+      this.segmentEntries.push({ fileName, kind: 'episodes', recordCount: this.currentBatchEpisodes.length, byteSize, sha256 });
       if (this.firstFoldEpisodes.length < 100) {
         this.firstFoldEpisodes.push(...this.currentBatchEpisodes.slice(0, 100 - this.firstFoldEpisodes.length));
       }
@@ -128,44 +144,30 @@ export class M3uBoundedStagingWriter {
 
     if (this.currentBatchStreams.length > 0) {
       const json = JSON.stringify(this.currentBatchStreams);
-      const byteSize = getUtf8ByteLength(json);
+      const bytes = this.encoder.encode(json);
+      const byteSize = bytes.byteLength;
       this.totalCatalogBytes += byteSize;
-      this.streamingHash.update(this.encoder.encode(json));
+      this.streamingHash.update(bytes);
+      const sha256 = await calculateSha256Async(bytes);
       const fileName = `streams_${seqStr}.json`;
-      if (this.storage?.writeStagingSegment) {
-        await this.storage.writeStagingSegment(this.snapshotId, resolveSegmentRelativePath(fileName), json);
-      }
-      this.segmentEntries.push({ fileName, kind: 'streams', recordCount: this.currentBatchStreams.length, byteSize, sha256: calculateSha256(json) });
+      await this.writeSegment(fileName, json);
+      this.segmentEntries.push({ fileName, kind: 'streams', recordCount: this.currentBatchStreams.length, byteSize, sha256 });
       if (this.firstFoldStreams.length < 200) {
         this.firstFoldStreams.push(...this.currentBatchStreams.slice(0, 200 - this.firstFoldStreams.length));
       }
       this.currentBatchStreams = [];
     }
 
-    if (this.currentBatchArtworks.length > 0) {
-      const json = JSON.stringify(this.currentBatchArtworks);
-      const byteSize = getUtf8ByteLength(json);
-      this.totalCatalogBytes += byteSize;
-      this.streamingHash.update(this.encoder.encode(json));
-      const fileName = `artworks_${seqStr}.json`;
-      if (this.storage?.writeStagingSegment) {
-        await this.storage.writeStagingSegment(this.snapshotId, resolveSegmentRelativePath(fileName), json);
-      }
-      this.segmentEntries.push({ fileName, kind: 'artworks', recordCount: this.currentBatchArtworks.length, byteSize, sha256: calculateSha256(json) });
-      if (this.firstFoldArtworks.length < 200) {
-        this.firstFoldArtworks.push(...this.currentBatchArtworks.slice(0, 200 - this.firstFoldArtworks.length));
-      }
-      this.currentBatchArtworks = [];
-    }
-
     if (this.currentBatchLive.length > 0) {
       const json = JSON.stringify(this.currentBatchLive);
-      const byteSize = getUtf8ByteLength(json);
+      const bytes = this.encoder.encode(json);
+      const byteSize = bytes.byteLength;
+      this.totalCatalogBytes += byteSize;
+      this.streamingHash.update(bytes);
+      const sha256 = await calculateSha256Async(bytes);
       const fileName = `live_${seqStr}.json`;
-      if (this.storage?.writeStagingSegment) {
-        await this.storage.writeStagingSegment(this.snapshotId, resolveSegmentRelativePath(fileName), json);
-      }
-      this.segmentEntries.push({ fileName, kind: 'live', recordCount: this.currentBatchLive.length, byteSize, sha256: calculateSha256(json) });
+      await this.writeSegment(fileName, json);
+      this.segmentEntries.push({ fileName, kind: 'live', recordCount: this.currentBatchLive.length, byteSize, sha256 });
       if (this.firstFoldLive.length < 100) {
         this.firstFoldLive.push(...this.currentBatchLive.slice(0, 100 - this.firstFoldLive.length));
       }
@@ -177,19 +179,19 @@ export class M3uBoundedStagingWriter {
     await yieldToEventLoop();
   }
 
-    async writeSeriesBatch(batch: Series[]): Promise<void> {
+  async writeSeriesBatch(batch: Series[]): Promise<void> {
     if (batch.length === 0) return;
     this.segmentSeq++;
     const seqStr = String(this.segmentSeq).padStart(6, '0');
     const json = JSON.stringify(batch);
-    const byteSize = getUtf8ByteLength(json);
+    const bytes = this.encoder.encode(json);
+    const byteSize = bytes.byteLength;
     this.totalCatalogBytes += byteSize;
-    this.streamingHash.update(this.encoder.encode(json));
+    this.streamingHash.update(bytes);
+    const sha256 = await calculateSha256Async(bytes);
     const fileName = `series_${seqStr}.json`;
-    if (this.storage?.writeStagingSegment) {
-      await this.storage.writeStagingSegment(this.snapshotId, resolveSegmentRelativePath(fileName), json);
-    }
-    this.segmentEntries.push({ fileName, kind: 'series', recordCount: batch.length, byteSize, sha256: calculateSha256(json) });
+    await this.writeSegment(fileName, json);
+    this.segmentEntries.push({ fileName, kind: 'series', recordCount: batch.length, byteSize, sha256 });
     await yieldToEventLoop();
   }
 
@@ -198,14 +200,14 @@ export class M3uBoundedStagingWriter {
     this.segmentSeq++;
     const seqStr = String(this.segmentSeq).padStart(6, '0');
     const json = JSON.stringify(batch);
-    const byteSize = getUtf8ByteLength(json);
+    const bytes = this.encoder.encode(json);
+    const byteSize = bytes.byteLength;
     this.totalCatalogBytes += byteSize;
-    this.streamingHash.update(this.encoder.encode(json));
+    this.streamingHash.update(bytes);
+    const sha256 = await calculateSha256Async(bytes);
     const fileName = `seasons_${seqStr}.json`;
-    if (this.storage?.writeStagingSegment) {
-      await this.storage.writeStagingSegment(this.snapshotId, resolveSegmentRelativePath(fileName), json);
-    }
-    this.segmentEntries.push({ fileName, kind: 'seasons', recordCount: batch.length, byteSize, sha256: calculateSha256(json) });
+    await this.writeSegment(fileName, json);
+    this.segmentEntries.push({ fileName, kind: 'seasons', recordCount: batch.length, byteSize, sha256 });
     await yieldToEventLoop();
   }
 
@@ -260,7 +262,7 @@ export class M3uBoundedStagingWriter {
           categories: params.categories.length,
           genres: params.genres.length,
           streams: params.movieCount + params.episodeCount,
-          artworks: this.firstFoldArtworks.length,
+          artworks: 0,
         },
       },
       categories: params.categories,
@@ -270,7 +272,7 @@ export class M3uBoundedStagingWriter {
       seasons: params.firstFoldSeasons,
       episodes: this.firstFoldEpisodes,
       streams: this.firstFoldStreams,
-      artworks: this.firstFoldArtworks,
+      artworks: [],
       extensions: {
         categoryProvenance: params.categoryProvenance,
         isSegmented: true,
@@ -305,7 +307,7 @@ export class M3uBoundedStagingWriter {
         episodes: params.episodeCount,
         live: params.liveCount,
         streams: params.movieCount + params.episodeCount,
-        artworks: this.firstFoldArtworks.length,
+        artworks: 0,
         categories: params.categories.length,
         genres: params.genres.length,
       },
@@ -339,6 +341,7 @@ export class M3uBoundedStagingWriter {
 
     bootTelemetry.mark('IMPORT_STAGING_FINALIZED');
 
+
     return {
       catalogHeader,
       liveCatalog,
@@ -348,5 +351,3 @@ export class M3uBoundedStagingWriter {
     };
   }
 }
-
-

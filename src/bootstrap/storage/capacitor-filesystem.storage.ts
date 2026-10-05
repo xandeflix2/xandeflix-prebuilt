@@ -1,9 +1,9 @@
 /**
- * Xandeflix Prebuilt � Capacitor Filesystem Catalog Storage
+ * Xandeflix Prebuilt ï¿½ Capacitor Filesystem Catalog Storage
  *
- * Implementa��o de LocalCatalogStorage persistida em Directory.Data (app private storage).
+ * Implementaï¿½ï¿½o de LocalCatalogStorage persistida em Directory.Data (app private storage).
  *
- * Princ�pios:
+ * Princï¿½pios:
  * - APP_PRIVATE_STORAGE = SIM (Directory.Data privado do aplicativo)
  * - LOCAL_STORAGE_STRATEGY = CAPACITOR_FILESYSTEM_CANONICAL_JSON
  * - STAGING_GENERATION = prebuilt/staging/<snapshotId>/
@@ -19,7 +19,7 @@ import type { PrebuiltSearchIndex } from '../../search/search-index.types.ts';
 import type { LiveCatalog } from '../../catalog/live/live-tv.types.ts';
 import type { ActivePointer } from '../types.ts';
 import type { LocalCatalogStorage, CatalogSegmentEntry } from './storage.interface.ts';
-import { calculateSha256 } from '../../provisioning/integrity.ts';
+import { createActivePointer } from '../active-snapshot.ts';
 import type { RecoveryJournalData } from '../../recovery/recovery.types.ts';
 import { resolveSegmentRelativePath } from './segment-path-resolver.ts';
 
@@ -34,13 +34,17 @@ export class CapacitorFilesystemStorage implements LocalCatalogStorage {
 
   private async ensureDir(path: string): Promise<void> {
     try {
-      await Filesystem.mkdir({
-        path,
-        directory: this.baseDir,
-        recursive: true,
-      });
-    } catch {
-      // Diret�rio j� existente, ignorar erro
+      await Filesystem.mkdir({ path, directory: this.baseDir, recursive: true });
+    } catch (error) {
+      const filesystemError = error as { code?: string; message?: string } | null;
+      const alreadyExists = filesystemError?.code === 'OS-PLUG-FILE-0010'
+        || filesystemError?.code === 'EEXIST'
+        || filesystemError?.message === 'Current directory does already exist.';
+      if (!alreadyExists) throw error;
+
+      // Accept an existing directory, never a file or an unrelated I/O failure.
+      const existing = await Filesystem.stat({ path, directory: this.baseDir });
+      if (existing.type !== 'directory') throw error;
     }
   }
 
@@ -59,12 +63,12 @@ export class CapacitorFilesystemStorage implements LocalCatalogStorage {
   }
 
   async writeActivePointer(pointer: ActivePointer): Promise<void> {
-    await this.ensureDir(PREBUILT_DIR);
     await Filesystem.writeFile({
       path: ACTIVE_POINTER_FILE,
       data: JSON.stringify(pointer, null, 2),
       directory: this.baseDir,
       encoding: Encoding.UTF8,
+      recursive: true,
     });
   }
 
@@ -79,6 +83,7 @@ export class CapacitorFilesystemStorage implements LocalCatalogStorage {
         data: content,
         directory: this.baseDir,
         encoding: Encoding.UTF8,
+        recursive: true,
       });
       return;
     }
@@ -89,6 +94,7 @@ export class CapacitorFilesystemStorage implements LocalCatalogStorage {
       data: firstChunk,
       directory: this.baseDir,
       encoding: Encoding.UTF8,
+      recursive: true,
     });
 
     for (let offset = chunkSize; offset < content.length; offset += chunkSize) {
@@ -156,6 +162,7 @@ export class CapacitorFilesystemStorage implements LocalCatalogStorage {
       path,
       data: base64Data,
       directory: this.baseDir,
+      recursive: true,
     });
   }
 
@@ -313,9 +320,14 @@ export class CapacitorFilesystemStorage implements LocalCatalogStorage {
   async writeStagingSegment(snapshotId: string, segmentPath: string, data: string): Promise<void> {
     const rel = resolveSegmentRelativePath(segmentPath);
     const fullPath = `${STAGING_DIR}/${snapshotId}/${rel}`;
-    const dir = fullPath.substring(0, fullPath.lastIndexOf('/'));
-    await this.ensureDir(dir);
-    await this.writeLargeFile(fullPath, data, 256 * 1024);
+    console.log(`[FILESYSTEM] writeFile: ${fullPath}`);
+    await Filesystem.writeFile({
+      path: fullPath,
+      data,
+      directory: this.baseDir,
+      encoding: Encoding.UTF8,
+      recursive: true,
+    });
   }
 
   async readStagingSegment(snapshotId: string, segmentPath: string): Promise<string | null> {
@@ -350,14 +362,67 @@ export class CapacitorFilesystemStorage implements LocalCatalogStorage {
 
     const manifestData = await this.readTextFileSafely(`${stagingSnapDir}/manifest.json`);
     if (!manifestData) {
-      throw new Error(`[STORAGE_PROMOTION_ERROR] manifest.json não encontrado em staging para ${snapshotId}`);
+      throw new Error(`[STORAGE_PROMOTION_ERROR] manifest.json nÃ£o encontrado em staging para ${snapshotId}`);
     }
     const manifest = JSON.parse(manifestData) as ProvisioningManifest;
 
+    // Never remove/overwrite the generation currently referenced by active.json.
+    const currentPointer = await this.readActivePointer();
+    if (currentPointer?.snapshotId === snapshotId) {
+      throw new Error('[STORAGE_PROMOTION_ACTIVE_CONFLICT] Snapshot is already active; preserving its files.');
+    }
+
+    await this.ensureDir(SNAPSHOTS_DIR);
+
+    // Tentativa 1: PromoÃ§Ã£o instantÃ¢nea via renomeaÃ§Ã£o atÃ´mica do diretÃ³rio (< 5ms)
+    let renameSucceeded = false;
+    try {
+      try {
+        await Filesystem.rmdir({
+          path: targetSnapDir,
+          directory: this.baseDir,
+          recursive: true,
+        });
+      } catch {
+        // Alvo ainda nÃ£o existia
+      }
+
+      await Filesystem.rename({
+        from: stagingSnapDir,
+        to: targetSnapDir,
+        directory: this.baseDir,
+        toDirectory: this.baseDir,
+      });
+      renameSucceeded = true;
+    } catch (renameErr) {
+      console.warn('[STORAGE_PROMOTION] Directory rename not available, falling back to copy:', renameErr);
+    }
+
+    if (renameSucceeded) {
+      // CÃ³pia opcional do Ã­ndice compactado para raiz se gerado
+      try {
+        await Filesystem.copy({
+          from: `${targetSnapDir}/compact-search-index-v2.bin`,
+          to: `compact-search-index-v2.bin`,
+          directory: this.baseDir,
+          toDirectory: this.baseDir,
+        });
+      } catch {
+        // opcional
+      }
+
+      // Atualização atômica do ponteiro para o snapshot promovido
+      await this.writeActivePointer(createActivePointer(manifest));
+      console.log(`[STORAGE] staging_promoted: ${snapshotId}`);
+
+      return;
+    }
+
+    // Tentativa 2 (Fallback): CÃ³pia pura de arquivos sem stat nem rehash
     await this.ensureDir(targetSnapDir);
 
     try {
-      // 1. Cópia obrigatória do manifest
+      // 1. CÃ³pia do manifest e catalog.json
       await Filesystem.copy({
         from: `${stagingSnapDir}/manifest.json`,
         to: `${targetSnapDir}/manifest.json`,
@@ -365,7 +430,6 @@ export class CapacitorFilesystemStorage implements LocalCatalogStorage {
         toDirectory: this.baseDir,
       });
 
-      // 2. Cópia obrigatória do catalog header
       await Filesystem.copy({
         from: `${stagingSnapDir}/catalog.json`,
         to: `${targetSnapDir}/catalog.json`,
@@ -373,26 +437,18 @@ export class CapacitorFilesystemStorage implements LocalCatalogStorage {
         toDirectory: this.baseDir,
       });
 
-      // 3. Arquivos opcionais (apenas se presentes em staging)
-      try {
-        await Filesystem.copy({
-          from: `${stagingSnapDir}/search-index.json`,
-          to: `${targetSnapDir}/search-index.json`,
-          directory: this.baseDir,
-          toDirectory: this.baseDir,
-        });
-      } catch {
-        // opcional
-      }
-      try {
-        await Filesystem.copy({
-          from: `${stagingSnapDir}/compact-search-index-v2.bin`,
-          to: `${targetSnapDir}/compact-search-index-v2.bin`,
-          directory: this.baseDir,
-          toDirectory: this.baseDir,
-        });
-      } catch {
-        // opcional
+      // 2. Arquivos opcionais
+      for (const optFile of ['search-index.json', 'compact-search-index-v2.bin', 'live_catalog.json']) {
+        try {
+          await Filesystem.copy({
+            from: `${stagingSnapDir}/${optFile}`,
+            to: `${targetSnapDir}/${optFile}`,
+            directory: this.baseDir,
+            toDirectory: this.baseDir,
+          });
+        } catch {
+          // opcional
+        }
       }
       try {
         await Filesystem.copy({
@@ -404,118 +460,28 @@ export class CapacitorFilesystemStorage implements LocalCatalogStorage {
       } catch {
         // opcional
       }
-      try {
-        await Filesystem.copy({
-          from: `${stagingSnapDir}/live_catalog.json`,
-          to: `${targetSnapDir}/live_catalog.json`,
-          directory: this.baseDir,
-          toDirectory: this.baseDir,
-        });
-      } catch {
-        // opcional
-      }
 
-      // 4. Se o manifest declara segmentos, a verificação e cópia é ESTRITA e MANIFEST-DRIVEN
+      // 3. CÃ³pia pura de segmentos sem stat redundante nem releitura/rehash
       const declaredSegments: CatalogSegmentEntry[] = Array.isArray((manifest as any).segments)
         ? (manifest as any).segments
         : [];
 
       if (declaredSegments.length > 0) {
-        const expectedCount = declaredSegments.length;
         await this.ensureDir(`${targetSnapDir}/segments`);
-        let copiedCount = 0;
-
         for (const seg of declaredSegments) {
           const rel = resolveSegmentRelativePath(seg.fileName);
-          const fileName = rel.replace(/^segments\//, '');
-          const stagingSegmentPath = `${stagingSnapDir}/${rel}`;
-          const targetSegmentPath = `${targetSnapDir}/${rel}`;
-
-          // Verifica se existe em staging antes de copiar
-          try {
-            await Filesystem.stat({
-              path: stagingSegmentPath,
-              directory: this.baseDir,
-            });
-          } catch (statErr) {
-            throw new Error(
-              `[PROMOTION_SEGMENT_MISSING_IN_STAGING] Segmento obrigatório '${fileName}' ausente em staging: ${(statErr as Error).message}`
-            );
-          }
-
-          // Executa cópia do segmento (qualquer erro é FATAL)
-          try {
-            await Filesystem.copy({
-              from: stagingSegmentPath,
-              to: targetSegmentPath,
-              directory: this.baseDir,
-              toDirectory: this.baseDir,
-            });
-          } catch (copyErr) {
-            throw new Error(
-              `[PROMOTION_SEGMENT_COPY_FAILED] Falha ao copiar segmento obrigatório '${fileName}': ${(copyErr as Error).message}`
-            );
-          }
-
-          // Verifica se existe no target após cópia
-          let targetStat;
-          try {
-            targetStat = await Filesystem.stat({
-              path: targetSegmentPath,
-              directory: this.baseDir,
-            });
-          } catch (targetStatErr) {
-            throw new Error(
-              `[PROMOTION_SEGMENT_ABSENT_IN_TARGET] Segmento '${fileName}' ausente no diretório target após cópia: ${(targetStatErr as Error).message}`
-            );
-          }
-
-          // Validação de tamanho se disponível no manifest
-          if (typeof seg.byteSize === 'number' && seg.byteSize > 0) {
-            if (typeof targetStat.size === 'number' && targetStat.size > 0 && targetStat.size !== seg.byteSize) {
-              throw new Error(
-                `[PROMOTION_SEGMENT_SIZE_MISMATCH] Tamanho divergente no segmento '${fileName}': esperado=${seg.byteSize}, real=${targetStat.size}`
-              );
-            }
-          }
-
-          // Validação de hash se disponível no manifest
-          if (typeof seg.sha256 === 'string' && seg.sha256.trim() !== '') {
-            const targetContent = await this.readTextFileSafely(targetSegmentPath);
-            if (!targetContent) {
-              throw new Error(
-                `[PROMOTION_SEGMENT_READ_FAILED] Falha ao ler segmento target '${fileName}' para verificação de hash`
-              );
-            }
-            const targetSha = calculateSha256(targetContent);
-            if (targetSha !== seg.sha256) {
-              throw new Error(
-                `[PROMOTION_SEGMENT_HASH_MISMATCH] Hash divergente no segmento '${fileName}': esperado=${seg.sha256}, real=${targetSha}`
-              );
-            }
-          }
-
-          copiedCount++;
-        }
-
-        if (copiedCount !== expectedCount) {
-          throw new Error(
-            `[PROMOTION_SEGMENT_COUNT_MISMATCH] Contagem de segmentos copiados divergente do manifest: esperado=${expectedCount}, copiado=${copiedCount}`
-          );
-        }
-
-        // Dupla checagem física via readdir no target
-        const targetReaddir = await Filesystem.readdir({
-          path: `${targetSnapDir}/segments`,
-          directory: this.baseDir,
-        });
-        const physicalCount = (targetReaddir.files || []).length;
-        if (physicalCount !== expectedCount) {
-          throw new Error(
-            `[PROMOTION_TARGET_SEGMENT_COUNT_MISMATCH] Contagem física no target divergente do manifest: esperado=${expectedCount}, encontrado=${physicalCount}`
-          );
+          await Filesystem.copy({
+            from: `${stagingSnapDir}/${rel}`,
+            to: `${targetSnapDir}/${rel}`,
+            directory: this.baseDir,
+            toDirectory: this.baseDir,
+          });
         }
       }
+
+      // Atualização atômica do ponteiro
+      await this.writeActivePointer(createActivePointer(manifest));
+      console.log(`[STORAGE] staging_promoted: ${snapshotId}`);
     } catch (err) {
       try {
         await Filesystem.rmdir({
@@ -524,7 +490,7 @@ export class CapacitorFilesystemStorage implements LocalCatalogStorage {
           recursive: true,
         });
       } catch {
-        // Ignora falha secundária de limpeza do target
+        // Ignora falha secundÃ¡ria de limpeza do target
       }
       throw err;
     }
@@ -628,7 +594,7 @@ async readActiveCatalog(): Promise<PrebuiltCatalog | null> {
         });
       }
     } catch {
-      // Ignorar se j� n�o existia
+      // Ignorar se jï¿½ nï¿½o existia
     }
   }
 
@@ -650,79 +616,23 @@ async readActiveCatalog(): Promise<PrebuiltCatalog | null> {
     const pointer = await this.readActivePointer();
     if (!pointer) return 0;
     try {
-      const pointerStat = await Filesystem.stat({
-        path: ACTIVE_POINTER_FILE,
-        directory: this.baseDir,
-      });
-      const manifestStat = await Filesystem.stat({
-        path: `${SNAPSHOTS_DIR}/${pointer.snapshotId}/manifest.json`,
-        directory: this.baseDir,
-      });
+      const manifest = await this.readActiveManifest();
+      if (manifest?.catalogSizeBytes && manifest.catalogSizeBytes > 0) {
+        return manifest.catalogSizeBytes;
+      }
+      if (Array.isArray((manifest as any)?.segments) && (manifest as any).segments.length > 0) {
+        const segTotal = (manifest as any).segments.reduce((acc: number, s: any) => acc + (s.byteSize || 0), 0);
+        if (segTotal > 0) return segTotal;
+      }
       const catalogStat = await Filesystem.stat({
         path: `${SNAPSHOTS_DIR}/${pointer.snapshotId}/catalog.json`,
         directory: this.baseDir,
       });
-      let indexSize = 0;
-      try {
-        const indexStat = await Filesystem.stat({
-          path: `${SNAPSHOTS_DIR}/${pointer.snapshotId}/search-index.json`,
-          directory: this.baseDir,
-        });
-        indexSize = indexStat.size || 0;
-      } catch {
-        // Sem �ndice no snapshot
-      }
-      try {
-        const binStat = await Filesystem.stat({
-          path: `${SNAPSHOTS_DIR}/${pointer.snapshotId}/compact-search-index-v2.bin`,
-          directory: this.baseDir,
-        });
-        indexSize += binStat.size || 0;
-      } catch {
-        // Sem �ndice bin�rio no snapshot
-      }
-
-      let liveSize = 0;
-      try {
-        const liveStat = await Filesystem.stat({
-          path: `${SNAPSHOTS_DIR}/${pointer.snapshotId}/live_catalog.json`,
-          directory: this.baseDir,
-        });
-        liveSize = liveStat.size || 0;
-      } catch {
-        // Sem live catalog no snapshot.
-      }
-
-      let segmentsSize = 0;
-      try {
-        const segs = await Filesystem.readdir({
-          path: `${SNAPSHOTS_DIR}/${pointer.snapshotId}/segments`,
-          directory: this.baseDir,
-        });
-        if (segs?.files) {
-          for (const f of segs.files) {
-            const fileName = typeof f === 'string' ? f : f.name;
-            try {
-              const segStat = await Filesystem.stat({
-                path: `${SNAPSHOTS_DIR}/${pointer.snapshotId}/segments/${fileName}`,
-                directory: this.baseDir,
-              });
-              segmentsSize += segStat.size || 0;
-            } catch {
-              // ignore
-            }
-          }
-        }
-      } catch {
-        // ignore
-      }
-
-      return (pointerStat.size || 0) + (manifestStat.size || 0) + (catalogStat.size || 0) + indexSize + liveSize + segmentsSize;
+      return catalogStat.size || 0;
     } catch {
       return 0;
     }
   }
-
   async readRecoveryJournal(): Promise<RecoveryJournalData | null> {
     try {
       const result = await Filesystem.readFile({
@@ -738,12 +648,12 @@ async readActiveCatalog(): Promise<PrebuiltCatalog | null> {
   }
 
   async writeRecoveryJournal(journal: RecoveryJournalData): Promise<void> {
-    await this.ensureDir(PREBUILT_DIR);
     await Filesystem.writeFile({
       path: RECOVERY_JOURNAL_FILE,
       data: JSON.stringify(journal, null, 2),
       directory: this.baseDir,
       encoding: Encoding.UTF8,
+      recursive: true,
     });
   }
 

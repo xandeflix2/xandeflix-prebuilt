@@ -10,6 +10,7 @@
 import { getSupabaseBrowserClient } from '../../integrations/supabase/client.ts';
 import { DeviceIdentityService } from '../../device/device-identity.service.ts';
 import { getPublicDeviceActivationService } from './public-device-activation.service.ts';
+import { activationDeadline } from './activation-timeout.ts';
 import type {
   DeviceActivationRequestParams,
   DeviceActivationRequestResult,
@@ -46,7 +47,7 @@ export class DeviceActivationService {
     }
 
     try {
-      const { data, error } = await client.rpc('rpc_request_device_activation', {
+      const { data, error } = await activationDeadline((signal) => client.rpc('rpc_request_device_activation', {
         p_installation_id: params.installationId,
         p_device_id: params.deviceId,
         p_display_code: params.displayCode,
@@ -54,7 +55,7 @@ export class DeviceActivationService {
         p_activation_key_hash: params.activationKeyHash,
         p_device_type: params.deviceType || 'TV',
         p_device_label: params.deviceLabel || null,
-      });
+      }).abortSignal(signal));
 
       if (error) {
         return { success: false, code: error.code || 'RPC_ERROR', message: error.message };
@@ -100,17 +101,18 @@ export class DeviceActivationService {
     }
 
     try {
-      const { data, error } = await client.rpc('rpc_check_device_activation_status', {
+      const { data, error } = await activationDeadline((signal) => client.rpc('rpc_check_device_activation_status', {
         p_activation_id: activationId,
         p_device_id: deviceId,
         p_activation_status_secret: activationStatusSecret,
-      });
+      }).abortSignal(signal));
       if (error) {
         return { success: false, code: error.code || 'RPC_ERROR', message: error.message };
       }
 
       const result = data as DeviceActivationStatusResult;
-      if (result.status === 'CONSUMED' || result.status === 'CANCELLED') {
+      // Keep CONSUMED capability until the authorized state is persisted.
+      if (result.success && result.status === 'CANCELLED') {
         const pending = this.getPendingActivation();
         if (pending?.activationId === activationId) this.clearPendingActivation();
       }

@@ -11,7 +11,7 @@
  * - FOCUS SAFETY: Sem focus traps; classes .focusable-item preservadas em todas as faixas carregadas.
  */
 
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo } from 'react';
 import type { CatalogReadModel } from '../../catalog/catalog-read-model.ts';
 import type { CatalogItemViewModel } from '../../catalog/catalog-view-model.ts';
 import { getHeroItem, movieToViewModel, seriesToViewModel } from '../../catalog/catalog-selectors.ts';
@@ -35,39 +35,7 @@ export const HomePage: React.FC<HomePageProps> = ({ readModel, onSelectItem }) =
 
   const queue = useMemo(() => new SimpleRailQueue(2), []);
 
-  const [seriesPostersReady, setSeriesPostersReady] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-    browseService.ensureSeriesPostersLoaded().then((posterMap) => {
-      console.log('[HOME_PAGE] Series poster map received:', posterMap?.size);
-      if (!cancelled && posterMap && posterMap.size > 0) {
-        for (const s of readModel.catalog.series) {
-          const uri = posterMap.get(s.id);
-          if (uri) {
-            (s as any).posterUri = uri;
-            (s as any).posterUrl = uri;
-          }
-        }
-        for (const list of readModel.seriesByCategoryId.values()) {
-          for (const s of list) {
-            const uri = posterMap.get(s.id);
-            if (uri) {
-              (s as any).posterUri = uri;
-              (s as any).posterUrl = uri;
-            }
-          }
-        }
-        console.log('[HOME_PAGE] Hydrated series, setting seriesPostersReady = true');
-        setSeriesPostersReady(true);
-      }
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [browseService, readModel]);
-
-  const heroItem = useMemo(() => getHeroItem(readModel), [readModel, seriesPostersReady]);
+  const heroItem = useMemo(() => getHeroItem(readModel), [readModel]);
 
   // Faixas em destaque (first-fold imediato)
   const featuredMovies = useMemo(
@@ -83,7 +51,7 @@ export const HomePage: React.FC<HomePageProps> = ({ readModel, onSelectItem }) =
       readModel.catalog.series
         .slice(0, 20)
         .map((s) => seriesToViewModel(readModel, s)),
-    [readModel, seriesPostersReady]
+    [readModel]
   );
 
   // Categorias canônicas por tipo

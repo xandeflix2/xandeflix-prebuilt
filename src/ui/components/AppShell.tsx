@@ -7,6 +7,7 @@
 import React from 'react';
 import type { AppView } from '../navigation/route-state.ts';
 import { Header } from './Header.tsx';
+import { useLandscapeNavigation } from '../hooks/useLandscapeNavigation.ts';
 
 interface AppShellProps {
   currentView: AppView;
@@ -29,13 +30,15 @@ export const AppShell: React.FC<AppShellProps> = ({
   warningNotice,
   children,
 }) => {
+  const sideNavigation = useLandscapeNavigation();
+  const detailPage = currentView === 'movie-detail' || currentView === 'series-detail';
   return (
-    <div className="app-shell">
+    <div className={`app-shell${sideNavigation ? ' app-shell--side-nav' : ''}${sideNavigation && currentView === 'live' ? ' app-shell--live-view' : ''}${currentView === 'live' ? ' app-shell--live-page' : ''}${currentView === 'home' ? ' app-shell--home-page' : ''}${currentView === 'movies' || currentView === 'series' || currentView === 'search' || currentView === 'activation' || detailPage ? ' app-shell--phone-header-back' : ''}${detailPage ? ' app-shell--phone-detail-page' : ''}`}>
       <Header
         currentView={currentView}
         onNavigate={onNavigate}
         onBack={onBack}
-        canGoBack={canGoBack}
+        canGoBack={!sideNavigation && currentView !== 'live' && currentView !== 'home' && canGoBack}
         snapshotId={snapshotId}
         catalogVersion={catalogVersion}
       />
@@ -47,7 +50,16 @@ export const AppShell: React.FC<AppShellProps> = ({
         </div>
       )}
 
-      <div className="app-content">{children}</div>
+      <div className="app-content">
+        {sideNavigation && canGoBack && onBack && currentView !== 'live' && currentView !== 'home' && (
+          <div className="page-back-row">
+            <button type="button" className="focusable-item btn-back" onClick={onBack} aria-label="Voltar para a tela anterior">
+              ← Voltar
+            </button>
+          </div>
+        )}
+        {children}
+      </div>
 
       <footer className="app-footer">
         <div className="footer-left">
