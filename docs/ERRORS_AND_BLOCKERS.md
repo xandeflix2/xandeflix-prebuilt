@@ -1,5 +1,73 @@
 # Registro de Erros e Bloqueadores (Errors and Blockers)
 
+## 2026-10-05 — PUSH_ADMINISTRATIVE_EVIDENCE_RECEIVED
+
+Supabase Deploy to production aparece OFF nas capturas da configuração enviadas
+pelo usuário; repo correto conectado. Primeira captura era catálogo /integrations,
+não configuração, e não foi usada como prova. Vercel sem vínculo nos escopos
+acessíveis; isso não certifica outras contas/hospedagens. GitHub credenciais com
+push sem admin: hooks/protection HTTP404, não prova de inexistência. Capturas
+administrativas posteriores do usuário mostram webhooks vazios e somente o App
+Supabase instalado; retenção por falta de evidência esclarecida, nenhum gatilho
+de deploy de produção identificado nas superfícies inspecionadas. Push ainda
+não executado, aguarda confirmação expressa/reconferência do remoto; nenhuma
+integração/branch policy modificada para contornar. Atualização documental inicial
+recusada por contexto de patch inexistente; aplicação abortou sem mudança parcial,
+reexecutada com contexto correto. Nenhuma alteração de runtime/teste nesse erro.
+Testes novos/lock/typecheck/build PASS; manager-form continua14/15 por literal
+T15 já ausente no parent995de5f. Scanner inicialmente exit1 por três URLs antigas
+de fixtures: classificação manual por contexto sintético, não remoção de teste
+nem exposição de URL/credencial. Nenhum segredo de alta confiança detectado nos
+455 textos; varredura não é auditoria universal de segurança. Avisos de build
+anteriores mantidos; zero warning crypto. Sem write remoto/aparelhos/novo Gate.
+[Evidência](evidence/C11_GIT_CONSOLIDATION.md).
+
+## 2026-10-05 — AUTHORIZED_KEY_PRESENTATION_LOCAL_FIX_DELIVERED
+
+Chave existente era omitida porque JSX/cópia estavam dentro do formulário
+effectiveStatus!==AUTHORIZED. Não é perda/regeneração da chave nem regressão
+introduzida pelo atalho Home; renderer do HEAD reproduziu a omissão. Fix mínimo
+autorizado/página comum entregue ao celular; serviços/efeitos preservados por AST
+e lock49+9. Cinco privados/508 catálogo idênticos após ambas atualizações in-place.
+Nova UI18/browser/clipboard/layout/build/assinatura/hash final PASS; confirmação
+visual física final pendente, nenhum outro aparelho ou fonte real alterado.
+Auxiliares: CommonJS import.meta falhou duas vezes, cast .env exigiu mock de
+import.meta inteiro; nenhuma alteração de env em produção. Eval PowerShell perdeu
+aspas (ReferenceError: vite), depois atob interpretou UTF8 como Latin1 e comparação
+acentuada falhou; decodificação UTF8 explícita confirmou a UI sem erro. Reexecuções
+válidas registradas, não ocultar tentativas nem relaxar testes. Instrução espacial
+A1 ajustada na revisão final e APK rebuilt/revalidado/reinstalado somente phone.
+Avisos preexistentes de build/apksigner e teste legado manager-form continuam
+fora do escopo; HTTP403/publicação do painel não declarados resolvidos.
+[Evidência](evidence/C11_ACTIVATION_KEY_VISIBILITY.md). Sem Git/backend/novo Gate.
+
+## 2026-10-05 — PHONE_INSTALL_HASH_FORMAT_AUXILIARY_RESOLVED
+
+Conferência read-only inicial de hashes do catálogo rejeitou o formato retornado
+pelo comando composto, com CATALOG_HASH_FORMAT_FAILED, antes de alcançar install.
+Sem escrita ou mudança de dados nesse erro; causa específica de quoting/truncagem
+não confirmada. Substituída por find explícito, validação dos caminhos e sha256sum
+direto em lotes de64:508 arquivos conferidos antes/depois, zero diferenças.
+Entrega ao único celular com Success e hash instalado correto; cinco arquivos
+privados preservados. Sem reinstalação limpa, launch, reprodução ou fonte real
+alterada. Fire Stick/tablet não atualizados. HTTP403 e publicação do painel
+continuam pendentes; falha textual legada do teste manager-form não alterada.
+[Evidência](evidence/C11_EXCLUSIVE_DEVICE_SOURCE_HOME_ACTIVATION.md).
+
+## 2026-10-05 — EXCLUSIVE_SOURCE_LOCAL_COMPLETE_REMOTE_USE_PENDING
+
+HTTP403 do provedor não confirmado resolvido. Nova fonte depende de URL com
+credenciais próprias e confirmação no painel; nenhuma escrita remota executada.
+Painel mudou só localmente; hospedagem/push continuam retidos por integração
+automática desconhecida. Sem teste físico/instalação nesta tarefa.
+R2F2B0 manager-form T15 falha por exigir frase já ausente em HEAD995de5f (14/15);
+não é mudança provocada pelas duas props novas; não relaxar teste fora do escopo.
+Guard null-expiry JSON corrigido na revisão com teste dedicado,31 exclusivos PASS.
+Reexecução browser teve timeout de spawnSync/cleanup; erro primário agora explícito;
+CUA sem browser; sessão CLI nova pré-aberta e reexecução final PASS. Lock/build/
+assinatura/assets PASS, avisos de build/signature metadata preexistentes permanecem.
+[Evidência](evidence/C11_EXCLUSIVE_DEVICE_SOURCE_HOME_ACTIVATION.md).
+
 ## 2026-10-05 — C11_PUSH_HELD_AUTOMATIC_DEPLOY_UNKNOWN
 
 Usuário desconhece se push main dispara deploy. Leitura GitHub: zero workflows/

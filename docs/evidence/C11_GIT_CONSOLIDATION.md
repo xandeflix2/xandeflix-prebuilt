@@ -1,4 +1,109 @@
-# C11 — Checkpoint Git local e publicação retida — 2026-10-05
+# C11 — Checkpoint Git local e análise de publicação — 2026-10-05
+
+## Novo checkpoint das duas entregas recentes — 2026-10-05
+
+Pedido atual: "prossiga com o commit e analise para o push"; commit local
+expressamente autorizado, push/PR/deploy NÃO executados neste ciclo. Emenda e
+manifesto literal de21 arquivos definidos antes do staging no plano canônico.
+Parent esperado995de5f767a14276bc2f4ca58944e4f7af95ca4e; main remoto vivo
+e99f830a24b5de6dd74b4397f1ed6f0995bc8483, três commits locais anteriores.
+Índice inicialmente vazio;19 candidatos recentes mais este registro e plano.
+Identificar o novo checkpoint pelo assunto
+`feat(c11): isolate device sources and preserve activation key visibility`.
+SHA efetivo e auditoria pós-commit são conferidos no terminal, não pré-fixados
+em documento que integra o próprio commit. Os registros abaixo são históricos
+do primeiro checkpoint; seus contadores/hash de APK não são os valores atuais.
+
+Proveniência: specs/evidências C11_EXCLUSIVE_DEVICE_SOURCE_HOME_ACTIVATION e
+C11_ACTIVATION_KEY_VISIBILITY. Revisados form/workflow, wiring do gestor,
+Header/CSS e diff da ActivationPage. Nenhum novo patch funcional, mudança de
+contrato/autoridade, relaxamento de teste ou alteração de dependência/CI/SQL.
+Sete utilitários operacionais continuam excluídos e preservados; APK ignorado.
+
+### Validações repetidas nesta consolidação
+
+- Lock:22 ativação+27 promoção=49 PASS,9 controles negativos PASS; repetido
+  pelo prebuild. Invariantes de geração/persistência/boot/backup mantidas.
+- Visibilidade da chave:18 PASS com --compare-head, incluindo AST dos efeitos/
+  handlers/status e reprodução do defeito no parent. Após incorporar o patch
+  ao HEAD, o caso opcional de reprodução antiga deixa de se aplicar; contador
+  menor nesse modo não é teste relaxado nem regressão.
+- Fonte exclusiva:31 PASS; dois fluxos de ativação do gestor:20/20 PASS.
+- Layout/policy:18 casos+hook real PASS; aviso de playback:11 PASS.
+- Typecheck PASS; build web414 módulos PASS13,97s, com prebuild obrigatório;
+  nenhum warning de crypto externalizado. Avisos anteriores node:fs/node:path,
+  imports mistos e chunk grande continuam e não foram ocultados/corrigidos.
+- R2F2B0 manager-form repetido:14/15, exit1; T15 exige frase ausente também
+  no parent995de5f. Falha textual preexistente, não regressão dos dois patches;
+  nenhum ajuste fora do escopo. Não declarar todas as suites do repo verdes.
+- Browser, Gradle, assinatura e instalação física são evidência histórica das
+  duas entregas, NÃO reexecutados aqui. Sem cap sync/Gradle/update/launch/reset.
+  Testes repetidos usam fixtures/mocks, sem backend real ou carga remota.
+
+Varredura sanitizada:455 fontes textuais/5895083bytes dos21 candidatos e blobs
+alterados em cada um dos três commits inéditos. Zero chaves privadas/tokens
+GitHub/sb_secret/Stripe live/AWS/service_role JWT detectados. Scanner inicialmente
+exit1 por três URLs do teste scripts/test-real-source-adapter.mjs no0eb3272,
+linhas135/223/327: revisadas como entradas sintéticas de detector/sanitizador,
+com host marcado example/test e sem request; arquivo atual idêntico ao blob.
+Nenhum valor de URL/credencial foi impresso. Os três alertas são classificados,
+não removidos por alteração de teste nem tratados como segredos de cliente.
+Não é certificação universal do histórico/binários ou ausência de todo segredo.
+
+433 hashes congelados antes deste ciclo para runtime/candidatos/operacionais;
+reconferência pré-staging confirmou428 byte-idênticos e somente os cinco registros
+documentais alterados;405/405 runtime e sete operacionais intactos. APK atual
+8785127bytes/SHA256
+F58BC34DA5B30ADC1E8C0D443086ACB286BEA47E4E4CEE9D23F261B6808881F8
+preservado. Nenhum APK/segredo/catálogo/captura real incluído no manifesto.
+
+### Análise do push — evidência atual e limites
+
+GitHub connector e CLI: repo esperado/public/main, permissão push=SIM e
+admin=NAO; zero workflows/runs/environments/deployments/check-runs/statuses,
+zero rulesets retornados. Estado combinado pending sem statuses NÃO prova
+pipeline pendente. Hooks e branch protection HTTP404: não verificáveis nesta
+credencial, NÃO listas vazias/prova de ausência. Sem hooks locais ativos ou
+core.hooksPath customizado; identidade de autor Git configurada, não alterada.
+
+Vercel connector: zero projetos ligados ao URL exato do repo no escopo padrão
+e na única equipe acessível. Limite: não cobre outras contas/equipes/provedores.
+Supabase metadata confirma projeto cujbmyhitgomlgwfkaat/Xandeflix Prebuilt,
+us-east-2/ACTIVE_HEALTHY; não foi executada query de cliente ou write remoto.
+
+Usuário enviou primeiro catálogo /integrations com pesquisa vazia, insuficiente
+para concluir deploy. Depois enviou capturas da configuração correta
+/settings/integrations: repo xandeflix2/xandeflix-prebuilt conectado, working
+directory ".", Deploy to production visivelmente DESLIGADO; branching indisponível
+na tela do plano atual. Seção Vercel oferece instalar integração, não mostra
+vínculo instalado. Evidência fornecida pelo usuário, não leitura live independente
+nem alteração/salvamento de opções pelo agente. Resolve a incógnita observada
+do deploy de produção Supabase, não certifica webhooks/GitHub Apps externos.
+
+Skills Supabase/Vercel separaram publicação Git de deploy/migração; documentação
+oficial atual confirma que Deploy to production habilitado aplica migrations,
+Edge Functions declaradas e buckets. Changelog consultado em memória; sem upgrade.
+[Documentação Supabase](https://supabase.com/docs/guides/deployment/branching/github-integration).
+Fetch inicial markdown pelo navegador de pesquisa recusou content-type; leitura
+HTTP direta em memória confirmou o changelog, sem salvar arquivo ou mudar projeto.
+
+Usuário enviou depois as capturas administrativas do repo correto:
+/settings/hooks com lista vazia; /settings/installations com somente Supabase.
+Não é ausência de App: o App instalado existe, mas sua configuração de produção
+mostrada anteriormente está OFF. Capturas são evidência fornecida pelo usuário;
+não foram arquivadas no Git nem substituídas por interpretação do HTTP404.
+Incógnita administrativa anterior esclarecida; nenhuma integração alterada.
+
+Push continua não executado: este pedido autoriza análise, não execução do push.
+Conclusão pelas evidências disponíveis: nenhum gatilho de deploy de produção
+identificado; checkpoint apto para propor push normal de main após confirmação
+expressa e reconferência do remoto/fast-forward. Não é garantia universal sobre
+outros provedores/contas ou automações fora das superfícies inspecionadas.
+Nenhuma integração desabilitada, backend reconciliado ou drift de migrations
+reparado. Drift remoto46/local44 documentado anteriormente não foi reconsultado
+nem resolvido neste ciclo. Revalidar remoto antes de eventual fast-forward;
+não fazer force-push. Meta Fire<=60s/beta>100/HTTP403 remoto seguem pendentes.
+Git comum ainda na pasta histórica: não apagar a pasta antiga depois do push.
 
 ## Escopo e resultado verificável
 

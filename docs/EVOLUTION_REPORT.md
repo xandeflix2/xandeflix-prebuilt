@@ -1,5 +1,74 @@
 # Relatorio de Evolucao (Evolution Report)
 
+## 2026-10-05 — Checkpoint adicional e análise de deploy em leitura
+
+Pedido nominal de commit local; emenda/allowlist21 antes de staging. Revisão das
+duas entregas recentes, sem editar runtime/testes/dependências. Lock49+9, chave18,
+fonte31, gestor20, layout18+hook, playback11 e typecheck/build414 repetidos PASS;
+T15 manager-form já ausente no parent permanece14/15, não relaxado. Scanner455
+textos detectou três entradas sintéticas antigas de detector/sanitizador, revisadas
+sem revelar URL/credenciais; nenhum segredo de alta confiança detectado.
+Supabase/Vercel skills orientaram auditoria read-only: projeto saudável, nenhum
+Vercel ligado ao repo nos dois escopos acessíveis; GitHub sem admin para hooks.
+Capturas do usuário confirmam repo correto e toggle Deploy to production OFF no
+Supabase. Capturas posteriores do GitHub mostram lista de webhooks vazia e somente
+App Supabase, esclarecendo a pendência administrativa sem inferir ausência do App.
+Não alterar/salvar opções, migrar/deployar, instalar/limpar aparelhos ou publicar
+painel. Novo checkpoint identificado pelo assunto na evidência; push separado,
+não executado, proposto após confirmação explícita/reconferência do remoto.
+APK/runtime e sete operacionais protegidos por hashes; Git comum preservado.
+[Evidência](evidence/C11_GIT_CONSOLIDATION.md).
+
+## 2026-10-05 — Apresentação da mesma chave após AUTHORIZED
+
+Diagnóstico read-only confirmou persistência e ocultação pelo JSX condicional.
+Usuário aprovou fix e update somente do celular. Spec antes do código; chave/
+cópia movidas para cartão comum, um estado de feedback local, instrução A1
+compatível com a nova posição. AST prova efeitos/handlers/status inalterados;
+serviços/autoridade/persistência não modificados. Novo teste18, lock49+9, playback11
+e fonte exclusiva31 PASS. Skills de browser orientaram testes do JSX/callback
+real com dependências sintéticas, clipboard mock, transição e quatro viewports;
+nenhum dado/env real ou request externo. Falhas de import.meta/quoting/UTF8 do
+harness registradas e corrigidas com reexecuções válidas, sem alteração funcional.
+Build/cap/Gradle/assinatura/assets PASS;655 entradas nativas preservadas.
+Revisão final ajustou somente instrução "abaixo" e repetiu testes/build/entrega.
+APK final8785127bytes/F58BC34DA5B30ADC1E8C0D443086ACB286BEA47E4E4CEE9D23F261B6808881F8
+instalado in-place somente SM-S926B;5/5 privados e508/508 catálogo preservados,
+hash instalado correto/firstInstallTime original intacto.403/405 runtime idênticos,
+diferenças apenas página/APK, backup anterior mantido. Sem launch/reset/fonte real/
+Git/backend/novo Gate. Confirmação visual física final pelo usuário pendente.
+[Evidência](evidence/C11_ACTIVATION_KEY_VISIBILITY.md).
+
+## 2026-10-05 — Entrega física somente no Samsung SM-S926B
+
+Usuário confirmou Depuração USB após pedido de instalar somente no celular.
+Spec de entrega antes da operação, preflight C11/main/origin correto e lock49+9
+PASS. APK existente8751706bytes atualizado com install -r e Success, sem rebuild.
+Hash do base.apk instalado idêntico ao APK entregue; cinco arquivos privados e
+508 arquivos de catálogo preservados byte a byte, sem registrar seus conteúdos
+ou hashes particulares. firstInstallTime do user0 inalterado, lastUpdateTime
+2026-10-05 18:24:03. Sem launch/uninstall/clear/reset, alteração remota de fonte,
+Git ou próximo Gate. Fire Stick conectado e tablet excluídos. Conferência visual
+da Home no celular permanece a cargo do usuário; HTTP403 não declarado resolvido.
+Validação auxiliar inicial de formato dos hashes abortou antes da instalação;
+inventário explícito e lotes de64 permitiram conferência completa antes/depois.
+[Evidência](evidence/C11_EXCLUSIVE_DEVICE_SOURCE_HOME_ACTIVATION.md).
+
+## 2026-10-05 — Fonte exclusiva no gestor e acesso à Ativação na Home phone
+
+Usuário pediu trocar fonte de aparelho ativo sem interromper fonte compartilhada
+e corrigiu o posicionamento do atalho: cabeçalho à direita somente Home mobile.
+Novo form usa vault+switch existentes, preflight/confirm/busy/verificação, retry
+sem recriar fonte nem reter URL; não passa pelo fluxo de nova ativação. Supabase/
+Postgres/React e browser orientaram isolamento, tipagem wire-null e lifecycle.
+Header/footer/layouts e núcleo de ativação preservados;400/405 baseline iguais.
+Lock49+9,31 testes novos,20 gestor,18 policy/hook,11 playback,44 Header e browser
+manager final PASS; build/cap/Gradle e APK assinatura/assets PASS. APK atualizado
+na raiz com backup recuperável; não instalado/publicado, nenhuma fonte real mudou.
+Falha textual legada14/15 já no HEAD permanece explícita; harness browser corrigido
+após timeout, reexecução final válida. Nenhuma certificação HTTP403/Fire60s/beta100.
+[Evidência](evidence/C11_EXCLUSIVE_DEVICE_SOURCE_HOME_ACTIVATION.md).
+
 ## 2026-10-05 — Preparação da consolidação C11 no Git existente
 
 Pedido de seguir plano de consolidação em xandeflix2/xandeflix-prebuilt, sem

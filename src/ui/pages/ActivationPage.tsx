@@ -83,6 +83,7 @@ export const ActivationPage: React.FC<ActivationPageProps> = ({
   const [activationAttempt, setActivationAttempt] = useState(0);
   const [isCheckingDeviceActivation, setIsCheckingDeviceActivation] = useState(false);
   const [deviceActivationFeedback, setDeviceActivationFeedback] = useState<string | null>(null);
+  const [keyCopyFeedback, setKeyCopyFeedback] = useState<string | null>(null);
 
   const [isActivating, setIsActivating] = useState(false);
   const [sourceConfigured, setSourceConfigured] = useState(false);
@@ -768,6 +769,39 @@ export const ActivationPage: React.FC<ActivationPageProps> = ({
           </div>
         </div>
 
+        {/* Chave local permanente: disponível antes e depois da autorização. */}
+        <div
+          style={{ backgroundColor: '#101624', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '1.5rem', marginBottom: '1.5rem' }}
+        >
+          <span style={{ fontSize: '0.72rem', color: '#94a3b8', display: 'block', fontWeight: 600 }}>
+            CHAVE PERMANENTE DO DISPOSITIVO
+          </span>
+          <code style={{ display: 'block', color: '#86efac', fontSize: '1.2rem', lineHeight: 1.5, wordBreak: 'break-all', fontFamily: 'monospace', marginTop: '0.25rem' }}>
+            {localKeyState === 'READY' ? deviceActivationKey
+              : localKeyState === 'ERROR' ? 'Falha ao preparar a chave local.' : 'Gerando chave...'}
+          </code>
+          <button
+            type="button"
+            className="focusable-item"
+            onClick={() => {
+              if (deviceActivationKey && navigator.clipboard) {
+                void navigator.clipboard.writeText(deviceActivationKey)
+                  .then(() => setKeyCopyFeedback('Chave copiada.'))
+                  .catch(() => setKeyCopyFeedback('Não foi possível copiar. Anote a chave exibida.'));
+              }
+            }}
+            disabled={localKeyState !== 'READY'}
+            style={{ marginTop: '0.75rem', padding: '0.65rem 1rem', backgroundColor: '#7e22ce', color: '#fff', border: 'none', borderRadius: '5px', cursor: deviceActivationKey ? 'pointer' : 'not-allowed', fontWeight: 700 }}
+          >
+            Copiar chave
+          </button>
+          {keyCopyFeedback && (
+            <div role="status" style={{ marginTop: '0.75rem', fontSize: '0.8rem', color: '#cbd5e1' }}>
+              {keyCopyFeedback}
+            </div>
+          )}
+        </div>
+
         {/* Formulário de Ativação */}
         {effectiveStatus !== 'AUTHORIZED' && (
           <div
@@ -830,7 +864,7 @@ export const ActivationPage: React.FC<ActivationPageProps> = ({
                 ATIVAÇÃO NOVA (A1)
               </strong>
               <p style={{ color: '#cbd5e1', fontSize: '0.84rem', margin: '0 0 1rem 0', lineHeight: 1.45 }}>
-                Abra a página externa de ativação, informe o código e a chave abaixo e cadastre a fonte. Não é necessário criar conta ou informar senha.
+                Abra a página externa de ativação, informe o código e a chave exibidos nesta tela e cadastre a fonte. Não é necessário criar conta ou informar senha.
               </p>
 
               <div style={{ marginBottom: '0.9rem' }}>
@@ -842,42 +876,7 @@ export const ActivationPage: React.FC<ActivationPageProps> = ({
                 </strong>
               </div>
 
-              <div style={{ marginBottom: '0.9rem' }}>
-                <span style={{ fontSize: '0.72rem', color: '#94a3b8', display: 'block', fontWeight: 600 }}>
-                  CHAVE PERMANENTE DO DISPOSITIVO
-                </span>
-                <code
-                  style={{
-                    display: 'block',
-                    color: '#86efac',
-                    fontSize: '0.78rem',
-                    lineHeight: 1.5,
-                    wordBreak: 'break-all',
-                    fontFamily: 'monospace',
-                    marginTop: '0.25rem',
-                  }}
-                >
-                  {localKeyState === 'READY' ? deviceActivationKey
-                    : localKeyState === 'ERROR' ? 'Falha ao preparar a chave local.' : 'Gerando chave...'}
-                </code>
-              </div>
-
               <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap', alignItems: 'center' }}>
-                <button
-                  type="button"
-                  className="focusable-item"
-                  onClick={() => {
-                    if (deviceActivationKey && navigator.clipboard) {
-                      void navigator.clipboard.writeText(deviceActivationKey)
-                        .then(() => setDeviceActivationFeedback('Chave copiada.'))
-                        .catch(() => setDeviceActivationFeedback('Não foi possível copiar. Anote a chave exibida.'));
-                    }
-                  }}
-                  disabled={localKeyState !== 'READY'}
-                  style={{ padding: '0.65rem 1rem', backgroundColor: '#7e22ce', color: '#fff', border: 'none', borderRadius: '5px', cursor: deviceActivationKey ? 'pointer' : 'not-allowed', fontWeight: 700 }}
-                >
-                  Copiar chave
-                </button>
                 <button
                   type="button"
                   className="focusable-item"

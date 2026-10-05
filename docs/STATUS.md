@@ -1,5 +1,64 @@
 # Status Operacional — Xandeflix Prebuilt
 
+## Novo checkpoint local das entregas recentes; análise do push — 2026-10-05
+
+Commit local expressamente autorizado: fonte exclusiva por aparelho, acesso à
+Ativação na Home phone e mesma chave visível após autorização, com specs/testes.
+Manifesto literal21 arquivos; sete operacionais e APK fora do commit, preservados.
+Lock49+9, chave18, fonte31, gestor20, layout18+hook, playback11, typecheck/build414
+PASS; falha textual legada manager-form T15 continua14/15, também no parent.
+Nenhum novo patch funcional ou instalação/reset/backend/novo Gate neste ciclo.
+Capturas do usuário mostram Deploy to production OFF no Supabase/repo correto;
+Vercel não encontrou vínculo nos escopos acessíveis. GitHub push permitido, sem
+admin via API para hooks/protection (HTTP404); capturas posteriores do usuário
+mostram webhooks vazios e somente o App Supabase instalado. Pendência administrativa
+esclarecida; nenhum gatilho de deploy de produção identificado pelas evidências.
+Push NÃO executado, aguarda confirmação explícita/reconferência de main remoto.
+APK F58BC34D... intacto; sem publicação web ou certificação universal de automações.
+[Evidência e limites](evidence/C11_GIT_CONSOLIDATION.md).
+
+## Chave permanente visível após autorização; celular atualizado — 2026-10-05
+
+Correção aprovada: chave/cópia em cartão comum da Ativação, usando a chave
+existente; feedback local de cópia separado, formulário A1 segue condicional.
+Somente ActivationPage e APK alterados entre405 runtime;403 byte-idênticos.
+Teste18/AST dos efeitos e handlers, lock49+9, playback11, fonte exclusiva31,
+browser sintético/clipboard/viewport320/390/1024/960 PASS; build/cap/Gradle PASS.
+APK final8785127bytes/SHA256F58BC34DA5B30ADC1E8C0D443086ACB286BEA47E4E4CEE9D23F261B6808881F8
+instalado SOMENTE no SM-S926B com install -r/Success/hash instalado correto;
+cinco privados e508 arquivos do catálogo preservados. Sem reset/rotação/launch/
+outro aparelho/Git/backend/novo Gate; confirmação visual física pelo usuário
+pendente. Backup APK anterior preservado. Falhas auxiliares do harness resolvidas
+sem mudar produção/relaxar testes; pendências de fonte remota/publicação continuam.
+[Evidência](evidence/C11_ACTIVATION_KEY_VISIBILITY.md).
+
+## APK atualizado somente no celular; dados preservados — 2026-10-05
+
+Pedido explícito: somente celular, sem limpar. Samsung SM-S926B identificado por
+modelo/characteristics=phone; alvo ADB RXGYB03FL4W. Lock canônico49+9 PASS antes
+da entrega; install -r com Success. APK instalado confere com SHA256 da entrega
+8463607357B9042ACC95FF5037D2747CFEDA98C1899998D90AED17B0225FC6EB.
+Cinco arquivos privados e508 arquivos do catálogo byte-idênticos por hash antes/
+depois; instalação original de2026-10-03 preservada. Nenhum uninstall/clear/reset,
+abertura automática, fonte real trocada ou teste de reprodução. Fire Stick e
+tablet NÃO atualizados. Somente docs neste ciclo, sem build/Git/backend/novo Gate.
+Conferência visual no aparelho pelo usuário ainda pendente; painel não publicado.
+[Evidência](evidence/C11_EXCLUSIVE_DEVICE_SOURCE_HOME_ACTIVATION.md).
+
+## Fonte exclusiva por aparelho e chave na Home mobile — 2026-10-05
+
+Patch local: Clientes/Inspecionar/dispositivo → Trocar fonte exclusiva, sem editar
+fonte compartilhada; confirmação remota, retry sem duplicar criação, URL transitória.
+Atalho Ativação somente no cabeçalho da Home phone à direita; footer quatro ícones.
+Lock49+9,31 testes exclusivos,20 ativação gestor,18 layout/hook,11 playback,
+44 verificações Header e browser manager final PASS; typecheck/build/cap/Gradle PASS.
+400/405 runtime preservados; diferenças apenas quatro UI existentes e APK atual.
+APK8751706bytes gerado/assinatura/assets verificados, backup anterior em tmp.
+Nenhuma instalação, fonte real trocada, backend write ou publicação Git/hospedagem.
+Falha textual legada T15 do manager-form já presente no HEAD continua pendente.
+Timeout do harness browser resolvido com sessão nova pré-aberta; UI final PASS.
+[Evidência](evidence/C11_EXCLUSIVE_DEVICE_SOURCE_HOME_ACTIVATION.md).
+
 ## Checkpoint Git local validado; push retido — 2026-10-05
 
 C11 já é main do repo existente; não criar backend/banco nem mesclar o original.

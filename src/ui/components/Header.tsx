@@ -172,6 +172,17 @@ export const Header: React.FC<HeaderProps> = ({
       </nav>
 
       <div className="header-right">
+        {currentView === 'home' && (
+          <button
+            type="button"
+            className="focusable-item header-activation-button"
+            onClick={() => onNavigate('activation')}
+            aria-label="Abrir Ativação do dispositivo"
+            title="Ativação"
+          >
+            <NavigationIcon view="activation" />
+          </button>
+        )}
         {catalogVersion === 'Sincronizando...' && (
           <div className="header-sync-status" role="status">
             <span className="badge-dot" />

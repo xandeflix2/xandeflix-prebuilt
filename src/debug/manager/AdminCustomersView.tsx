@@ -9,6 +9,8 @@
  */
 
 import React, { useState } from 'react';
+import { ExclusiveDeviceSourceForm } from './ExclusiveDeviceSourceForm.tsx';
+import type { ExclusiveSourceAuthority, ExclusiveSourceTarget } from './exclusive-device-source.ts';
 import type {
   CustomerStatus,
   ManagerCustomerDetail,
@@ -20,6 +22,8 @@ interface AdminCustomersViewProps {
   onInspectCustomer: (customerId: string) => Promise<ManagerCustomerDetail | null>;
   onUpdateCustomerStatus: (customerId: string, status: CustomerStatus, reason?: string) => Promise<boolean>;
   loading?: boolean;
+  sourceAuthority?: ExclusiveSourceAuthority;
+  onDeviceSourceApplied?: () => void;
 }
 
 export const AdminCustomersView: React.FC<AdminCustomersViewProps> = ({
@@ -27,6 +31,8 @@ export const AdminCustomersView: React.FC<AdminCustomersViewProps> = ({
   onInspectCustomer,
   onUpdateCustomerStatus,
   loading,
+  sourceAuthority,
+  onDeviceSourceApplied,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'ALL' | CustomerStatus>('ALL');
@@ -36,6 +42,8 @@ export const AdminCustomersView: React.FC<AdminCustomersViewProps> = ({
   const [targetStatus, setTargetStatus] = useState<CustomerStatus>('ACTIVE');
   const [statusReason, setStatusReason] = useState('');
   const [mutating, setMutating] = useState(false);
+  const [sourceTarget, setSourceTarget] = useState<ExclusiveSourceTarget | null>(null);
+  const [sourceBusy, setSourceBusy] = useState(false);
 
   const filtered = customers.filter((c) => {
     const matchesSearch =
@@ -46,6 +54,8 @@ export const AdminCustomersView: React.FC<AdminCustomersViewProps> = ({
   });
 
   const handleInspect = async (customerId: string) => {
+    if (sourceBusy) return;
+    setSourceTarget(null);
     setInspectLoading(true);
     try {
       const detail = await onInspectCustomer(customerId);
@@ -201,6 +211,7 @@ export const AdminCustomersView: React.FC<AdminCustomersViewProps> = ({
                           type="button"
                           className="focusable-item"
                           onClick={() => handleInspect(c.customerId)}
+                          disabled={sourceBusy || inspectLoading}
                           style={{
                             padding: '0.35rem 0.75rem',
                             backgroundColor: '#1e293b',
@@ -219,6 +230,7 @@ export const AdminCustomersView: React.FC<AdminCustomersViewProps> = ({
                           type="button"
                           className="focusable-item"
                           onClick={() => handleOpenStatusModal(c)}
+                          disabled={sourceBusy}
                           style={{
                             padding: '0.35rem 0.75rem',
                             backgroundColor: '#334155',
@@ -258,7 +270,8 @@ export const AdminCustomersView: React.FC<AdminCustomersViewProps> = ({
             <button
               type="button"
               className="focusable-item"
-              onClick={() => setInspectedCustomer(null)}
+              disabled={sourceBusy}
+              onClick={() => { setInspectedCustomer(null); setSourceTarget(null); }}
               style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '1rem' }}
             >
               ✕ Fechar
@@ -328,11 +341,36 @@ export const AdminCustomersView: React.FC<AdminCustomersViewProps> = ({
                     <strong style={{ color: '#38bdf8' }}>{d.displayCode}</strong>
                     <span style={{ marginLeft: '0.4rem', color: '#cbd5e1' }}>{d.deviceLabel} ({d.deviceType})</span>
                     <span style={{ marginLeft: '0.4rem', color: '#34d399' }}>● {d.status}</span>
+                    {sourceAuthority && inspectedCustomer.customer.status === 'ACTIVE' && d.status === 'AUTHORIZED'
+                      && inspectedCustomer.licenses.some(lic => lic.licenseId === d.licenseId && lic.mode === 'MANAGED' && lic.status === 'ACTIVE') && (
+                      <button
+                        type="button"
+                        className="focusable-item btn-secondary"
+                        disabled={sourceBusy || sourceTarget?.deviceId === d.deviceId}
+                        style={{ marginLeft: '0.75rem' }}
+                        onClick={() => setSourceTarget({
+                          customerId: inspectedCustomer.customer.customerId,
+                          nickname: inspectedCustomer.customer.nickname,
+                          deviceId: d.deviceId, displayCode: d.displayCode, licenseId: d.licenseId,
+                        })}
+                      >Trocar fonte exclusiva</button>
+                    )}
                   </div>
                 ))}
               </div>
             )}
           </div>
+
+          {sourceAuthority && sourceTarget && (
+            <ExclusiveDeviceSourceForm
+              key={`${sourceTarget.customerId}:${sourceTarget.deviceId}:${sourceTarget.licenseId}`}
+              authority={sourceAuthority}
+              target={sourceTarget}
+              onBusyChange={setSourceBusy}
+              onClose={() => setSourceTarget(null)}
+              onApplied={() => onDeviceSourceApplied?.()}
+            />
+          )}
 
           {/* Fontes de Autoatendimento do Cliente */}
           <div>

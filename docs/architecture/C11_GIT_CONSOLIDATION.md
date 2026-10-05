@@ -1,5 +1,94 @@
 # C11 — Consolidação Git no repositório existente — 2026-10-05
 
+## Emenda vigente — novo commit local e análise do push — 2026-10-05
+
+Pedido explícito do usuário: "prossiga com o commit e analise para o push".
+GIT_COMMIT_AUTHORIZED=SIM, somente o novo checkpoint descrito abaixo;
+GIT_PUSH_AUTHORIZED=NAO_NESTE_CICLO_ANALISE_SOMENTE;
+GIT_PR_AUTHORIZED=NAO; CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO.
+A retenção administrativa do push continua vigente. Esta emenda não autoriza
+deploy, backend/migrations, integração, instalação/reset, limpeza ou novo patch.
+
+Preflight: workspace/toplevel C:\Xandeflix\xandeflix-prebuilt-c11-main,
+origin https://github.com/xandeflix2/xandeflix-prebuilt.git, main, HEAD
+995de5f767a14276bc2f4ca58944e4f7af95ca4e. Main remoto reconsultado:
+e99f830a24b5de6dd74b4397f1ed6f0995bc8483; três commits locais, índice vazio,
+oito tracked modificados e onze arquivos novos das duas entregas recentes.
+Os sete operacionais excluídos abaixo permanecem locais, sem exclusão/edição.
+AGENTS, Architecture, Execution, Source Data Boundary e Activation Lock relidos.
+Proveniência funcional: C11_EXCLUSIVE_DEVICE_SOURCE_HOME_ACTIVATION e
+C11_ACTIVATION_KEY_VISIBILITY; nenhuma alteração funcional adicional neste ciclo.
+
+Allowlist literal deste novo commit (21 arquivos, substitui o manifesto antigo
+somente para este ciclo):
+
+- docs/ERRORS_AND_BLOCKERS.md
+- docs/EVOLUTION_REPORT.md
+- docs/STATUS.md
+- docs/architecture/C11_GIT_CONSOLIDATION.md
+- docs/evidence/C11_GIT_CONSOLIDATION.md
+- docs/architecture/C11_ACTIVATION_KEY_VISIBILITY.md
+- docs/architecture/C11_EXCLUSIVE_DEVICE_SOURCE_HOME_ACTIVATION.md
+- docs/evidence/C11_ACTIVATION_KEY_VISIBILITY.md
+- docs/evidence/C11_EXCLUSIVE_DEVICE_SOURCE_HOME_ACTIVATION.md
+- src/debug/manager/AdminCustomersView.tsx
+- src/debug/manager/ManagerPanelPage.tsx
+- src/debug/manager/ExclusiveDeviceSourceForm.tsx
+- src/debug/manager/exclusive-device-source.ts
+- src/index.css
+- src/ui/components/Header.tsx
+- src/ui/pages/ActivationPage.tsx
+- scripts/exclusive-device-source-fixture.html
+- scripts/exclusive-device-source-fixture.tsx
+- scripts/test-c11-activation-key-visibility.mjs
+- scripts/test-c11-exclusive-device-source.mjs
+- scripts/verify-c11-exclusive-device-source.mjs
+
+Novas edições permitidas: somente este plano, sua evidência, STATUS, EVOLUTION
+e ERRORS, para registrar revisão/validação/limites. Os outros candidatos devem
+ficar byte-idênticos. Saídas ignoradas de testes/build web são regeneráveis;
+APK entregue deve conservar SHA256
+F58BC34DA5B30ADC1E8C0D443086ACB286BEA47E4E4CEE9D23F261B6808881F8.
+433 hashes congelados em memória antes da emenda, incluindo runtime, candidatos
+e sete operacionais. Não incluir APK, env, capturas reais, dados privados ou build.
+
+Sequência: revisar os patches/testes/evidências; varredura sanitizada de segredos
+nos candidatos e commits inéditos; lock canônico, testes dos dois patches,
+regressões relevantes, typecheck/build web; diff --check e hashes; staging
+literal auditado; commit novo sem amend; verificar parent/manifesto/índice/status.
+Não relaxar testes. Falha textual legada manager-form T15 é registrada como
+pendência anterior, não deve ser apresentada como suite integralmente aprovada.
+
+Análise remota somente leitura: main vivo, permissões/Actions/checks/deployments/
+hooks GitHub, projetos Vercel ligados ao repositório nos escopos acessíveis,
+metadata Supabase e opções GitHub quando acessíveis. Ausência de projeto/checks
+ou branches não prova ausência universal de deploy. Nenhum token/URL sensível
+de hook/env deve aparecer em logs ou documentos. Sem permissão administrativa,
+pedir confirmação das integrações; não alterar opções para contornar a retenção.
+Push posterior exige decisão explícita, reconferência do remoto e fast-forward;
+divergência/colisão/regressão exige STOP. Git comum/pastas originais preservados.
+
+Aceitação deste ciclo: checkpoint local revisado, 21 arquivos exatos, somente
+sete operacionais não rastreados, índice vazio, runtime/APK intactos em relação
+ao início deste ciclo; relatório honesto de testes e risco/limite do push.
+O critério histórico "GitHub main aponta" abaixo não é resultado deste ciclo.
+
+### Decisão da análise após capturas administrativas do usuário
+
+Usuário forneceu as telas corretas do Supabase e GitHub: repo esperado conectado,
+Deploy to production OFF, lista de webhooks vazia e somente Supabase na lista
+Installed GitHub Apps. Vercel connector sem vínculo nos escopos acessíveis;
+Actions/checks/deployments sem registros. A incógnita administrativa anterior
+fica esclarecida pelas evidências disponíveis; não se identificou gatilho de
+deploy de produção. Não é certificação universal de outros provedores/contas.
+Nenhuma opção foi alterada pelo agente e nenhum push foi executado.
+
+Conclusão: checkpoint apto para propor push normal de main a origin, após nova
+confirmação expressa e reconferência do SHA remoto/fast-forward. Nesta tarefa,
+o pedido é commit + análise; GIT_PUSH_AUTHORIZED=NAO_NESTE_CICLO permanece.
+Esta decisão supera a retenção por falta de capturas descrita historicamente
+abaixo, não autoriza deploy/migração ou resolve drift de schema, HTTP403 ou beta.
+
 ## Autorização e escopo anterior à execução
 
 Usuário descartou criar outro repositório e pediu seguir o plano de consolidar

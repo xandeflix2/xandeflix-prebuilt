@@ -1954,6 +1954,8 @@ export const ManagerPanelPage: React.FC<ManagerPanelPageProps> = ({ onBack }) =>
             loading={dataLoading}
             onInspectCustomer={handleInspectCustomer}
             onUpdateCustomerStatus={handleUpdateCustomerStatus}
+            sourceAuthority={managerSession && managerRemote ? managerRemote : undefined}
+            onDeviceSourceApplied={() => { void refreshData(); }}
           />
         )}
 
