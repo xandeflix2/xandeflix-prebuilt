@@ -917,3 +917,13 @@ aprovadas, sem patch funcional. Falhas iniciais e correções em evidência C99.
 Envio pendente até confirmação do push; sem backend/deploy/instalação/PR.
 CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO; GIT_COMMIT_AUTHORIZED=SIM;
 GIT_PUSH_AUTHORIZED=SIM.
+
+## C99 — Código publicado e remoto confirmado — 2026-10-13
+Commit0bf9471019114b8c3ce74751ce3b6b8ec7d97494 publicou500 arquivos C11
+em xandeflix2/xandeflix-prebuilt/main, push normal e ls-remote idêntico ao HEAD.
+Build/lock,30 regressões e178 JVM PASS; APK18/env/privados preservados.
+Auditoria final de staging/proveniência PASS, sem arquivo fora da allowlist;
+harness de staging corrigido após inventário parcial worktree/index, sem reset.
+Este complemento registra confirmação observada após o envio do código.
+[Evidência](evidence/C11_GITHUB_SYNCHRONIZATION_20261013.md).
+CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO; sem backend/deploy/instalação/PR.

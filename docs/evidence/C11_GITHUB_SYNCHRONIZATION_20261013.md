@@ -51,3 +51,18 @@ relatórios e SQL, sem mudança de lógica ou normalização de outros arquivos.
 
 CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO; GIT_COMMIT_AUTHORIZED=SIM;
 GIT_PUSH_AUTHORIZED=SIM. Sem alteração/deploy de banco ou aplicativo instalado.
+
+## Publicação confirmada
+
+Commit de código/documentação0bf9471019114b8c3ce74751ce3b6b8ec7d97494,
+500 arquivos, enviado por push normal de61ec009 para main. git ls-remote confirmou
+refs/heads/main exatamente igual ao HEAD local após o envio. Preservados env,
+arquivos privados ignorados e APK18. Este registro de confirmação é documental;
+nenhum patch funcional adicional ou repetição de build/APK necessária.
+
+Harness de staging teve uma falha recuperável ao comparar novamente apenas
+worktree/index após stage inicial; corrigida união explícita dos arquivos já
+preparados com os ainda alterados, sem reset, perda ou publicação de extras.
+Manifesto final500, scan com fixtures revisadas, diff staged/check e proveniência
+PASS (17 arquivos alterados neste ciclo, demais bytes de origem preservados).
+Resultado Git terminal e hashes locais/remotos finais em tmp/c99-github-sync.
