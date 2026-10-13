@@ -18,6 +18,7 @@ export type AppView =
   | 'series-detail'
   | 'debug-source-setup'
   | 'activation'
+  | 'settings'
   | 'activate-device'
   | 'manager-panel'
   | 'portal';
@@ -43,6 +44,7 @@ export function createInitialRoute(): NavigationState {
       'search',
     'activation',
     'activate-device',
+    'settings',
       'debug-source-setup',
       'manager-panel',
       'portal',

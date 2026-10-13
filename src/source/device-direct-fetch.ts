@@ -118,6 +118,7 @@ export interface DeviceDirectM3uStreamHandle {
 }
 
 export interface DeviceDirectM3uStreamResult {
+  sourceContentDigest?: string;
   success: boolean;
   observation: SanitizedTransportObservation;
   sourcePayloadSizeBytes?: number;
@@ -565,6 +566,7 @@ export async function fetchDeviceDirectM3uStream(
         success: true,
         observation,
         sourcePayloadSizeBytes: result.bytesWritten,
+        sourceContentDigest: /^[a-f0-9]{64}$/.test(result.sourceContentDigest || '') ? result.sourceContentDigest : undefined,
         getSourcePayloadSizeBytes: () => result.bytesWritten,
         stream,
       };

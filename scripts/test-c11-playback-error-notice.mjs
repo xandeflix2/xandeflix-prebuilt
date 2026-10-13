@@ -107,6 +107,9 @@ await test('REAL_APP_EFFECT_BRIDGE_ERROR_AND_MANUAL_RETURN', async () => {
     handleNativePlayerReturn,
     defaultPlaybackService: { stopPlayback: async (reason) => { reasons.push(reason); } },
     setNativePlaybackErrorNotice: (notice) => notices.push(notice),
+    setPlaybackSupportDiagnostic: () => {},
+    capturePlaybackSupportDiagnostic: () => 'controlled diagnostic',
+    routeStateRef: { current: { current: { view: 'movie-detail' } } },
   });
   await flush();
   callback(error('HTTP_ERROR', 404));
@@ -156,7 +159,17 @@ await test('REAL_COMPONENT_ACCESSIBILITY_AND_NO_EMPTY_NOTICE', () => {
   const source = readFileSync(new URL('../src/ui/components/PlaybackErrorNotice.tsx', import.meta.url), 'utf8');
   const output = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.React, esModuleInterop: true } }).outputText;
   const exports = {};
-  vm.runInNewContext(output, { exports, require });
+  vm.runInNewContext(output, { exports, require: name => name === 'react'
+    ? { ...React, useEffect() {}, useRef(value) { return { current: value }; }, useState(value) { return [value, () => {}]; } }
+    : name === '@capacitor/browser' ? { Browser: {} }
+    : name.includes('multi-device-contact') ? { getMultiDeviceContactService: () => ({}) }
+    : name.includes('playback-support-diagnostic') ? { whatsappPlaybackSupportUrl: () => '' }
+    : name.includes('playback-error-report.service') ? { createPlaybackReportRequestId: () => 'fixture', getPlaybackErrorReportService: () => ({}) }
+    : name.includes('usePhoneLayout') ? { usePhoneLayout: () => true }
+    : name.includes('playback-support-profile') ? { canUsePlaybackWhatsapp: () => true }
+    : name.includes('google-cast') ? { hasGoogleCast: () => false, GoogleCast: {} }
+    : name.includes('dpad-error-controls') ? { navigateErrorControls: () => {} }
+    : require(name) });
   const Component = exports.PlaybackErrorNotice;
   const html = renderToStaticMarkup(React.createElement(Component, { message: getNativePlaybackErrorNotice(error('HTTP_ERROR', 404)), onDismiss: () => {} }));
   assert.match(html, /role="alert"/);
@@ -172,16 +185,18 @@ await test('REAL_COMPONENT_ACCESSIBILITY_AND_NO_EMPTY_NOTICE', () => {
   assert.equal((appText.match(/<PlaybackErrorNotice /g) || []).length, 2, 'notice in normal and empty catalog shells');
   const css = readFileSync(new URL('../src/index.css', import.meta.url), 'utf8');
   const noticeStyle = css.match(/\.playback-error-notice \{([^}]+)\}/)?.[1];
-  assert.ok(noticeStyle?.includes('position: sticky;'), 'notice stays in the scrolled viewport');
-  assert.ok(noticeStyle?.includes('top: var(--ui-header-height, 4rem);'), 'notice does not cover sticky navigation');
+  assert.ok(noticeStyle?.includes('position: fixed;'), 'notice stays in a viewport corner without shifting content');
+  assert.ok(noticeStyle?.includes('top: calc(var(--ui-header-height, 4rem) + 0.75rem);'), 'notice stays below horizontal navigation');
+  assert.ok(noticeStyle?.includes('max-width: calc(100vw - 1.5rem);'), 'notice fits narrow screens');
 });
 await test('NATIVE_TERMINAL_PATHS_CARRY_ONLY_ALLOWED_DETAILS', () => {
   const activity = readFileSync(new URL('../android/app/src/main/java/com/xandeflix/prebuilt/player/NativePlayerActivity.java', import.meta.url), 'utf8');
   const plugin = readFileSync(new URL('../android/app/src/main/java/com/xandeflix/prebuilt/player/NativeAndroidPlayerPlugin.java', import.meta.url), 'utf8');
   assert.equal((activity.match(/emitTerminalEvent\(false, "NATIVE_ERROR", category, statusCode\)/g) || []).length, 2);
   assert.ok(/if \(terminalEventEmitted\)\s*\{?\s*return;/.test(activity), 'terminal idempotence preserved');
-  assert.ok(/notifyPlaybackTerminal\(positionMs, ended, errorCode, errorCategory, httpStatus\)/.test(activity), 'Activity forwards sanitized fields');
-  assert.ok(/buildResumeData\(positionMs, ended, errorCode, errorCategory, httpStatus\)\.entrySet\(\)/.test(plugin), 'IPC uses tested allowlist builder');
+  assert.ok(/notifyPlaybackTerminal\(positionMs, ended, errorCode, errorCategory, httpStatus,/.test(activity), 'Activity forwards sanitized fields');
+  assert.ok(/errorCategory != null && lastMedia3ErrorCode >= 1000 \? lastMedia3ErrorCode : null/.test(activity), 'only an actual categorized media error supplies its numeric code');
+  assert.ok(/buildResumeData\(positionMs, ended, errorCode, errorCategory, httpStatus, media3ErrorCode, checkpoint\)\.entrySet\(\)/.test(plugin), 'IPC uses tested allowlist builder');
   assert.ok(/notifyListeners\("resume", sanitizedPayload\)/.test(plugin), 'same native event channel');
 });
 console.log(`C11_PLAYBACK_ERROR_NOTICE_FIX=PASS tests=${passed}`);

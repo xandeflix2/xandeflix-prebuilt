@@ -1,0 +1,68 @@
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import React from 'react';
+import ts from 'typescript';
+import { sampleStartupArtwork, prepareStartupArtwork, STARTUP_ARTWORK_LIMIT, STARTUP_ARTWORK_WAIT_MS } from '../src/artwork/startup-artwork-preparation.ts';
+globalThis.innerHeight=540;globalThis.innerWidth=960;
+let layoutReads=0;
+const card=(ready=false,unavailable=false)=>({getBoundingClientRect(){layoutReads++;return {top:10,bottom:100,left:10,right:80};},querySelector(selector){return selector.startsWith('img')?ready?{complete:true,naturalWidth:342}:null:unavailable?{}:null;}});
+const marked=Array.from({length:100},()=>card(true));
+const visible=Array.from({length:700},()=>card(false,true));
+const root={querySelectorAll(selector){return selector.includes('data-startup')?marked:visible;},querySelector(selector){return selector.includes('home-hero')?{querySelector(s){return s.startsWith('img')?{complete:true,naturalWidth:1280}:null;}}:null;}};
+const sample=sampleStartupArtwork(root);
+assert.equal(sample.total,40);assert.equal(sample.ready,32);assert.equal(sample.unavailable,8);
+assert.equal(layoutReads,40,'initial stage must never measure all catalog cards');
+assert.equal(sample.heroSettled,true);
+let time=0,job,updates=0,reason;
+const options={sample:()=>({total:4,ready:3,unavailable:1,waitingRails:false,heroSettled:true}),update:()=>updates++,finish:r=>reason=r,now:()=>time,schedule:fn=>(job=fn),cancel:()=>{job=undefined;}};
+const cancel=prepareStartupArtwork(options);
+time=250;job();assert.equal(reason,undefined);
+time=500;job();assert.equal(reason,undefined);
+time=750;job();assert.equal(reason,'settled');assert.equal(updates,3);
+cancel();assert.equal(job,undefined);
+reason=undefined;time=0;updates=0;
+const pending={...options,sample:()=>({total:4,ready:3,unavailable:0,waitingRails:true,heroSettled:false})};
+const stop=prepareStartupArtwork(pending);time=STARTUP_ARTWORK_WAIT_MS;job();assert.equal(reason,'timeout');stop();
+reason=undefined;time=0;updates=0;
+const dispose=prepareStartupArtwork(options),late=job;dispose();time=50000;late();assert.equal(updates,0);assert.equal(reason,undefined);
+console.log('PASS_STARTUP40_BOUNDED_LAYOUT_READS_REAL_READY_DISTINCT_FALLBACK_STABILITY_TIMEOUT_CANCEL');
+
+const passive={...React,useRef:v=>({current:v}),useState:v=>[typeof v==='function'?v():v,()=>{}],useEffect:()=>{},useLayoutEffect:()=>{},useMemo:f=>f()};
+function load(file,imports){const module={exports:{}};const code=ts.transpileModule(readFileSync(new URL('../'+file,import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.React,target:ts.ScriptTarget.ES2022}}).outputText;new Function('require','module','exports',code)(name=>{for(const [key,value]of Object.entries(imports))if(name.includes(key))return value;throw Error('Uncontrolled dependency '+name);},module,module.exports);return module.exports;}
+function elements(tree){const result=[];function walk(n){if(!React.isValidElement(n))return;result.push(n);React.Children.forEach(n.props.children,walk);}walk(tree);return result;}
+const Card=()=>null,Artwork=()=>null;
+const {MediaRail}=load('src/ui/components/MediaRail.tsx',{react:{default:passive,...passive},'category-presentation':{createPresentationSeed:()=>1,orderCategoryItems:x=>x,isReleaseCategory:()=>false},MediaCard:{MediaCard:Card},useRailArtworkPreparation:{useRailArtworkPreparation:()=>({root:{current:null},prepare:false})}});
+const items=Array.from({length:20},(_,id)=>({id:String(id),title:'Synthetic',kind:'movie',posterUri:'https://synthetic.invalid/poster.jpg',genreLabels:[]}));
+const props={id:'startup',title:'Synthetic',items,preserveOrder:true,onItemClick(){},startupArtworkCount:999};
+const rail=elements(MediaRail.type(props)),cards=rail.filter(n=>n.type===Card);
+assert.equal(cards.filter(n=>n.props.startupArtwork).length,8);
+assert.equal(elements(MediaRail.type({...props,startupArtworkCount:0})).filter(n=>n.type===Card&&n.props.startupArtwork).length,0);
+const {MediaCard}=load('src/ui/components/MediaCard.tsx',{react:{default:passive,...passive},Artwork:{Artwork},NewContentProvider:{useContentBadge:()=>undefined},'artwork-uri':{displayArtworkUri:x=>x},'image-load-queue':{loadImage:()=>Promise.resolve({ok:true})}});
+const node=MediaCard.type({item:items[0],onClick(){},startupArtwork:true});
+assert.equal(node.props['data-startup-artwork'],true);assert.equal(elements(node).find(n=>n.type===Artwork).props.startup,true);
+console.log('PASS_REAL_RAIL8_LIMIT_AND_CARD_TO_ARTWORK_PROP_AND_NORMAL_DEFAULT');
+
+const effects=[],listeners=new Map();
+const hookReact={...passive,useEffect:fn=>effects.push(fn),useLayoutEffect:fn=>effects.push(fn)};
+let preparing=[],cancelled=0,finishStage;
+globalThis.document={addEventListener:(type,fn)=>listeners.set(type,fn),removeEventListener:(type,fn)=>{if(listeners.get(type)===fn)listeners.delete(type);}};
+const {StartupArtworkPreparation}=load('src/ui/components/StartupArtworkPreparation.tsx',{react:{default:hookReact,...hookReact},'startup-artwork-preparation':{sampleStartupArtwork:()=>sample,prepareStartupArtwork:opts=>{finishStage=opts.finish;return()=>cancelled++;}}});
+StartupArtworkPreparation({root:{current:{closest:()=>null}},snapshot:'phone',onPreparing:v=>preparing.push(v)});
+effects.splice(0).forEach(fn=>fn());assert.deepEqual(preparing,[]);assert.equal(listeners.size,0);
+let heroFocused=0;
+StartupArtworkPreparation({root:{current:{closest:()=>({}),querySelector:()=>({focus:()=>heroFocused++})}},snapshot:'fire',onPreparing:v=>preparing.push(v)});
+const cleanups=effects.splice(0).map(fn=>fn()).filter(fn=>typeof fn==='function');
+assert.deepEqual(preparing,[true]);finishStage();assert.deepEqual(preparing,[true,false]);assert.equal(heroFocused,1);
+let intercepted=0;listeners.get('keydown')({key:'ArrowDown',preventDefault:()=>intercepted++,stopImmediatePropagation:()=>intercepted++});
+assert.equal(intercepted,0,'startup handler must release D-pad immediately after entering');
+cleanups.forEach(fn=>fn());assert.equal(listeners.size,0);assert.ok(cancelled>=1);
+console.log('PASS_REAL_COMPONENT_PHONE_SKIP_FIRE_START_FINISH_FOCUS_DPAD_RELEASE_LISTENER_CLEANUP');
+
+let fireClass=false,notify,observerStopped=0;
+globalThis.MutationObserver=class {constructor(fn){notify=fn;}observe(_el,options){assert.deepEqual(options,{attributes:true,attributeFilter:['class']});}disconnect(){observerStopped++;}};
+preparing=[];
+StartupArtworkPreparation({root:{current:{closest:selector=>selector==='.app-shell'?{}:fireClass?{}:null,querySelector:()=>({focus(){}})}},snapshot:'async-profile',onPreparing:v=>preparing.push(v)});
+const asyncCleanup=effects.splice(0).map(fn=>fn()).filter(fn=>typeof fn==='function');
+assert.deepEqual(preparing,[]);fireClass=true;notify();assert.deepEqual(preparing,[true]);notify();assert.deepEqual(preparing,[true]);
+finishStage();asyncCleanup.forEach(fn=>fn());assert.ok(observerStopped>=2);
+console.log('PASS_REAL_ASYNC_FIRE_PROFILE_STARTS_ONCE_CLASS_ONLY_OBSERVER_CLEANUP');

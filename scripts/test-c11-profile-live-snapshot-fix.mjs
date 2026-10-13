@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import { InMemoryCatalogStorage } from '../src/bootstrap/storage/in-memory.storage.ts';
+import { CURRENT_CLASSIFICATION_PROFILE_VERSION } from '../src/source/source-classification-profile.ts';
 import {
   readClassificationProfileVersion,
   requiresClassificationProfileRefresh,
@@ -116,13 +117,14 @@ await test('TEST_T129_PROFILE_VERSION_READBACK_EQUALS_CURRENT', async () => {
 });
 
 await test('TEST_T130_CURRENT_PROFILE_BOOT_DOES_NOT_REFRESH', async () => {
-  assert.equal(requiresClassificationProfileRefresh(manifest(snapshotId, 2)), false);
+  assert.equal(requiresClassificationProfileRefresh(manifest(snapshotId, CURRENT_CLASSIFICATION_PROFILE_VERSION)), false);
 });
 
 await test('TEST_T131_OLD_PROFILE_REFRESHES_ONCE_ONLY', async () => {
   assert.equal(requiresClassificationProfileRefresh(manifest(snapshotId, undefined)), true);
   assert.equal(requiresClassificationProfileRefresh(manifest(snapshotId, 1)), true);
-  assert.equal(requiresClassificationProfileRefresh(manifest(snapshotId, 2)), false);
+  assert.equal(requiresClassificationProfileRefresh(manifest(snapshotId, 2)), true);
+  assert.equal(requiresClassificationProfileRefresh(manifest(snapshotId, CURRENT_CLASSIFICATION_PROFILE_VERSION)), false);
 });
 
 const firstFold = Array.from({ length: 100 }, (_, index) => channel(`live:first:${index}`, 'first'));

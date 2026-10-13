@@ -50,6 +50,7 @@ export interface LargeSourceDownloadStartOptions {
 
 export interface LargeSourceDownloadStartResult {
   success: boolean;
+  sourceContentDigest?: string;
   downloadId?: string;
   httpResponseReceived: 'SIM' | 'NAO';
   httpStatusClass: '2XX' | '3XX' | '4XX' | '5XX' | 'UNKNOWN' | 'NOT_APPLICABLE';

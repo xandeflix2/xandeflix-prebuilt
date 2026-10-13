@@ -1,5 +1,6 @@
 import {
   classifyCanonicalSourceContent,
+  isExplicit24HourChannel,
   type CanonicalSourceContentKind,
   type CanonicalSourceContentInput,
 } from './content-kind-classifier.ts';
@@ -41,7 +42,7 @@ export interface SourceProfileClassificationResult {
 
 export const MANAGED_SOURCE_CLASSIFICATION_PROFILE_SOURCE_ID = 'src_uhwh5cio';
 
-export const CURRENT_CLASSIFICATION_PROFILE_VERSION = 2;
+export const CURRENT_CLASSIFICATION_PROFILE_VERSION = 4;
 export const MANAGED_SOURCE_CLASSIFICATION_PROFILE_V1 = {
   sourceId: MANAGED_SOURCE_CLASSIFICATION_PROFILE_SOURCE_ID,
   version: 1,
@@ -115,6 +116,8 @@ export function classifySourceItemWithProfile(
       classificationEvidence: 'EXPLICIT_SOURCE_ITEM_KIND',
     };
   }
+
+  if (isExplicit24HourChannel(input)) return genericClassification(input);
 
   const profile = input.profile;
   if (

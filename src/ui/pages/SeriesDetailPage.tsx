@@ -12,28 +12,67 @@ import React, { useState, useCallback, useEffect } from 'react';
 import type { CatalogReadModel } from '../../catalog/catalog-read-model.ts';
 import { getSeriesDetail } from '../../catalog/catalog-selectors.ts';
 import { Artwork } from '../components/Artwork.tsx';
+import { useArtworkMetadata } from '../hooks/useArtworkMetadata.ts';
+import { tmdbPosterPath } from '../../artwork/tmdb-metadata.service.ts';
+import { useImmersiveArtwork } from '../hooks/useImmersiveArtwork.ts';
+import { DetailTrailer } from '../components/DetailTrailer.tsx';
+import { SeriesDetailSections } from '../components/SeriesDetailSections.tsx';
+import { SeriesPersonalActions } from '../components/SeriesPersonalActions.tsx';
+import { watchFingerprint, watchHistory } from '../../playback/watch-history.ts';
+import { PhoneSeriesDetail } from '../components/PhoneSeriesDetail.tsx';
+import { usePhoneLayout } from '../hooks/usePhoneLayout.ts';
+import { useDetailInitialFocus } from '../hooks/useDetailInitialFocus.ts';
+import type { CatalogItemViewModel } from '../../catalog/catalog-view-model.ts';
 import { defaultPlaybackService } from '../../playback/playback.service.ts';
 
 interface SeriesDetailPageProps {
   seriesId: string;
   readModel: CatalogReadModel;
   onBack: () => void;
+  onSelectItem?: (item: CatalogItemViewModel) => void;
+  onHome?: () => void;
 }
 
 export const SeriesDetailPage: React.FC<SeriesDetailPageProps> = ({
   seriesId,
   readModel,
   onBack,
+  onSelectItem,
 }) => {
-  const detail = getSeriesDetail(readModel, seriesId);
+  const immersive=useImmersiveArtwork(seriesId);
+  const phone = usePhoneLayout();
+  const sourceDetail = getSeriesDetail(readModel, seriesId);
+  const identity = sourceDetail ? { kind: 'series' as const, title: sourceDetail.title,
+    year: sourceDetail.yearFormatted, tmdbId: sourceDetail.externalIds?.tmdbId, posterPath: tmdbPosterPath(sourceDetail.posterUri), sourcePosterUri: sourceDetail.posterUri } : undefined;
+  const metadata = useArtworkMetadata(identity, Boolean(sourceDetail && (!sourceDetail.overview || !sourceDetail.yearFormatted
+    || !sourceDetail.originalTitle || !sourceDetail.genreLabels.length)), 'high');
+  const detail = sourceDetail && { ...sourceDetail,
+    originalTitle: sourceDetail.originalTitle || metadata?.originalTitle,
+    yearFormatted: sourceDetail.yearFormatted || (metadata?.year ? String(metadata.year) : undefined),
+    overview: sourceDetail.overview || metadata?.overview,
+    genreLabels: sourceDetail.genreLabels.length ? sourceDetail.genreLabels : metadata?.genres || [],
+  };
   const [detailLoading, setDetailLoading] = useState(!detail);
+  const [detailFailed, setDetailFailed] = useState(false);
+  const [detailAttempt, setDetailAttempt] = useState(0);
 
   const seasons = detail?.seasons || [];
   const [selectedSeasonIndex, setSelectedSeasonIndex] = useState<number>(0);
   const [resolvingEpisodeId, setResolvingEpisodeId] = useState<string | null>(null);
     const [episodeStatusNotice, setEpisodeStatusNotice] = useState<string | null>(null);
-  const [episodesLoading, setEpisodesLoading] = useState<boolean>(false);
+  const [episodesLoading, setEpisodesLoading] = useState<boolean>(() => typeof readModel.loadEpisodesForSeries === 'function');
+  const [episodesFailed, setEpisodesFailed] = useState(false);
+  const [episodeLoadAttempt, setEpisodeLoadAttempt] = useState(0);
   const [, setRefreshKey] = useState<number>(0);
+  const [selectedEpisodeId, setSelectedEpisodeId] = useState<string | null>(null);
+  useDetailInitialFocus(immersive,seriesId,Boolean(detail),phone);
+
+  useEffect(() => {
+    setSelectedEpisodeId(null);
+    const unsubscribe=watchHistory.subscribe(()=>setRefreshKey(value=>value+1));
+    void watchHistory.syncNativeProgress();
+    return unsubscribe;
+  }, [seriesId]);
 
   useEffect(() => {
     let active = true;
@@ -42,19 +81,21 @@ export const SeriesDetailPage: React.FC<SeriesDetailPageProps> = ({
       return () => { active = false; };
     }
     setDetailLoading(true);
+    setDetailFailed(false);
     void readModel.resolveSeriesById(seriesId).then(() => {
       if (active) {
         setDetailLoading(false);
         setRefreshKey((value) => value + 1);
       }
-    });
+    }).catch(() => { if (active) { setDetailLoading(false); setDetailFailed(true); } });
     return () => { active = false; };
-  }, [readModel, seriesId]);
+  }, [readModel, seriesId, detailAttempt]);
 
   useEffect(() => {
     let isMounted = true;
     if (typeof (readModel as any).loadEpisodesForSeries === 'function') {
       setEpisodesLoading(true);
+      setEpisodesFailed(false);
       (readModel as any).loadEpisodesForSeries(seriesId)
         .then(() => {
           if (isMounted) {
@@ -63,13 +104,13 @@ export const SeriesDetailPage: React.FC<SeriesDetailPageProps> = ({
           }
         })
         .catch(() => {
-          if (isMounted) setEpisodesLoading(false);
+          if (isMounted) { setEpisodesLoading(false); setEpisodesFailed(true); }
         });
     }
     return () => {
       isMounted = false;
     };
-  }, [seriesId, readModel]);
+  }, [seriesId, readModel, episodeLoadAttempt]);
 
   const handlePlayEpisode = useCallback(
     async (episodeId: string) => {
@@ -95,15 +136,16 @@ export const SeriesDetailPage: React.FC<SeriesDetailPageProps> = ({
   );
 
   if (!detail && detailLoading) {
-    return <main className="page-container detail-page"><p>Carregando detalhes da série...</p></main>;
+    return <main ref={immersive} className="page-container detail-page"><p>Carregando detalhes da série...</p></main>;
   }
 
   if (!detail) {
     return (
-      <main className="page-container detail-page">
+      <main ref={immersive} className="page-container detail-page">
         <div className="detail-not-found">
-          <h2>Série não encontrada</h2>
-          <p>O título solicitado não foi localizado no catálogo ativo.</p>
+          <h2>{detailFailed ? 'Não foi possível carregar a série' : 'Série não encontrada'}</h2>
+          <p>{detailFailed ? 'Tente carregar os detalhes novamente.' : 'O título solicitado não foi localizado no catálogo ativo.'}</p>
+          {detailFailed && <button type="button" className="focusable-item btn-primary" onClick={() => setDetailAttempt(v => v + 1)}>Tentar novamente</button>}
           <button type="button" className="focusable-item btn-primary" onClick={onBack}>
             Voltar ao Catálogo
           </button>
@@ -113,12 +155,103 @@ export const SeriesDetailPage: React.FC<SeriesDetailPageProps> = ({
   }
 
   const currentSeason = seasons[selectedSeasonIndex] || seasons[0];
+  const canonicalSeries = readModel.seriesById.get(seriesId);
+  const fingerprint = canonicalSeries ? watchFingerprint('series',canonicalSeries) : null;
+  const lastWatched = fingerprint ? watchHistory.list().find(row=>row.kind==='series' && row.itemId===seriesId && row.fingerprint===fingerprint) : undefined;
+  const selectedEpisode = selectedEpisodeId ?? lastWatched?.episodeId;
+  const publicId = Number(detail.externalIds?.tmdbId);
+  const episodesSection = (
+        <section className="seasons-section" aria-label="Temporadas e Episódios">
+          <h2 className="section-heading">Episódios</h2>
+
+          {seasons.length > 1 && (
+            <div className="season-selector-tabs" role="tablist">
+              {seasons.map((season, idx) => (
+                <button
+                  key={season.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={idx === selectedSeasonIndex}
+                  className={`focusable-item season-tab ${idx === selectedSeasonIndex ? 'active' : ''}`}
+                  onClick={() => setSelectedSeasonIndex(idx)}
+                >
+                  {season.title}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {episodeStatusNotice && (
+            <div className="series-playback-status-banner">
+              <p className="playback-status-notice notice-info">{episodeStatusNotice}</p>
+            </div>
+          )}
+
+          {currentSeason && (
+            <ul className="episodes-list" aria-label={`Episódios de ${currentSeason.title}`}>
+              {episodesLoading && currentSeason.episodes.length === 0 ? (
+                <li className="loading-episodes" role="status" aria-live="polite"><span className="episode-loading-spinner" aria-hidden="true"/>Carregando episódios da temporada...</li>
+              ) : currentSeason.episodes.length === 0 ? (
+                <li className="no-episodes">Nenhum episódio cadastrado para esta temporada.</li>
+              ) : (
+                currentSeason.episodes.map((ep) => {
+                  const resumePosition = fingerprint ? watchHistory.savedPosition('series',seriesId,fingerprint,ep.id) : 0;
+                  return (
+                  <li key={ep.id} className={`episode-card${selectedEpisode===ep.id?' episode-card--selected':''}`}
+                    onFocusCapture={()=>setSelectedEpisodeId(ep.id)} onClickCapture={()=>setSelectedEpisodeId(ep.id)}>
+                    <div className="episode-info">
+                      <div className="episode-header">
+                        <h3 className="episode-title">
+                          {ep.episodeNumber}. {ep.title}
+                        </h3>
+                        {ep.durationFormatted && (
+                          <span className="episode-duration">{ep.durationFormatted}</span>
+                        )}
+                      </div>
+                      {ep.overview && <p className="episode-overview">{ep.overview}</p>}
+                      <div className="episode-playback-action">
+                        {resumePosition>0 && <span className="episode-resume-notice">Continuar assistindo</span>}
+                        <button
+                          type="button"
+                          className={`focusable-item btn-primary btn-episode-play ${resolvingEpisodeId === ep.id ? 'btn-resolving' : ''}`}
+                          onClick={() => handlePlayEpisode(ep.id)}
+                          disabled={resolvingEpisodeId !== null}
+                        >
+                          {resolvingEpisodeId === ep.id ? 'Preparando...' : resumePosition>0 ? '▶ Continuar' : '▶ Assistir'}
+                        </button>
+                      </div>
+                    </div>
+                  </li>
+                );})
+              )}
+            </ul>
+          )}
+          {!currentSeason && episodesLoading && <p className="loading-episodes" role="status" aria-live="polite"><span className="episode-loading-spinner" aria-hidden="true"/>Carregando temporadas e episódios...</p>}
+        </section>
+  );
+
+  if (phone && identity) return (
+    <main ref={immersive} className="page-container detail-page series-phone-detail">
+      <PhoneSeriesDetail key={seriesId} detail={detail} identity={identity} readModel={readModel}
+        episodes={episodesSection} episodesLoading={episodesLoading} episodesFailed={episodesFailed}
+        selectedSeasonIndex={selectedSeasonIndex} resolving={resolvingEpisodeId !== null}
+        onPlay={id => {void handlePlayEpisode(id);}} onRetryEpisodes={() => setEpisodeLoadAttempt(value => value + 1)}
+        onBack={onBack} onSelectItem={onSelectItem}/>
+    </main>
+  );
 
   return (
-    <main className="page-container detail-page">
+    <main ref={immersive} className={`page-container detail-page detail-page--wide${typeof navigator !== 'undefined' && /\bAFT\w*/i.test(navigator.userAgent) ? ' detail-page--fire' : ''}`}>
+      <div className="detail-content">
+        <div className="detail-hero-wide">
       <div className="detail-backdrop-wrapper">
         <Artwork
-          uri={detail.backdropUri || detail.posterUri}
+          uri={detail.backdropUri}
+          fallbackUri={detail.posterUri}
+          identity={identity}
+          priority="high"
+          tmdbBackdropOnly
+          immersiveArtwork="backdrop"
           title={detail.title}
           kind="backdrop"
           className="detail-backdrop-img"
@@ -126,13 +259,15 @@ export const SeriesDetailPage: React.FC<SeriesDetailPageProps> = ({
         <div className="detail-backdrop-gradient" />
       </div>
 
-      <div className="detail-content">
-        <div className="detail-layout">
+        <div className="detail-layout" data-detail-hero tabIndex={-1}>
           <div className="detail-poster-col">
             <Artwork
               uri={detail.posterUri}
+              identity={identity}
+              priority="high"
               title={detail.title}
               kind="poster"
+              immersiveArtwork="poster"
               className="detail-poster-img"
             />
           </div>
@@ -170,90 +305,18 @@ export const SeriesDetailPage: React.FC<SeriesDetailPageProps> = ({
               </div>
             )}
 
-            <div className="detail-actions">
-              <button
-                type="button"
-                className="focusable-item btn-secondary"
-                onClick={onBack}
-              >
-                ← Voltar
-              </button>
+            <div className="detail-actions series-detail-hero-actions">
+              {identity && <DetailTrailer key={seriesId} title={detail.title} identity={identity} backdrop={detail.backdropUri} poster={detail.posterUri}/>}
+              <SeriesPersonalActions key={seriesId} title={detail.title}
+                fingerprint={watchFingerprint('series',readModel.seriesById.get(seriesId)!)}
+                tmdbId={Number.isSafeInteger(publicId)&&publicId>0?publicId:undefined}/>
             </div>
           </div>
         </div>
-
-        {/* Seção de Temporadas e Episódios */}
-        <section className="seasons-section" aria-label="Temporadas e Episódios">
-          <h2 className="section-heading">Episódios</h2>
-
-          {seasons.length > 1 && (
-            <div className="season-selector-tabs" role="tablist">
-              {seasons.map((season, idx) => (
-                <button
-                  key={season.id}
-                  type="button"
-                  role="tab"
-                  aria-selected={idx === selectedSeasonIndex}
-                  className={`focusable-item season-tab ${idx === selectedSeasonIndex ? 'active' : ''}`}
-                  onClick={() => setSelectedSeasonIndex(idx)}
-                >
-                  {season.title}
-                </button>
-              ))}
-            </div>
-          )}
-
-          {episodeStatusNotice && (
-            <div className="series-playback-status-banner">
-              <p className="playback-status-notice notice-info">{episodeStatusNotice}</p>
-            </div>
-          )}
-
-          {currentSeason && (
-            <div className="episodes-list">
-              {episodesLoading && currentSeason.episodes.length === 0 ? (
-                <p className="loading-episodes">Carregando episódios da temporada...</p>
-              ) : currentSeason.episodes.length === 0 ? (
-                <p className="no-episodes">Nenhum episódio cadastrado para esta temporada.</p>
-              ) : (
-                currentSeason.episodes.map((ep) => (
-                  <article key={ep.id} className="episode-card focusable-item" tabIndex={0}>
-                    <div className="episode-thumb-wrapper">
-                      <Artwork
-                        uri={ep.thumbnailUri || detail.posterUri}
-                        title={ep.title}
-                        kind="thumbnail"
-                        className="episode-thumb-img"
-                      />
-                      <span className="episode-num-badge">EP {ep.episodeNumber}</span>
-                    </div>
-                    <div className="episode-info">
-                      <div className="episode-header">
-                        <h3 className="episode-title">
-                          {ep.episodeNumber}. {ep.title}
-                        </h3>
-                        {ep.durationFormatted && (
-                          <span className="episode-duration">{ep.durationFormatted}</span>
-                        )}
-                      </div>
-                      {ep.overview && <p className="episode-overview">{ep.overview}</p>}
-                      <div className="episode-playback-action">
-                        <button
-                          type="button"
-                          className={`focusable-item btn-primary btn-episode-play ${resolvingEpisodeId === ep.id ? 'btn-resolving' : ''}`}
-                          onClick={() => handlePlayEpisode(ep.id)}
-                          disabled={resolvingEpisodeId !== null}
-                        >
-                          {resolvingEpisodeId === ep.id ? 'Preparando...' : '▶ Assistir'}
-                        </button>
-                      </div>
-                    </div>
-                  </article>
-                ))
-              )}
-            </div>
-          )}
-        </section>
+        </div>
+        <SeriesDetailSections key={seriesId} seriesId={seriesId}
+          readModel={readModel} episodes={episodesSection} episodesFailed={episodesFailed}
+          onRetryEpisodes={()=>setEpisodeLoadAttempt(value=>value+1)} onSelectItem={onSelectItem}/>
       </div>
     </main>
   );

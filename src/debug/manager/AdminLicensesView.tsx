@@ -12,15 +12,41 @@
  */
 
 import React, { useState } from 'react';
+import './AdminLicensesView.css';
+import { ManagerLicenseEditor } from './ManagerLicenseEditor.tsx';
+import { summarizeLicenseDevices } from './license-device-summary.ts';
+import type { RemoteManagerControlPlaneAuthority } from '../../control-plane/client/manager-remote-control-plane-authority.ts';
 import type {
   LicenseMode,
   LicenseStatus,
   ManagerLicenseDetail,
   ManagerLicenseListItem,
+  DeviceSourceBindingEntity,
+  ManagerCustomerSourceListItem,
+  ManagerLicenseDetailDeviceItem,
 } from '../../control-plane/control-plane.types.ts';
 
+function licenseDeviceRows(license: ManagerLicenseListItem) {
+  const devices = license.devices || [];
+  const principals = new Map(devices.filter(d => d.deviceRole === 'PRIMARY').map(d => [d.displayCode, d]));
+  const children = new Map<string, ManagerLicenseDetailDeviceItem[]>();
+  const roots: ManagerLicenseDetailDeviceItem[] = [];
+  for (const device of devices) {
+    const parent = device.deviceRole === 'SECONDARY' && device.primaryDisplayCode ? principals.get(device.primaryDisplayCode) : undefined;
+    if (parent && parent.deviceId !== device.deviceId) children.set(parent.deviceId, [...(children.get(parent.deviceId) || []), device]);
+    else roots.push(device);
+  }
+  return roots.flatMap(device => [{ device, parent: undefined as ManagerLicenseDetailDeviceItem | undefined, children: children.get(device.deviceId) || [] },
+    ...(children.get(device.deviceId) || []).map(child => ({ device: child, parent: device, children: [] as ManagerLicenseDetailDeviceItem[] }))]);
+}
+
 interface AdminLicensesViewProps {
+  authority?: RemoteManagerControlPlaneAuthority;
+  isMaster?: boolean;
+  onUpdated?: () => Promise<unknown>;
   licenses: ManagerLicenseListItem[];
+  sourceBindings?: DeviceSourceBindingEntity[];
+  customerSources?: ManagerCustomerSourceListItem[];
   onInspectLicense: (licenseId: string) => Promise<ManagerLicenseDetail | null>;
   onUpdateLimits: (licenseId: string, maxDevices: number, maxConcurrentSessions: number, reason?: string) => Promise<boolean>;
   onSuspendLicense: (licenseId: string, reason?: string) => Promise<boolean>;
@@ -30,27 +56,26 @@ interface AdminLicensesViewProps {
 }
 
 export const AdminLicensesView: React.FC<AdminLicensesViewProps> = ({
+  authority, isMaster = false, onUpdated,
   licenses,
+  sourceBindings, customerSources,
   onInspectLicense,
-  onUpdateLimits,
   onSuspendLicense,
   onRevokeLicense,
   onActivateLicense,
   loading,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [editor, setEditor] = useState<{ license: ManagerLicenseListItem; mode: 'EDIT' | 'DELETE' } | null>(null);
   const [statusFilter, setStatusFilter] = useState<'ALL' | LicenseStatus>('ALL');
   const [modeFilter, setModeFilter] = useState<'ALL' | LicenseMode>('ALL');
+  const [showEmptyLicenses, setShowEmptyLicenses] = useState(false);
+  const [expandedDevices, setExpandedDevices] = useState<Record<string, boolean>>({});
   const [inspectedLicense, setInspectedLicense] = useState<ManagerLicenseDetail | null>(null);
   const [inspectLoading, setInspectLoading] = useState(false);
+  const deviceSummary = React.useMemo(() => summarizeLicenseDevices(licenses, sourceBindings, customerSources), [licenses, sourceBindings, customerSources]);
 
   // Modal de Limites
-  const [limitsModalLicense, setLimitsModalLicense] = useState<ManagerLicenseListItem | null>(null);
-  const [newMaxDevices, setNewMaxDevices] = useState<number>(1);
-  const [newMaxConcurrent, setNewMaxConcurrent] = useState<number>(1);
-  const [limitsReason, setLimitsReason] = useState('');
-  const [limitsError, setLimitsError] = useState<string | null>(null);
-  const [limitsBusy, setLimitsBusy] = useState(false);
 
   // Modal de Ação (Suspender / Revogar)
   const [actionModal, setActionModal] = useState<{
@@ -67,9 +92,12 @@ export const AdminLicensesView: React.FC<AdminLicensesViewProps> = ({
   const [activationError, setActivationError] = useState<string | null>(null);
   const [activationBusy, setActivationBusy] = useState(false);
 
+  const emptyLicenseCount = licenses.filter(l => l.activeDeviceCount === 0 && l.devices?.length === 0).length;
   const filtered = licenses.filter((l) => {
+    if (!showEmptyLicenses && l.activeDeviceCount === 0 && l.devices?.length === 0) return false;
     const matchesSearch =
       l.licenseId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      l.devices?.some(d => `${d.displayCode} ${d.deviceLabel}`.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (l.customerNickname && l.customerNickname.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (l.customerId === null && 'legacy managed'.includes(searchTerm.toLowerCase()));
     const matchesStatus = statusFilter === 'ALL' || l.status === statusFilter;
@@ -84,60 +112,6 @@ export const AdminLicensesView: React.FC<AdminLicensesViewProps> = ({
       setInspectedLicense(detail);
     } finally {
       setInspectLoading(false);
-    }
-  };
-
-  const handleOpenLimitsModal = (lic: ManagerLicenseListItem) => {
-    setLimitsModalLicense(lic);
-    setNewMaxDevices(lic.maxDevices);
-    setNewMaxConcurrent(lic.maxConcurrentSessions);
-    setLimitsReason('');
-    setLimitsError(null);
-  };
-
-  const handleConfirmLimits = async () => {
-    if (!limitsModalLicense) return;
-    setLimitsError(null);
-
-    // Validação local imediata
-    if (newMaxDevices < 1 || newMaxDevices > 100) {
-      setLimitsError('max_devices deve ser entre 1 e 100.');
-      return;
-    }
-    if (newMaxConcurrent < 1 || newMaxConcurrent > 50) {
-      setLimitsError('max_concurrent_sessions deve ser entre 1 e 50.');
-      return;
-    }
-    if (newMaxDevices < limitsModalLicense.activeDeviceCount) {
-      setLimitsError(
-        `Política de Segurança: Proibido reduzir max_devices (${newMaxDevices}) abaixo dos aparelhos ativos vinculados (${limitsModalLicense.activeDeviceCount}).`
-      );
-      return;
-    }
-
-    setLimitsBusy(true);
-    try {
-      const ok = await onUpdateLimits(
-        limitsModalLicense.licenseId,
-        newMaxDevices,
-        newMaxConcurrent,
-        limitsReason.trim() || undefined
-      );
-      if (ok) {
-        setLimitsModalLicense(null);
-        if (inspectedLicense?.license.licenseId === limitsModalLicense.licenseId) {
-          setInspectedLicense((curr) => curr ? {
-            ...curr,
-            license: {
-              ...curr.license,
-              maxDevices: newMaxDevices,
-              maxConcurrentSessions: newMaxConcurrent,
-            },
-          } : null);
-        }
-      }
-    } finally {
-      setLimitsBusy(false);
     }
   };
 
@@ -234,25 +208,25 @@ export const AdminLicensesView: React.FC<AdminLicensesViewProps> = ({
   };
 
   return (
-    <div style={{ backgroundColor: '#101624', padding: '1.5rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)' }}>
+    <div className="admin-licenses-view" style={{ backgroundColor: '#101624', padding: '1.5rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)' }}>
       {/* Header com Filtros */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0, color: '#f8fafc' }}>
-            Gestão de Licenças Comerciais ({licenses.length})
+            Gestão de Licenças Comerciais ({filtered.length})
           </h2>
           <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.82rem', color: '#94a3b8' }}>
             Slots de dispositivos, autorizações, limites de sessões e status administrativo auditável.
           </p>
         </div>
 
-        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+        <div className="license-table-filters" style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
           <input
             type="text"
             className="focusable-item"
-            placeholder="Buscar por licença ou cliente..."
+            placeholder="Buscar por cliente ou código..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => { setSearchTerm(e.target.value); setExpandedDevices({}); }}
             style={{
               padding: '0.45rem 0.85rem',
               backgroundColor: '#151d30',
@@ -302,6 +276,11 @@ export const AdminLicensesView: React.FC<AdminLicensesViewProps> = ({
             <option value="MANAGED">MANAGED</option>
             <option value="SELF_SERVICE">SELF_SERVICE</option>
           </select>
+          {emptyLicenseCount > 0 && <label className="license-empty-filter">
+            <input type="checkbox" className="focusable-item" checked={showEmptyLicenses}
+              onChange={event => setShowEmptyLicenses(event.target.checked)} />
+            Exibir licenças sem aparelhos ({emptyLicenseCount})
+          </label>}
         </div>
       </div>
 
@@ -313,16 +292,23 @@ export const AdminLicensesView: React.FC<AdminLicensesViewProps> = ({
           Nenhuma licença encontrada com os filtros informados.
         </div>
       ) : (
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+        <div className="license-table-container">
+          <table className="license-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+            <colgroup>
+              {[7, 10, 7, 9, 10, 9, 6, 7.5, 6.5, 8, 6, 14].map((width, index) => <col key={index} style={{ width: `${width}%` }} />)}
+            </colgroup>
             <thead>
               <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', color: '#94a3b8', textAlign: 'left' }}>
-                <th style={{ padding: '0.6rem 0.75rem' }}>ID da Licença</th>
                 <th style={{ padding: '0.6rem 0.75rem' }}>Cliente</th>
+                <th style={{ padding: '0.6rem 0.75rem' }}>Código do dispositivo</th>
+                <th>Local/<wbr />Tipo</th>
+                <th style={{ padding: '0.6rem 0.75rem' }}>Plataforma / Tipo</th>
+                <th>Vínculo / Mesma fonte</th>
+                <th style={{ padding: '0.6rem 0.75rem' }}>Visto pela última vez</th>
                 <th style={{ padding: '0.6rem 0.75rem' }}>Modo</th>
                 <th style={{ padding: '0.6rem 0.75rem' }}>Status</th>
                 <th style={{ padding: '0.6rem 0.75rem' }}>Slots (Disp.)</th>
-                <th style={{ padding: '0.6rem 0.75rem' }}>Sessões Máx</th>
+                <th style={{ padding: '0.6rem 0.75rem' }}>Aparelhos vinculados</th>
                 <th style={{ padding: '0.6rem 0.75rem' }}>Criada em</th>
                 <th style={{ padding: '0.6rem 0.75rem', textAlign: 'right' }}>Ações</th>
               </tr>
@@ -331,24 +317,50 @@ export const AdminLicensesView: React.FC<AdminLicensesViewProps> = ({
               {filtered.map((l) => {
                 const badge = statusBadge(l.status);
                 const isLegacy = l.customerId === null;
-                return (
-                  <tr key={l.licenseId} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                    <td style={{ padding: '0.75rem', fontFamily: 'monospace', color: '#c084fc', fontSize: '0.78rem' }}>
-                      {l.licenseId}
-                    </td>
-                    <td style={{ padding: '0.75rem' }}>
-                      {isLegacy ? (
+                const rows = licenseDeviceRows(l);
+                const query = searchTerm.trim().toLowerCase();
+                const matchesDevice = (device: ManagerLicenseDetailDeviceItem) => `${device.displayCode} ${device.deviceLabel}`.toLowerCase().includes(query);
+                const accountMatch = Boolean(query && `${l.customerNickname || ''} ${l.licenseId}`.toLowerCase().includes(query));
+                const expanded = (device: ManagerLicenseDetailDeviceItem) => expandedDevices[`${l.licenseId}:${device.deviceId}`] ?? Boolean(query && (accountMatch || rows.some(row => row.parent?.deviceId === device.deviceId && matchesDevice(row.device))));
+                return (rows.length ? rows : [{ device: undefined, parent: undefined, children: [] }]).map(({ device: d, parent, children }, index) => (
+                  <tr key={`${l.licenseId}:${d?.deviceId || 'empty'}`} id={`license-device-${l.licenseId}-${d?.deviceId || 'empty'}`} hidden={Boolean(parent && !expanded(parent))} className={parent ? 'license-secondary-row' : 'license-primary-row'} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                    <td data-label="Cliente" style={{ padding: '0.75rem' }}>
+                      {index === 0 && (isLegacy ? (
                         <span style={{ color: '#fbbf24', fontSize: '0.78rem', fontWeight: 600 }}>
                           [LEGACY MANAGED]
                         </span>
                       ) : (
                         <span style={{ color: '#f8fafc', fontWeight: 600 }}>{l.customerNickname || 'Sem Apelido'}</span>
-                      )}
+                      ))}
                     </td>
-                    <td style={{ padding: '0.75rem', color: '#94a3b8', fontSize: '0.78rem' }}>
-                      {l.mode}
+                    <td data-label="Código do dispositivo" style={{ padding: '0.75rem' }}>
+                      <strong>{d?.displayCode || 'Sem dispositivo'}</strong>
+                      {d && children.length > 0 && <button type="button" className="license-device-toggle focusable-item" aria-expanded={expanded(d)} aria-controls={children.map(child => `license-device-${l.licenseId}-${child.deviceId}`).join(' ')} onClick={() => setExpandedDevices(current => ({ ...current, [`${l.licenseId}:${d.deviceId}`]: !expanded(d) }))}>
+                        <span aria-hidden="true">{expanded(d) ? '▾' : '▸'}</span><span>{children.length} secundário{children.length === 1 ? '' : 's'}</span>
+                      </button>}
                     </td>
-                    <td style={{ padding: '0.75rem' }}>
+                    <td data-label="Local/Tipo">{d ? d.deviceLabel || 'Não informado' : '—'}</td>
+                    <td data-label="Plataforma / Tipo" style={{ padding: '0.75rem' }}>
+                      {d ? <>{d.platform || 'Não informada'} / {d.deviceType}</> : '—'}
+                    </td>
+                    <td data-label="Vínculo / Mesma fonte">
+                      {d ? <div className="license-device-value">
+                        <strong>{d.deviceRole === 'PRIMARY' ? 'Principal' : d.deviceRole === 'SECONDARY' ? 'Secundário' : 'Não definido'}</strong>
+                        {d.deviceRole === 'SECONDARY' && <small>Principal: {d.primaryDisplayCode || 'Não informado'}</small>}
+                        {d.sourceLinks?.map(source => <small key={source.sourceId}>Fonte: {source.name} · {source.deviceCount} aparelho(s)</small>)}
+                        {d.sourceLinks?.length === 0 && <small>Nenhuma fonte vinculada</small>}
+                        {d.sourceLinks === undefined && <small>{!deviceSummary.sourcesKnown ? 'Vínculos indisponíveis' : deviceSummary.peers.get(d.deviceId)?.length
+                          ? <span title={deviceSummary.peers.get(d.deviceId)!.map(peer => `${peer.displayCode} — ${peer.deviceLabel || 'Local não informado'}`).join('\n')}>{deviceSummary.peers.get(d.deviceId)!.length} outro(s) na mesma fonte</span>
+                          : 'Sem outro aparelho visível na mesma fonte'}</small>}
+                      </div> : '—'}
+                    </td>
+                    <td data-label="Visto pela última vez" style={{ padding: '0.75rem' }}>
+                      {d ? d.lastSeenAt ? new Date(d.lastSeenAt).toLocaleString('pt-BR') : 'Não informado' : '—'}
+                    </td>
+                    <td data-label="Modo" style={{ padding: '0.75rem', color: '#94a3b8', fontSize: '0.78rem' }}>
+                      {l.mode === 'SELF_SERVICE' ? <>SELF_<wbr />SERVICE</> : l.mode}
+                    </td>
+                    <td data-label="Status" style={{ padding: '0.75rem' }}>
                       <span
                         style={{
                           backgroundColor: badge.bg,
@@ -363,21 +375,25 @@ export const AdminLicensesView: React.FC<AdminLicensesViewProps> = ({
                         {l.status}
                       </span>
                     </td>
-                    <td style={{ padding: '0.75rem', color: '#cbd5e1' }}>
-                      <strong>{l.activeDeviceCount}</strong> / {l.maxDevices}
+                    <td data-label="Slots (Disp.)" style={{ padding: '0.75rem', color: '#cbd5e1' }}>
+                      {index === 0 && <><strong>{l.activeDeviceCount}</strong> / {l.maxDevices}</>}
+                      {d && <small className="license-slot-device">{d.slotNumber ? `Slot ${d.slotNumber}` : 'Slot a definir'}</small>}
                     </td>
-                    <td style={{ padding: '0.75rem', color: '#cbd5e1' }}>
-                      {l.maxConcurrentSessions}
+                    <td data-label="Aparelhos vinculados" style={{ padding: '0.75rem', color: '#cbd5e1' }}>
+                      {index === 0 && <>{deviceSummary.customerDevices.get(l.customerId || l.licenseId)?.size || 0}<small className="license-slot-device">Simultâneos: {l.maxConcurrentSessions}</small></>}
                     </td>
-                    <td style={{ padding: '0.75rem', color: '#94a3b8', fontSize: '0.78rem' }}>
-                      {new Date(l.createdAt).toLocaleDateString('pt-BR')}
+                    <td data-label="Criada em" style={{ padding: '0.75rem', color: '#94a3b8', fontSize: '0.78rem' }}>
+                      <time dateTime={l.createdAt}>{new Date(l.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}<wbr />/{new Date(l.createdAt).getFullYear()}</time>
                     </td>
-                    <td style={{ padding: '0.75rem', textAlign: 'right' }}>
-                      <div style={{ display: 'inline-flex', gap: '0.35rem' }}>
+                    <td data-label="Ações" style={{ padding: '0.75rem', textAlign: 'right' }}>
+                      {index === 0 && <div className="manager-license-actions">
+                        {authority && onUpdated && <button type="button" className="focusable-item" title="Editar licença" aria-label="Editar licença" onClick={() => setEditor({ license: l, mode: 'EDIT' })}>✎</button>}
+                        {authority && onUpdated && isMaster && l.customerId && <button type="button" className="focusable-item" title="Excluir cliente e todos os dispositivos" aria-label="Excluir cliente e todos os dispositivos" onClick={() => setEditor({ license: l, mode: 'DELETE' })}>🗑</button>}
                         <button
                           type="button"
                           className="focusable-item"
                           onClick={() => handleInspect(l.licenseId)}
+                          aria-label="Inspecionar licença" title="Inspecionar licença"
                           style={{
                             padding: '0.3rem 0.65rem',
                             backgroundColor: '#1e293b',
@@ -392,29 +408,12 @@ export const AdminLicensesView: React.FC<AdminLicensesViewProps> = ({
                           🔍
                         </button>
 
-                        <button
-                          type="button"
-                          className="focusable-item"
-                          onClick={() => handleOpenLimitsModal(l)}
-                          style={{
-                            padding: '0.3rem 0.65rem',
-                            backgroundColor: '#334155',
-                            color: '#f8fafc',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                            fontSize: '0.75rem',
-                            fontWeight: 600,
-                          }}
-                        >
-                          ⚙️ Limites
-                        </button>
-
-                        {onActivateLicense && (l.status === 'TRIAL' || l.status === 'EXPIRED' || l.status === 'ACTIVE') && (
+{onActivateLicense && (l.status === 'TRIAL' || l.status === 'EXPIRED' || l.status === 'ACTIVE') && (
                           <button
                             type="button"
                             className="focusable-item"
                             onClick={() => handleOpenActivationModal(l)}
+                            aria-label={l.status === 'ACTIVE' ? 'Renovar licença' : 'Ativar licença'} title={l.status === 'ACTIVE' ? 'Renovar licença' : 'Ativar licença'}
                             style={{
                               padding: '0.3rem 0.65rem',
                               backgroundColor: '#059669',
@@ -426,7 +425,7 @@ export const AdminLicensesView: React.FC<AdminLicensesViewProps> = ({
                               fontWeight: 600,
                             }}
                           >
-                            {l.status === 'ACTIVE' ? '⚡ Renovar' : '⚡ Ativar'}
+                            ⚡
                           </button>
                         )}
 
@@ -435,6 +434,7 @@ export const AdminLicensesView: React.FC<AdminLicensesViewProps> = ({
                             type="button"
                             className="focusable-item"
                             onClick={() => handleOpenActionModal(l, 'SUSPEND')}
+                            aria-label="Suspender licença" title="Suspender licença"
                             style={{
                               padding: '0.3rem 0.65rem',
                               backgroundColor: '#92400e',
@@ -446,7 +446,7 @@ export const AdminLicensesView: React.FC<AdminLicensesViewProps> = ({
                               fontWeight: 600,
                             }}
                           >
-                            ⏸️ Suspender
+                            ⏸️
                           </button>
                         )}
 
@@ -455,6 +455,7 @@ export const AdminLicensesView: React.FC<AdminLicensesViewProps> = ({
                             type="button"
                             className="focusable-item"
                             onClick={() => handleOpenActionModal(l, 'REVOKE')}
+                            aria-label="Revogar licença" title="Revogar licença"
                             style={{
                               padding: '0.3rem 0.65rem',
                               backgroundColor: '#dc2626',
@@ -466,13 +467,13 @@ export const AdminLicensesView: React.FC<AdminLicensesViewProps> = ({
                               fontWeight: 600,
                             }}
                           >
-                            🚫 Revogar
+                            🚫
                           </button>
                         )}
-                      </div>
+                      </div>}
                     </td>
                   </tr>
-                );
+                ));
               })}
             </tbody>
           </table>
@@ -480,6 +481,7 @@ export const AdminLicensesView: React.FC<AdminLicensesViewProps> = ({
       )}
 
       {/* Modal / Painel de Detalhes da Licença */}
+      {editor && authority && onUpdated && <ManagerLicenseEditor key={`${editor.license.licenseId}:${editor.mode}`} license={editor.license} availableLicenses={licenses} mode={editor.mode} authority={authority} isMaster={isMaster} onClose={() => setEditor(null)} onUpdated={onUpdated} onEditPrincipalLicense={principalLicense => setEditor({ license: principalLicense, mode: 'EDIT' })} />}
       {inspectLoading && (
         <div style={{ marginTop: '1.5rem', padding: '1rem', backgroundColor: '#151d30', borderRadius: '6px', textAlign: 'center', color: '#c084fc' }}>
           Carregando detalhes da licença...
@@ -570,154 +572,6 @@ export const AdminLicensesView: React.FC<AdminLicensesViewProps> = ({
               {inspectedLicense.managedSources.length === 0 && inspectedLicense.customerSources.length === 0 && (
                 <p style={{ color: '#64748b', fontSize: '0.8rem', margin: 0 }}>Nenhuma fonte vinculada a esta licença.</p>
               )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Modal de Ajuste de Limites com Validação Server-Side */}
-      {limitsModalLicense && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(0,0,0,0.8)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 9999,
-            padding: '1rem',
-          }}
-        >
-          <div style={{ backgroundColor: '#101624', padding: '1.5rem', borderRadius: '8px', border: '1px solid #7c3aed', maxWidth: '460px', width: '100%' }}>
-            <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.15rem', color: '#f8fafc', fontWeight: 700 }}>
-              Ajustar Limites Administrativos
-            </h3>
-            <p style={{ fontSize: '0.85rem', color: '#94a3b8', margin: '0 0 1rem 0' }}>
-              Licença: <code style={{ color: '#c084fc' }}>{limitsModalLicense.licenseId}</code>
-            </p>
-
-            <div style={{ backgroundColor: '#151d30', padding: '0.75rem', borderRadius: '4px', marginBottom: '1rem', fontSize: '0.82rem' }}>
-              <span style={{ color: '#94a3b8', display: 'block' }}>Aparelhos Ativos Atualmente:</span>
-              <strong style={{ color: '#38bdf8', fontSize: '1rem' }}>{limitsModalLicense.activeDeviceCount} aparelhos vinculados</strong>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '1rem' }}>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: '#cbd5e1', marginBottom: '0.4rem' }}>
-                  Máx Dispositivos:
-                </label>
-                <input
-                  type="number"
-                  className="focusable-item"
-                  min="1"
-                  max="100"
-                  value={newMaxDevices}
-                  onChange={(e) => setNewMaxDevices(parseInt(e.target.value) || 1)}
-                  style={{
-                    width: '100%',
-                    padding: '0.5rem',
-                    backgroundColor: '#151d30',
-                    color: '#fff',
-                    border: '1px solid rgba(255,255,255,0.2)',
-                    borderRadius: '4px',
-                    fontSize: '0.9rem',
-                  }}
-                />
-              </div>
-
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: '#cbd5e1', marginBottom: '0.4rem' }}>
-                  Máx Sessões Simultâneas:
-                </label>
-                <input
-                  type="number"
-                  className="focusable-item"
-                  min="1"
-                  max="50"
-                  value={newMaxConcurrent}
-                  onChange={(e) => setNewMaxConcurrent(parseInt(e.target.value) || 1)}
-                  style={{
-                    width: '100%',
-                    padding: '0.5rem',
-                    backgroundColor: '#151d30',
-                    color: '#fff',
-                    border: '1px solid rgba(255,255,255,0.2)',
-                    borderRadius: '4px',
-                    fontSize: '0.9rem',
-                  }}
-                />
-              </div>
-            </div>
-
-            <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', fontSize: '0.8rem', color: '#cbd5e1', marginBottom: '0.4rem' }}>
-                Motivo / Justificativa da Alteração:
-              </label>
-              <input
-                type="text"
-                className="focusable-item"
-                placeholder="Ex: Upgrade de plano, autorização especial..."
-                value={limitsReason}
-                onChange={(e) => setLimitsReason(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '0.5rem',
-                  backgroundColor: '#151d30',
-                  color: '#fff',
-                  border: '1px solid rgba(255,255,255,0.2)',
-                  borderRadius: '4px',
-                  fontSize: '0.85rem',
-                }}
-              />
-            </div>
-
-            {limitsError && (
-              <div style={{ backgroundColor: '#7f1d1d', color: '#fca5a5', padding: '0.6rem 0.8rem', borderRadius: '4px', marginBottom: '1rem', fontSize: '0.8rem' }}>
-                {limitsError}
-              </div>
-            )}
-
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
-              <button
-                type="button"
-                className="focusable-item"
-                disabled={limitsBusy}
-                onClick={() => setLimitsModalLicense(null)}
-                style={{
-                  padding: '0.5rem 1rem',
-                  backgroundColor: '#334155',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '0.85rem',
-                }}
-              >
-                Cancelar
-              </button>
-
-              <button
-                type="button"
-                className="focusable-item"
-                disabled={limitsBusy}
-                onClick={handleConfirmLimits}
-                style={{
-                  padding: '0.5rem 1.25rem',
-                  backgroundColor: '#7c3aed',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: limitsBusy ? 'wait' : 'pointer',
-                  fontSize: '0.85rem',
-                  fontWeight: 700,
-                }}
-              >
-                {limitsBusy ? 'Salvando...' : 'Salvar Limites'}
-              </button>
             </div>
           </div>
         </div>

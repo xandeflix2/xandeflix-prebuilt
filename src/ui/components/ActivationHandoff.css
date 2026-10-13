@@ -1,0 +1,8 @@
+.activation-handoff { margin-bottom: 1.5rem; padding: 1.25rem; border: 1px solid #334155; border-radius: 8px; background: #101624; }
+.activation-handoff h2 { margin: 0 0 1rem; font-size: 1.15rem; }
+.activation-handoff form { display: grid; gap: 1rem; }
+.activation-handoff label { display: grid; gap: .4rem; }
+.activation-handoff input, .activation-handoff select { box-sizing: border-box; width: 100%; min-height: 44px; padding: .7rem; color: #f8fafc; background: #151d30; border: 1px solid #475569; border-radius: 6px; font: inherit; }
+.activation-handoff p { line-height: 1.5; color: #cbd5e1; }
+.activation-handoff button { min-height: 44px; padding: .75rem 1rem; }
+.activation-handoff .focusable-item:focus { outline: 2px solid #ff344e; outline-offset: 3px; box-shadow: 0 0 12px #ff183b88; }

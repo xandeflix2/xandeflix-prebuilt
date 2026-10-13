@@ -19,6 +19,14 @@ const SOURCE_ID_ALPHABET = "abcdefghijklmnopqrstuvwxyz0123456789";
 const M3U_KEYS = new Set(["playlistUrl", "token", "runtimeOptions"]);
 const XTREAM_KEYS = new Set(["endpoint", "username", "password", "token", "runtimeOptions"]);
 const SAFE_ERROR_CODES = new Set([
+  "LICENSE_EDITOR_CONFLICT", "INVALID_CUSTOMER_NAME", "CUSTOMER_NAME_CONFLICT", "CUSTOMER_PROFILE_NAME_INVALID", "CUSTOMER_NAME_ALREADY_USED", "INVALID_DEVICE_PLATFORM", "INVALID_DEVICE_TYPE", "INVALID_DEVICE_SLOT", "DEVICE_SLOT_OCCUPIED", "DEVICE_SLOT_OUTSIDE_LIMIT", "PRIMARY_SLOT_READ_ONLY", "DEVICE_ROLE_CONFIRMATION_REQUIRED", "DEVICE_TREE_CONFIRMATION_REQUIRED", "DEVICE_TREE_CHANGED",
+  "PRINCIPAL_REQUIRED", "PRIMARY_CANNOT_BECOME_SECONDARY", "LICENSE_EDIT_REQUIRED", "EXTRA_SCREENS_PAYMENT_REQUIRED", "PAYMENT_REFERENCE_INVALID", "INVALID_PAID_EXTRA_SCREENS", "SCREEN_CHANGE_REASON_REQUIRED", "USE_ACTIVATION_SUBMENU",
+  "PRIMARY_HAS_SECONDARIES", "REGISTERED_DEVICE_REQUIRED", "LICENSE_DEVICE_LIMIT_REACHED",
+  "INVALID_DEVICE_ROLE", "PRIMARY_DEVICE_REQUIRED", "PRIMARY_DEVICE_INVALID", "DEVICE_ROLE_CONFLICT",
+  "INVALID_MAX_DEVICES", "INVALID_MAX_CONCURRENT_SESSIONS", "CONCURRENT_LIMIT_EXCEEDS_DEVICES", "CANNOT_REDUCE_BELOW_ACTIVE_DEVICES",
+  "CUSTOMER_SHARED_IDENTITY", "CUSTOMER_DELETE_CONFIRMATION_REQUIRED", "MANAGER_SCOPE_DENIED",
+  "INVALID_DEVICE_LABEL", "CROSS_CUSTOMER_BINDING_DENIED",
+  "HANDOFF_EXPIRED",
   "METHOD_NOT_ALLOWED",
   "MANAGER_AUTH_REQUIRED",
   "MANAGER_NOT_AUTHORIZED",
@@ -89,6 +97,7 @@ const SAFE_ERROR_CODES = new Set([
 ]);
 
 const ERROR_MESSAGES: Record<string, string> = {
+  HANDOFF_EXPIRED: "Solicitacao indisponivel ou expirada. Abra novamente a notificacao antes de ativar.",
   METHOD_NOT_ALLOWED: "Metodo HTTP nao permitido para esta boundary.",
   AUTH_REQUIRED: "Autenticacao da sessao Manager obrigatoria.",
   MANAGER_NOT_AUTHORIZED: "Sessao sem autorizacao ativa de Manager.",
@@ -337,7 +346,7 @@ async function encryptSourceConfig(
 }
 
 function safeErrorCode(error: unknown): string {
-  const message = error instanceof Error ? error.message : "";
+  const message = error instanceof Error ? error.message : isRecord(error) && typeof error.message === "string" ? error.message : "";
   if (error instanceof SanitizedVaultError && SAFE_ERROR_CODES.has(error.code)) return error.code;
   if (/MASTER_MANAGER_NOT_AUTHORIZED|MANAGER_NOT_AUTHORIZED/i.test(message)) return "MANAGER_NOT_AUTHORIZED";
   if (/MANAGER_AUTH_REQUIRED/i.test(message)) return "MANAGER_AUTH_REQUIRED";
@@ -361,7 +370,7 @@ function stageForErrorCode(code: string): ErrorStage {
 function statusForErrorCode(code: string): number {
   if (code === "METHOD_NOT_ALLOWED") return 405;
   if (["AUTH_REQUIRED", "MANAGER_AUTH_REQUIRED"].includes(code)) return 401;
-  if (["MANAGER_NOT_AUTHORIZED", "DATABASE_PERMISSION_DENIED"].includes(code)) return 403;
+  if (["MANAGER_NOT_AUTHORIZED", "DATABASE_PERMISSION_DENIED", "MANAGER_SCOPE_DENIED"].includes(code)) return 403;
   if (["VERSION_CONFLICT", "SOURCE_ALREADY_EXISTS"].includes(code)) return 409;
   if (code === "INTERNAL_SANITIZED_ERROR") return 500;
   return 400;
@@ -459,11 +468,114 @@ async function handle(request: Request): Promise<Response> {
   if (body.operation === "PREFLIGHT_VAULT_RUNTIME") {
     return response(await runVaultRuntimePreflight(supabase));
   }
+  if (body.operation === "LICENSE_DEVICE") {
+    const displayCode = validateDisplayCode(body.displayCode);
+    if (typeof body.licenseId !== "string" || !/^[a-f0-9-]{36}$/i.test(body.licenseId)) fail("INVALID_LICENSE_ID");
+    if (typeof body.label !== "string" || body.label.trim().length < 1 || body.label.trim().length > 100) fail("INVALID_DEVICE_LABEL");
+    const hash = body.activationKey === undefined ? null : await sha256Hex(validateActivationKey(body.activationKey));
+    const { data, error } = await supabase.rpc("rpc_manager_license_device", {
+      p_license_id: body.licenseId, p_display_code: displayCode, p_label: body.label.trim(), p_key_hash: hash,
+    });
+    if (error) throw new Error(rpcErrorCode(error));
+    if (!isRecord(data) || data.success !== true) fail("INTERNAL_SANITIZED_ERROR");
+    return response({ success: true });
+  }
+  if (body.operation === "REPLACE_LICENSE_SOURCE") {
+    if (typeof body.licenseId !== "string" || !/^[a-f0-9-]{36}$/i.test(body.licenseId) || !Array.isArray(body.expectedSources)) fail("INVALID_REQUEST");
+    const protocol = body.protocol;
+    assertProtocol(protocol);
+    const { data: detail, error: detailError } = await supabase.rpc("rpc_manager_get_license_detail", { p_license_id: body.licenseId });
+    if (detailError) throw new Error(rpcErrorCode(detailError));
+    if (!isRecord(detail) || detail.success !== true || !isRecord(detail.license)) fail("LICENSE_NOT_FOUND");
+    const sourceId = detail.license.mode === "SELF_SERVICE" ? createOpaqueSourceId().replace(/^src_/, "csrc_") : createOpaqueSourceId();
+    const name = validateName(body.name);
+    // Same source vault key and AAD contract for managed/customer delivery.
+    const envelope = await encryptSourceConfig(sourceId, 1, protocol, body.sourceConfig);
+    const { data, error } = await supabase.rpc("rpc_manager_replace_license_source", {
+      p_license_id: body.licenseId, p_expected_sources: body.expectedSources, p_source_id: sourceId,
+      p_name: name, p_protocol: protocol, p_ciphertext: envelope.ciphertext, p_nonce: envelope.nonce,
+      p_auth_tag: envelope.authTag, p_key_version: envelope.keyVersion,
+    });
+    if (error) throw new Error(rpcErrorCode(error));
+    if (!isRecord(data) || data.success !== true) fail("INTERNAL_SANITIZED_ERROR");
+    return response({ success: true, sourceId, sourceVersion: 1 });
+  }
+  if (body.operation === "SAVE_LICENSE_EDITS") {
+    if (typeof body.licenseId !== "string" || !/^[a-f0-9-]{36}$/i.test(body.licenseId) ||
+      typeof body.expectedSnapshot !== "string" || !/^[a-f0-9]{64}$/.test(body.expectedSnapshot) || !isRecord(body.changes) ||
+      !isRecord(body.source) || !Array.isArray(body.source.expectedSources) || "source" in body.changes) fail("INVALID_REQUEST");
+    const protocol = body.source.protocol;
+    assertProtocol(protocol);
+    const { data: detail, error: detailError } = await supabase.rpc("rpc_manager_get_license_detail", { p_license_id: body.licenseId });
+    if (detailError) throw new Error(rpcErrorCode(detailError));
+    if (!isRecord(detail) || detail.success !== true || !isRecord(detail.license)) fail("LICENSE_NOT_FOUND");
+    if (detail.editorSnapshot !== body.expectedSnapshot) fail("LICENSE_EDITOR_CONFLICT");
+    const sourceId = detail.license.mode === "SELF_SERVICE" ? createOpaqueSourceId().replace(/^src_/, "csrc_") : createOpaqueSourceId();
+    const name = validateName(body.source.name);
+    const envelope = await encryptSourceConfig(sourceId, 1, protocol, body.source.sourceConfig);
+    const { data, error } = await supabase.rpc("rpc_manager_save_license_edits", {
+      p_license_id: body.licenseId, p_expected_snapshot: body.expectedSnapshot,
+      p_changes: { ...body.changes, source: { expectedSources: body.source.expectedSources, sourceId, name, protocol,
+        ciphertext: envelope.ciphertext, nonce: envelope.nonce, authTag: envelope.authTag, keyVersion: envelope.keyVersion } },
+    });
+    if (error) throw new Error(rpcErrorCode(error));
+    if (!isRecord(data) || data.success !== true) fail("INTERNAL_SANITIZED_ERROR");
+    return response({ success: true });
+  }
+  if (body.operation === "LINK_LICENSE_DEVICE") {
+    if (typeof body.licenseId !== "string" || !/^[0-9a-f-]{36}$/i.test(body.licenseId)) fail("INVALID_LICENSE_ID");
+    if (typeof body.registered !== "boolean") fail("INVALID_REQUEST");
+    if (body.deviceRole !== "PRIMARY" && body.deviceRole !== "SECONDARY") fail("INVALID_DEVICE_ROLE");
+    if (body.registered && body.deviceRole !== "SECONDARY") fail("INVALID_DEVICE_ROLE");
+    if (typeof body.deviceLabel !== "string" || body.deviceLabel.trim().length < 1 || body.deviceLabel.trim().length > 100) fail("INVALID_DEVICE_LABEL");
+    if (!Number.isSafeInteger(body.maxDevices) || (body.maxDevices as number) < 1 || (body.maxDevices as number) > 100) fail("INVALID_MAX_DEVICES");
+    if (!Number.isSafeInteger(body.maxConcurrentSessions) || (body.maxConcurrentSessions as number) < 1 || (body.maxConcurrentSessions as number) > 50) fail("INVALID_MAX_CONCURRENT_SESSIONS");
+    if ((body.maxConcurrentSessions as number) > (body.maxDevices as number)) fail("CONCURRENT_LIMIT_EXCEEDS_DEVICES");
+    const displayCode = validateDisplayCode(body.displayCode);
+    const primary = body.primaryDisplayCode ? validateDisplayCode(body.primaryDisplayCode) : null;
+    if (body.deviceRole === "SECONDARY" && !primary) fail("PRIMARY_DEVICE_REQUIRED");
+    if (primary === displayCode) fail("PRIMARY_DEVICE_INVALID");
+    const { data, error } = await supabase.rpc("rpc_manager_link_license_device", {
+      p_license_id: body.licenseId, p_display_code: displayCode, p_primary_display_code: primary,
+      p_device_label: body.deviceLabel.trim(), p_max_devices: body.maxDevices, p_max_sessions: body.maxConcurrentSessions,
+      p_device_role: body.deviceRole, p_registered: body.registered,
+      p_key_hash: body.registered ? null : await sha256Hex(validateActivationKey(body.activationKey)),
+    });
+    if (error) throw new Error(rpcErrorCode(error));
+    if (!isRecord(data) || data.success !== true) fail("INTERNAL_SANITIZED_ERROR");
+    return response({ success: true });
+  }
   if (body.operation === "ACTIVATE_SOURCE_FOR_DEVICE") {
+    const configured = body.deviceRole !== undefined || body.primaryDisplayCode !== undefined || body.deviceLabel !== undefined || body.maxDevices !== undefined || body.maxConcurrentSessions !== undefined;
+    if (configured) {
+      if (body.deviceRole !== "PRIMARY" && body.deviceRole !== "SECONDARY") fail("INVALID_DEVICE_ROLE");
+      if (body.deviceRole === "SECONDARY" && (body.flowMode !== "EXISTING_CUSTOMER" || typeof body.primaryDisplayCode !== "string" || !/^XF-[0-9A-Z]{4}-[0-9A-Z]{4}$/.test(body.primaryDisplayCode.trim().toUpperCase()))) fail("PRIMARY_DEVICE_REQUIRED");
+      if (body.deviceRole === "SECONDARY" && (body.primaryDisplayCode as string).trim().toUpperCase() !== String(body.existingDeviceCode ?? body.existingDisplayCode).trim().toUpperCase()) fail("PRIMARY_DEVICE_INVALID");
+      if (typeof body.deviceLabel !== "string" || body.deviceLabel.trim().length < 1 || body.deviceLabel.trim().length > 100) fail("INVALID_DEVICE_LABEL");
+      if (!Number.isSafeInteger(body.maxDevices) || (body.maxDevices as number) < 1 || (body.maxDevices as number) > 100) fail("INVALID_MAX_DEVICES");
+      if (!Number.isSafeInteger(body.maxConcurrentSessions) || (body.maxConcurrentSessions as number) < 1 || (body.maxConcurrentSessions as number) > 50) fail("INVALID_MAX_CONCURRENT_SESSIONS");
+      if ((body.maxConcurrentSessions as number) > (body.maxDevices as number)) fail("CONCURRENT_LIMIT_EXCEEDS_DEVICES");
+    }
+    const activate = (args: RecordValue) => configured
+      ? supabase.rpc("rpc_manager_activate_device_configured", { p_activation: args, p_device_label: (body.deviceLabel as string).trim(), p_max_devices: body.maxDevices, p_max_sessions: body.maxConcurrentSessions, p_device_role: body.deviceRole, p_primary_display_code: body.deviceRole === "SECONDARY" ? (body.primaryDisplayCode as string).trim().toUpperCase() : null })
+      : supabase.rpc("rpc_manager_complete_device_activation", args);
     const flowMode = body.flowMode === "EXISTING_CUSTOMER" ? "EXISTING_CUSTOMER" : "NEW_CUSTOMER";
     const displayCode = validateDisplayCode(body.displayCode);
-    const activationKey = validateActivationKey(body.activationKey);
-    const activationKeyHash = await sha256Hex(activationKey);
+    let activationKeyHash: string;
+    if (body.activationNotificationId !== undefined) {
+      if (typeof body.activationNotificationId !== "string" || !/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(body.activationNotificationId)) fail("INVALID_REQUEST");
+      const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+      if (!serviceKey) fail("VAULT_RUNTIME_NOT_CONFIGURED");
+      const server = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
+      // The manager id comes from auth.getUser, never from the request body.
+      const { data, error } = await server.rpc("rpc_service_activation_notification_hash", {
+        p_manager_id: userData.user.id, p_notification_id: body.activationNotificationId, p_display_code: displayCode,
+      });
+      if (error || !isRecord(data) || data.success !== true || typeof data.activationKeyHash !== "string" || !/^[a-f0-9]{64}$/i.test(data.activationKeyHash)) fail("HANDOFF_EXPIRED");
+      activationKeyHash = data.activationKeyHash;
+    } else {
+      activationKeyHash = await sha256Hex(validateActivationKey(body.activationKey));
+    }
     const licenseId = typeof body.licenseId === "string" && body.licenseId.trim().length > 0
       ? body.licenseId.trim()
       : null;
@@ -476,7 +588,7 @@ async function handle(request: Request): Promise<Response> {
       if (!customerId || !/^[0-9a-f-]{36}$/i.test(customerId)) fail("CUSTOMER_ID_REQUIRED");
       const existingDisplayCode = validateDisplayCode(body.existingDeviceCode ?? body.existingDisplayCode);
 
-      const { data, error } = await supabase.rpc("rpc_manager_complete_device_activation", {
+      const { data, error } = await activate({
         p_display_code: displayCode,
         p_activation_key_hash: activationKeyHash,
         p_license_id: licenseId,
@@ -535,7 +647,7 @@ async function handle(request: Request): Promise<Response> {
     if (name.length > 100) fail("INVALID_SOURCE_NAME");
     const sourceId = createOpaqueSourceId();
     const envelope = await encryptSourceConfig(sourceId, 1, protocol, body.sourceConfig);
-    const { data, error } = await supabase.rpc("rpc_manager_complete_device_activation", {
+    const { data, error } = await activate({
       p_display_code: displayCode,
       p_activation_key_hash: activationKeyHash,
       p_license_id: licenseId,

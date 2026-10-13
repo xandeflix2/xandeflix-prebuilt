@@ -86,12 +86,20 @@ public class NativeAndroidPlayerPlugin extends Plugin {
     private String currentPreviewId = null;
     private ExoPlayer previewPlayer = null;
     private PlayerView previewView = null;
+    private LivePlayerControls liveControls;
     private FrameLayout previewHost = null;
     private List<NativeStreamRequest> previewCandidateRequests = Collections.emptyList();
     private int currentPreviewCandidateIndex = 0;
     private boolean previewWasPlaying = false;
+    private boolean previewForeground = true;
     private FrameLayout.LayoutParams previewInlineLayoutParams = null;
     private boolean previewFullscreen = false;
+    private MobilePipController pipController;
+    private MobilePipLifecycle pipLifecycle = new MobilePipLifecycle();
+    private boolean pipWasFullscreen;
+    private android.widget.ImageButton castButton;
+    private boolean previewInPip;
+    private android.view.ViewTreeObserver.OnPreDrawListener previewCastDrawListener;
 
     /**
      * Contrato de abertura de player nativo em tela cheia.
@@ -137,13 +145,16 @@ public class NativeAndroidPlayerPlugin extends Plugin {
             return;
         }
 
-        Long startPositionMs = call.getLong("startPositionMs", 0L);
-        if (startPositionMs != null && startPositionMs < 0) {
-            rejectWithSanitizedError(call, ERROR_INVALID_REQUEST, "Posição inicial (startPositionMs) não pode ser negativa.");
+        Long startPositionMs = parseStartPositionMs(call.getData().opt("startPositionMs"));
+        if (startPositionMs == null) {
+            rejectWithSanitizedError(call, ERROR_INVALID_REQUEST, "Posição inicial (startPositionMs) deve ser um inteiro não negativo.");
             return;
         }
 
         String title = call.getString("title");
+        String playbackId=call.getString("playbackId");
+        String replacePlaybackId=call.getString("replacePlaybackId");
+        String navigationRequestId=call.getString("navigationRequestId");
 
         // Extrai headers explícitos sem duplicar lógica de validação/sanitização
         JSObject headersObj = call.getObject("headers");
@@ -155,6 +166,13 @@ public class NativeAndroidPlayerPlugin extends Plugin {
             candidateRequests = NativeStreamRequest.fromUrlWithHeaders(trimmedUri, explicitHeaders, null);
         } catch (Exception e) {
             rejectWithSanitizedError(call, ERROR_NATIVE_ERROR, "Falha ao resolver candidatos de streaming.");
+            return;
+        }
+        if(replacePlaybackId==null && com.xandeflix.prebuilt.cast.CastController.get().connected() && !candidateRequests.isEmpty()) {
+            activePlugin=this;
+            getActivity().runOnUiThread(()->com.xandeflix.prebuilt.cast.CastController.get().startStandalone(getContext(),candidateRequests.get(0),title,normalizedKind,playbackId,startPositionMs!=null ? startPositionMs : 0,
+                ()->{JSObject result=new JSObject();result.put("accepted",true);result.put("candidateCount",1);call.resolve(result);},
+                code->call.reject(com.xandeflix.prebuilt.cast.CastController.message(code),code)));
             return;
         }
 
@@ -179,6 +197,10 @@ public class NativeAndroidPlayerPlugin extends Plugin {
             try {
                 activePlugin = this;
                 Intent intent = new Intent(context, NativePlayerActivity.class);
+                if(validPlaybackId(playbackId))intent.putExtra("watchPlaybackId",playbackId);
+                JSObject episodeContext=call.getObject("episodeContext");
+                if("series".equals(normalizedKind)&&episodeContext!=null&&episodeContext.toString().length()<=131072)
+                    intent.putExtra("episodeContext",episodeContext.toString());
                 intent.putExtra(PlaybackIntentContract.EXTRA_URI, candidateRequests.get(0).getMediaUrl());
                 if (title != null && !title.trim().isEmpty()) {
                     intent.putExtra(PlaybackIntentContract.EXTRA_TITLE, title.trim());
@@ -191,13 +213,26 @@ public class NativeAndroidPlayerPlugin extends Plugin {
                     intent.putStringArrayListExtra(PlaybackIntentContract.EXTRA_HEADERS_KEYS, new ArrayList<>(explicitHeaders.keySet()));
                     intent.putStringArrayListExtra(PlaybackIntentContract.EXTRA_HEADERS_VALUES, new ArrayList<>(explicitHeaders.values()));
                 }
+                if(replacePlaybackId!=null) {
+                    if(!validPlaybackId(replacePlaybackId)||!validPlaybackId(navigationRequestId)||!validPlaybackId(playbackId)||!"series".equals(normalizedKind)) {
+                        rejectWithSanitizedError(call,ERROR_INVALID_REQUEST,"Transição inválida.");return;
+                    }
+                    final int count=candidateRequests.size();
+                    NativePlayerActivity.replaceEpisode(intent,replacePlaybackId,navigationRequestId,accepted->{
+                        if(!accepted){rejectWithSanitizedError(call,ERROR_NATIVE_ERROR,"Player encerrado durante a transição.");return;}
+                        JSObject result=new JSObject();result.put("accepted",true);result.put("candidateCount",count);result.put("kind",normalizedKind);call.resolve(result);
+                    });
+                    return;
+                }
                 context.startActivity(intent);
             } catch (Exception ex) {
+                if(replacePlaybackId!=null){rejectWithSanitizedError(call,ERROR_NATIVE_ERROR,"Falha na transição de episódio.");return;}
                 // Em ambiente de teste unitário headless, loga aviso sem quebrar o contrato
                 Log.w(TAG, "Activity launch diferido ou indisponível no ambiente atual.");
             }
         }
 
+        if(replacePlaybackId!=null){rejectWithSanitizedError(call,ERROR_NATIVE_ERROR,"Player indisponível para transição.");return;}
         JSObject result = new JSObject();
         result.put("accepted", true);
         result.put("candidateCount", candidateRequests.size());
@@ -270,6 +305,7 @@ public class NativeAndroidPlayerPlugin extends Plugin {
         activity.runOnUiThread(() -> {
         releasePreview();
         this.currentPreviewId = "live-preview-" + UUID.randomUUID();
+        pipLifecycle = new MobilePipLifecycle();
         this.currentPreviewKind = previewKind;
         this.previewCandidateRequests = candidateRequests;
         this.currentPreviewCandidateIndex = 0;
@@ -298,15 +334,44 @@ public class NativeAndroidPlayerPlugin extends Plugin {
 
         try {
             this.previewHost = host;
+            activePlugin=this;
             this.previewView = createPreviewView();
             logPreviewStage("PLAYER_VIEW_CREATED", this.previewView != null);
             host.addView(this.previewView, layoutParams);
             logPreviewStage("PLAYER_VIEW_ATTACHED", this.previewView.getParent() != null);
+            PlaybackBufferPolicy.Profile bufferProfile = PlaybackBufferPolicy.forDevice(getSafeContext(), currentPreviewKind);
+            bufferProfile.logConfiguration();
             this.previewPlayer = new ExoPlayer.Builder(getSafeContext())
-                    .setLoadControl(NativePlayerActivity.buildLoadControl(2500, 12000, 500, 1000))
+                    .setLoadControl(bufferProfile.buildLoadControl())
                     .build();
             logPreviewStage("MEDIA3_CREATED", this.previewPlayer != null);
             this.previewView.setPlayer(this.previewPlayer);
+            if ("live".equals(previewKind) && previewView.findViewById(com.xandeflix.prebuilt.R.id.live_channels) != null) {
+                liveControls = new LivePlayerControls(getActivity(), previewView, (action, id, channelId) -> {
+                    if (!isPreviewActive || currentPreviewId == null || !LivePlayerControls.validId(channelId)) return;
+                    if (id != null && !LivePlayerControls.validId(id)) return;
+                    JSObject payload = new JSObject();
+                    payload.put("previewId", currentPreviewId); payload.put("channelId", channelId);
+                    payload.put("action", action); if (id != null) payload.put("id", id);
+                    notifyListeners("nativeLiveAction", payload);
+                }, this::exitPreviewFullscreenInternal);
+                liveControls.bind(call.getObject("liveContext"));
+            }
+            if(com.xandeflix.prebuilt.cast.CastController.mobile(getSafeContext())) {
+                castButton=com.xandeflix.prebuilt.cast.CastController.get().button(getActivity());
+                float density=getSafeContext().getResources().getDisplayMetrics().density;
+                FrameLayout.LayoutParams params=new FrameLayout.LayoutParams((int)(48*density),(int)(48*density),android.view.Gravity.TOP|android.view.Gravity.RIGHT);
+                params.topMargin=params.rightMargin=(int)(16*density);castButton.setVisibility(View.INVISIBLE);
+                FrameLayout controllerHost = previewView.findViewById(androidx.media3.ui.R.id.exo_controller);
+                if (controllerHost != null) controllerHost.addView(castButton,params);
+                final PlayerView owner = previewView;
+                previewCastDrawListener = () -> {
+                    if (previewView == owner) updatePreviewCastButtonVisibility();
+                    return true;
+                };
+                owner.getViewTreeObserver().addOnPreDrawListener(previewCastDrawListener);
+            }
+            pipController = new MobilePipController(getPluginActivity(),previewView,previewPlayer,currentPreviewKind);
             logPreviewStage("PLAYER_VIEW_BOUND", this.previewView.getPlayer() != null);
             attachPreviewListener();
             this.isPreviewActive = true;
@@ -363,13 +428,33 @@ public class NativeAndroidPlayerPlugin extends Plugin {
             return;
         }
 
-        if (previewHost != null && !previewFullscreen) {
+        boolean suspendPlayback = Boolean.TRUE.equals(call.getBoolean("suspendPlayback"));
+        if (suspendPlayback && (rawUri != null || !"live".equals(currentPreviewKind)
+                || requestedPreviewId == null || !requestedPreviewId.equals(currentPreviewId))) {
+            rejectWithSanitizedError(call, ERROR_INVALID_REQUEST, "Suspensao de canal invalida.");
+            return;
+        }
+        if (suspendPlayback) {
+            if (currentPreviewCandidateIndex < previewCandidateRequests.size())
+                com.xandeflix.prebuilt.cast.CastController.get().detach(previewCandidateRequests.get(currentPreviewCandidateIndex));
+            previewCandidateRequests = java.util.Collections.emptyList();
+            currentPreviewCandidateIndex = 0;
+            previewWasPlaying = false;
+            if (previewPlayer != null) {
+                previewPlayer.setPlayWhenReady(false);
+                previewPlayer.stop();
+                previewPlayer.clearMediaItems();
+            }
+        }
+
+        if (previewHost != null && !previewFullscreen && !previewInPip && !suspendPlayback) {
             FrameLayout.LayoutParams layoutParams = readPreviewLayout(call);
             if (layoutParams == null) {
                 rejectWithSanitizedError(call, ERROR_LIVE_PREVIEW_SURFACE_FAILED, "Geometria de preview inválida.");
                 return;
             }
             previewView.setLayoutParams(layoutParams);
+            previewInlineLayoutParams = new FrameLayout.LayoutParams(layoutParams);
         }
 
         if (rawUri != null && !rawUri.trim().isEmpty()) {
@@ -386,11 +471,43 @@ public class NativeAndroidPlayerPlugin extends Plugin {
         }
 
         JSObject result = new JSObject();
+        result.put("accepted", true);
         result.put("previewUpdated", true);
         result.put("isActive", isPreviewActive);
         result.put("previewId", currentPreviewId);
         call.resolve(result);
     }
+
+    /** Presentation only; never changes a stream, geometry, player or authorization. */
+    @PluginMethod
+    public void setLiveControls(PluginCall call) {
+        android.app.Activity activity = getPluginActivity();
+        if (activity != null && android.os.Looper.myLooper() != android.os.Looper.getMainLooper()) {
+            activity.runOnUiThread(() -> setLiveControls(call)); return;
+        }
+        JSObject context = call.getObject("context");
+        if (!isPreviewActive || liveControls == null || currentPreviewId == null
+                || !currentPreviewId.equals(call.getString("previewId")) || context == null
+                || context.toString().length() > 50000 || !LivePlayerControls.validId(context.optString("channelId"))) {
+            rejectWithSanitizedError(call, ERROR_INVALID_REQUEST, "Controles de TV ao vivo indisponíveis."); return;
+        }
+        liveControls.bind(context);
+        JSObject result = new JSObject(); result.put("accepted", true); call.resolve(result);
+    }
+
+    public boolean dispatchLiveKey(android.view.KeyEvent event) {
+        return previewFullscreen && !previewInPip && liveControls != null && liveControls.dispatchKey(event);
+    }
+    @PluginMethod
+    public void openLivePanel(PluginCall call) {
+        android.app.Activity activity=getPluginActivity();
+        if(activity!=null && android.os.Looper.myLooper()!=android.os.Looper.getMainLooper()) { activity.runOnUiThread(()->openLivePanel(call));return; }
+        if(!isPreviewActive || liveControls==null || currentPreviewId==null || !currentPreviewId.equals(call.getString("previewId")) || !liveControls.openRequestedPanel(call.getString("panel"))) {
+            rejectWithSanitizedError(call,ERROR_INVALID_REQUEST,"Controles de TV ao vivo indisponíveis.");return;
+        }
+        JSObject result=new JSObject();result.put("accepted",true);call.resolve(result);
+    }
+    public boolean dismissLivePanel() { return liveControls != null && liveControls.dismissPanel(); }
 
     /**
      * Promove o mesmo PlayerView/ExoPlayer do preview inline para fullscreen.
@@ -441,8 +558,16 @@ public class NativeAndroidPlayerPlugin extends Plugin {
 
             previewView.requestLayout();
             this.previewFullscreen = true;
+            if (liveControls != null) liveControls.setFullscreen(true);
+            previewView.setFocusable(true);
+            previewView.requestFocus();
+            previewView.setClickable(true);
+            previewView.setControllerShowTimeoutMs(3000);
+            previewView.setControllerAutoShow(true);
+            previewView.showController();
+            updatePreviewCastButtonVisibility();
             MainActivity.applyPhoneUiOrientation(activity, true);
-            MainActivity.applyAppSystemUiPolicy(activity.getWindow());
+            MainActivity.applyAppSystemUiPolicy(activity.getWindow(), true);
             notifyPreviewFullscreenChanged(true);
         }
 
@@ -579,7 +704,9 @@ public class NativeAndroidPlayerPlugin extends Plugin {
 
     private PlayerView createPreviewView() {
         logPreviewStage("PREVIEW_CONTEXT", getSafeContext() != null);
-        PlayerView view = new PlayerView(getSafeContext());
+        PlayerView view = "live".equals(currentPreviewKind)
+                ? (PlayerView) android.view.LayoutInflater.from(getSafeContext()).inflate(com.xandeflix.prebuilt.R.layout.live_preview_player, null)
+                : new PlayerView(getSafeContext());
         logPreviewStage("PREVIEW_VIEW_CONSTRUCTOR", true);
         view.setShowBuffering(PlayerView.SHOW_BUFFERING_WHEN_PLAYING);
         logPreviewStage("PREVIEW_BUFFERING_CONFIGURED", true);
@@ -654,9 +781,31 @@ public class NativeAndroidPlayerPlugin extends Plugin {
             return;
         }
 
+        final ExoPlayer owner = previewPlayer;
         previewPlayer.addListener(new Player.Listener() {
             @Override
+            public void onPlaybackStateChanged(int state) {
+                if (previewPlayer == owner && (state == Player.STATE_BUFFERING || state == Player.STATE_READY)) {
+                    Log.i(TAG, "BUFFER_STATE preview=true state=" + state + " bufferedMs=" + owner.getTotalBufferedDuration());
+                }
+            }
+            @Override
+            public void onIsPlayingChanged(boolean playing) {
+                if (!playing || previewPlayer != owner || !isPreviewActive || currentPreviewId == null) return;
+                JSObject payload = new JSObject();
+                payload.put("previewId", currentPreviewId);
+                notifyListeners("nativePreviewPlaying", payload);
+            }
+            @Override
+            public void onEvents(@NonNull Player player, @NonNull Player.Events events) {
+                updatePreviewKeepScreenOn();
+            }
+
+            @Override
             public void onPlayerError(@NonNull PlaybackException error) {
+                if (previewView != null) {
+                    previewView.setKeepScreenOn(false);
+                }
                 if (NativeStreamRequest.shouldTryNextCandidate(error)
                         && currentPreviewCandidateIndex + 1 < previewCandidateRequests.size()) {
                     currentPreviewCandidateIndex += 1;
@@ -666,6 +815,24 @@ public class NativeAndroidPlayerPlugin extends Plugin {
                 notifyPreviewError(ERROR_LIVE_PREVIEW_PLAYBACK_FAILED);
             }
         });
+    }
+
+    /** Same policy for the inline PlayerView and its fullscreen expansion. */
+    public static boolean shouldKeepPreviewScreenOn(boolean active, boolean foreground,
+            boolean playWhenReady, int playbackState, boolean hasError, boolean suppressed) {
+        return active && foreground && playWhenReady && !hasError && !suppressed
+                && (playbackState == Player.STATE_READY || playbackState == Player.STATE_BUFFERING);
+    }
+
+    private void updatePreviewKeepScreenOn() {
+        if (previewView == null) return;
+        boolean keepScreenOn = previewPlayer != null && shouldKeepPreviewScreenOn(
+                isPreviewActive, previewForeground, previewPlayer.getPlayWhenReady(),
+                previewPlayer.getPlaybackState(), previewPlayer.getPlayerError() != null,
+                previewPlayer.getPlaybackSuppressionReason() != Player.PLAYBACK_SUPPRESSION_REASON_NONE);
+        if (previewView.getKeepScreenOn() != keepScreenOn) {
+            previewView.setKeepScreenOn(keepScreenOn);
+        }
     }
 
     private void playPreviewCandidate(int index) {
@@ -680,12 +847,17 @@ public class NativeAndroidPlayerPlugin extends Plugin {
         }
         DefaultMediaSourceFactory mediaSourceFactory = new DefaultMediaSourceFactory(getSafeContext())
                 .setDataSourceFactory(NativePlayerActivity.buildHttpDataSourceFactory(request, SecurePlaybackDiagnosticProbe.enabled(getSafeContext())));
+        PlaybackBufferPolicy.forDevice(getSafeContext(), currentPreviewKind).configureMediaSource(mediaSourceFactory);
         MediaItem mediaItem = new MediaItem.Builder()
                 .setUri(android.net.Uri.parse(request.getMediaUrl()))
                 .build();
         previewPlayer.setMediaSource(mediaSourceFactory.createMediaSource(mediaItem));
         previewPlayer.setPlayWhenReady(true);
         previewPlayer.prepare();
+        if(com.xandeflix.prebuilt.cast.CastController.mobile(getSafeContext()))com.xandeflix.prebuilt.cast.CastController.get().attach(getSafeContext(),request,"Canal ao vivo",currentPreviewKind,null,
+                ()->previewPlayer!=null ? previewPlayer.getCurrentPosition() : 0,
+                ()->{if(previewPlayer!=null)previewPlayer.pause();},
+                position->{if(previewPlayer!=null && isPreviewActive)previewPlayer.play();});
     }
 
     private void notifyPreviewError(String errorCode) {
@@ -713,6 +885,17 @@ public class NativeAndroidPlayerPlugin extends Plugin {
     }
 
     private void releasePreview() {
+        if (liveControls != null) { liveControls.close(); liveControls = null; }
+        pipLifecycle.close();
+        if(currentPreviewCandidateIndex<previewCandidateRequests.size())com.xandeflix.prebuilt.cast.CastController.get().detach(previewCandidateRequests.get(currentPreviewCandidateIndex));
+        if (previewView != null && previewCastDrawListener != null && previewView.getViewTreeObserver().isAlive()) {
+            previewView.getViewTreeObserver().removeOnPreDrawListener(previewCastDrawListener);
+        }
+        previewCastDrawListener = null;
+        castButton=null;
+        if(pipController!=null){pipController.close();pipController=null;}
+        isPreviewActive = false;
+        updatePreviewKeepScreenOn();
         exitPreviewFullscreenInternal();
         if (previewView != null) {
             try {
@@ -741,6 +924,10 @@ public class NativeAndroidPlayerPlugin extends Plugin {
         previewWasPlaying = false;
         previewInlineLayoutParams = null;
         previewFullscreen = false;
+        previewInPip = false;
+        if (getBridge() != null && getBridge().getWebView() != null) {
+            getBridge().getWebView().setVisibility(View.VISIBLE);
+        }
     }
 
     @Nullable
@@ -770,12 +957,37 @@ public class NativeAndroidPlayerPlugin extends Plugin {
             previewView.requestLayout();
         }
         if (activity != null) {
-            MainActivity.applyAppSystemUiPolicy(activity.getWindow());
+            MainActivity.applyAppSystemUiPolicy(activity.getWindow(), false);
         }
         previewFullscreen = false;
-        notifyPreviewFullscreenChanged(false);
+        if (previewView != null) {
+            if (liveControls != null) liveControls.setFullscreen(false);
+            previewView.setControllerAutoShow(false);
+            previewView.setClickable(false);
+            previewView.setFocusable(false);
+            previewView.hideController();
+        }
+        updatePreviewCastButtonVisibility();
         MainActivity.applyPhoneUiOrientation(getPluginActivity(), false);
+        notifyPreviewFullscreenChanged(false);
         return true;
+    }
+
+    public static boolean shouldAllowPreviewCast(boolean fullscreen, boolean inPip) {
+        return fullscreen && !inPip;
+    }
+
+    private void updatePreviewCastButtonVisibility() {
+        if (castButton != null && previewView != null) {
+            View controls = previewView.findViewById(androidx.media3.ui.R.id.exo_controls_background);
+            float alpha = controls != null && controls.getVisibility() == View.VISIBLE
+                    ? controls.getAlpha() : 0f;
+            boolean visible = shouldAllowPreviewCast(previewFullscreen, previewInPip)
+                    && alpha > 0f;
+            int visibility = visible ? View.VISIBLE : View.INVISIBLE;
+            if (castButton.getVisibility() != visibility) castButton.setVisibility(visibility);
+            if (castButton.getAlpha() != alpha) castButton.setAlpha(alpha);
+        }
     }
 
     /**
@@ -788,8 +1000,13 @@ public class NativeAndroidPlayerPlugin extends Plugin {
 
     public static JSObject buildResumePayload(long positionMs, boolean ended, @Nullable String errorCode,
             @Nullable String errorCategory, @Nullable String httpStatus) {
+        return buildResumePayload(positionMs, ended, errorCode, errorCategory, httpStatus, null, null);
+    }
+
+    private static JSObject buildResumePayload(long positionMs, boolean ended, @Nullable String errorCode,
+            @Nullable String errorCategory, @Nullable String httpStatus, @Nullable Integer media3ErrorCode, @Nullable String checkpoint) {
         JSObject payload = new JSObject();
-        for (Map.Entry<String, Object> entry : buildResumeData(positionMs, ended, errorCode, errorCategory, httpStatus).entrySet()) {
+        for (Map.Entry<String, Object> entry : buildResumeData(positionMs, ended, errorCode, errorCategory, httpStatus, media3ErrorCode, checkpoint).entrySet()) {
             payload.put(entry.getKey(), entry.getValue());
         }
         return payload;
@@ -798,6 +1015,11 @@ public class NativeAndroidPlayerPlugin extends Plugin {
     /** Plain values make the exact IPC allowlist testable without Android JSON stubs. */
     public static Map<String, Object> buildResumeData(long positionMs, boolean ended, @Nullable String errorCode,
             @Nullable String errorCategory, @Nullable String httpStatus) {
+        return buildResumeData(positionMs, ended, errorCode, errorCategory, httpStatus, null, null);
+    }
+
+    public static Map<String, Object> buildResumeData(long positionMs, boolean ended, @Nullable String errorCode,
+            @Nullable String errorCategory, @Nullable String httpStatus, @Nullable Integer media3ErrorCode, @Nullable String checkpoint) {
         Map<String, Object> payload = new LinkedHashMap<>();
         payload.put("positionMs", Math.max(0L, positionMs));
         payload.put("ended", ended);
@@ -808,6 +1030,9 @@ public class NativeAndroidPlayerPlugin extends Plugin {
             if ("HTTP_ERROR".equals(category) && httpStatus != null && httpStatus.matches("[45][0-9]{2}")) {
                 payload.put("httpStatus", Integer.parseInt(httpStatus));
             }
+            if (media3ErrorCode != null && media3ErrorCode >= 1000) payload.put("media3ErrorCode", media3ErrorCode);
+            if ("NATIVE_ACTIVITY_STARTED".equals(checkpoint) || "DATASOURCE_OPEN".equals(checkpoint)
+                    || "FIRST_FRAME".equals(checkpoint) || "PLAYER_READY".equals(checkpoint)) payload.put("checkpoint", checkpoint);
         }
         return payload;
     }
@@ -821,7 +1046,12 @@ public class NativeAndroidPlayerPlugin extends Plugin {
 
     public void emitResumeEvent(long positionMs, boolean ended, @Nullable String errorCode,
             @Nullable String errorCategory, @Nullable String httpStatus) {
-        JSObject sanitizedPayload = buildResumePayload(positionMs, ended, errorCode, errorCategory, httpStatus);
+        emitResumeEvent(positionMs, ended, errorCode, errorCategory, httpStatus, null, null);
+    }
+
+    private void emitResumeEvent(long positionMs, boolean ended, @Nullable String errorCode,
+            @Nullable String errorCategory, @Nullable String httpStatus, @Nullable Integer media3ErrorCode, @Nullable String checkpoint) {
+        JSObject sanitizedPayload = buildResumePayload(positionMs, ended, errorCode, errorCategory, httpStatus, media3ErrorCode, checkpoint);
         try {
             if (getBridge() != null) {
                 notifyListeners("resume", sanitizedPayload);
@@ -834,12 +1064,76 @@ public class NativeAndroidPlayerPlugin extends Plugin {
     public static void notifyPlaybackTerminal(long positionMs, boolean ended, @Nullable String errorCode) {
         notifyPlaybackTerminal(positionMs, ended, errorCode, null, null);
     }
+    public static void terminateCastPlayback(boolean ended,String errorCode) {
+        NativeAndroidPlayerPlugin plugin=activePlugin;
+        if(plugin!=null && plugin.isPreviewActive){plugin.notifyPreviewError(ERROR_LIVE_PREVIEW_PLAYBACK_FAILED);plugin.releasePreview();}
+        else NativePlayerActivity.terminateCastPlayback(ended,errorCode);
+    }
+    /** Android JSON uses Integer for ordinary JS millisecond values; getLong only accepts Long. */
+    public static Long parseStartPositionMs(Object value) {
+        if(value==null || value==org.json.JSONObject.NULL)return 0L;
+        if(!(value instanceof Number))return null;
+        double number=((Number)value).doubleValue();
+        if(Double.isNaN(number) || Double.isInfinite(number) || number<0 || number>9007199254740991d || Math.floor(number)!=number)return null;
+        return ((Number)value).longValue();
+    }
+    public static boolean validPlaybackId(String value){return value!=null && value.matches("[A-Za-z0-9_-]{1,64}");}
+    public static void notifyEpisodeNavigation(String playbackId,String requestId,String reason,@Nullable String episodeId) {
+        NativeAndroidPlayerPlugin plugin=activePlugin;
+        if(plugin==null||!validPlaybackId(playbackId)||!validPlaybackId(requestId))return;
+        android.util.Log.i(NativePlayerActivity.TAG,"EPISODE_NAVIGATION_DELIVER listeners="+plugin.hasListeners("episodeNavigation")
+                +" uptime="+android.os.SystemClock.uptimeMillis());
+        JSObject payload=new JSObject();payload.put("playbackId",playbackId);payload.put("requestId",requestId);payload.put("reason",reason);
+        if(episodeId!=null)payload.put("episodeId",episodeId);
+        try{plugin.notifyListeners("episodeNavigation",payload);}catch(Exception ignored){}
+    }
+    @PluginMethod public void cancelEpisodeNavigation(PluginCall call) {
+        NativePlayerActivity.cancelEpisodeNavigation(call.getString("playbackId"),call.getString("requestId"));call.resolve();
+    }
+    public static Map<String,Object> buildProgressData(String playbackId,long positionMs,long durationMs,boolean ended,long observedAt) {
+        Map<String,Object> data=new LinkedHashMap<>();if(!validPlaybackId(playbackId))return data;
+        data.put("playbackId",playbackId);data.put("positionMs",Math.max(0,positionMs));data.put("durationMs",Math.max(0,durationMs));data.put("ended",ended);data.put("observedAt",observedAt);return data;
+    }
+    public static void notifyPlaybackProgress(String playbackId,long positionMs,long durationMs,boolean ended) {
+        NativeAndroidPlayerPlugin plugin=activePlugin;if(plugin==null || !validPlaybackId(playbackId))return;
+        long observedAt=System.currentTimeMillis();
+        try {
+            android.content.Context context=plugin.getSafeContext();
+            if(context!=null) {
+                android.content.SharedPreferences prefs=context.getSharedPreferences("watch_progress_v1",android.content.Context.MODE_PRIVATE);
+                String value=NativeWatchProgressJournal.record(prefs.getString("events", ""),playbackId,positionMs,durationMs,ended,observedAt);
+                prefs.edit().putString("events",value).commit();
+            }
+        } catch(Exception ignored) {}
+        JSObject payload=new JSObject();for(Map.Entry<String,Object> entry:buildProgressData(playbackId,positionMs,durationMs,ended,observedAt).entrySet())payload.put(entry.getKey(),entry.getValue());
+        try{plugin.notifyListeners("progress",payload);}catch(Exception ignored){}
+    }
+
+    @PluginMethod
+    public void getWatchProgress(PluginCall call) {
+        com.getcapacitor.JSArray events=new com.getcapacitor.JSArray();
+        try {
+            android.content.Context context=getSafeContext();
+            if(context!=null)for(NativeWatchProgressJournal.Event event:NativeWatchProgressJournal.decode(
+                    context.getSharedPreferences("watch_progress_v1",android.content.Context.MODE_PRIVATE).getString("events",""))) {
+                JSObject payload=new JSObject();
+                for(Map.Entry<String,Object> entry:buildProgressData(event.playbackId,event.positionMs,event.durationMs,event.ended,event.observedAt).entrySet())payload.put(entry.getKey(),entry.getValue());
+                events.put(payload);
+            }
+        } catch(Exception ignored) {}
+        JSObject result=new JSObject();result.put("events",events);call.resolve(result);
+    }
 
     public static void notifyPlaybackTerminal(long positionMs, boolean ended, @Nullable String errorCode,
             @Nullable String errorCategory, @Nullable String httpStatus) {
+        notifyPlaybackTerminal(positionMs, ended, errorCode, errorCategory, httpStatus, null, null);
+    }
+
+    public static void notifyPlaybackTerminal(long positionMs, boolean ended, @Nullable String errorCode,
+            @Nullable String errorCategory, @Nullable String httpStatus, @Nullable Integer media3ErrorCode, @Nullable String checkpoint) {
         NativeAndroidPlayerPlugin plugin = activePlugin;
         if (plugin != null) {
-            plugin.emitResumeEvent(positionMs, ended, errorCode, errorCategory, httpStatus);
+            plugin.emitResumeEvent(positionMs, ended, errorCode, errorCategory, httpStatus, media3ErrorCode, checkpoint);
         }
     }
 
@@ -857,7 +1151,9 @@ public class NativeAndroidPlayerPlugin extends Plugin {
     @Override
     protected void handleOnPause() {
         super.handleOnPause();
-        if (previewPlayer != null) {
+        previewForeground = false;
+        updatePreviewKeepScreenOn();
+        if (previewPlayer != null && (pipController == null || !pipController.eligible())) {
             previewWasPlaying = previewPlayer.getPlayWhenReady();
             previewPlayer.pause();
         }
@@ -866,9 +1162,12 @@ public class NativeAndroidPlayerPlugin extends Plugin {
     @Override
     protected void handleOnResume() {
         super.handleOnResume();
+        pipLifecycle.resumed();
+        previewForeground = true;
         if (previewPlayer != null && isPreviewActive && previewWasPlaying) {
             previewPlayer.play();
         }
+        updatePreviewKeepScreenOn();
     }
 
     @Override
@@ -882,6 +1181,40 @@ public class NativeAndroidPlayerPlugin extends Plugin {
 
     public boolean isPreviewActive() {
         return isPreviewActive;
+    }
+
+    public void onUserLeaveForPip() { if(pipController!=null)pipController.onLeave(); }
+    public void onPipModeChanged(boolean pip) {
+        pipLifecycle.modeChanged(pip);
+        if(pipController==null)return;
+        previewInPip = pip;
+        if(pip) {pipWasFullscreen=previewFullscreen;enterPreviewFullscreen(null);}
+        if(getBridge()!=null && getBridge().getWebView()!=null)getBridge().getWebView().setVisibility(pip ? View.INVISIBLE : View.VISIBLE);
+        pipController.modeChanged(pip);
+        updatePreviewCastButtonVisibility();
+        if(!pip && !pipWasFullscreen)exitPreviewFullscreenInternal();
+    }
+    public void onHostStopped() {
+        android.app.Activity activity=getPluginActivity();
+        pipLifecycle.stopped(false, activity != null && activity.isFinishing(),
+                activity != null && activity.isChangingConfigurations(),
+                com.xandeflix.prebuilt.cast.CastController.get().active(),
+                () -> {
+                    if (previewPlayer != null) {
+                        previewWasPlaying = previewWasPlaying || previewPlayer.getPlayWhenReady();
+                        previewPlayer.pause();
+                    }
+                },
+                () -> {
+                    boolean wasActive = isPreviewActive;
+                    releasePreview();
+                    if (wasActive) emitResumeEvent(0L, false, null);
+                });
+    }
+    @PluginMethod public void stopPlayback(PluginCall call) {
+        android.app.Activity activity=getPluginActivity();
+        if(activity==null){call.resolve();return;}
+        activity.runOnUiThread(() -> {com.xandeflix.prebuilt.cast.CastController.get().stop(false);NativePlayerActivity.stopActivePlayback();releasePreview();call.resolve();});
     }
 
     public String getCurrentPreviewKind() {
@@ -1011,7 +1344,8 @@ public class NativeAndroidPlayerPlugin extends Plugin {
             return ERROR_NATIVE_ERROR;
         }
         String trimmed = rawCode.trim();
-        if (ERROR_INVALID_REQUEST.equals(trimmed)
+        if (com.xandeflix.prebuilt.cast.CastFailurePolicy.known(trimmed)
+                || ERROR_INVALID_REQUEST.equals(trimmed)
                 || ERROR_PLAYER_ACTIVITY_UNAVAILABLE.equals(trimmed)
                 || ERROR_PREVIEW_UNAVAILABLE.equals(trimmed)
                 || ERROR_NATIVE_ERROR.equals(trimmed)

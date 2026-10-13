@@ -1,0 +1,44 @@
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+
+const values = new Map();
+const storage = { getItem: key => values.get(key) ?? null, setItem: (key, value) => values.set(key, value) };
+globalThis.window = { localStorage: storage };
+const { DevicePresentationStore, devicePresentationStore, parseDevicePresentation, isTelevisionPresentation, requiresDevicePresentation, DEVICE_PRESENTATION_KEY } = await import('../src/ui/device-presentation.ts');
+const { DeviceIdentityService } = await import('../src/device/device-identity.service.ts');
+const deceptiveUA = 'Mozilla/5.0 (Linux; Android 9; MiTV-MSSP0 Build/PI) AppleWebKit/537.36 Chrome/120.0 Mobile Safari/537.36';
+Object.defineProperty(globalThis, 'navigator', { configurable: true, value: { userAgent: deceptiveUA } });
+for (const type of ['PHONE', 'TABLET', 'TV']) {
+  devicePresentationStore.select(type);
+  assert.equal(DeviceIdentityService.detectDefaultDeviceType(), type);
+  assert.equal(new DevicePresentationStore(storage).read(), type);
+  assert.equal(isTelevisionPresentation(deceptiveUA), type === 'TV');
+}
+console.log('PASS THREE_CHOICES_PERSIST_RESTART_AND_ACTUAL_INITIAL_IDENTITY_DETECTOR');
+assert.equal(values.size, 1);
+assert.deepEqual(JSON.parse(values.get(DEVICE_PRESENTATION_KEY)), { version: 1, type: 'TV' });
+for (const raw of [null, '', '{', '{}', '{"version":2,"type":"TV"}', '{"version":1,"type":"OWNER"}']) assert.equal(parseDevicePresentation(raw), null);
+const denied = new DevicePresentationStore({ getItem() { throw Error('denied'); }, setItem() { throw Error('denied'); } });
+assert.equal(denied.read(), null); assert.throws(() => denied.select('TV')); assert.equal(denied.read(), null);
+const lost = new DevicePresentationStore({ getItem: () => null, setItem() {} });
+assert.throws(() => lost.select('TV')); assert.equal(lost.read(), null);
+let notifications = 0;
+const observer = devicePresentationStore.subscribe(() => notifications++);
+devicePresentationStore.select('TABLET'); observer(); devicePresentationStore.select('PHONE');
+assert.equal(notifications, 1);
+console.log('PASS_INVALID_DENIED_LOST_WRITE_NO_FALSE_SUCCESS_AND_RUNTIME_SUBSCRIPTION');
+assert.equal(requiresDevicePresentation(true, 'android', null), true);
+for (const type of ['PHONE', 'TABLET', 'TV']) assert.equal(requiresDevicePresentation(true, 'android', type), false);
+assert.equal(requiresDevicePresentation(false, 'web', null), false);
+assert.equal(isTelevisionPresentation('Android TV', 'PHONE'), false);
+assert.equal(isTelevisionPresentation(deceptiveUA, 'TV'), true);
+const main = readFileSync('src/main.tsx', 'utf8');
+const gate = readFileSync('src/ui/components/DevicePresentationGate.tsx', 'utf8');
+assert.match(main, /<DevicePresentationGate><App \/><\/DevicePresentationGate>/);
+assert.match(gate, /!required && children/);
+assert.match(gate, /stopImmediatePropagation/);
+assert.match(gate, /aria-modal="true"/);
+assert.match(gate, /previous\.isConnected/);
+assert.match(readFileSync('src/ui/components/HomeHero.tsx', 'utf8'), /const phone = usePhoneLayout/);
+assert.match(readFileSync('src/ui/components/Header.tsx', 'utf8'), /aria-label="Configurações"/);
+console.log('PASS FIRST_ANDROID_CHOICE_PRECEDES_APP_AND_CODE_KEY_WITH_SETTINGS_ENTRY');

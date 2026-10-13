@@ -94,7 +94,7 @@ for (const run of [
 console.log(`PASS LOCK_NEGATIVE_CONTROLS=${negatives}`);
 
 for (const [script, marker] of [
-  ['scripts/test-c11-new-device-activation.mjs', 'RESULT=22_TESTS_PASSED'],
+  ['scripts/test-c11-new-device-activation.mjs', 'RESULT=26_TESTS_PASSED'],
   ['scripts/test-c11-catalog-promotion-directories.mjs', 'C11_CATALOG_PROMOTION_DIRECTORY_TESTS=27/27_PASS'],
 ]) {
   assert.ok(fs.existsSync(path.join(root, script)), `Required suite missing: ${script}`);

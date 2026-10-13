@@ -135,6 +135,10 @@ public class LargeSourceTransportPluginTest {
         assertEquals("DOWNLOAD_COMPLETE", result.stage);
         assertEquals("2XX", result.httpStatusClass);
         assertEquals(payload.length, result.bytesWritten);
+        byte[] digest = java.security.MessageDigest.getInstance("SHA-256").digest(payload);
+        StringBuilder expectedDigest = new StringBuilder(64);
+        for (byte value : digest) expectedDigest.append(String.format(java.util.Locale.ROOT, "%02x", value & 255));
+        assertEquals("C60: digest is the exact streamed source bytes", expectedDigest.toString(), result.sourceContentDigest);
         assertFalse("TEST_A: Fallback NÃO deve ser chamado quando System DNS funciona", fallbackCalled.get());
         session.closeAndDelete();
     }

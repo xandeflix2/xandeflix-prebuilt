@@ -26,21 +26,17 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
 
   React.useEffect(() => {
     let active = true;
-    for (const r of results) {
-      if (r.kind === 'movie' && !readModel.moviesById.has(r.id)) {
-        void readModel.resolveMovieById(r.id).then((resolved) => {
-          if (active && resolved) {
-            setResolvedVersion((v) => v + 1);
-          }
-        });
-      } else if (r.kind === 'series' && !readModel.seriesById.has(r.id)) {
-        void readModel.resolveSeriesById(r.id).then((resolved) => {
-          if (active && resolved) {
-            setResolvedVersion((v) => v + 1);
-          }
-        });
+    void (async () => {
+      for (const r of results) {
+        if (!active) break;
+        try {
+          const resolved = r.kind === 'movie'
+            ? await readModel.resolveMovieById(r.id)
+            : await readModel.resolveSeriesById(r.id);
+          if (active && resolved) setResolvedVersion((v) => v + 1);
+        } catch { /* Keep the index card usable; detail can retry its own read. */ }
       }
-    }
+    })();
     return () => {
       active = false;
     };

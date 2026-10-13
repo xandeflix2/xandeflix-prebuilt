@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import { createHash, webcrypto } from 'node:crypto';
 import ts from 'typescript';
+import { CURRENT_CLASSIFICATION_PROFILE_VERSION } from '../src/source/source-classification-profile.ts';
 
 // Node crypto belongs exclusively to this test oracle, never the app bundle.
 const hash = (value) => createHash('sha256').update(value).digest('hex');
@@ -21,6 +22,9 @@ function harness(options = {}) {
   const calls = [];
   const flags = { readHang: false, writeFail: false, storageFail: false, ...options.flags };
   let pendingStatus = 'PENDING';
+  let statusFailureCode = null;
+  let failedRpc = null;
+  let requestCount = 0;
   let remoteSuccess = true;
   let registerSuccess = true;
   let reportHang = false;
@@ -49,16 +53,17 @@ function harness(options = {}) {
       return { abortSignal() {
         calls.push({ name, params });
         if (name === 'rpc_report_app_installation' && reportHang) return never();
-        if (!remoteSuccess) return Promise.resolve({ data: null, error: { code: 'OFFLINE', message: 'Offline fixture' } });
+        if (!remoteSuccess || name === failedRpc) return Promise.resolve({ data: null, error: { code: 'OFFLINE', message: 'Offline fixture' } });
         let data;
         if (name === 'rpc_report_app_installation') data = { success: true };
         if (name === 'rpc_request_device_activation') {
           const key = storage.get('__xandeflix_device_activation_key__');
           assert.equal(params.p_activation_key_hash, hash(key));
           assert.match(params.p_device_token_hash, /^[a-f0-9]{64}$/);
-          data = { success: true, activationId: 'fixture-activation', activationStatusSecret: 'fixture-status-capability' };
+          requestCount++;
+          data = { success: true, activationId: `fixture-activation-${requestCount}`, activationStatusSecret: `fixture-status-capability-${requestCount}` };
         }
-        if (name === 'rpc_check_device_activation_status') data = {
+        if (name === 'rpc_check_device_activation_status') data = statusFailureCode ? { success: false, code: statusFailureCode } : {
           success: true, status: pendingStatus, licenseStatus: 'ACTIVE', licenseId: 'fixture-license',
         };
         return Promise.resolve({ data, error: null });
@@ -111,6 +116,8 @@ function harness(options = {}) {
     setRemote(success) { remoteSuccess = success; },
     setRegister(success) { registerSuccess = success; },
     setStatus(status) { pendingStatus = status; },
+    setStatusFailure(code) { statusFailureCode = code; },
+    failRpc(name) { failedRpc = name; },
     hangReport() { reportHang = true; },
   };
 }
@@ -263,6 +270,63 @@ await test('INDETERMINATE_STATUS_PRESERVES_PENDING_SESSION', async () => {
   assert.equal(h.calls.filter((call) => call.name === 'rpc_request_device_activation').length, 1);
 });
 
+await test('DELETED_PENDING_REQUEST_RECREATED_WITH_SAME_LOCAL_IDENTITY_AND_KEY', async () => {
+  const h = harness(); await h.sync.ensurePendingDeviceActivationRequest();
+  const before = h.service.getPendingActivation();
+  const stored = new Map(h.storage); const writes = h.writes.length;
+  h.setStatusFailure('ACTIVATION_NOT_FOUND');
+  assert.ok((await Promise.all(Array.from({ length: 20 }, () => h.sync.ensurePendingDeviceActivationRequest()))).every(Boolean));
+  const after = h.service.getPendingActivation();
+  assert.notEqual(after.activationId, before.activationId);
+  assert.notEqual(after.activationStatusSecret, before.activationStatusSecret);
+  assert.equal(after.deviceId, before.deviceId); assert.equal(after.displayCode, before.displayCode);
+  for (const [key, value] of stored) if (key !== 'xandeflix:device_activation:pending') assert.equal(h.storage.get(key), value);
+  assert.equal(h.writes.length, writes);
+  const requests = h.calls.filter(call => call.name === 'rpc_request_device_activation');
+  assert.equal(requests.length, 2); assert.deepEqual(requests[1].params, requests[0].params);
+  assert.equal(h.calls.filter(call => call.operation === 'REGISTER_KEY').length, 2);
+  assert.equal(await h.identity.loadActivationState(), null);
+  h.setStatusFailure(null);
+  assert.equal(await h.sync.ensurePendingDeviceActivationRequest(), true);
+  assert.equal(h.calls.filter(call => call.name === 'rpc_request_device_activation').length, 2);
+});
+
+await test('DELETION_RECOVERY_FAILURE_PRESERVES_OLD_CAPABILITY_UNTIL_SUCCESS', async () => {
+  for (const name of ['rpc_report_app_installation', 'rpc_request_device_activation']) {
+    const h = harness(); await h.sync.ensurePendingDeviceActivationRequest();
+    const before = JSON.stringify(h.service.getPendingActivation());
+    h.setStatusFailure('ACTIVATION_NOT_FOUND'); h.failRpc(name);
+    assert.equal(await h.sync.ensurePendingDeviceActivationRequest(), false);
+    assert.equal(JSON.stringify(h.service.getPendingActivation()), before);
+    h.failRpc(null);
+    assert.equal(await h.sync.ensurePendingDeviceActivationRequest(), true);
+    assert.notEqual(JSON.stringify(h.service.getPendingActivation()), before);
+  }
+});
+
+await test('CAPABILITY_OR_UNKNOWN_FAILURE_NEVER_RECREATES_PENDING_REQUEST', async () => {
+  for (const code of ['ACTIVATION_STATUS_CAPABILITY_INVALID', 'NETWORK_ERROR', 'RPC_ERROR', 'UNKNOWN']) {
+    const h = harness(); await h.sync.ensurePendingDeviceActivationRequest();
+    const before = JSON.stringify(h.service.getPendingActivation());
+    h.setStatusFailure(code);
+    assert.equal(await h.sync.ensurePendingDeviceActivationRequest(), false);
+    assert.equal(JSON.stringify(h.service.getPendingActivation()), before);
+    assert.equal(h.calls.filter(call => call.name === 'rpc_request_device_activation').length, 1);
+  }
+});
+
+await test('DELETION_RECOVERY_REGISTER_FAILURE_RETRIES_NEW_REQUEST_WITHOUT_ROTATION', async () => {
+  const h = harness(); await h.sync.ensurePendingDeviceActivationRequest();
+  h.setStatusFailure('ACTIVATION_NOT_FOUND'); h.setRegister(false);
+  assert.equal(await h.sync.ensurePendingDeviceActivationRequest(), false);
+  const pending = JSON.stringify(h.service.getPendingActivation());
+  h.setStatusFailure(null); h.setRegister(true);
+  assert.equal(await h.sync.ensurePendingDeviceActivationRequest(), true);
+  assert.equal(JSON.stringify(h.service.getPendingActivation()), pending);
+  assert.equal(h.calls.filter(call => call.name === 'rpc_request_device_activation').length, 2);
+  assert.equal(await h.identity.loadActivationState(), null);
+});
+
 await test('FAILED_REGISTER_IS_NOT_READY_AND_RETRY_REUSES_SESSION', async () => {
   const h = harness(); h.setRegister(false);
   assert.equal(await h.sync.ensurePendingDeviceActivationRequest(), false);
@@ -325,7 +389,7 @@ await test('AUTHORIZED_BOOT_STILL_RESOLVES_AND_PRESERVES_REAL_CATALOG', async ()
     bootstrapService: {
       getActivePointer: async () => pointer,
       getStorage: () => ({ hasActiveCatalog: async () => true,
-        readActiveManifest: async () => ({ metadata: { classificationProfileVersion: 2 } }) }),
+        readActiveManifest: async () => ({ metadata: { classificationProfileVersion: CURRENT_CLASSIFICATION_PROFILE_VERSION } }) }),
     },
     sourceResolver: async () => { sourceCalls++; return { status: 'SOURCE_READY', mode: 'SELF_SERVICE',
       licenseId: 'fixture-license', licenseStatus: 'ACTIVE', sourceId: pointer.sourceId, sourceVersion: 1 }; },

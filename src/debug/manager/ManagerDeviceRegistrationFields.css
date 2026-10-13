@@ -1,0 +1,6 @@
+.manager-device-registration { margin: 0; padding: 12px; min-width: 0; border: 1px solid #334155; border-radius: 8px; }
+.manager-device-registration legend { padding: 0 6px; color: #cbd5e1; font-weight: 600; }
+.manager-device-registration > div { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); gap: 12px; }
+.manager-device-registration label { color: #cbd5e1; font-size: .85rem; min-width: 0; }
+.manager-device-registration input, .manager-device-registration select { display: block; box-sizing: border-box; width: 100%; margin-top: 6px; padding: 8px; color: #fff; background: #151d30; border: 1px solid #475569; border-radius: 4px; }
+.manager-device-registration p { color: #94a3b8; font-size: .8rem; margin: 12px 0 0; }

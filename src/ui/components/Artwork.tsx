@@ -1,66 +1,104 @@
-/**
- * Xandeflix Prebuilt — Artwork Component (Gate G6)
- *
- * Renderizador de arte visual com fallback local para erros ou ausência de imagem.
- *
- * Princípios:
- * - RESILIENT FALLBACK: Se uri falhar ou for ausente, renderiza placeholder gráfico local.
- * - SANITIZED URI: Remove barras duplicadas em URLs malformadas sem quebrar o protocolo.
- * - RESET ON URI CHANGE: Reseta o estado de erro quando a URI do item é atualizada.
- * - ZERO EXTERNAL FETCH: Não consulta provedores de arte de terceiros em runtime.
- */
-
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { chooseArtworkUri, displayArtworkUri } from '../../artwork/artwork-uri.ts';
+import { artworkIdentityKey, tmdbPosterPath, type ArtworkIdentity } from '../../artwork/tmdb-metadata.service.ts';
+import { useArtworkMetadataState } from '../hooks/useArtworkMetadata.ts';
+import { loadImage, reserveHeroImageSlot, isImageReady, invalidateLoadedImage } from '../../artwork/image-load-queue.ts';
+import { invalidateCachedArtworkUri } from '../../artwork/artwork-file-cache.ts';
+import { observeArtwork } from '../../artwork/artwork-visibility.ts';
 
 interface ArtworkProps {
-  uri?: string;
-  title: string;
-  kind?: 'poster' | 'backdrop' | 'thumbnail';
-  className?: string;
+  uri?: string; fallbackUri?: string; identity?: ArtworkIdentity; title: string;
+  kind?: 'poster' | 'backdrop' | 'thumbnail'; className?: string;
+  priority?: 'high' | 'normal'; tmdbBackdropOnly?: boolean;
+  immersiveArtwork?: 'backdrop' | 'poster'; prepare?: boolean;
+  startup?: boolean;
 }
 
-export const Artwork = React.memo<ArtworkProps>(function Artwork({
-  uri,
-  title,
-  kind = 'poster',
-  className = '',
-}) {
-  const [hasError, setHasError] = useState(false);
-  const [lastUri, setLastUri] = useState(uri);
+function ArtworkImage({ uri, fallbackUri, identity, title, kind = 'poster', className = '', priority = 'normal', tmdbBackdropOnly = false, immersiveArtwork, startup = false }: ArtworkProps) {
+  const high = priority === 'high';
+  const [failed, setFailed] = useState<Set<string>>(() => new Set());
+  const [retried] = useState<Set<string>>(() => new Set());
+  const [retryTimers] = useState<Set<ReturnType<typeof setTimeout>>>(() => new Set());
+  const [element, setElement] = useState<HTMLElement | null>(null);
+  const [visibility, setVisibility] = useState({ near: high, visible: high });
+  const [ready, setReady] = useState<{ uri: string; src: string }>();
+  const [attempt, setAttempt] = useState(0);
+  const source = displayArtworkUri(uri, kind, high), fallback = displayArtworkUri(fallbackUri, kind, high);
+  const near = visibility.near || visibility.visible || startup;
+  const urgent = visibility.visible || (high && near);
+  const externalPoster = kind === 'poster' && !!source && !tmdbPosterPath(source);
+  const missingSource = (kind === 'backdrop' && tmdbBackdropOnly) || !source || failed.has(source) || (kind === 'backdrop' && source === fallback);
+  // A failed source filename is not proof that TMDB has no poster for this title.
+  // Matching still enforces kind/year/title and rejects ambiguous candidates.
+  const metadataIdentity = identity && (externalPoster || failed.has(source || ''))
+    ? { ...identity, title: identity.title.replace(/\s+\(L\)\s*$/i, ''), posterPath: undefined } : identity;
+  const { metadata, pending: metadataPending } = useArtworkMetadataState(metadataIdentity, near && (missingSource || externalPoster), urgent ? 'high' : 'normal');
+  const provider = displayArtworkUri(kind === 'backdrop' ? metadata?.backdropUri : metadata?.posterUri, kind, high);
+  const chosen = chooseArtworkUri({ source, fallback, kind, failed, tmdbBackdropOnly,
+    provider,
+    providerPoster: displayArtworkUri(metadata?.posterUri, 'poster', high),
+  });
 
-  if (uri !== lastUri) {
-    setLastUri(uri);
-    setHasError(false);
-  }
+  useEffect(() => element ? observeArtwork(element, setVisibility) : undefined, [element]);
+  useEffect(() => { if (high && near && !isImageReady(chosen) && ready?.uri !== chosen) return reserveHeroImageSlot(); }, [high, near, chosen, ready?.uri]);
+  useEffect(() => {
+    if (!near || !chosen) return;
+    const controller = new AbortController(); let deferred: ReturnType<typeof setTimeout> | undefined;
+    const viewportTop = urgent && !high ? element?.getBoundingClientRect?.().top ?? 0 : undefined;
+    void loadImage(chosen, urgent, controller.signal, viewportTop).then(result => {
+      if (controller.signal.aborted) return;
+      if (result.ok && result.src) setReady({ uri: chosen, src: result.src });
+      else if (result.deferred) deferred = setTimeout(() => setAttempt(value => value + 1), 500);
+      else if (!result.cancelled) {
+        setFailed(previous => new Set(previous).add(chosen));
+      }
+    });
+    return () => { controller.abort(); if (deferred) clearTimeout(deferred); };
+  }, [near, chosen, urgent, element, high, attempt, source, fallback, retried, retryTimers]);
+  useEffect(() => {
+    if (!near || metadataPending || (provider && !failed.has(provider))) return;
+    const candidate = [source, fallback].find(value => value && failed.has(value) && !retried.has(value));
+    if (!candidate) return;
+    retried.add(candidate);
+    let fired = false;
+    const timer = setTimeout(() => {
+      fired = true;
+      retryTimers.delete(timer); invalidateCachedArtworkUri(candidate);
+      setFailed(previous => { const next = new Set(previous); next.delete(candidate); return next; });
+    }, 3000);
+    retryTimers.add(timer);
+    return () => { clearTimeout(timer); retryTimers.delete(timer); if (!fired) retried.delete(candidate); };
+  }, [near, metadataPending, provider, failed, source, fallback, retried, retryTimers]);
+  useEffect(() => () => { for (const timer of retryTimers) clearTimeout(timer); }, [retryTimers]);
+  useEffect(() => {
+    const online = () => { for (const uri of failed) invalidateCachedArtworkUri(uri); retried.clear(); setFailed(new Set()); setAttempt(value => value + 1); };
+    window.addEventListener('online', online);
+    return () => window.removeEventListener('online', online);
+  }, [retried, failed]);
 
-  let cleanUri = uri ? uri.replace(/([^:])\/\//g, '$1/') : undefined;
-  if (cleanUri && cleanUri.startsWith('http://') && (cleanUri.includes('tmdb.org') || cleanUri.includes('themoviedb.org'))) {
-    cleanUri = cleanUri.replace(/^http:\/\//, 'https://');
-  }
-  const showFallback = !cleanUri || hasError;
+  const onError = () => {
+    if (!ready) return;
+    invalidateLoadedImage(ready.uri); invalidateCachedArtworkUri(ready.uri); setReady(undefined);
+    if (ready.src !== ready.uri && !retried.has(`cache:${ready.uri}`)) {
+      retried.add(`cache:${ready.uri}`); setAttempt(value => value + 1);
+    } else setFailed(previous => new Set(previous).add(ready.uri));
+  };
+  const shown = ready && !failed.has(ready.uri) ? ready : undefined;
+  if (shown) return <img ref={setElement} src={shown.src} alt={title} aria-busy={false} data-artwork-ready
+    data-immersive-artwork={immersiveArtwork} className={`artwork-img artwork-${kind} ${className}`}
+    loading="eager" decoding="async" {...{ fetchpriority: urgent ? 'high' : 'auto' }} onError={onError}/>;
+  if (chosen || metadataPending) return <div ref={setElement}
+    role="img" aria-label={`Carregando imagem para ${title}`} aria-busy data-artwork-ready={false}
+    className={`artwork-placeholder artwork-${kind} ${className}`}/>;
+  return <div ref={setElement} className={`artwork-fallback artwork-${kind} ${className}`} aria-label={`Imagem indisponível para ${title}`}>
+    <div className="artwork-fallback-icon">{kind === 'backdrop' ? '🎬' : kind === 'thumbnail' ? '📺' : '🎥'}</div>
+    <span className="artwork-fallback-title">{title}</span>
+  </div>;
+}
 
-  if (showFallback) {
-    return (
-      <div
-        className={`artwork-fallback artwork-${kind} ${className}`}
-        aria-label={`Imagem para ${title}`}
-      >
-        <div className="artwork-fallback-icon">
-          {kind === 'backdrop' ? '🎬' : kind === 'thumbnail' ? '📺' : '🎥'}
-        </div>
-        <span className="artwork-fallback-title">{title}</span>
-      </div>
-    );
-  }
-
-  return (
-    <img
-      src={cleanUri}
-      alt={title}
-      className={`artwork-img artwork-${kind} ${className}`}
-      loading="lazy"
-      decoding="async"
-      onError={() => setHasError(true)}
-    />
-  );
+export const Artwork = React.memo<ArtworkProps>(function Artwork(props) {
+  const identity = props.identity && { ...props.identity, posterPath: props.identity.posterPath || tmdbPosterPath(props.kind === 'backdrop' ? props.fallbackUri : props.uri),
+    sourcePosterUri: props.identity.sourcePosterUri || (props.kind === 'backdrop' ? props.fallbackUri : props.uri) };
+  const key = `${identity ? artworkIdentityKey(identity) : props.title}:${props.kind}:${props.uri}:${props.fallbackUri}:${props.tmdbBackdropOnly}`;
+  return <ArtworkImage key={key} {...props} identity={identity}/>;
 });

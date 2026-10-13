@@ -1,5 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.116.0";
+import { ensureSignalIndex, signalFingerprint, signalVaultKey } from '../_shared/signal-policy.ts';
 
 type RecordValue = Record<string, unknown>;
 
@@ -11,6 +12,8 @@ const corsHeaders = {
 };
 
 const SAFE_ERROR_CODES = new Set([
+  'INITIAL_SCREEN_LIMIT', 'LICENSE_EDIT_REQUIRED', 'SECONDARY_SOURCE_SETUP_DENIED',
+  'ADDITIONAL_DEVICE_REQUIRES_APPROVAL', 'SOURCE_POLICY_REQUIRED', 'SOURCE_POLICY_UNAVAILABLE', 'SOURCE_POLICY_PREPARING', 'SOURCE_POLICY_RETRY',
   "METHOD_NOT_ALLOWED",
   "INVALID_REQUEST",
   "DISPLAY_CODE_INVALID",
@@ -45,6 +48,13 @@ const SAFE_ERROR_CODES = new Set([
 ]);
 
 const ERROR_MESSAGES: Record<string, string> = {
+  INITIAL_SCREEN_LIMIT: 'No cadastro inicial, escolha de uma a quatro telas.',
+  LICENSE_EDIT_REQUIRED: 'Os limites de uma conta já cadastrada devem ser alterados pelo gestor em Editar licença.',
+  SECONDARY_SOURCE_SETUP_DENIED: 'Este aparelho é secundário. Peça ao gestor para alterar os dados da conta principal.',
+  ADDITIONAL_DEVICE_REQUIRES_APPROVAL: 'Um aparelho adicional com esta fonte precisa ser vinculado pelo seu ADMIN ou MASTER. Acima de quatro telas, o gestor deve conferir o pagamento adicional.',
+  SOURCE_POLICY_PREPARING: 'Estamos preparando a autorização. Tente novamente em alguns instantes.',
+  SOURCE_POLICY_UNAVAILABLE: 'Não foi possível conferir a autorização desta fonte. Entre em contato com seu ADMIN ou MASTER.',
+  SOURCE_POLICY_RETRY: 'A autorização mudou durante a ativação. Valide o dispositivo novamente.',
   INVALID_EPG_URL: "Informe uma URL EPG publica e valida.",
   INVALID_SOURCE_CREDENTIALS: "Informe usuario e senha juntos ou deixe os dois vazios.",
   METHOD_NOT_ALLOWED: "Método HTTP não permitido.",
@@ -206,7 +216,7 @@ async function encryptSourceConfig(sourceId: string, sourceType: "M3U" | "M3U8",
   if (keyBytes.byteLength !== 32) fail("INTERNAL_SANITIZED_ERROR");
 
   try {
-    const key = await crypto.subtle.importKey("raw", keyBytes, { name: "AES-GCM" }, false, ["encrypt"]);
+    const key = await crypto.subtle.importKey("raw", new Uint8Array(keyBytes).buffer, { name: "AES-GCM" }, false, ["encrypt"]);
     const nonce = crypto.getRandomValues(new Uint8Array(12));
     const encrypted = new Uint8Array(await crypto.subtle.encrypt(
       {
@@ -243,7 +253,7 @@ async function encryptPermanentKey(deviceId: string, displayCode: string, activa
   if (keyBytes.byteLength !== 32) fail("INTERNAL_SANITIZED_ERROR");
 
   try {
-    const key = await crypto.subtle.importKey("raw", keyBytes, { name: "AES-GCM" }, false, ["encrypt"]);
+    const key = await crypto.subtle.importKey("raw", new Uint8Array(keyBytes).buffer, { name: "AES-GCM" }, false, ["encrypt"]);
     const nonce = crypto.getRandomValues(new Uint8Array(12));
     const keyVersion = "v1";
     const aad = new TextEncoder().encode(`${deviceId}\u0000${displayCode}\u0000${keyVersion}`);
@@ -271,12 +281,13 @@ function response(body: RecordValue, status = 200): Response {
 
 function safeErrorCode(error: unknown): string {
   if (error instanceof ActivationError && SAFE_ERROR_CODES.has(error.code)) return error.code;
+  const message = error instanceof Error ? error.message : isRecord(error) && typeof error.message === 'string' ? error.message : '';
+  for (const code of SAFE_ERROR_CODES) if (message.includes(code)) return code;
   if (isRecord(error) && typeof error.code === "string") {
     if (error.code === "42501") return "SERVICE_ROLE_REQUIRED";
     if (error.code === "22P02") return "ACTIVATION_KEY_REGISTRATION_INVALID";
     if (error.code.startsWith("23")) return "PERMANENT_KEY_ENVELOPE_INVALID";
   }
-  const message = error instanceof Error ? error.message : "";
   if (/permission denied|service_role_required/i.test(message)) return "SERVICE_ROLE_REQUIRED";
   if (/invalid input syntax for type uuid/i.test(message)) return "ACTIVATION_KEY_REGISTRATION_INVALID";
   if (/violates .*constraint|check constraint|unique constraint/i.test(message)) return "PERMANENT_KEY_ENVELOPE_INVALID";
@@ -295,7 +306,7 @@ async function createSupabase() {
   return createClient(env("SUPABASE_URL"), env("SUPABASE_SERVICE_ROLE_KEY"));
 }
 
-async function startActivation(supabase: ReturnType<typeof createClient>, body: RecordValue): Promise<Response> {
+async function startActivation(supabase: Awaited<ReturnType<typeof createSupabase>>, body: RecordValue): Promise<Response> {
   const displayCode = validateDisplayCode(body.displayCode);
   const activationKey = validateActivationKey(body.activationKey);
   const sessionToken = randomHex(32);
@@ -324,7 +335,7 @@ async function startActivation(supabase: ReturnType<typeof createClient>, body: 
   });
 }
 
-async function registerPermanentKey(supabase: ReturnType<typeof createClient>, body: RecordValue): Promise<Response> {
+async function registerPermanentKey(supabase: Awaited<ReturnType<typeof createSupabase>>, body: RecordValue): Promise<Response> {
   const activationId = typeof body.activationId === "string" ? body.activationId.trim() : "";
   const deviceId = typeof body.deviceId === "string" ? body.deviceId.trim() : "";
   const displayCode = validateDisplayCode(body.displayCode);
@@ -352,9 +363,11 @@ async function registerPermanentKey(supabase: ReturnType<typeof createClient>, b
   return response({ success: true, status: "ACTIVE" });
 }
 
-async function completeActivation(supabase: ReturnType<typeof createClient>, body: RecordValue): Promise<Response> {
+async function completeActivation(supabase: Awaited<ReturnType<typeof createSupabase>>, body: RecordValue): Promise<Response> {
   const displayCode = validateDisplayCode(body.displayCode);
   const sessionToken = validateSessionToken(body.sessionToken);
+  const initialScreens = body.initialScreens ?? 1;
+  if (typeof initialScreens !== 'number' || !Number.isInteger(initialScreens) || initialScreens < 1 || initialScreens > 4) throw new ActivationError('INITIAL_SCREEN_LIMIT');
   const displayName = validateDisplayName(body.sourceName);
   const sourceType = validatePublicSourceType(body.sourceType);
   const sourceConfig = validatePublicSourceConfig(body, sourceType);
@@ -372,10 +385,27 @@ async function completeActivation(supabase: ReturnType<typeof createClient>, bod
     );
   }
 
+  const vaultKey = signalVaultKey();
+  let replacing: { kind: string; sourceId: string; version: number } | undefined;
+  if (typeof preflight.customerId === 'string') {
+    const { data: target, error: targetError } = await supabase.rpc('rpc_signal_public_owned_target', {
+      p_session_hash: sessionTokenHash, p_display_code: displayCode,
+    });
+    if (targetError) throw new ActivationError(safeErrorCode(targetError));
+    if (isRecord(target) && target.kind === 'CUSTOMER' && typeof target.sourceId === 'string' && typeof target.version === 'number')
+      replacing = { kind: target.kind, sourceId: target.sourceId, version: target.version };
+  }
+  await ensureSignalIndex(supabase, vaultKey, replacing);
+  const fingerprint = await signalFingerprint(sourceConfig, sourceType, vaultKey);
+  const { data: policy, error: policyError } = await supabase.rpc('rpc_signal_public_check', {
+    p_session_hash: sessionTokenHash, p_display_code: displayCode, p_fingerprint: fingerprint,
+  });
+  if (policyError) throw new ActivationError(safeErrorCode(policyError));
+  if (!isRecord(policy) || policy.success !== true) throw new ActivationError('SOURCE_POLICY_UNAVAILABLE');
   const sourceId = `csrc_${randomHex(8)}`;
   const envelope = await encryptSourceConfig(sourceId, sourceType, sourceConfig);
 
-  const existingCustomerId = typeof preflight.customerId === "string" ? preflight.customerId : null;
+  const existingCustomerId = typeof policy.customerId === "string" ? policy.customerId : typeof preflight.customerId === "string" ? preflight.customerId : null;
   let createdCustomerId: string | null = null;
   let customerId = existingCustomerId;
   if (!customerId) {
@@ -394,7 +424,9 @@ async function completeActivation(supabase: ReturnType<typeof createClient>, bod
   const nickname = `trial-${displayCode.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${randomHex(4)}`.slice(0, 32);
 
   try {
-    const { data, error } = await supabase.rpc("rpc_public_complete_device_activation", {
+    const { data, error } = await supabase.rpc("rpc_signal_public_complete_with_screens", {
+      p_initial_screens: initialScreens,
+      p_fingerprint: fingerprint,
       p_session_token_hash: sessionTokenHash,
       p_display_code: displayCode,
       p_customer_id: customerId,
@@ -432,10 +464,20 @@ export async function handleDevicePublicActivation(request: Request): Promise<Re
   const body: unknown = await request.json();
   if (!isRecord(body)) throw new ActivationError("INVALID_REQUEST");
   const operation = body.operation;
-  if (operation !== "START" && operation !== "COMPLETE" && operation !== "REGISTER_KEY") throw new ActivationError("INVALID_REQUEST");
+  if (operation !== "START" && operation !== "COMPLETE" && operation !== "REGISTER_KEY" && operation !== 'CHECK_POLICY') throw new ActivationError("INVALID_REQUEST");
   const supabase = await createSupabase();
   if (operation === "START") return startActivation(supabase, body);
   if (operation === "REGISTER_KEY") return registerPermanentKey(supabase, body);
+  if (operation === 'CHECK_POLICY') {
+    const displayCode = validateDisplayCode(body.displayCode);
+    const sessionToken = validateSessionToken(body.sessionToken);
+    const { data, error } = await supabase.rpc('rpc_public_check_device_activation_session', {
+      p_session_token_hash: await sha256Hex(sessionToken), p_display_code: displayCode,
+    });
+    if (error || !isRecord(data) || data.success !== true) throw new ActivationError('ACTIVATION_SESSION_NOT_OPEN');
+    await ensureSignalIndex(supabase, signalVaultKey());
+    return response({ success: true, policyReady: true });
+  }
   return completeActivation(supabase, body);
 }
 

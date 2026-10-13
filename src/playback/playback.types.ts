@@ -68,6 +68,7 @@ export interface NativePlayerLaunchResult {
   success: boolean;
   state: NativePlayerLaunchState;
   errorMessage?: string;
+  errorCode?: string;
 }
 
 export interface PlaybackSessionInfo {
@@ -77,4 +78,5 @@ export interface PlaybackSessionInfo {
   sanitizedUri?: string;
   errorCategory?: PlaybackErrorCategory;
   errorMessage?: string;
+  nativeErrorCode?: string;
 }

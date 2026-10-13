@@ -7,14 +7,16 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.webkit.WebSettings;
 
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
-import androidx.core.view.OnApplyWindowInsetsListener;
+import androidx.core.graphics.Insets;
 import com.getcapacitor.BridgeActivity;
 import com.getcapacitor.Plugin;
 import com.xandeflix.prebuilt.debug.DebugProvisioner;
@@ -23,8 +25,11 @@ import com.xandeflix.prebuilt.player.NativePlayerPlugin;
 import com.xandeflix.prebuilt.security.LocalSecureSourceStorePlugin;
 import com.xandeflix.prebuilt.security.PendingDeviceReactivationStorePlugin;
 import com.xandeflix.prebuilt.source.LargeSourceTransportPlugin;
+import com.xandeflix.prebuilt.update.AppUpdatesPlugin;
 
 public class MainActivity extends BridgeActivity {
+    // UI-thread only. Weak keys avoid retaining destroyed activity windows.
+    private static final java.util.Map<View, Boolean> fullscreenDecorViews = new java.util.WeakHashMap<>();
     public static int phoneUiOrientation(int smallestScreenWidthDp, int uiMode, boolean fullscreen) {
         if (smallestScreenWidthDp <= 0 || smallestScreenWidthDp >= 600
                 || (uiMode & Configuration.UI_MODE_TYPE_MASK) == Configuration.UI_MODE_TYPE_TELEVISION) {
@@ -47,8 +52,43 @@ public class MainActivity extends BridgeActivity {
         }
     }
 
+    public static boolean shouldUseImmersiveSystemBars(int uiMode) {
+        return shouldUseImmersiveSystemBars(uiMode, false);
+    }
+
+    public static boolean shouldUseImmersiveSystemBars(int uiMode, boolean fullscreenVideo) {
+        return fullscreenVideo
+                || (uiMode & Configuration.UI_MODE_TYPE_MASK) == Configuration.UI_MODE_TYPE_TELEVISION;
+    }
+
     public static void applyAppSystemUiPolicy(Window window) {
+        if (window == null) return;
+        applyAppSystemUiPolicy(window, Boolean.TRUE.equals(fullscreenDecorViews.get(window.getDecorView())));
+    }
+
+    public static void applyAppSystemUiPolicy(Window window, boolean fullscreenVideo) {
         if (window == null) {
+            return;
+        }
+        fullscreenDecorViews.put(window.getDecorView(), fullscreenVideo);
+        if (!shouldUseImmersiveSystemBars(window.getContext().getResources().getConfiguration().uiMode, fullscreenVideo)) {
+            try {
+                window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                View decor = window.getDecorView();
+                // Keep edge-to-edge geometry; bindSafeInsets reserves the visible bars once.
+                decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+                WindowCompat.setDecorFitsSystemWindows(window, false);
+                window.setStatusBarColor(android.graphics.Color.rgb(11, 15, 24));
+                window.setNavigationBarColor(android.graphics.Color.rgb(11, 15, 24));
+                WindowInsetsControllerCompat controller = WindowCompat.getInsetsController(window, decor);
+                controller.setAppearanceLightStatusBars(false);
+                controller.setAppearanceLightNavigationBars(false);
+                controller.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_DEFAULT);
+                controller.show(WindowInsetsCompat.Type.systemBars());
+                ViewCompat.requestApplyInsets(decor);
+            } catch (Exception ignored) {
+            }
             return;
         }
         try {
@@ -64,6 +104,7 @@ public class MainActivity extends BridgeActivity {
             }
         } catch (Exception ignored) {
         }
+        ViewCompat.requestApplyInsets(window.getDecorView());
         try {
             View decorView = window.getDecorView();
             if (decorView != null) {
@@ -89,10 +130,26 @@ public class MainActivity extends BridgeActivity {
                 : insetsRoot;
         contentContainer.setPadding(0, 0, 0, 0);
         target.setPadding(0, 0, 0, 0);
-        ViewCompat.setOnApplyWindowInsetsListener(insetsRoot, (view, insets) -> insets);
-        if (contentContainer != insetsRoot) {
-            ViewCompat.setOnApplyWindowInsetsListener(contentContainer, (view, insets) -> insets);
+        // Capacitor's WebView margin handler must not also reserve these insets.
+        ViewCompat.setOnApplyWindowInsetsListener(target, null);
+        if (target.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
+            ViewGroup.MarginLayoutParams margins = (ViewGroup.MarginLayoutParams) target.getLayoutParams();
+            margins.setMargins(0, 0, 0, 0);
+            target.setLayoutParams(margins);
         }
+        ViewCompat.setOnApplyWindowInsetsListener(insetsRoot, (view, insets) -> insets);
+        ViewCompat.setOnApplyWindowInsetsListener(contentContainer, (view, insets) -> {
+            if (shouldUseImmersiveSystemBars(view.getResources().getConfiguration().uiMode,
+                    Boolean.TRUE.equals(fullscreenDecorViews.get(insetsRoot)))) {
+                view.setPadding(0, 0, 0, 0);
+                return insets;
+            }
+            Insets safe = insets.getInsets(WindowInsetsCompat.Type.systemBars()
+                    | WindowInsetsCompat.Type.displayCutout() | WindowInsetsCompat.Type.ime());
+            view.setPadding(safe.left, safe.top, safe.right, safe.bottom);
+            return WindowInsetsCompat.CONSUMED;
+        });
+        ViewCompat.requestApplyInsets(contentContainer);
     }
 
     @Override
@@ -103,6 +160,10 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(LocalSecureSourceStorePlugin.class);
         registerPlugin(PendingDeviceReactivationStorePlugin.class);
         registerPlugin(LargeSourceTransportPlugin.class);
+        registerPlugin(AppUpdatesPlugin.class);
+        registerPlugin(com.xandeflix.prebuilt.artwork.ArtworkCachePlugin.class);
+        registerPlugin(com.xandeflix.prebuilt.cast.GoogleCastPlugin.class);
+        registerPlugin(com.xandeflix.prebuilt.trailer.PublicTrailerPlugin.class);
         super.onCreate(savedInstanceState);
         applyAppSystemUiPolicy(getWindow());
         if (getBridge() != null && getBridge().getWebView() != null) {
@@ -146,6 +207,7 @@ public class MainActivity extends BridgeActivity {
             Plugin plugin = getBridge().getPlugin("NativeAndroidPlayer").getInstance();
             if (plugin instanceof NativeAndroidPlayerPlugin) {
                 NativeAndroidPlayerPlugin nativePlayer = (NativeAndroidPlayerPlugin) plugin;
+                if (nativePlayer.dismissLivePanel()) return;
                 if (nativePlayer.exitPreviewFullscreenFromActivity()) {
                     applyAppSystemUiPolicy(getWindow());
                     return;
@@ -157,5 +219,28 @@ public class MainActivity extends BridgeActivity {
             }
         }
         super.onBackPressed();
+    }
+
+    private NativeAndroidPlayerPlugin nativePlayerPlugin() {
+        if (getBridge() == null || getBridge().getPlugin("NativeAndroidPlayer") == null) return null;
+        Plugin plugin = getBridge().getPlugin("NativeAndroidPlayer").getInstance();
+        return plugin instanceof NativeAndroidPlayerPlugin ? (NativeAndroidPlayerPlugin)plugin : null;
+    }
+    @Override public boolean dispatchKeyEvent(android.view.KeyEvent event) {
+        NativeAndroidPlayerPlugin plugin=nativePlayerPlugin();
+        if(plugin!=null && plugin.dispatchLiveKey(event))return true;
+        return super.dispatchKeyEvent(event);
+    }
+    @Override public void onUserLeaveHint() {
+        super.onUserLeaveHint(); NativeAndroidPlayerPlugin plugin=nativePlayerPlugin();
+        if(plugin!=null)plugin.onUserLeaveForPip();
+    }
+    @Override public void onPictureInPictureModeChanged(boolean pip, Configuration configuration) {
+        super.onPictureInPictureModeChanged(pip,configuration);
+        NativeAndroidPlayerPlugin plugin=nativePlayerPlugin();if(plugin!=null)plugin.onPipModeChanged(pip);
+    }
+    @Override public void onStop() {
+        super.onStop();NativeAndroidPlayerPlugin plugin=nativePlayerPlugin();
+        if(plugin!=null)plugin.onHostStopped();
     }
 }

@@ -38,13 +38,14 @@ async function ensurePendingRequest(): Promise<boolean> {
       identity.deviceId,
       pending.activationStatusSecret,
     );
-    // Network failure is not cancellation. Never replace an unknown live session.
-    if (!status.success) return false;
-    if (status.status === 'CONSUMED') {
+    // Only an explicit missing request permits re-registration after deletion.
+    // Keep the old capability until requestActivation persists a successful replacement.
+    if (!status.success && status.code !== 'ACTIVATION_NOT_FOUND') return false;
+    if (status.success && status.status === 'CONSUMED') {
       await syncPendingDeviceActivation();
       return false;
     }
-    if (status.status === 'PENDING') {
+    if (status.success && status.status === 'PENDING') {
       const registered = await activationService.registerPermanentKey({
         activationId: pending.activationId,
         deviceId: identity.deviceId,
@@ -53,7 +54,7 @@ async function ensurePendingRequest(): Promise<boolean> {
       });
       return registered.success;
     }
-    if (status.status !== 'CANCELLED') return false;
+    if (status.success && status.status !== 'CANCELLED') return false;
   }
 
   const report = await InstallationRegistryService.reportInstallationBestEffort();

@@ -22,6 +22,7 @@ local.properties
 # IDEs e Editores
 .vscode/
 .idea/
+.settings/
 *.swp
 *.swo
 
@@ -41,3 +42,13 @@ temp/
 forensics/
 scratch/
 supabase/.temp/
+
+# Metadados incrementais e diagnósticos privados da máquina local
+*.tsbuildinfo
+/sync_sample.txt
+/deploy-wifi.ps1
+/monitor-firetv.ps1
+/scripts/audit-tablet-final.ps1
+/scripts/monitor-sync.ps1
+/scripts/test-clean-activation-home.ps1
+/scripts/verify-c11-side-navigation-firestick.mjs

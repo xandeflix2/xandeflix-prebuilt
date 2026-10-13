@@ -1,8 +1,13 @@
 import { useEffect, useState } from 'react';
 import { shouldUseSideNavigation } from '../navigation/landscape-navigation.ts';
+import { getDevicePresentation } from '../device-presentation.ts';
+import { useDevicePresentation } from './useDevicePresentation.ts';
 
 function readSideNavigation(): boolean {
   if (typeof window === 'undefined') return false;
+  const choice = getDevicePresentation();
+  if (choice === 'TV') return true;
+  if (choice === 'PHONE') return false;
   const mobile = (navigator as Navigator & { userAgentData?: { mobile?: boolean } }).userAgentData?.mobile;
   return shouldUseSideNavigation({
     width: window.innerWidth,
@@ -10,13 +15,14 @@ function readSideNavigation(): boolean {
     screenWidth: window.screen.width,
     screenHeight: window.screen.height,
     orientation: window.screen.orientation?.type,
-    userAgent: navigator.userAgent,
+    userAgent: choice === 'TABLET' ? 'iPad' : navigator.userAgent,
     touchPoints: navigator.maxTouchPoints,
-    mobile,
+    mobile: choice === 'TABLET' ? false : mobile,
   });
 }
 
 export function useLandscapeNavigation(): boolean {
+  const choice = useDevicePresentation();
   const [sideNavigation, setSideNavigation] = useState(readSideNavigation);
   useEffect(() => {
     const update = () => setSideNavigation(readSideNavigation());
@@ -27,6 +33,6 @@ export function useLandscapeNavigation(): boolean {
       window.removeEventListener('resize', update);
       window.removeEventListener('orientationchange', update);
     };
-  }, []);
-  return sideNavigation;
+  }, [choice]);
+  return choice === 'TV' ? true : choice === 'PHONE' ? false : sideNavigation;
 }

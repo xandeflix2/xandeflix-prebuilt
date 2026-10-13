@@ -9,6 +9,8 @@
  * - ZERO NETWORK: Dados originados estritamente do catálogo local pré-construído.
  */
 
+import type { ExternalIds } from '../contracts/catalog.ts';
+
 export const HOME_RAIL_MAX_ITEMS_INITIAL = 24;
 export const GRID_BATCH_SIZE = 48;
 
@@ -16,6 +18,7 @@ export type ContentType = 'movie' | 'series';
 
 export interface CatalogItemViewModel {
   id: string;
+  externalIds?: Pick<ExternalIds, 'tmdbId'>;
   kind: ContentType;
   title: string;
   originalTitle?: string;
@@ -30,6 +33,7 @@ export interface CatalogItemViewModel {
 
 export interface MovieDetailViewModel {
   id: string;
+  externalIds?: Pick<ExternalIds, 'tmdbId'>;
   title: string;
   originalTitle?: string;
   yearFormatted?: string;
@@ -62,6 +66,7 @@ export interface SeasonViewModel {
 
 export interface SeriesDetailViewModel {
   id: string;
+  externalIds?: Pick<ExternalIds, 'tmdbId'>;
   title: string;
   originalTitle?: string;
   yearFormatted?: string;

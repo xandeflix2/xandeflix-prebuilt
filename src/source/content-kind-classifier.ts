@@ -15,6 +15,14 @@ export interface CanonicalSourceContentInput {
   streamUrl?: string;
 }
 
+/** Explicit continuous channel context; a title or group alone is insufficient. */
+export function isExplicit24HourChannel({ title = '', groupName = '', streamUrl = '' }: CanonicalSourceContentInput): boolean {
+  if (!/^\s*24\s*h(?=\s|[^a-z0-9]|$)/i.test(title) || containsRawM3uAttributes(title)
+    || parseM3uEpisodeIdentity(title.replace(/\b(?:temporada|season)\s*\d+\b/gi, '')) || streamUrl.toLowerCase().split(/[?#]/, 1)[0].includes('/movie/')) return false;
+  const group = groupName.trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();
+  return /^(?:CANAL|CANAIS)\s*\|\s*24\s*H(?:RS?|ORAS)?$/.test(group);
+}
+
 /**
  * A ordem é deliberadamente determinística:
  * live explícito > movie explícito > série estrutural > extensões médias
@@ -34,6 +42,7 @@ export function classifyCanonicalSourceContent({
   const groupFamily = normGroup.split('|', 1)[0].trim();
 
   if (!cleanTitle || containsRawM3uAttributes(cleanTitle)) return 'unresolved';
+  if (isExplicit24HourChannel({ title: cleanTitle, groupName, streamUrl })) return 'live';
 
   // 1. Evidência estrutural forte de Movie: path /movie/ ou extensão típica VOD
   const hasStrongMoviePath = urlPath.includes('/movie/');

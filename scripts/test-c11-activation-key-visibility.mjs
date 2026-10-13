@@ -37,6 +37,11 @@ const compile = text => ts.transpileModule(text.replaceAll('import.meta', '({ en
   jsx: ts.JsxEmit.React, esModuleInterop: true,
 } }).outputText;
 const output = compile(source);
+function pureHelper(name, navigatorFixture) {
+  const helper = {};
+  vm.runInNewContext(compile(readFileSync(path.resolve(root, 'src/ui/activation', name), 'utf8')), { exports: helper, navigator: navigatorFixture });
+  return helper;
+}
 
 // Runs the real page JSX/copy callback. Effects and every external service are
 // deliberately isolated: no App, credentials, Supabase, real storage or backend.
@@ -65,7 +70,11 @@ function createHarness(react, loadPage, names, overrides, navigatorFixture, onCh
   const page = loadPage(name => {
     if (name === 'react') return fakeReact;
     if (name.endsWith('/TransportObservabilityDiagnosticBlock.tsx')) return { TransportObservabilityDiagnosticBlock: () => null };
+    if (name.endsWith('/ActivationHandoff.tsx')) return { ActivationHandoff: () => null };
     if (name.endsWith('/authorized-device-reactivation.service.ts')) return { AuthorizedDeviceReactivationService: class {} };
+    if (name.endsWith('/activation-clipboard.ts')) return pureHelper('activation-clipboard.ts', navigatorFixture);
+    if (name.endsWith('/activation-diagnostics.ts')) return pureHelper('activation-diagnostics.ts', navigatorFixture);
+    if (name.endsWith('/multi-device-contact.service.ts')) return { whatsappContactUrl: contact => contact && /^[1-9][0-9]{7,14}$/.test(contact.whatsapp) ? 'https://wa.me/' + contact.whatsapp : null };
     return services;
   }, navigatorFixture);
   return {
@@ -123,8 +132,11 @@ for (const status of ['UNREGISTERED', 'PENDING_MANAGER_APPROVAL', 'AUTHORIZED'])
       assert.equal((html.match(/CHAVE PERMANENTE DO DISPOSITIVO/g) || []).length, 1);
       assert.equal((html.match(/123456/g) || []).length, 1, 'same synthetic key, never duplicate');
       assert.equal(copyButton(f.render()).props.disabled, false);
-      assert.equal(html.includes('ATIVAÇÃO NOVA (A1)'), status !== 'AUTHORIZED');
-      assert.equal(html.includes('Verificar ativação'), status !== 'AUTHORIZED');
+      assert.equal(html.includes('ATIVAÇÃO NOVA (A1)'), false, 'support initially collapsed');
+      assert.equal(html.includes('Verificar ativação'), false, 'manual operations stay in support');
+      f.set({ isSupportOpen: true });
+      assert.equal(htmlOf(f).includes('ATIVAÇÃO NOVA (A1)'), status !== 'AUTHORIZED');
+      assert.equal(htmlOf(f).includes('Verificar ativação'), status !== 'AUTHORIZED');
       assert.equal(f.blockedCalls(), 0);
     });
   }
@@ -154,7 +166,10 @@ await test('REMOTE_AUTH_MISMATCH_STILL_FAILS_CLOSED_WITH_LOCAL_KEY_VISIBLE', () 
   const f = fixture({ authPreflight: { remoteDeviceStatus: 'REVOKED' } });
   const html = htmlOf(f);
   assert.match(html, /123456/);
-  assert.match(html, /ATIVAÇÃO NOVA/);
+  assert.match(html, /Aguardando ativação/);
+  assert.doesNotMatch(html, />Autorizado</);
+  f.set({ isSupportOpen: true });
+  assert.match(htmlOf(f), /ATIVAÇÃO NOVA/);
   assert.doesNotMatch(html, /✓ Dispositivo Autorizado/);
 });
 for (const status of ['UNREGISTERED', 'AUTHORIZED']) {
@@ -184,6 +199,52 @@ await test('CLIPBOARD_REJECTION_NO_SECRET_OR_RAW_ERROR_IN_FEEDBACK', async () =>
 await test('LEGACY_CLIPBOARD_ABSENT_HAS_NO_CRASH_OR_EXTERNAL_CALL', () => {
   const f = fixture({}, {});
   assert.doesNotThrow(() => copyButton(f.render()).props.onClick());
+  assert.equal(f.blockedCalls(), 0);
+});
+await test('DEFAULT_UI_ONLY_CODE_KEY_CONTACT_AND_CLOSED_SUPPORT', () => {
+  for (const status of ['UNREGISTERED', 'PENDING_MANAGER_APPROVAL', 'AUTHORIZED']) {
+    const f = fixture({ status, contactState: 'READY', multiDeviceContact: { whatsapp: '' }, statusMessage: 'TECHNICAL_INTERNAL_DETAIL' });
+    const html = htmlOf(f);
+    assert.doesNotMatch(html, /TECHNICAL_INTERNAL_DETAIL|AUTH_UI_STATE|Modo Gerenciado|SOURCE_ID|RECOVERY|ATIVAÇÃO NOVA/);
+    assert.match(html, /aria-expanded="false"/);
+    assert.match(html, /Quer utilizar uma única licença/);
+    assert.match(html, /ainda não informou o WhatsApp/);
+    assert.equal(html.includes('>Autorizado<'), status === 'AUTHORIZED');
+    assert.ok(html.indexOf('CÓDIGO DO DISPOSITIVO') < html.indexOf('CHAVE PERMANENTE'));
+    assert.ok(html.indexOf('CHAVE PERMANENTE') < html.indexOf('Quer utilizar'));
+    assert.ok(html.indexOf('Quer utilizar') < html.indexOf('Informações para suporte'));
+  }
+});
+await test('REAL_TOGGLE_OPENS_AND_RETRACTS_TECHNICAL_UI', () => {
+  const f = fixture();
+  const toggle = () => nodes(f.render(), node => node.type === 'button' && node.props['aria-controls'] === 'activation-support-details')[0];
+  toggle().props.onClick();
+  assert.match(htmlOf(f), /aria-expanded="true"/);
+  assert.match(htmlOf(f), /AUTH_UI_STATE=AUTHORIZED/);
+  assert.match(htmlOf(f), /Copiar diagnóstico/);
+  toggle().props.onClick();
+  assert.doesNotMatch(htmlOf(f), /AUTH_UI_STATE|Copiar diagnóstico|Modo Gerenciado/);
+  assert.equal(f.state.deviceActivationKey, '123456');
+  assert.equal(f.blockedCalls(), 0);
+});
+await test('DIAGNOSTIC_CLIPBOARD_EXCLUDES_PERMANENT_KEY_AND_FREE_MESSAGES', async () => {
+  const copies = [];
+  const f = fixture({ isSupportOpen: true, statusMessage: 'synthetic-private-message' }, { clipboard: { writeText: async value => copies.push(value) } });
+  const button = nodes(f.render(), node => node.type === 'button' && textOf(node) === 'Copiar diagnóstico')[0];
+  button.props.onClick(); await flush();
+  assert.equal(copies.length, 1);
+  assert.match(copies[0], /AUTH_UI_STATE=AUTHORIZED/);
+  assert.doesNotMatch(copies[0], /123456|synthetic-private-message/);
+  assert.match(htmlOf(f), /Diagnóstico copiado/);
+});
+await test('CONTACT_FAILURE_KEEPS_LOCAL_KEY_AND_RETRY_INDEPENDENT', () => {
+  const f = fixture({ contactState: 'ERROR', multiDeviceContact: null, status: 'UNREGISTERED' });
+  assert.match(htmlOf(f), /123456/);
+  const button = nodes(f.render(), node => node.type === 'button' && textOf(node) === 'Tentar novamente')[0];
+  const oldAttempt = f.state.activationAttempt;
+  button.props.onClick();
+  assert.equal(f.state.contactAttempt, 1);
+  assert.equal(f.state.activationAttempt, oldAttempt);
   assert.equal(f.blockedCalls(), 0);
 });
 
@@ -216,6 +277,12 @@ if (process.argv.includes('--serve')) {
   const browserCode = `
     import React from 'react';
     import {createRoot} from 'react-dom/client';
+    const helperCodes = ${JSON.stringify(Object.fromEntries(['activation-clipboard.ts', 'activation-diagnostics.ts'].map(name => [name, compile(readFileSync(path.resolve(root, 'src/ui/activation', name), 'utf8'))])))};
+    function pureHelper(name, navigatorFixture) {
+      const exports = {};
+      new Function('exports', 'navigator', 'document', helperCodes[name])(exports, navigatorFixture, undefined);
+      return exports;
+    }
     const createHarness = ${createHarness.toString()};
     const code = ${JSON.stringify(output)};
     const names = ${JSON.stringify(stateNames)};
@@ -244,16 +311,16 @@ if (process.argv.includes('--serve')) {
     window.__KEY_VISIBILITY_FIXTURE__ = {
       set: patch => harness.set(patch),
       rejectCopy: value => { rejectCopy = value; },
-      evidence: () => ({errors, copies: copies.length, lastCopyMatches: copies.at(-1) === '123456', blockedCalls: harness.blockedCalls()})
+      evidence: () => ({errors, copies: copies.length, lastCopyMatches: copies.at(-1) === '123456', diagnosticSafe: copies.at(-1)?.includes('AUTH_UI_STATE=AUTHORIZED') && !copies.at(-1)?.includes('123456'), blockedCalls: harness.blockedCalls()})
     };
     render();
   `;
   const result = await build({ stdin: { contents: browserCode, resolveDir: root, sourcefile: 'synthetic-key-fixture.js' }, bundle: true, write: false, platform: 'browser', format: 'iife' });
-  const css = readFileSync(new URL('../src/index.css', import.meta.url), 'utf8');
+  const css = readFileSync(new URL('../src/index.css', import.meta.url), 'utf8') + '\n' + readFileSync(new URL('../src/ui/pages/ActivationPage.css', import.meta.url), 'utf8');
   const server = createServer((req, res) => {
     const name = new URL(req.url, 'http://127.0.0.1:3016').pathname;
     if (name === '/fixture.js') { res.setHeader('Content-Type', 'text/javascript'); res.end(result.outputFiles[0].contents); }
-    else if (name === '/fixture.css') { res.setHeader('Content-Type', 'text/css'); res.end(css); }
+    else if (name === '/fixture.css') { res.setHeader('Content-Type', 'text/css'); res.end(readFileSync(new URL('../src/index.css', import.meta.url), 'utf8') + '\n' + readFileSync(new URL('../src/ui/pages/ActivationPage.css', import.meta.url), 'utf8')); }
     else if (name === '/') { res.setHeader('Content-Type', 'text/html'); res.end('<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Chave sintética — fixture isolada</title><link rel="stylesheet" href="/fixture.css"></head><body><div id="root"></div><script src="/fixture.js"></script></body></html>'); }
     else { res.writeHead(404); res.end(); }
   });

@@ -34,6 +34,23 @@ SUPERSEDES=SUPERSEDED_BY_C11_PERMANENT_KEY_EXTERNAL_ACTIVATION_AMENDMENT
 
 ## 1. Boundary canônico
 
+### Exceção explicitamente autorizada — Google Cast local — 2026-10-06
+
+O usuário autorizou o transporte local descrito em
+[C11_GOOGLE_CAST_MOBILE_FEASIBILITY](C11_GOOGLE_CAST_MOBILE_FEASIBILITY.md).
+Somente celular/tablet remetente autorizado pode fornecer mídia, acessada
+diretamente da fonte, ao receiver Google Cast escolhido na mesma rede local.
+Receiver recebe URL de sessão efêmera opaca LAN, nunca URL/headers/credenciais
+da fonte. Transporte exclusivamente em RAM, sem gravar vídeo/transcodificar,
+sem catálogo remoto e sem proxy central/backend. C9 continua autoridade única;
+lease temporária, revogação, saída/falha/desconexão encerram transporte.
+Morte do processo fecha sockets; retorno local é explícito. Esta exceção
+substitui apenas DEVICE_TO_SOURCE_DIRECT para a saída Cast local selecionada
+e a proibição de transportar mídia para esse receiver; não permite revelar
+segredos da fonte, alterar cofre, source delivery, ativação ou backend.
+
+`LOCAL_CAST_MEDIA_TRANSPORT=AUTHORIZED_EPHEMERAL_LAN_ONLY`
+
 O backend do Prebuilt continua sendo o Control Plane e não é data plane de mídia. Para sources `MANAGED`, o Control Plane mantém a configuração real exclusivamente em um `SOURCE_CONFIGURATION_VAULT` remoto, cifrado/protegido e separado da metadata pública. Para `SELF_SERVICE`, o produto suporta dois canais canônicos de provisionamento:
 - `REMOTE_PORTAL`: o cliente informa sua fonte (M3U ou Xtream Codes) remotamente no Portal do Cliente; a configuração sensível é gravada exclusivamente em um cofre privado cifrado (`CUSTOMER_SOURCE_VAULT`) isolado por conta de cliente, sem exposição pública, e entregue de forma cifrada/autorizada aos dispositivos autenticados e emparelhados da licença;
 - `LOCAL_DEVICE`: canal de entrada local direta no dispositivo, validado em memória e selado no `LocalSecureSourceStore` sem transmissão remota.
@@ -58,6 +75,29 @@ LOCAL_CATALOG_SYNC_TO_BACKEND=NAO
 ```
 
 ## 2. Dados permitidos no Control Plane
+
+### C90 — distribuição pública de atualização Android, 2026-10-12
+
+Pedido explícito e spec [C11_APP_UPDATE_MIRRORS](C11_APP_UPDATE_MIRRORS.md)
+permitem metadata pública de software: versão, hash/tamanho do APK, notas e até
+cinco URLs públicas HTTPS de espelhos externos, publicadas somente por MASTER.
+Não são fontes de mídia nem credenciais de cliente. Configuração administrativa
+privada com RLS/RPC e auditoria sanitizada; download do binário direto do espelho,
+sem Storage/proxy Supabase. Não autoriza catálogo remoto, secret de assinatura,
+alteração de ativação/licença ou instalação automática em aparelho.
+
+### C70 — autorização de dispositivo adicional, 2026-10-11
+
+Pedido explícito: impedir que USER reutilize a conexão de uma fonte em outro
+dispositivo sem liberação de ADMIN responsável ou MASTER. O runtime do vault
+pode calcular HMAC com chave separada por domínio sobre a conexão normalizada,
+mantendo a prova somente em schema privado de autorização. Nunca usar a prova
+como sourceId, catálogo ou identidade de conteúdo; nunca retorná-la a clientes,
+listagens, logs ou auditorias. Versões cifradas existentes podem ser indexadas
+somente dentro desse runtime, sem persistir plaintext. Nenhum fetch de fonte.
+Liberação adicional fica vinculada a licença, fonte e dispositivo registrado;
+nenhuma alegação de pagamento no cliente concede acesso. As demais regras,
+inclusive catálogo local e isolamento dos cofres, permanecem obrigatórias.
 
 O Control Plane pode persistir somente:
 

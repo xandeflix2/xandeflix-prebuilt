@@ -12,6 +12,9 @@ export type CanonicalItemKind = 'movies' | 'series';
 export class CanonicalItemResolver {
   private readonly storage: LocalCatalogStorage;
   private readonly snapshotId: string;
+  private readonly pending = new Map<string, Promise<Movie | Series | undefined>>();
+  private readonly queue: Array<() => void> = [];
+  private running = false;
 
   constructor(
     storage: LocalCatalogStorage,
@@ -29,7 +32,38 @@ export class CanonicalItemResolver {
     return this.resolveById<Series>('series', itemId);
   }
 
-  private async resolveById<T extends Movie | Series>(kind: CanonicalItemKind, itemId: string): Promise<T | undefined> {
+  private resolveById<T extends Movie | Series>(kind: CanonicalItemKind, itemId: string): Promise<T | undefined> {
+    if (!itemId) return Promise.resolve(undefined);
+    const key = `${kind}:${itemId}`;
+    const existing = this.pending.get(key);
+    if (existing) return existing as Promise<T | undefined>;
+    if (this.pending.size >= 32) return Promise.reject(new Error('CANONICAL_RESOLVER_BUSY'));
+    let finish!: (value: T | undefined) => void, fail!: (error: unknown) => void;
+    const result = new Promise<T | undefined>((resolve, reject) => { finish = resolve; fail = reject; });
+    this.pending.set(key, result);
+    this.queue.push(() => {
+      this.running = true;
+      void (async () => {
+        let value: T | undefined, error: unknown, failed = false;
+        try { value = await this.readById<T>(kind, itemId); }
+        catch (cause) { failed = true; error = cause; }
+        finally {
+          this.pending.delete(key);
+          this.running = false;
+          this.drain();
+        }
+        if (failed) fail(error); else finish(value);
+      })();
+    });
+    this.drain();
+    return result;
+  }
+
+  private drain(): void {
+    if (!this.running) this.queue.shift()?.();
+  }
+
+  private async readById<T extends Movie | Series>(kind: CanonicalItemKind, itemId: string): Promise<T | undefined> {
     if (!itemId) return undefined;
     const manifest = await this.storage.readActiveManifest() as (null | {
       snapshotId?: string;

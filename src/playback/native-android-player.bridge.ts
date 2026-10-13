@@ -15,15 +15,34 @@
 
 import { registerPlugin, Capacitor, type PluginListenerHandle } from '@capacitor/core';
 import { validatePlaybackUri } from './playback-redaction.ts';
+import { isCastFailureCode, castFailureNotice, type CastFailureCode } from './cast-failure.ts';
 
 export type NativePlaybackKind = 'movie' | 'series' | 'live' | 'vod';
 
+export interface NativeEpisodeContext {
+  currentEpisodeId: string;
+  hasNext: boolean;
+  seasonNumber: number;
+  episodeNumber: number;
+  episodes: Array<{ id: string; title: string; seasonNumber: number; episodeNumber: number }>;
+}
+export interface NativeEpisodeNavigationEvent {
+  playbackId: string;
+  requestId: string;
+  reason: 'ended' | 'next' | 'select';
+  episodeId?: string;
+}
+
 export interface NativePlaybackRequest {
+  playbackId?:string;
   uri: string;
   title?: string;
   kind: NativePlaybackKind;
   headers?: Record<string, string>;
   startPositionMs?: number;
+  episodeContext?: NativeEpisodeContext;
+  replacePlaybackId?: string;
+  navigationRequestId?: string;
 }
 
 export interface NativePreviewRequest {
@@ -34,10 +53,24 @@ export interface NativePreviewRequest {
   top?: number;
   width?: number;
   height?: number;
+  liveContext?: NativeLiveContext;
+}
+
+export type NativeLiveAction = 'previous' | 'next' | 'channels' | 'categories' | 'guide' | 'favorite' | 'favorites' | 'selectChannel' | 'selectGroup' | 'pageNext' | 'pagePrevious' | 'groupNext' | 'groupPrevious' | 'closePanel';
+export interface NativeLiveActionEvent { previewId: string; channelId: string; action: NativeLiveAction; id?: string }
+export interface NativeLiveContext {
+  channelId: string; name: string; groupName: string; favorite: boolean;
+  browseName: string; channels: Array<{ id: string; name: string; favorite: boolean }>;
+  groups: Array<{ id: string; name: string }>;
+  nextPage: boolean; previousPage: boolean; nextGroups: boolean; previousGroups: boolean;
+  busy: boolean; message: string;
+  epg: { message: string; programs: Array<{ title: string; description: string; start: number; end: number }> };
 }
 
 export interface NativePreviewUpdateRequest {
   previewId?: string;
+  /** Stop the authorized media before C9 handoff, retaining the view/mode. */
+  suspendPlayback?: boolean;
   uri?: string;
   headers?: Record<string, string>;
   left?: number;
@@ -60,6 +93,8 @@ export interface NativePreviewTapEvent {
   previewId: string;
 }
 
+export interface NativePreviewPlayingEvent { previewId: string }
+
 export interface NativeAndroidBackButtonEvent {}
 
 export interface NativePlayerResumeEvent {
@@ -69,9 +104,18 @@ export interface NativePlayerResumeEvent {
   errorCategory?: 'HTTP_ERROR' | 'NETWORK_TIMEOUT' | 'DECODER_ERROR' | 'SOURCE_UNAVAILABLE'
     | 'MEDIA_PARSER_FAILURE' | 'MEDIA_ERROR' | 'UNKNOWN';
   httpStatus?: number;
+  media3ErrorCode?: number;
+  checkpoint?: 'NATIVE_ACTIVITY_STARTED' | 'DATASOURCE_OPEN' | 'FIRST_FRAME' | 'PLAYER_READY';
 }
 
+export interface NativePlayerProgressEvent {playbackId?:string;positionMs:number;durationMs?:number;observedAt?:number;ended?:boolean}
+
 export interface NativeAndroidPlayerPlugin {
+  openLivePanel(options: { previewId: string; panel: 'channels' | 'categories' | 'guide' | 'favorites' }): Promise<{ accepted: boolean }>;
+  setLiveControls(options: { previewId: string; context: NativeLiveContext }): Promise<{ accepted: boolean }>;
+  cancelEpisodeNavigation(options: { playbackId: string; requestId: string }): Promise<void>;
+  stopPlayback():Promise<void>;
+  getWatchProgress(): Promise<{ events: NativePlayerProgressEvent[] }>;
   open(options: NativePlaybackRequest): Promise<{ accepted: boolean; candidateCount?: number; message?: string }>;
   startPreview(options: NativePreviewRequest): Promise<{ accepted: boolean; previewId: string; message?: string }>;
   updatePreview(options: NativePreviewUpdateRequest): Promise<{ accepted: boolean; previewId: string; message?: string }>;
@@ -80,15 +124,20 @@ export interface NativeAndroidPlayerPlugin {
   exitPreviewFullscreen(options?: { previewId?: string }): Promise<{ accepted: boolean; fullscreen: boolean; previewId?: string; message?: string }>;
   finishApp(): Promise<{ finished: boolean }>;
   addListener(eventName: 'resume', listenerFunc: (event: NativePlayerResumeEvent) => void): Promise<PluginListenerHandle>;
+  addListener(eventName:'progress',listenerFunc:(event:NativePlayerProgressEvent)=>void):Promise<PluginListenerHandle>;
+  addListener(eventName:'episodeNavigation',listenerFunc:(event:NativeEpisodeNavigationEvent)=>void):Promise<PluginListenerHandle>;
   addListener(eventName: 'nativePreviewError', listenerFunc: (event: NativePreviewErrorEvent) => void): Promise<PluginListenerHandle>;
   addListener(eventName: 'nativePreviewFullscreenChanged', listenerFunc: (event: NativePreviewFullscreenChangedEvent) => void): Promise<PluginListenerHandle>;
   addListener(eventName: 'nativePreviewTap', listenerFunc: (event: NativePreviewTapEvent) => void): Promise<PluginListenerHandle>;
+  addListener(eventName: 'nativePreviewPlaying', listenerFunc: (event: NativePreviewPlayingEvent) => void): Promise<PluginListenerHandle>;
+  addListener(eventName: 'nativeLiveAction', listenerFunc: (event: NativeLiveActionEvent) => void): Promise<PluginListenerHandle>;
   addListener(eventName: 'androidBackButton', listenerFunc: (event: NativeAndroidBackButtonEvent) => void): Promise<PluginListenerHandle>;
 }
 
 export const NativeAndroidPlayer = registerPlugin<NativeAndroidPlayerPlugin>('NativeAndroidPlayer');
 
 export type NativeAndroidPlayerErrorCode =
+  | CastFailureCode
   | 'INVALID_REQUEST'
   | 'PLAYER_ACTIVITY_UNAVAILABLE'
   | 'PREVIEW_UNAVAILABLE'
@@ -175,6 +224,10 @@ export async function openNativeAndroidPlayer(
   // 3. Invocação segura via IPC Capacitor
   try {
     const result = await plugin.open({
+      playbackId:request.playbackId,
+      episodeContext:request.episodeContext,
+      replacePlaybackId:request.replacePlaybackId,
+      navigationRequestId:request.navigationRequestId,
       uri: request.uri.trim(),
       title: request.title?.trim() || undefined,
       kind: request.kind,
@@ -197,12 +250,14 @@ export async function openNativeAndroidPlayer(
       errorMessage: result.message || 'Player nativo rejeitou os parâmetros de reprodução.',
     };
   } catch (ipcErr: unknown) {
-    const rawMsg = ipcErr instanceof Error ? ipcErr.message : String(ipcErr);
+    const reported = readNativeErrorCode(ipcErr);
+    const code = isCastFailureCode(reported) || reported === 'INVALID_REQUEST'
+      || reported === 'PLAYER_ACTIVITY_UNAVAILABLE' || reported === 'PREVIEW_UNAVAILABLE' ? reported : 'NATIVE_ERROR';
     return {
       success: false,
       state: 'NATIVE_PLAYER_ERROR',
-      errorCode: 'NATIVE_ERROR',
-      errorMessage: `Falha na comunicação nativa: ${rawMsg}`,
+      errorCode: code,
+      errorMessage: castFailureNotice(code) || 'Não foi possível iniciar o player nativo. Tente novamente.',
     };
   }
 }
@@ -406,6 +461,35 @@ export async function addNativePreviewTapListener(
 ): Promise<PluginListenerHandle> {
   const plugin = pluginInstance || NativeAndroidPlayer;
   return plugin.addListener('nativePreviewTap', listener);
+}
+
+export async function addNativePlayerProgressListener(listener:(event:NativePlayerProgressEvent)=>void):Promise<PluginListenerHandle> {
+  if(!Capacitor.isNativePlatform() || !Capacitor.isPluginAvailable('NativeAndroidPlayer'))throw new Error('NATIVE_UNAVAILABLE');
+  return NativeAndroidPlayer.addListener('progress',listener);
+}
+
+export async function readNativeWatchProgress(): Promise<NativePlayerProgressEvent[]> {
+  if (!Capacitor.isNativePlatform() || !Capacitor.isPluginAvailable('NativeAndroidPlayer')) return [];
+  try {
+    const result = await NativeAndroidPlayer.getWatchProgress();
+    return Array.isArray(result.events) ? result.events.slice(0, 4) : [];
+  } catch { return []; }
+}
+
+export async function addNativePreviewPlayingListener(listener: (event: NativePreviewPlayingEvent) => void): Promise<PluginListenerHandle> {
+  return NativeAndroidPlayer.addListener('nativePreviewPlaying', listener);
+}
+
+export function addNativeLiveActionListener(listener: (event: NativeLiveActionEvent) => void): Promise<PluginListenerHandle> {
+  return NativeAndroidPlayer.addListener('nativeLiveAction', listener);
+}
+export async function setNativeLiveControls(previewId: string, context: NativeLiveContext): Promise<void> {
+  const result = await NativeAndroidPlayer.setLiveControls({ previewId, context });
+  if (!result.accepted) throw Error('LIVE_CONTROLS_UNAVAILABLE');
+}
+export async function openNativeLivePanel(previewId: string, panel: 'channels' | 'categories' | 'guide' | 'favorites'): Promise<void> {
+  const result = await NativeAndroidPlayer.openLivePanel({ previewId, panel });
+  if (!result.accepted) throw Error('LIVE_CONTROLS_UNAVAILABLE');
 }
 
 function readNativeErrorCode(err: unknown): NativeAndroidPlayerErrorCode | undefined {

@@ -15,7 +15,6 @@ import { Browser } from '@capacitor/browser';
 import type { DeviceType, ActivationStatus, LicenseMode, StoredActivationState } from '../../device/device.types.ts';
 import { DeviceIdentityService } from '../../device/device-identity.service.ts';
 import { getControlPlaneClient } from '../../control-plane/client/control-plane-client.ts';
-import type { ControlPlaneSettings } from '../../control-plane/control-plane.types.ts';
 import {
   getDeviceSourceDeliveryDispatcher,
   DeviceSourceDeliveryError,
@@ -46,16 +45,23 @@ import { getDeviceActivationService } from '../../control-plane/client/device-ac
 import { reconcileAuthorizedActivationState } from '../../device/authorization-reconciliation.ts';
 import { ensurePendingDeviceActivationRequest, syncPendingDeviceActivation } from '../../control-plane/client/device-activation-sync.service.ts';
 import { activationDeadline } from '../../control-plane/client/activation-timeout.ts';
+import { getMultiDeviceContactService, whatsappContactUrl, type MultiDeviceContact } from '../../control-plane/client/multi-device-contact.service.ts';
+import { buildActivationDiagnostics } from '../activation/activation-diagnostics.ts';
+import { copyActivationText } from '../activation/activation-clipboard.ts';
+import './ActivationPage.css';
+import { ActivationHandoff } from '../components/ActivationHandoff.tsx';
 
 
 interface ActivationPageProps {
   onBack: () => void;
+  onOpenSettings?: () => void;
   onOpenSourceSetup?: () => void;
   onCatalogImported?: () => Promise<void> | void;
 }
 
 export const ActivationPage: React.FC<ActivationPageProps> = ({
   onBack,
+  onOpenSettings,
   onOpenSourceSetup,
   onCatalogImported,
 }) => {
@@ -67,7 +73,6 @@ export const ActivationPage: React.FC<ActivationPageProps> = ({
 
   const [status, setStatus] = useState<ActivationStatus>('UNREGISTERED');
   const [mode, setMode] = useState<LicenseMode | undefined>(undefined);
-  const [supportContact, setSupportContact] = useState<ControlPlaneSettings | undefined>(undefined);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
   // C4 Device Pairing State
@@ -84,6 +89,11 @@ export const ActivationPage: React.FC<ActivationPageProps> = ({
   const [isCheckingDeviceActivation, setIsCheckingDeviceActivation] = useState(false);
   const [deviceActivationFeedback, setDeviceActivationFeedback] = useState<string | null>(null);
   const [keyCopyFeedback, setKeyCopyFeedback] = useState<string | null>(null);
+  const [multiDeviceContact, setMultiDeviceContact] = useState<MultiDeviceContact | null>(null);
+  const [contactState, setContactState] = useState<'LOADING' | 'READY' | 'ERROR'>('LOADING');
+  const [contactAttempt, setContactAttempt] = useState(0);
+  const [isSupportOpen, setIsSupportOpen] = useState(false);
+  const [diagnosticCopyFeedback, setDiagnosticCopyFeedback] = useState<string | null>(null);
 
   const [isActivating, setIsActivating] = useState(false);
   const [sourceConfigured, setSourceConfigured] = useState(false);
@@ -99,6 +109,29 @@ export const ActivationPage: React.FC<ActivationPageProps> = ({
   const reactivationHandleRef = useRef<AuthorizedDeviceReactivationHandle | null>(null);
   const reactivationServiceRef = useRef(new AuthorizedDeviceReactivationService());
   const managedDeliveryPromiseRef = useRef<Promise<boolean> | null>(null);
+
+  // Administrative contact is independent of local identity, activation and source delivery.
+  useEffect(() => {
+    let controller: AbortController | null = null;
+    const load = () => {
+      controller?.abort();
+      const current = new AbortController();
+      controller = current;
+      setContactState('LOADING');
+      void getMultiDeviceContactService().readPublic(current.signal).then(contact => {
+        if (current.signal.aborted) return;
+        setMultiDeviceContact(contact);
+        setContactState('READY');
+      }).catch(() => {
+        if (current.signal.aborted) return;
+        setMultiDeviceContact(null);
+        setContactState('ERROR');
+      });
+    };
+    load();
+    window.addEventListener('online', load);
+    return () => { controller?.abort(); window.removeEventListener('online', load); };
+  }, [contactAttempt]);
 
   const deliverManagedSource = useCallback(async (): Promise<boolean> => {
     if (managedDeliveryPromiseRef.current) return managedDeliveryPromiseRef.current;
@@ -424,9 +457,6 @@ export const ActivationPage: React.FC<ActivationPageProps> = ({
 
       setStatus(res.status);
       setMode(res.mode);
-      if (res.supportContact) {
-        setSupportContact(res.supportContact);
-      }
 
       if (res.message) {
         setStatusMessage(res.message);
@@ -658,10 +688,15 @@ export const ActivationPage: React.FC<ActivationPageProps> = ({
       ? 'UNREGISTERED'
       : status;
   const authUiState = effectiveStatus === 'AUTHORIZED' ? 'AUTHORIZED' : 'NOT_AUTHORIZED';
+  const contactUrl = whatsappContactUrl(multiDeviceContact);
+  const diagnosticText = isSupportOpen ? buildActivationDiagnostics({
+    displayCode, effectiveStatus, mode, localKeyState, sourceConfigured, deviceId,
+    authPreflight, deliveryAck, deliveryErrorCode, catalogImportResult, managedStagingResult,
+  }) : '';
 
   return (
     <div
-      className="activation-page"
+      className="activation-page activation-page--simple"
       style={{
         minHeight: '100vh',
         backgroundColor: '#080c14',
@@ -671,8 +706,9 @@ export const ActivationPage: React.FC<ActivationPageProps> = ({
       }}
     >
       <div style={{ maxWidth: '750px', margin: '0 auto' }}>
+        {onOpenSettings && <button type="button" className="focusable-item btn-secondary" onClick={onOpenSettings}>Configurações</button>}
         {/* Cabeçalho */}
-        <div
+        <div className="activation-page__header"
           style={{
             display: 'flex',
             justifyContent: 'space-between',
@@ -693,7 +729,7 @@ export const ActivationPage: React.FC<ActivationPageProps> = ({
                 letterSpacing: '1px',
               }}
             >
-              AUTORIZAÇÃO & ATIVAÇÃO (R7B)
+              ATIVAÇÃO
             </span>
             <h1 style={{ fontSize: '1.75rem', marginTop: '0.5rem', fontWeight: 700 }}>
               Xandeflix Ativação
@@ -726,10 +762,10 @@ export const ActivationPage: React.FC<ActivationPageProps> = ({
             marginBottom: '1.5rem',
           }}
         >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div className="activation-page__identity" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
               <span style={{ fontSize: '0.8rem', color: '#94a3b8', display: 'block' }}>
-                CÓDIGO DO DISPOSITIVO (INFORME AO GESTOR)
+                CÓDIGO DO DISPOSITIVO
               </span>
               <strong
                 style={{
@@ -747,7 +783,7 @@ export const ActivationPage: React.FC<ActivationPageProps> = ({
               <span style={{ fontSize: '0.8rem', color: '#94a3b8', display: 'block' }}>
                 STATUS ATUAL
               </span>
-              <span
+              <span role="status"
                 style={{
                   fontSize: '0.95rem',
                   fontWeight: 700,
@@ -760,10 +796,10 @@ export const ActivationPage: React.FC<ActivationPageProps> = ({
                 }}
               >
                 {effectiveStatus === 'AUTHORIZED'
-                  ? 'AUTHORIZED'
+                  ? 'Autorizado'
                   : effectiveStatus === 'PENDING_MANAGER_APPROVAL'
-                    ? 'PENDING_MANAGER_APPROVAL'
-                    : 'AGUARDANDO ATIVACAO'}
+                    ? 'Aguardando autorização'
+                    : 'Aguardando ativação'}
               </span>
             </div>
           </div>
@@ -784,8 +820,8 @@ export const ActivationPage: React.FC<ActivationPageProps> = ({
             type="button"
             className="focusable-item"
             onClick={() => {
-              if (deviceActivationKey && navigator.clipboard) {
-                void navigator.clipboard.writeText(deviceActivationKey)
+              if (localKeyState === 'READY' && deviceActivationKey) {
+                void copyActivationText(deviceActivationKey)
                   .then(() => setKeyCopyFeedback('Chave copiada.'))
                   .catch(() => setKeyCopyFeedback('Não foi possível copiar. Anote a chave exibida.'));
               }
@@ -802,7 +838,46 @@ export const ActivationPage: React.FC<ActivationPageProps> = ({
           )}
         </div>
 
-        {/* Formulário de Ativação */}
+        <ActivationHandoff displayCode={displayCode} activationKey={deviceActivationKey}
+          ready={localKeyState === 'READY'} pending={authUiState !== 'AUTHORIZED'} />
+        <section className="activation-page__contact" aria-labelledby="activation-multi-title">
+          <h2 id="activation-multi-title">Quer utilizar uma única licença em vários dispositivos?</h2>
+          <p>Fale com o gerente de múltiplos acessos pelo WhatsApp.</p>
+          {contactUrl ? (
+            <button type="button" className="focusable-item activation-page__whatsapp" onClick={() => {
+              void Browser.open({ url: contactUrl }).catch(() => setContactState('ERROR'));
+            }}>Falar pelo WhatsApp</button>
+          ) : <p role="status">{contactState === 'LOADING' ? 'Consultando contato...' : contactState === 'ERROR'
+            ? 'Não foi possível consultar o contato agora.' : 'O gestor ainda não informou o WhatsApp de atendimento.'}</p>}
+          {contactState === 'ERROR' && <button type="button" className="focusable-item activation-page__secondary" onClick={() => setContactAttempt(value => value + 1)}>Tentar novamente</button>}
+        </section>
+
+        <section className="activation-page__support">
+          {authUiState !== 'AUTHORIZED' && (
+            <section style={{ padding: '1rem', marginBottom: '1rem', background: '#101624', borderRadius: 10 }}>
+              <h2 style={{ fontSize: '1.1rem' }}>Ative seu dispositivo</h2>
+              <p>Abra a página pública e informe o Código ID e a Chave de 6 dígitos exibidos aqui. Após validar, cadastre sua fonte. A sincronização começa neste aparelho quando a ativação for confirmada.</p>
+              <button type="button" className="focusable-item" onClick={() => { void openExternalActivationPage(); }}
+                style={{ padding: '.75rem 1rem', background: '#2563eb', color: 'white', border: 0, borderRadius: 6 }}>
+                Abrir página de ativação
+              </button>
+            </section>
+          )}
+          <button type="button" className="focusable-item activation-page__support-toggle" aria-expanded={isSupportOpen}
+            aria-controls="activation-support-details" onClick={() => { setIsSupportOpen(open => !open); setDiagnosticCopyFeedback(null); }}>
+            Informações para suporte <span aria-hidden="true">{isSupportOpen ? '−' : '+'}</span>
+          </button>
+          {isSupportOpen && <div id="activation-support-details">
+            <p>Consulte e copie o diagnóstico para enviar ao gestor em caso de erro.</p>
+            <pre className="activation-page__diagnostic">{diagnosticText}</pre>
+            <button type="button" className="focusable-item activation-page__secondary" onClick={() => {
+              void copyActivationText(diagnosticText)
+                .then(() => setDiagnosticCopyFeedback('Diagnóstico copiado. Envie ao gestor para análise.'))
+                .catch(() => setDiagnosticCopyFeedback('Não foi possível copiar o diagnóstico neste dispositivo.'));
+            }}>Copiar diagnóstico</button>
+            {diagnosticCopyFeedback && <p role="status">{diagnosticCopyFeedback}</p>}
+
+        {/* Operações anteriores preservadas no painel de suporte. */}
         {effectiveStatus !== 'AUTHORIZED' && (
           <div
             style={{
@@ -1398,29 +1473,9 @@ export const ActivationPage: React.FC<ActivationPageProps> = ({
           </div>
         )}
 
-        {/* Bloco de Contato do Gestor (Section 14 e 15) */}
-        <div
-          style={{
-            backgroundColor: '#0d131f',
-            border: '1px dashed rgba(255,255,255,0.15)',
-            borderRadius: '8px',
-            padding: '1.25rem',
-            fontSize: '0.85rem',
-            color: '#94a3b8',
-            lineHeight: 1.5,
-          }}
-        >
-          <strong style={{ color: '#f8fafc', display: 'block', marginBottom: '0.25rem' }}>
-            Quer utilizar uma única licença em vários dispositivos?
-          </strong>
-          Entre em contato com um gestor para migrar para uma licença com múltiplos slots gerenciados.
-          {supportContact && supportContact.supportContactValue && (
-            <div style={{ marginTop: '0.5rem', color: '#38bdf8' }}>
-              <span>{supportContact.supportContactLabel || 'Atendimento'}: </span>
-              <strong>{supportContact.supportContactValue}</strong>
-            </div>
-          )}
-        </div>
+          </div>}
+        </section>
+
       </div>
     </div>
   );

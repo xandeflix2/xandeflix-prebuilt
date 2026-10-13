@@ -1,0 +1,118 @@
+.live-action-message { color:#e0e3ea; font-size:14px; margin:8px 0 0; }
+.live-tv-page--mobile .live-action-message { order:4; }
+.live-page-range { color: #cbd5e1; font-size: 0.85rem; margin: 0.3rem 0 0.6rem; }
+.live-page-button { width: 100%; padding: 0.65rem; margin-bottom: 0.5rem; background: #1e293b; color: #bfdbfe; border: 1px solid #334155; border-radius: 6px; font-weight: 600; }
+.live-channel-list button:disabled { opacity: 0.55; }
+
+/* C93: duas metades somente no modo touch quase quadrado. */
+#root .app-shell.app-shell--live-square.app-shell--live-page {
+  height: 100dvh; min-height: 0; overflow: hidden; padding-left: 0;
+}
+#root .app-shell.app-shell--live-square.app-shell--live-page .app-header {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 12px; padding: 8px 12px !important; height: auto !important; min-height: 0; flex-shrink: 0;
+}
+#root .app-shell.app-shell--live-square.app-shell--live-page .header-left { min-width: 0; }
+#root .app-shell.app-shell--live-square.app-shell--live-page .brand-logo { font-size: 1.15rem; }
+#root .app-shell.app-shell--live-square.app-shell--live-page .brand-sub { font-size: 0.6rem; }
+#root .app-shell.app-shell--live-square.app-shell--live-page .header-nav {
+  grid-row: 2; grid-column: 1 / -1; display: flex !important;
+  min-width: 0; justify-content: space-between; gap: 4px;
+}
+#root .app-shell.app-shell--live-square.app-shell--live-page .header-nav .nav-link {
+  flex: 1; min-width: 0; min-height: 44px; padding: 8px 6px;
+  font-size: 0.85rem; white-space: nowrap;
+}
+#root .app-shell.app-shell--live-square.app-shell--live-page .header-nav .nav-icon { display: none; }
+#root .app-shell.app-shell--live-square.app-shell--live-page .header-nav .nav-label { display: inline; }
+#root .app-shell.app-shell--live-square.app-shell--live-page .header-nav .nav-settings .nav-icon { display: inline-flex; }
+#root .app-shell.app-shell--live-square.app-shell--live-page .header-right { grid-column: 2; grid-row: 1; }
+#root .app-shell.app-shell--live-square.app-shell--live-page .header-live-slot,
+#root .app-shell.app-shell--live-square.app-shell--live-page .header-settings-button,
+#root .app-shell.app-shell--live-square.app-shell--live-page .mobile-bottom-nav { display: none !important; }
+#root .app-shell.app-shell--live-square.app-shell--live-page .app-content {
+  flex: 1; min-height: 0; overflow: hidden; padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+}
+#root .app-shell.app-shell--live-square.app-shell--live-page .page-container {
+  flex: 1; min-height: 0; max-width: none; padding: 0; overflow: hidden;
+}
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-tv-page {
+  height: 100% !important; flex: 1; min-height: 0;
+}
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-page-header { padding: 8px 12px !important; flex-shrink: 0; }
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-page-header > div {
+  display: grid !important; grid-template-columns: minmax(0, 1fr) 44px 44px auto;
+  align-items: center; gap: 4px 8px;
+}
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-page-header h1 { font-size: 1.1rem !important; grid-column: 1; grid-row: 1; margin: 0 !important; }
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-channel-total { grid-column: 1; grid-row: 2; justify-self: start; }
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-page-home { grid-column: 2; grid-row: 1 / 3; }
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-page-back { grid-column: 3; grid-row: 1 / 3; }
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-page-header .cast-button { grid-column: 4; grid-row: 1 / 3; }
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-page-header .cast-control { grid-column: 4; grid-row: 1 / 3; position: relative; gap: 4px; }
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-page-header .cast-control button { width: 44px; height: 44px; min-height: 44px; padding: 0; justify-content: center; }
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-page-header .cast-error { position: absolute; right: 0; top: calc(100% + 8px); z-index: 10; width: min(280px, 85vw); padding: 10px; background: #1e293b; }
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-page-home,
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-page-back { min-height: 44px; width: 44px; padding: 8px; }
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-page-back .live-back-label { display: none; }
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-page-back .live-back-icon { display: block; }
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-page-home { background: #1e293b; color: #f8fafc; border: 1px solid #334155; border-radius: 4px; }
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-columns {
+  display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)); min-height: 0;
+}
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-channel-column {
+  grid-column: 2; grid-row: 1; width: auto !important; min-width: 0 !important;
+  min-height: 0; border-right: 0 !important;
+}
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-preview-panel {
+  grid-column: 1; grid-row: 1; flex: none !important; width: auto !important;
+  min-width: 0; min-height: 0; overflow: hidden !important; border-right: 1px solid #263244;
+}
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-preview-section {
+  display: flex; flex-direction: column; padding: 0 !important; flex-shrink: 0;
+}
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-preview-surface {
+  order: 1; width: min(100%, 53.333dvh) !important; height: auto !important;
+  aspect-ratio: 16 / 9 !important; max-height: 30dvh !important;
+  margin: 0 auto; border: 0 !important; border-radius: 0 !important; box-shadow: none !important;
+}
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-preview-surface > div {
+  min-height: 0; padding: 8px !important; gap: 4px !important; overflow-y: auto;
+  justify-content: safe center !important; overflow-wrap: anywhere;
+}
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-preview-surface button { min-height: 44px; flex-shrink: 0; }
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-preview-surface > div > div:first-child { font-size: 1.5rem !important; }
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-preview-surface strong,
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-preview-surface h3 { font-size: 0.95rem !important; margin: 0; }
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-preview-surface span,
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-preview-surface p { font-size: 0.8rem !important; }
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-preview-controls { order: 2; padding: 8px 12px; margin: 0 !important; min-width: 0; }
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-preview-legacy-title { min-width: 0; gap: 8px !important; }
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-preview-legacy-title h2 { font-size: 0.9rem !important; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-square-fullscreen {
+  order: 3; display: inline-flex; align-items: center; gap: 8px; align-self: flex-end;
+  margin: 0 12px 8px; min-height: 44px; padding: 8px 12px; color: #e2e8f0;
+  background: #1e293b; border: 1px solid #475569; border-radius: 8px;
+}
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-action-message { order: 4; max-height: 60px; overflow: auto; padding: 0 12px; }
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-mobile-epg.live-epg-inline {
+  position: static !important; inset: auto !important; transform: none !important;
+  flex: 1; min-height: 0; border-radius: 0; box-shadow: none; transition: none; z-index: auto;
+}
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-epg-inline-heading {
+  flex-shrink: 0; margin: 0; padding: 12px; font-size: 0.95rem; border-bottom: 1px solid #263244;
+}
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-epg-content,
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-channel-list {
+  min-height: 0; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y;
+}
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-square-category { display: block; margin-bottom: 12px; }
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-square-category > span { display: block; font-size: 0.8rem; font-weight: 700; color: #cbd5e1; margin-bottom: 6px; }
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-square-category select {
+  width: 100%; min-width: 0; min-height: 44px; padding: 8px; font-size: 1rem;
+  color: #f1f5f9; background: #162033; border: 1px solid #475569; border-radius: 8px;
+}
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-channel-column input { min-height: 44px; font-size: 1rem !important; }
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-channel-list button { min-height: 44px; }
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-epg-channel-name,
+#root .app-shell.app-shell--live-square.app-shell--live-page .live-epg-program { overflow-wrap: anywhere; }

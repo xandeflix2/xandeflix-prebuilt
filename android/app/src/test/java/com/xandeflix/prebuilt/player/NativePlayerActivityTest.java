@@ -28,6 +28,20 @@ import java.util.Map;
  */
 public class NativePlayerActivityTest {
 
+    @Test public void debugRangeBreadcrumbIsClosedAndValidatesOffsets() {
+        Map<String,List<String>> headers=new HashMap<>();
+        headers.put("Content-Range",Collections.singletonList("bytes 4096-8191/10000"));
+        assertEquals("HTTP_RANGE requested=4096 status=206 start=4096 result=MATCH",NativePlayerActivity.describeHttpRange(4096,206,headers));
+        assertEquals("HTTP_RANGE requested=0 status=206 start=4096 result=MISMATCH",NativePlayerActivity.describeHttpRange(0,206,headers));
+        headers.put("Content-Range",Collections.singletonList("bytes 8191-4096/10000"));
+        assertTrue(NativePlayerActivity.describeHttpRange(4096,206,headers).endsWith("start=UNAVAILABLE result=INVALID"));
+        headers.put("Content-Range",Collections.singletonList("secret-url\nAuthorization: token"));
+        assertEquals("HTTP_RANGE requested=4096 status=206 start=UNAVAILABLE result=INVALID",NativePlayerActivity.describeHttpRange(4096,206,headers));
+        headers.put("Content-Range",Collections.singletonList("bytes 99999999999999999999999999-99999999999999999999999999/*"));
+        assertTrue(NativePlayerActivity.describeHttpRange(4096,206,headers).endsWith("result=INVALID"));
+        assertEquals("HTTP_RANGE requested=UNAVAILABLE status=UNAVAILABLE start=UNAVAILABLE result=ABSENT",NativePlayerActivity.describeHttpRange(-1,-1,null));
+    }
+
     // 1. Activity contract & candidate #1
     @Test
     public void testActivityContractAndCandidate1() {

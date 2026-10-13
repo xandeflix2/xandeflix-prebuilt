@@ -4,15 +4,21 @@
  * Faixa temática horizontal de itens com rolagem suave e navegação por D-pad.
  */
 
-import React, { useRef } from 'react';
+import React, { useRef, useState, useMemo, useEffect } from 'react';
+import { createPresentationSeed, orderCategoryItems, isReleaseCategory } from '../../catalog/category-presentation.ts';
 import type { CatalogItemViewModel } from '../../catalog/catalog-view-model.ts';
 import { MediaCard } from './MediaCard.tsx';
+import { useRailArtworkPreparation } from '../hooks/useRailArtworkPreparation.ts';
 
 interface MediaRailProps {
   id: string;
   title: string;
   items: CatalogItemViewModel[];
   onItemClick: (item: CatalogItemViewModel) => void;
+  preserveOrder?: boolean;
+  onViewAll?: () => void;
+  onViewAllFocus?: () => void;
+  startupArtworkCount?: number;
 }
 
 export const MediaRail = React.memo<MediaRailProps>(function MediaRail({
@@ -20,8 +26,27 @@ export const MediaRail = React.memo<MediaRailProps>(function MediaRail({
   title,
   items,
   onItemClick,
+  preserveOrder=false,
+  onViewAll,
+  onViewAllFocus,
+  startupArtworkCount = 0,
 }) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const preparation = useRailArtworkPreparation();
+  const [seed] = useState(createPresentationSeed);
+  const [displayedIds, setDisplayedIds] = useState<string[]>([]);
+  const orderedItems = useMemo(() => {
+    if (preserveOrder || isReleaseCategory(title)) return items;
+    const shuffled = orderCategoryItems(items, title, seed);
+    const current = new Map(items.map(item => [item.id, item]));
+    const retained = displayedIds.filter(id => current.has(id));
+    const retainedSet = new Set(retained);
+    return [...retained.map(id => current.get(id)!), ...shuffled.filter(item => !retainedSet.has(item.id))];
+  }, [items, title, seed, preserveOrder, displayedIds]);
+  useEffect(() => {
+    const ids = orderedItems.map(item => item.id);
+    setDisplayedIds(previous => previous.length === ids.length && previous.every((id, index) => id === ids[index]) ? previous : ids);
+  }, [orderedItems]);
 
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
@@ -40,12 +65,15 @@ export const MediaRail = React.memo<MediaRailProps>(function MediaRail({
   }
 
   return (
-    <section className="media-rail" aria-labelledby={`rail-title-${id}`}>
+    <section ref={preparation.root} className="media-rail" aria-labelledby={`rail-title-${id}`} data-startup-rail={startupArtworkCount > 0 || undefined}>
       <div className="media-rail-header">
         <h2 id={`rail-title-${id}`} className="media-rail-title">
           {title}
         </h2>
         <div className="media-rail-controls">
+          {onViewAll ? <button type="button" className="focusable-item rail-view-all" onClick={onViewAll}
+            onFocus={onViewAllFocus} onMouseEnter={onViewAllFocus} onTouchStart={onViewAllFocus}
+            aria-label={`Ver todos: ${title}`}>Ver todos</button> : <>
           <button
             type="button"
             className="rail-scroll-btn"
@@ -64,11 +92,13 @@ export const MediaRail = React.memo<MediaRailProps>(function MediaRail({
           >
             ›
           </button>
+          </>}
         </div>
       </div>
       <div className="media-rail-track" ref={scrollContainerRef}>
-        {items.map((item) => (
-          <MediaCard key={item.id} item={item} onClick={onItemClick} />
+        {orderedItems.map((item, index) => (
+          <MediaCard key={item.id} item={item} onClick={onItemClick} prepareArtwork={preparation.prepare}
+            startupArtwork={index < Math.min(8, startupArtworkCount)} />
         ))}
       </div>
     </section>

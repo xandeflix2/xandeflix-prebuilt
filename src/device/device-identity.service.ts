@@ -12,6 +12,7 @@
 
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
 import type { DeviceIdentity, DeviceType, InstallationIdentity, StoredActivationState } from './device.types.ts';
+import { getDevicePresentation } from '../ui/device-presentation.ts';
 
 const IDENTITY_FILE = 'device_identity.json';
 const ACTIVATION_FILE = 'device_activation.json';
@@ -356,6 +357,8 @@ export class DeviceIdentityService {
    * Detecta heurística de tipo padrão do dispositivo com base no ambiente.
    */
   static detectDefaultDeviceType(): DeviceType {
+    const selectedType = getDevicePresentation();
+    if (selectedType) return selectedType;
     if (typeof navigator === 'undefined') return 'TV';
     const ua = (navigator.userAgent || '').toLowerCase();
     if (ua.includes('aft') || ua.includes('firetv') || ua.includes('smart-tv') || ua.includes('googletv') || ua.includes('crkey')) {

@@ -71,6 +71,12 @@ export default defineConfig(({ mode }) => ({
   server: {
     port: 3000,
     host: true,
+    watch: {
+      ignored: ['**/tmp/**'],
+    },
+  },
+  optimizeDeps: {
+    entries: ['index.html'],
   },
   build: {
     outDir: 'dist',

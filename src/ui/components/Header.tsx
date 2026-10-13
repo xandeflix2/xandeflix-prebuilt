@@ -15,7 +15,7 @@ const navigationIcons: Partial<Record<AppView, React.ReactNode>> = {
   series: <><rect x="6" y="6" width="15" height="15" rx="2" /><path d="M17 3H3v14M11 10l5 3.5-5 3.5z" /></>,
   live: <><rect x="3" y="7" width="18" height="14" rx="2" /><path d="m7 3 5 4 5-4M7 17h6M17 17h.01" /></>,
   search: <><circle cx="10.5" cy="10.5" r="6.5" /><path d="m15.5 15.5 5.5 5.5" /></>,
-  activation: <><circle cx="8" cy="8" r="4" /><path d="m11 11 10 10m-4-4 3-3m-1 5 3-3" /></>,
+  settings: <><path d="m9.5 3-.7 2.3-2 .9-2.2-.5-2.5 4.3 1.6 1.8v2.4l-1.6 1.8 2.5 4.3 2.2-.5 2 .9.7 2.3h5l.7-2.3 2-.9 2.2.5 2.5-4.3-1.6-1.8v-2.4l1.6-1.8-2.5-4.3-2.2.5-2-.9-.7-2.3z"/><circle cx="12" cy="12" r="3"/></>,
 };
 
 const NavigationIcon: React.FC<{ view: AppView }> = ({ view }) => (
@@ -27,6 +27,7 @@ const NavigationIcon: React.FC<{ view: AppView }> = ({ view }) => (
 );
 
 interface HeaderProps {
+  tabletPortrait?: boolean;
   currentView: AppView;
   onNavigate: (view: AppView) => void;
   onBack?: () => void;
@@ -37,6 +38,7 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({
   currentView,
+  tabletPortrait = false,
   onNavigate,
   onBack,
   canGoBack = false,
@@ -46,7 +48,7 @@ export const Header: React.FC<HeaderProps> = ({
     <>
       <header className="app-header">
       <div className="header-left">
-        {canGoBack && onBack && (
+        {currentView !== 'manager-panel' && canGoBack && onBack && (
           <button
             type="button"
             className="focusable-item btn-back"
@@ -74,7 +76,7 @@ export const Header: React.FC<HeaderProps> = ({
           <span className="brand-logo">XANDEFLIX</span>
           <span className="brand-sub">PREBUILT</span>
         </div>
-        {(currentView === 'movies' || currentView === 'series' || currentView === 'search' || currentView === 'activation') && (
+        {(currentView === 'movies' || currentView === 'series' || currentView === 'search' || currentView === 'activation' || currentView === 'settings' || currentView === 'movie-detail' || currentView === 'series-detail') && (
           <button
             type="button"
             className="focusable-item header-home-button"
@@ -85,6 +87,7 @@ export const Header: React.FC<HeaderProps> = ({
             <NavigationIcon view="home" />
           </button>
         )}
+        {currentView === 'live' && <div id="live-header-actions" className="header-live-slot" />}
       </div>
 
       <nav className="header-nav" aria-label="Navegação Principal">
@@ -126,7 +129,7 @@ export const Header: React.FC<HeaderProps> = ({
           title="Canais"
           onClick={() => onNavigate('live')}
         >
-          <NavigationIcon view="live" /><span className="nav-label">📺 Canais</span>
+          <NavigationIcon view="live" /><span className="nav-label">{tabletPortrait ? 'Canais' : '📺 Canais'}</span>
         </button>
         <button
           type="button"
@@ -138,16 +141,8 @@ export const Header: React.FC<HeaderProps> = ({
         >
           <NavigationIcon view="search" /><span className="nav-label">Busca</span>
         </button>
-        <button
-          type="button"
-          className={`focusable-item nav-link ${currentView === 'activation' ? 'active' : ''}`}
-          aria-current={currentView === 'activation' ? 'page' : undefined}
-          aria-label="Ativação"
-          title="Ativação"
-          onClick={() => onNavigate('activation')}
-          style={{ color: '#38bdf8' }}
-        >
-          <NavigationIcon view="activation" /><span className="nav-label">🔑 Ativação</span>
+        <button type="button" className={`focusable-item nav-link nav-settings ${currentView === 'settings' ? 'active' : ''}`} onClick={() => onNavigate('settings')} aria-current={currentView === 'settings' ? 'page' : undefined} aria-label="Configurações" title="Configurações">
+          <NavigationIcon view="settings" />
         </button>
         {typeof __XANDEFLIX_DEBUG_BUILD__ !== 'undefined' && __XANDEFLIX_DEBUG_BUILD__ && (
           <>
@@ -172,17 +167,16 @@ export const Header: React.FC<HeaderProps> = ({
       </nav>
 
       <div className="header-right">
-        {currentView === 'home' && (
           <button
             type="button"
-            className="focusable-item header-activation-button"
-            onClick={() => onNavigate('activation')}
-            aria-label="Abrir Ativação do dispositivo"
-            title="Ativação"
+            className="focusable-item header-settings-button"
+            onClick={() => onNavigate('settings')}
+            aria-current={currentView === 'settings' ? 'page' : undefined}
+            aria-label="Configurações"
+            title="Configurações"
           >
-            <NavigationIcon view="activation" />
+            <NavigationIcon view="settings" />
           </button>
-        )}
         {catalogVersion === 'Sincronizando...' && (
           <div className="header-sync-status" role="status">
             <span className="badge-dot" />

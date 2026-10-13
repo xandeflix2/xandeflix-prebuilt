@@ -21,6 +21,7 @@ import type {
   ManagerInstallationListItem,
   ManagerLicenseDetail,
   ManagerLicenseListItem,
+  ManagerCustomerDeletePreview,
   RemoteManagedSourceMetadata,
   RevokeLicenseResult,
   SuspendLicenseResult,
@@ -80,6 +81,15 @@ export interface ManagerAuthClient extends RemoteRpcClient {
 export interface ManagerAuthSession {
   userId: string;
 }
+
+export interface ManagerAccessProfile extends ManagerAuthSession {
+  role: 'MASTER' | 'ADMIN';
+}
+export interface ManagerConsumer {
+  userId: string; name: string; status: string; kind: 'MANAGED' | 'SELF_SERVICE'; adminId: string | null;
+  licenses: Array<{ licenseId: string; mode: string; status: string; maxDevices: number }>;
+}
+export interface ManagerStaff { userId: string; username: string; role: 'MASTER' | 'ADMIN'; status: string; }
 
 export interface ManagerAuthController {
   getSession(): Promise<ManagerAuthSession | null>;
@@ -153,8 +163,14 @@ export interface RemoteSourceMutationConfirmation {
 }
 
 export interface ManagerDeviceActivationInput {
+  deviceRole?: 'PRIMARY' | 'SECONDARY';
+  primaryDisplayCode?: string;
+  deviceLabel?: string;
+  maxDevices?: number;
+  maxConcurrentSessions?: number;
   displayCode: string;
   activationKey: string;
+  activationNotificationId?: string;
   flowMode?: 'NEW_CUSTOMER' | 'EXISTING_CUSTOMER';
   newCustomerName?: string;
   existingDeviceCode?: string;
@@ -163,6 +179,18 @@ export interface ManagerDeviceActivationInput {
   name?: string;
   protocol?: ManagerSourceType;
   sourceConfig?: ManagerManagedSourceConfig;
+}
+
+export interface ManagerLicenseDeviceLinkInput {
+  licenseId: string;
+  displayCode: string;
+  deviceLabel: string;
+  deviceRole: 'PRIMARY' | 'SECONDARY';
+  primaryDisplayCode?: string;
+  maxDevices: number;
+  maxConcurrentSessions: number;
+  registered: boolean;
+  activationKey?: string;
 }
 
 export interface ManagerDeviceActivationResult {
@@ -194,13 +222,43 @@ export interface ManagerVaultRuntimePreflight {
   rpcExecuteAuthenticated: boolean;
 }
 
+export interface ManagerLicenseDeviceEditInput {
+  licenseId: string;
+  displayCode: string;
+  label: string;
+  platform: string;
+  deviceType: string;
+  expectedRole: '' | 'PRIMARY' | 'SECONDARY';
+  role: '' | 'PRIMARY' | 'SECONDARY';
+  primaryLicenseId?: string;
+  primaryCode?: string;
+  slotNumber?: number;
+  roleConfirmed?: boolean;
+  treePlan?: { mode: 'MOVE_ALL' | 'KEEP_ACCOUNT'; expectedChildren: string[]; retainedPrincipalCode?: string };
+}
+
+export interface ManagerLicenseSaveInput {
+  licenseId: string;
+  expectedSnapshot: string;
+  customer?: { customerId: string; name: string; expectedName: string };
+  screens?: { principalCode: string; maxDevices: number; maxSessions: number; reason: string; paidExtraScreens?: number; paymentReference?: string; paymentConfirmed?: boolean };
+  devices: ManagerLicenseDeviceEditInput[];
+  source?: { expectedSources: Array<{ sourceId: string; version: number }>; name: string; protocol: ManagerSourceType; sourceConfig: ManagerManagedSourceConfig };
+}
+
 export interface RemoteManagerControlPlaneAuthority {
+  saveLicenseEdits?(input: ManagerLicenseSaveInput): Promise<void>;
+  editLicenseCustomer?(licenseId: string, customerId: string, name: string, expectedName: string): Promise<void>;
+  editLicenseDevice?(input: ManagerLicenseDeviceEditInput): Promise<void>;
   auth?: ManagerAuthController;
   runVaultRuntimePreflight(): Promise<ManagerVaultRuntimePreflight>;
   readControlPlane(): Promise<ManagerControlPlaneSnapshot>;
   createManagedSource(input: CreateManagedSourceInput): Promise<RemoteSourceMutationConfirmation>;
   createManagedSourceWithConfig(input: CreateManagedSourceWithConfigInput): Promise<RemoteSourceMutationConfirmation>;
   activateSourceForDevice(input: ManagerDeviceActivationInput): Promise<ManagerDeviceActivationResult>;
+  editLicenseScreens?(input: { licenseId: string; principalCode: string; maxDevices: number; maxSessions: number; reason: string; paidExtraScreens?: number; paymentReference?: string; paymentConfirmed?: boolean }): Promise<void>;
+  promoteLicenseDevice?(licenseId: string, displayCode: string): Promise<void>;
+  linkLicenseDevice?(input: ManagerLicenseDeviceLinkInput): Promise<void>;
   updateManagedSource(input: UpdateManagedSourceInput): Promise<RemoteSourceMutationConfirmation>;
   updateManagedSourceConfig(input: UpdateManagedSourceConfigInput): Promise<RemoteSourceMutationConfirmation>;
   setManagedSourceStatus(
@@ -223,8 +281,18 @@ export interface RemoteManagerControlPlaneAuthority {
   cancelDeviceReactivation(requestId: string): Promise<AuthorizedDeviceReactivationConfirmation>;
   listInstallations(): Promise<ManagerInstallationListItem[]>;
   listCustomers?(): Promise<ManagerCustomerListItem[]>;
+  getAccessProfile?(): Promise<ManagerAccessProfile>;
+  deleteDevicePermanently?(deviceId: string, confirmationCode: string): Promise<void>;
+  listUsers?(): Promise<ManagerConsumer[]>;
+  listStaff?(): Promise<ManagerStaff[]>;
+  assignUser?(customerId: string, adminId: string): Promise<void>;
+  allowAdditionalSignalDevice?(licenseId: string, displayCode: string): Promise<void>;
   listLicenses?(): Promise<ManagerLicenseListItem[]>;
   getLicenseDetail?(licenseId: string): Promise<ManagerLicenseDetail>;
+  updateLicenseDevice?(licenseId: string, displayCode: string, label: string, activationKey?: string): Promise<void>;
+  replaceLicenseSource?(licenseId: string, expectedSources: Array<{ sourceId: string; version: number }>, name: string, protocol: ManagerSourceType, sourceConfig: ManagerManagedSourceConfig): Promise<void>;
+  previewCustomerDeletion?(licenseId: string): Promise<ManagerCustomerDeletePreview>;
+  deleteLicenseCustomer?(licenseId: string, snapshot: string, confirmation: string): Promise<void>;
   updateLicenseLimits?(licenseId: string, maxDevices: number, maxConcurrentSessions: number, reason?: string): Promise<UpdateLicenseLimitsResult>;
   suspendLicense?(licenseId: string, reason?: string): Promise<SuspendLicenseResult>;
   revokeLicense?(licenseId: string, reason?: string): Promise<RevokeLicenseResult>;
@@ -238,6 +306,16 @@ export interface RemoteManagerControlPlaneAuthority {
 }
 
 const SAFE_REMOTE_ERRORS = new Set([
+  'LICENSE_EDITOR_CONFLICT', 'INVALID_CUSTOMER_NAME', 'CUSTOMER_NAME_CONFLICT', 'CUSTOMER_PROFILE_NAME_INVALID', 'CUSTOMER_NAME_ALREADY_USED', 'INVALID_DEVICE_PLATFORM', 'INVALID_DEVICE_TYPE',
+  'INVALID_DEVICE_SLOT', 'DEVICE_SLOT_OCCUPIED', 'DEVICE_SLOT_OUTSIDE_LIMIT', 'PRIMARY_SLOT_READ_ONLY', 'DEVICE_ROLE_CONFIRMATION_REQUIRED',
+  'DEVICE_TREE_CONFIRMATION_REQUIRED', 'DEVICE_TREE_CHANGED',
+  "PRINCIPAL_REQUIRED", "PRIMARY_CANNOT_BECOME_SECONDARY", "LICENSE_EDIT_REQUIRED", "EXTRA_SCREENS_PAYMENT_REQUIRED", "PAYMENT_REFERENCE_INVALID", "INVALID_PAID_EXTRA_SCREENS", "SCREEN_CHANGE_REASON_REQUIRED", "USE_ACTIVATION_SUBMENU",
+  'PRIMARY_HAS_SECONDARIES', 'REGISTERED_DEVICE_REQUIRED', 'LICENSE_DEVICE_LIMIT_REACHED',
+  'INVALID_DEVICE_ROLE', 'PRIMARY_DEVICE_REQUIRED', 'PRIMARY_DEVICE_INVALID', 'DEVICE_ROLE_CONFLICT',
+  'CUSTOMER_DELETE_CONFIRMATION_REQUIRED', 'CUSTOMER_SHARED_IDENTITY', 'INVALID_DEVICE_LABEL',
+  'MASTER_REQUIRED',
+  'MANAGER_SCOPE_DENIED',
+  'DEVICE_DELETE_CONFIRMATION_REQUIRED',
   'MANAGER_AUTH_REQUIRED',
   'MANAGER_NOT_AUTHORIZED',
   'AUTH_REQUIRED',
@@ -308,6 +386,7 @@ const SAFE_REMOTE_ERRORS = new Set([
   'LICENSE_ID_REQUIRED',
   'INVALID_MAX_DEVICES',
   'INVALID_MAX_CONCURRENT_SESSIONS',
+  'CONCURRENT_LIMIT_EXCEEDS_DEVICES',
   'CANNOT_REDUCE_BELOW_ACTIVE_DEVICES',
   'CANNOT_SUSPEND_REVOKED_LICENSE',
   'CANNOT_ACTIVATE_SUSPENDED_LICENSE',
@@ -644,6 +723,30 @@ function normalizeCustomers(data: unknown): ManagerCustomerListItem[] {
   return results;
 }
 
+function normalizeDeviceEditorFields(d: Record<string, unknown>) {
+  return {
+    ...(Number.isInteger(d.slotNumber) && Number(d.slotNumber) >= 1 && Number(d.slotNumber) <= 100 ? { slotNumber: Number(d.slotNumber) } : {}),
+    ...(Array.isArray(d.sourceLinks) ? { sourceLinks: d.sourceLinks.filter(isRecord).filter(s => typeof s.sourceId === 'string' && typeof s.name === 'string' && Number.isInteger(s.deviceCount) && Number(s.deviceCount) >= 0)
+      .map(s => ({ sourceId: s.sourceId as string, name: s.name as string, deviceCount: Number(s.deviceCount) })) } : {}),
+  };
+}
+
+function normalizeLicenseDevices(data: unknown): ManagerLicenseDetail['devices'] {
+  if (!Array.isArray(data)) return [];
+  return data.filter(isRecord).filter(d => typeof d.deviceId === 'string' && typeof d.displayCode === 'string').map(d => ({
+    ...normalizeDeviceEditorFields(d),
+    deviceId: d.deviceId as string, displayCode: d.displayCode as string,
+    deviceType: (typeof d.deviceType === 'string' ? d.deviceType : 'TV') as ManagerLicenseDetail['devices'][number]['deviceType'],
+    deviceLabel: typeof d.deviceLabel === 'string' ? d.deviceLabel : '',
+    ...(d.deviceRole === 'PRIMARY' || d.deviceRole === 'SECONDARY' ? { deviceRole: d.deviceRole } : {}),
+    ...(typeof d.primaryDisplayCode === 'string' ? { primaryDisplayCode: d.primaryDisplayCode } : {}),
+    ...(typeof d.licenseBindingStatus === 'string' ? { licenseBindingStatus: d.licenseBindingStatus } : {}),
+    platform: typeof d.platform === 'string' ? d.platform : undefined,
+    status: typeof d.status === 'string' ? d.status : '', boundAt: typeof d.boundAt === 'string' ? d.boundAt : '',
+    lastSeenAt: typeof d.lastSeenAt === 'string' ? d.lastSeenAt : undefined,
+  }));
+}
+
 function normalizeLicenses(data: unknown): ManagerLicenseListItem[] {
   if (!Array.isArray(data)) throw new Error('REMOTE_MANAGER_READ_FAILED');
   const uuidPattern = /^[0-9a-f-]{36}$/i;
@@ -702,6 +805,7 @@ function normalizeLicenses(data: unknown): ManagerLicenseListItem[] {
       maxConcurrentSessions,
       activeDeviceCount,
       sourceSummary,
+      devices: normalizeLicenseDevices(entry.devices),
       createdAt,
       expiresAt,
     });
@@ -742,13 +846,18 @@ function normalizeLicenseDetail(data: unknown): ManagerLicenseDetail {
     for (const d of data.devices) {
       if (!isRecord(d)) continue;
       devices.push({
+        ...normalizeDeviceEditorFields(d),
         deviceId: typeof d.deviceId === 'string' ? d.deviceId : '',
         displayCode: typeof d.displayCode === 'string' ? d.displayCode : '',
         deviceType: typeof d.deviceType === 'string' ? d.deviceType as any : 'TV',
         deviceLabel: typeof d.deviceLabel === 'string' ? d.deviceLabel : '',
+    ...(d.deviceRole === 'PRIMARY' || d.deviceRole === 'SECONDARY' ? { deviceRole: d.deviceRole } : {}),
+    ...(typeof d.primaryDisplayCode === 'string' ? { primaryDisplayCode: d.primaryDisplayCode } : {}),
+    ...(typeof d.licenseBindingStatus === 'string' ? { licenseBindingStatus: d.licenseBindingStatus } : {}),
         status: typeof d.status === 'string' ? d.status : '',
         boundAt: typeof d.boundAt === 'string' ? d.boundAt : '',
         lastSeenAt: typeof d.lastSeenAt === 'string' ? d.lastSeenAt : undefined,
+        platform: typeof d.platform === 'string' ? d.platform : undefined,
       });
     }
   }
@@ -799,6 +908,8 @@ function normalizeLicenseDetail(data: unknown): ManagerLicenseDetail {
       createdAt,
       expiresAt,
     },
+    editorSnapshot: typeof data.editorSnapshot === 'string' ? data.editorSnapshot : undefined,
+    screenAllowance: isRecord(data.screenAllowance) ? { baseScreens: 4, paidExtraScreens: Number(data.screenAllowance.paidExtraScreens) || 0 } : undefined,
     customer,
     devices,
     managedSources,
@@ -848,6 +959,9 @@ function normalizeCustomerDetail(data: unknown): ManagerCustomerDetail {
         displayCode: typeof d.displayCode === 'string' ? d.displayCode : '',
         deviceType: typeof d.deviceType === 'string' ? d.deviceType as any : 'TV',
         deviceLabel: typeof d.deviceLabel === 'string' ? d.deviceLabel : '',
+    ...(d.deviceRole === 'PRIMARY' || d.deviceRole === 'SECONDARY' ? { deviceRole: d.deviceRole } : {}),
+    ...(typeof d.primaryDisplayCode === 'string' ? { primaryDisplayCode: d.primaryDisplayCode } : {}),
+    ...(typeof d.licenseBindingStatus === 'string' ? { licenseBindingStatus: d.licenseBindingStatus } : {}),
         status: typeof d.status === 'string' ? d.status : '',
         licenseId: typeof d.licenseId === 'string' ? d.licenseId : '',
         boundAt: typeof d.boundAt === 'string' ? d.boundAt : '',
@@ -1080,6 +1194,40 @@ export class SupabaseManagerRemoteControlPlaneAuthority implements RemoteManager
     this.client = client;
   }
 
+  async getAccessProfile(): Promise<ManagerAccessProfile> {
+    const data = await this.call('rpc_manager_access_profile', {});
+    if (!isRecord(data) || typeof data.userId !== 'string' || !['MASTER', 'ADMIN'].includes(String(data.role))) {
+      throw new Error('MANAGER_NOT_AUTHORIZED');
+    }
+    return { userId: data.userId, role: data.role as ManagerAccessProfile['role'] };
+  }
+
+  async deleteDevicePermanently(deviceId: string, confirmationCode: string): Promise<void> {
+    const data = await this.call('rpc_manager_delete_device_permanently', {
+      p_device_id: deviceId, p_confirmation_code: confirmationCode,
+    });
+    if (!isRecord(data) || data.success !== true) throw new Error('REMOTE_MANAGER_MUTATION_FAILED');
+  }
+
+  async listUsers(): Promise<ManagerConsumer[]> {
+    const data = await this.call('rpc_manager_list_users', {});
+    if (!Array.isArray(data)) throw new Error('REMOTE_MANAGER_METADATA_ONLY');
+    return data as ManagerConsumer[];
+  }
+  async listStaff(): Promise<ManagerStaff[]> {
+    const data = await this.call('rpc_manager_list_staff', {});
+    if (!Array.isArray(data)) throw new Error('REMOTE_MANAGER_METADATA_ONLY');
+    return data as ManagerStaff[];
+  }
+  async assignUser(customerId: string, adminId: string): Promise<void> {
+    const data = await this.call('rpc_manager_assign_user', { p_customer_id: customerId, p_admin_id: adminId });
+    if (!isRecord(data) || data.success !== true) throw new Error('REMOTE_MANAGER_MUTATION_FAILED');
+  }
+  async allowAdditionalSignalDevice(licenseId: string, displayCode: string): Promise<void> {
+    const data = await this.call('rpc_manager_allow_additional_signal_device', { p_license_id: licenseId, p_display_code: displayCode });
+    if (!isRecord(data) || data.success !== true) throw new Error('REMOTE_MANAGER_MUTATION_FAILED');
+  }
+
   private async readManagerSession(): Promise<ManagerAuthSession | null> {
     try {
       const { data, error } = await this.client.auth.getSession();
@@ -1192,6 +1340,81 @@ export class SupabaseManagerRemoteControlPlaneAuthority implements RemoteManager
     });
   }
 
+  async editLicenseCustomer(licenseId: string, customerId: string, name: string, expectedName: string): Promise<void> {
+    if (!/^[0-9a-f-]{36}$/i.test(licenseId) || !/^[0-9a-f-]{36}$/i.test(customerId)) throw new Error('LICENSE_ID_REQUIRED');
+    if (!name.trim() || name.trim().length > 100 || /[\x00-\x1f\x7f]/.test(name)) throw new Error('INVALID_CUSTOMER_NAME');
+    await this.requireAuthenticatedSession();
+    const { data, error } = await this.client.rpc('rpc_manager_edit_license_customer', { p_license_id: licenseId, p_customer_id: customerId, p_name: name.trim(), p_expected_name: expectedName });
+    if (error || !isRecord(data) || data.success !== true) throw new SanitizedManagerRemoteError(safeErrorCode(error || data), 'RPC');
+  }
+
+  async editLicenseDevice(input: ManagerLicenseDeviceEditInput): Promise<void> {
+    if (!/^[0-9a-f-]{36}$/i.test(input.licenseId)) throw new Error('LICENSE_ID_REQUIRED');
+    if (!/^XF-[0-9A-Z]{4}-[0-9A-Z]{4}$/.test(input.displayCode)) throw new Error('DISPLAY_CODE_INVALID');
+    if (!input.label.trim() || input.label.trim().length > 100 || /[\x00-\x1f\x7f]/.test(input.label)) throw new Error('INVALID_DEVICE_LABEL');
+    if (!['ANDROID', 'IOS', 'TIZEN', 'WEBOS', 'WEB', 'OTHER'].includes(input.platform)) throw new Error('INVALID_DEVICE_PLATFORM');
+    if (!['TV', 'PHONE', 'TABLET', 'PC', 'OTHER'].includes(input.deviceType)) throw new Error('INVALID_DEVICE_TYPE');
+    if (!['', 'PRIMARY', 'SECONDARY'].includes(input.role) || !['', 'PRIMARY', 'SECONDARY'].includes(input.expectedRole)) throw new Error('INVALID_DEVICE_ROLE');
+    if (input.role === 'SECONDARY' && (!/^[0-9a-f-]{36}$/i.test(input.primaryLicenseId || '') || !/^XF-[0-9A-Z]{4}-[0-9A-Z]{4}$/.test(input.primaryCode || '') || input.primaryCode === input.displayCode)) throw new Error('PRIMARY_DEVICE_REQUIRED');
+    if (input.slotNumber !== undefined && (!Number.isInteger(input.slotNumber) || input.slotNumber < 1 || input.slotNumber > 100)) throw new Error('INVALID_DEVICE_SLOT');
+    if (input.role !== 'SECONDARY' && input.slotNumber !== undefined) throw new Error('PRIMARY_SLOT_READ_ONLY');
+    if (input.role !== input.expectedRole && input.roleConfirmed !== true) throw new Error('DEVICE_ROLE_CONFIRMATION_REQUIRED');
+    await this.requireAuthenticatedSession();
+    const { data, error } = await this.client.rpc('rpc_manager_edit_license_device', {
+      p_license_id: input.licenseId, p_display_code: input.displayCode, p_label: input.label.trim(), p_platform: input.platform, p_device_type: input.deviceType,
+      p_expected_role: input.expectedRole, p_role: input.role, p_primary_license_id: input.primaryLicenseId ?? null, p_primary_code: input.primaryCode ?? null,
+      p_slot: input.slotNumber ?? null, p_role_confirmed: input.roleConfirmed === true, p_tree_plan: input.treePlan ?? null,
+    });
+    if (error || !isRecord(data) || data.success !== true) throw new SanitizedManagerRemoteError(safeErrorCode(error || data), 'RPC');
+  }
+
+  async editLicenseScreens(input: { licenseId: string; principalCode: string; maxDevices: number; maxSessions: number; reason: string; paidExtraScreens?: number; paymentReference?: string; paymentConfirmed?: boolean }): Promise<void> {
+    if (!Number.isInteger(input.maxDevices) || input.maxDevices < 1 || input.maxDevices > 100) throw new Error('INVALID_MAX_DEVICES');
+    if (!Number.isInteger(input.maxSessions) || input.maxSessions < 1 || input.maxSessions > 50) throw new Error('INVALID_MAX_CONCURRENT_SESSIONS');
+    if (input.maxSessions > input.maxDevices) throw new Error('CONCURRENT_LIMIT_EXCEEDS_DEVICES');
+    if (!/^XF-[0-9A-Z]{4}-[0-9A-Z]{4}$/.test(input.principalCode)) throw new Error('PRIMARY_DEVICE_REQUIRED');
+    if (!input.reason.trim() || input.reason.length > 200) throw new Error('SCREEN_CHANGE_REASON_REQUIRED');
+    if (input.paidExtraScreens !== undefined && (!Number.isInteger(input.paidExtraScreens) || input.paidExtraScreens < 0 || input.paidExtraScreens > 96)) throw new Error('INVALID_PAID_EXTRA_SCREENS');
+    await this.requireAuthenticatedSession();
+    const { data, error } = await this.client.rpc('rpc_manager_edit_license_screens', {
+      p_license_id: input.licenseId, p_principal_code: input.principalCode, p_max_devices: input.maxDevices, p_max_sessions: input.maxSessions,
+      p_reason: input.reason.trim(), p_paid_extra_screens: input.paidExtraScreens ?? null,
+      p_payment_reference: input.paymentReference?.trim() || null, p_payment_confirmed: input.paymentConfirmed === true,
+    });
+    if (error || !isRecord(data) || data.success !== true) throw new SanitizedManagerRemoteError(safeErrorCode(error || data), 'RPC');
+  }
+
+  async promoteLicenseDevice(licenseId: string, displayCode: string): Promise<void> {
+    await this.requireAuthenticatedSession();
+    const { data, error } = await this.client.rpc('rpc_manager_promote_license_device', { p_license_id: licenseId, p_display_code: displayCode });
+    if (error || !isRecord(data) || data.success !== true) throw new SanitizedManagerRemoteError(safeErrorCode(error || data), 'RPC');
+  }
+
+  async linkLicenseDevice(input: ManagerLicenseDeviceLinkInput): Promise<void> {
+    if (!/^[0-9a-f-]{36}$/i.test(input.licenseId)) throw new Error('LICENSE_ID_INVALID');
+    if (!/^XF-[0-9A-Z]{4}-[0-9A-Z]{4}$/.test(input.displayCode.trim().toUpperCase())) throw new Error('DISPLAY_CODE_INVALID');
+    if (input.deviceRole !== 'PRIMARY' && input.deviceRole !== 'SECONDARY') throw new Error('INVALID_DEVICE_ROLE');
+    if (input.registered && input.deviceRole !== 'SECONDARY') throw new Error('INVALID_DEVICE_ROLE');
+    if (!input.deviceLabel.trim() || input.deviceLabel.trim().length > 100) throw new Error('INVALID_DEVICE_LABEL');
+    if (!Number.isInteger(input.maxDevices) || input.maxDevices < 1 || input.maxDevices > 100) throw new Error('INVALID_MAX_DEVICES');
+    if (!Number.isInteger(input.maxConcurrentSessions) || input.maxConcurrentSessions < 1 || input.maxConcurrentSessions > 50) throw new Error('INVALID_MAX_CONCURRENT_SESSIONS');
+    if (input.maxConcurrentSessions > input.maxDevices) throw new Error('CONCURRENT_LIMIT_EXCEEDS_DEVICES');
+    const primaryDisplayCode = input.primaryDisplayCode?.trim().toUpperCase();
+    if (input.deviceRole === 'SECONDARY' && (!primaryDisplayCode || !/^XF-[0-9A-Z]{4}-[0-9A-Z]{4}$/.test(primaryDisplayCode))) throw new Error('PRIMARY_DEVICE_REQUIRED');
+    if (primaryDisplayCode === input.displayCode.trim().toUpperCase()) throw new Error('PRIMARY_DEVICE_INVALID');
+    if (!input.registered && !/^[0-9]{6}$/.test(input.activationKey || '')) throw new Error('ACTIVATION_KEY_INVALID');
+    await this.requireAuthenticatedSession();
+    if (!this.client.functions) throw new Error('REMOTE_VAULT_BOUNDARY_UNAVAILABLE');
+    const { data, error } = await this.client.functions.invoke('managed-source-vault-admin', { body: {
+      operation: 'LINK_LICENSE_DEVICE', licenseId: input.licenseId, displayCode: input.displayCode.trim().toUpperCase(),
+      deviceLabel: input.deviceLabel.trim(), deviceRole: input.deviceRole, primaryDisplayCode: primaryDisplayCode || null,
+      maxDevices: input.maxDevices, maxConcurrentSessions: input.maxConcurrentSessions, registered: input.registered,
+      ...(!input.registered ? { activationKey: input.activationKey } : {}),
+    } });
+    if (error) throw new SanitizedManagerRemoteError(safeErrorCode(error), safeErrorStage(error), error.status);
+    if (!isRecord(data) || data.success !== true) throw new SanitizedManagerRemoteError(safeErrorCode(data), 'RPC');
+  }
+
   async activateSourceForDevice(
     input: ManagerDeviceActivationInput,
   ): Promise<ManagerDeviceActivationResult> {
@@ -1199,7 +1422,9 @@ export class SupabaseManagerRemoteControlPlaneAuthority implements RemoteManager
     if (!/^XF-[0-9A-Z]{4}-[0-9A-Z]{4}$/.test(input.displayCode.trim().toUpperCase())) {
       throw new Error('DISPLAY_CODE_INVALID');
     }
-    if (!/^[0-9]{6}$/.test(input.activationKey.trim())) {
+    const notificationId = input.activationNotificationId;
+    if (notificationId && !/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(notificationId)) throw new Error('INVALID_REQUEST');
+    if (!notificationId && !/^[0-9]{6}$/.test(input.activationKey.trim())) {
       throw new Error('ACTIVATION_KEY_INVALID');
     }
     const trimmedLicenseId = typeof input.licenseId === 'string' ? input.licenseId.trim() : '';
@@ -1208,6 +1433,16 @@ export class SupabaseManagerRemoteControlPlaneAuthority implements RemoteManager
     }
 
     let requestBody: Record<string, unknown>;
+    const configured = input.deviceRole !== undefined || input.primaryDisplayCode !== undefined || input.deviceLabel !== undefined || input.maxDevices !== undefined || input.maxConcurrentSessions !== undefined;
+    if (configured) {
+      if (input.deviceRole !== 'PRIMARY' && input.deviceRole !== 'SECONDARY') throw new Error('INVALID_DEVICE_ROLE');
+      if (input.deviceRole === 'SECONDARY' && (flowMode !== 'EXISTING_CUSTOMER' || !/^XF-[0-9A-Z]{4}-[0-9A-Z]{4}$/.test(input.primaryDisplayCode?.trim().toUpperCase() || ''))) throw new Error('PRIMARY_DEVICE_REQUIRED');
+      if (input.deviceRole === 'SECONDARY' && (input.primaryDisplayCode?.trim().toUpperCase() === input.displayCode.trim().toUpperCase() || input.primaryDisplayCode?.trim().toUpperCase() !== input.existingDeviceCode?.trim().toUpperCase())) throw new Error('PRIMARY_DEVICE_INVALID');
+      if (!input.deviceLabel?.trim() || input.deviceLabel.trim().length > 100) throw new Error('INVALID_DEVICE_LABEL');
+      if (!Number.isInteger(input.maxDevices) || input.maxDevices! < 1 || input.maxDevices! > 100) throw new Error('INVALID_MAX_DEVICES');
+      if (!Number.isInteger(input.maxConcurrentSessions) || input.maxConcurrentSessions! < 1 || input.maxConcurrentSessions! > 50) throw new Error('INVALID_MAX_CONCURRENT_SESSIONS');
+      if (input.maxConcurrentSessions! > input.maxDevices!) throw new Error('CONCURRENT_LIMIT_EXCEEDS_DEVICES');
+    }
 
     if (flowMode === 'EXISTING_CUSTOMER') {
       const trimmedCustomerId = typeof input.customerId === 'string' ? input.customerId.trim() : '';
@@ -1223,7 +1458,7 @@ export class SupabaseManagerRemoteControlPlaneAuthority implements RemoteManager
         operation: 'ACTIVATE_SOURCE_FOR_DEVICE',
         flowMode: 'EXISTING_CUSTOMER',
         displayCode: input.displayCode.trim().toUpperCase(),
-        activationKey: input.activationKey.trim(),
+        ...(notificationId ? { activationNotificationId: notificationId } : { activationKey: input.activationKey.trim() }),
         customerId: trimmedCustomerId,
         existingDeviceCode: existingCode,
         ...(trimmedLicenseId ? { licenseId: trimmedLicenseId } : {}),
@@ -1248,7 +1483,7 @@ export class SupabaseManagerRemoteControlPlaneAuthority implements RemoteManager
         operation: 'ACTIVATE_SOURCE_FOR_DEVICE',
         flowMode: 'NEW_CUSTOMER',
         displayCode: input.displayCode.trim().toUpperCase(),
-        activationKey: input.activationKey.trim(),
+        ...(notificationId ? { activationNotificationId: notificationId } : { activationKey: input.activationKey.trim() }),
         ...(trimmedNewCustomerName ? { newCustomerName: trimmedNewCustomerName } : {}),
         ...(trimmedCustomerId ? { customerId: trimmedCustomerId } : {}),
         ...(trimmedLicenseId ? { licenseId: trimmedLicenseId } : {}),
@@ -1258,6 +1493,7 @@ export class SupabaseManagerRemoteControlPlaneAuthority implements RemoteManager
       };
     }
 
+    if (configured) Object.assign(requestBody, { deviceLabel: input.deviceLabel!.trim(), maxDevices: input.maxDevices, maxConcurrentSessions: input.maxConcurrentSessions, deviceRole: input.deviceRole, ...(input.deviceRole === 'SECONDARY' ? { primaryDisplayCode: input.primaryDisplayCode!.trim().toUpperCase() } : {}) });
     await this.requireAuthenticatedSession();
     if (!this.client.functions) throw new SanitizedManagerRemoteError('REMOTE_VAULT_BOUNDARY_UNAVAILABLE', 'INTERNAL');
 
@@ -1463,6 +1699,40 @@ export class SupabaseManagerRemoteControlPlaneAuthority implements RemoteManager
     );
   }
 
+  async updateLicenseDevice(licenseId: string, displayCode: string, label: string, activationKey?: string): Promise<void> {
+    await this.callVaultBoundary({ operation: 'LICENSE_DEVICE', licenseId, displayCode, label, ...(activationKey === undefined ? {} : { activationKey }) });
+  }
+
+  async replaceLicenseSource(licenseId: string, expectedSources: Array<{ sourceId: string; version: number }>, name: string, protocol: ManagerSourceType, sourceConfig: ManagerManagedSourceConfig): Promise<void> {
+    await this.callVaultBoundary({ operation: 'REPLACE_LICENSE_SOURCE', licenseId, expectedSources, name, protocol, sourceConfig });
+  }
+
+  async saveLicenseEdits(input: ManagerLicenseSaveInput): Promise<void> {
+    if (!/^[0-9a-f-]{36}$/i.test(input.licenseId) || !/^[a-f0-9]{64}$/.test(input.expectedSnapshot)) throw new Error('LICENSE_EDITOR_CONFLICT');
+    if (!Array.isArray(input.devices) || input.devices.length > 100 || input.devices.some(d => d.licenseId !== input.licenseId)) throw new Error('INVALID_REQUEST');
+    await this.requireAuthenticatedSession();
+    const { source, licenseId, expectedSnapshot, ...changes } = input;
+    if (source) {
+      await this.callVaultBoundary({ operation: 'SAVE_LICENSE_EDITS', licenseId, expectedSnapshot, changes, source });
+    } else {
+      const { data, error } = await this.client.rpc('rpc_manager_save_license_edits', { p_license_id: licenseId, p_expected_snapshot: expectedSnapshot, p_changes: changes });
+      if (error || !isRecord(data) || data.success !== true) throw new SanitizedManagerRemoteError(safeErrorCode(error || data), 'RPC');
+    }
+  }
+
+  async previewCustomerDeletion(licenseId: string): Promise<ManagerCustomerDeletePreview> {
+    const data = await this.call('rpc_manager_customer_delete_preview', { p_license_id: licenseId });
+    if (!isRecord(data) || typeof data.customerId !== 'string' || typeof data.nickname !== 'string' || typeof data.snapshot !== 'string' || !Array.isArray(data.licenses) || !Array.isArray(data.devices)) throw new Error('REMOTE_MANAGER_READ_FAILED');
+    return { customerId: data.customerId, nickname: data.nickname, snapshot: data.snapshot,
+      licenses: data.licenses.filter((id): id is string => typeof id === 'string'),
+      devices: data.devices.filter(isRecord).map(d => ({ deviceId: String(d.deviceId), displayCode: String(d.displayCode), deviceLabel: String(d.deviceLabel ?? '') })) };
+  }
+
+  async deleteLicenseCustomer(licenseId: string, snapshot: string, confirmation: string): Promise<void> {
+    const data = await this.call('rpc_manager_delete_license_customer', { p_license_id: licenseId, p_snapshot: snapshot, p_confirmation: confirmation });
+    if (!isRecord(data) || data.success !== true) throw new Error('REMOTE_MANAGER_MUTATION_FAILED');
+  }
+
   async getLicenseDetail(licenseId: string): Promise<ManagerLicenseDetail> {
     if (!/^[0-9a-f-]{36}$/i.test(licenseId)) {
       throw new Error('LICENSE_ID_REQUIRED');
@@ -1481,6 +1751,7 @@ export class SupabaseManagerRemoteControlPlaneAuthority implements RemoteManager
     if (!/^[0-9a-f-]{36}$/i.test(licenseId)) {
       throw new Error('LICENSE_ID_REQUIRED');
     }
+    if (maxConcurrentSessions > maxDevices) throw new Error('CONCURRENT_LIMIT_EXCEEDS_DEVICES');
     const data = await this.call('rpc_manager_update_license_limits', {
       p_license_id: licenseId,
       p_max_devices: maxDevices,
@@ -1662,6 +1933,12 @@ export function sanitizeManagerErrorMessage(error: unknown): string {
       return 'Sessao Supabase autenticada obrigatoria para mutacoes do Manager.';
     case 'MANAGER_NOT_AUTHORIZED':
       return 'Usuario autenticado sem autorizacao ativa de Manager.';
+    case 'MASTER_REQUIRED':
+      return 'Esta funcao exige acesso MASTER.';
+    case 'MANAGER_SCOPE_DENIED':
+      return 'Este registro nao pertence aos clientes autorizados para seu acesso.';
+    case 'DEVICE_DELETE_CONFIRMATION_REQUIRED':
+      return 'Confirme o Codigo ID exato do dispositivo para excluir permanentemente.';
     case 'MASTER_MANAGER_NOT_AUTHORIZED':
       return 'Apenas o Gestor Master pode revelar dados protegidos.';
     case 'DEVICE_NOT_FOUND':

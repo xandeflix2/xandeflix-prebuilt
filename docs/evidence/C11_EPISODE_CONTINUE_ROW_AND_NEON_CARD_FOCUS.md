@@ -1,0 +1,19 @@
+# C11 — Episodio continuar, capa neon e D-pad serie — evidencia56
+
+2026-10-08 America/Sao_Paulo; execucao UTC em2026-10-09. [Spec e emendas antes de codigo](../architecture/C11_EPISODE_CONTINUE_ROW_AND_NEON_CARD_FOCUS.md).
+
+Preflight C11-main/top-level proprio/main/origin esperado/HEAD61ec00902be5d0037adf79c68b3a8624b3a2bd6e. AGENTS/Architecture/Execution/SourceBoundary/ActivationLock lidos; baseline728 e allowlists51–56, protegido693/HEAD igual/zero arquivo fora do escopo. CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO.
+
+Linha inteira de episodio selecionado destacada. Continuar assistindo/Continuar somente para posicao salva positiva incompleta, identidade canonica/fingerprint/episodeId exatos; subscription e sync nativo existentes com cleanup, sem novo store ou callback de playback. Capas focadas usam contorno e mesmo glow vermelho dos botoes sem alterar dimensoes. D-pad wide segue hero->abas->temporadas (quando existem)->episodios em ordem e volta, independente de X deslocado pelo badge/sinopse; row inteira centralizada. Right/Left locais/menu/restauro/related/modal e hero inteiro Fire preservados.
+
+Render real/WatchHistory2, hook8, hero4, detalhes7, continuidade4, Cast4, diagnostico8, ordem4, typecheck/React, lock22+27+9/prebuild, build/sync, assets6/certificado e Java148 PASS. QA ADB15 passos em Luke Cage aberto por busca no tablet e Fire0.106; hero inteiro/menu/restauro PASS. Fire A Biblia2013 com temporada unica/zero season-buttons:6 passos isolados e identidade da fixture conferida por passo PASS. Regressao Fire Home/filme11 passos PASS. CSS real tablet/Fire: shadow igual ao botao, dimensoes iguais, linha inteira; cascata phone simulada temporariamente no DOM do tablet e removida, nao equivale a QA fisica S24.
+
+APK_FINAL=4E1DD13D275D75A96FDF4548A03C3BC59024CA1404E83112D5F877ED4C90B10C; 12400179bytes; JS=index-SYW2hki0.js; package com.xandeflix.prebuilt1.0/code1; min23/target35/httpslocalhost/assinatura b235c7117c9660e17cf0732cd6493600a812692af289e627454988ea096e848d.
+
+- tablet: 755 arquivos/715 catalogo/5 estado nativo; 2026-10-09T01:53:25.717Z. Cinco grupos privados sem alteracao; hash e firstInstallTime preservados.
+- s24: 762 arquivos/718 catalogo/5 estado nativo; 2026-10-09T01:54:16.369Z. Cinco grupos privados sem alteracao; hash e firstInstallTime preservados.
+- firestick: 899 arquivos/856 catalogo/5 estado nativo; 2026-10-09T01:58:24.983Z. Cinco grupos privados sem alteracao; hash e firstInstallTime preservados.
+
+Erros e correcoes: primeira rodada do fixture phone reutilizou posicao observada pela rodada anterior (727243 vs725243); cada perfil passa a iniciar observacao monotonicamente em725243, assertions intactas. Teste inicial do hook reproduziu salto do terceiro episodio para temporada pela geometria; criterio permanece, corrigido pelo caminho estrutural. Revisao identificou empate de especificidade CSS phone; seletor episodes-list supera regra base e QA real da cascata passa. Helpers inicialmente acionaram busca antes de nav montada; passaram a aguardar UI. S24 WebView pausado e Fire fora do foreground/player ativo bloquearam input/screenshot/install; guards mantidos, aguardada disponibilidade real. Patch privado rejeitado por operacoes delete/add no mesmo alvo, corrigido sem alterar producao. Warnings Vite Node externalizado/import dinamico misto/chunk grande e Gradle flatDir preexistentes; builds exit0, nenhum requisito relaxado.
+
+S24 atualizado com dados preservados, mas UI fisica final pendente por tela/aplicativo fora do foreground; nao desbloqueado pelo agente. Fire107 ausente do ADB e IP atual solicitado; nao alegar versao atualizada ou QA nesse alvo. S23 excluido. Fonte Luke S01E03 aos12min e motor AirScreen continuam limitacoes externas documentadas55; usuario encerrou Cast, nenhum novo teste Cast. Sem semear historico real/avaliar/favoritar/WhatsApp automatico/reset/rotacao/backend/Git/novoGate.

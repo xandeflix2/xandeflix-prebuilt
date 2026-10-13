@@ -33,10 +33,16 @@ import {
 import {
   type NativePlaybackRequest,
   type NativePlaybackKind,
+  type NativeEpisodeNavigationEvent,
 } from './native-android-player.bridge.ts';
+import { episodeContext, orderedSeriesEpisodes } from './episode-sequence.ts';
 import { sanitizePlaybackUriForLog } from './playback-redaction.ts';
 import { getAuthorizedPlaybackSessionGuard } from '../control-plane/client/playback-session.service.ts';
 import { bootTelemetry } from '../diagnostics/boot-telemetry.ts';
+import { armCastAuthorization,stopGoogleCast } from './google-cast.ts';
+import { NativeAndroidPlayer } from './native-android-player.bridge.ts';
+import {watchHistory,WatchHistory,watchFingerprint} from './watch-history.ts';
+import { isAdultCatalogItem } from './content-adult-policy.ts';
 
 export type PlaybackStateListener = (session: PlaybackSessionInfo) => void;
 
@@ -54,6 +60,11 @@ export class PlaybackService {
   private playerClient?: NativePlayerClient;
   private sessionGuard?: PlaybackSessionGuard;
   private sessionAcquired = false;
+  private history:WatchHistory;
+  private watchPlaybackId?:string;
+  private episodeRun = 0;
+  private episodePlayback?: { seriesId: string; episodeId: string; model: CatalogReadModel; playbackId: string; run: number };
+  private navigatingEpisode = false;
   private currentSession: PlaybackSessionInfo;
   private listeners = new Set<PlaybackStateListener>();
 
@@ -64,6 +75,7 @@ export class PlaybackService {
     playerAdapter?: NativePlayerAdapter;
     playerClient?: NativePlayerClient;
     sessionGuard?: PlaybackSessionGuard;
+    history?:WatchHistory;
   }) {
     // Caminho canônico real não cria contexto sintético arbitrário
     this.runtimeContext = options?.runtimeContext;
@@ -72,8 +84,11 @@ export class PlaybackService {
     this.playerAdapter = options?.playerAdapter ?? new NativeAndroidPlayerAdapter();
     this.playerClient = options?.playerClient;
     this.sessionGuard = options?.sessionGuard;
+    this.history=options?.history ?? watchHistory;
     if (this.sessionGuard?.onTermination) {
       this.sessionGuard.onTermination((reason, code) => {
+        this.invalidateEpisodePlayback();
+        void stopGoogleCast();void NativeAndroidPlayer.stopPlayback().catch(()=>{});
         this.sessionAcquired = false;
         this.updateSession({
           state: 'ERROR',
@@ -112,6 +127,7 @@ export class PlaybackService {
   private updateSession(updates: Partial<PlaybackSessionInfo>): void {
     this.currentSession = {
       ...this.currentSession,
+      nativeErrorCode: updates.state ? undefined : this.currentSession.nativeErrorCode,
       ...updates,
     };
     for (const listener of this.listeners) {
@@ -131,6 +147,7 @@ export class PlaybackService {
     readModel: CatalogReadModel,
     options?: { startPositionMs?: number }
   ): Promise<NativePlayerLaunchResult> {
+    this.invalidateEpisodePlayback();
     bootTelemetry.mark('MOVIE_PLAY_REQUESTED');
     const sessionId = `movie-${movieId}-${Date.now()}`;
     this.updateSession({
@@ -157,6 +174,7 @@ export class PlaybackService {
         }
         this.sessionAcquired = true;
         bootTelemetry.mark('C9_SESSION_STARTED');
+        await armCastAuthorization();
       }
 
       // 1. Localizar filme no catálogo ativo
@@ -183,12 +201,16 @@ export class PlaybackService {
       this.updateSession({ streamRefId: streamRef.id });
 
       // 4. Resolver requisição direta
+      await this.history.syncNativeProgress();
+      const fingerprint = watchFingerprint('movie', movie);
       const resolvedRequest = await this.resolveStream(streamRef, {
         title: movie.title,
-        startPositionMs: options?.startPositionMs,
+        startPositionMs: options?.startPositionMs ?? this.history.savedPosition('movie', movieId, fingerprint),
       });
 
       // 5. Iniciar player nativo
+      this.watchPlaybackId=this.history.begin('movie',movieId,undefined,fingerprint,!isAdultCatalogItem(movie,readModel));
+      await this.history.ready();
       return await this.launchPlayer(resolvedRequest);
     } catch (err: unknown) {
       return await this.handlePlaybackFailure(err);
@@ -204,6 +226,65 @@ export class PlaybackService {
     readModel: CatalogReadModel,
     options?: { startPositionMs?: number }
   ): Promise<NativePlayerLaunchResult> {
+    this.invalidateEpisodePlayback();
+    return this.playEpisodeInternal(seriesId, episodeId, readModel, options, this.episodeRun);
+  }
+
+  private invalidateEpisodePlayback(): void {
+    this.episodeRun++;
+    this.episodePlayback = undefined;
+    this.navigatingEpisode = false;
+  }
+
+  /** Only the active native playback may request an episode; no stream URLs enter this event. */
+  async navigateEpisode(event: NativeEpisodeNavigationEvent): Promise<boolean> {
+    const current = this.episodePlayback;
+    if (!current || current.playbackId !== event.playbackId || current.run !== this.episodeRun
+      || this.navigatingEpisode || !/^[A-Za-z0-9_-]{1,64}$/.test(event.requestId)
+      || !['ended', 'next', 'select'].includes(event.reason)) return false;
+    const sequence = orderedSeriesEpisodes(current.model, current.seriesId);
+    const index = sequence.findIndex(ep => ep.id === current.episodeId);
+    const next = event.reason === 'select'
+      ? sequence.find(ep => ep.id === event.episodeId && ep.id !== current.episodeId)
+      : index >= 0 ? sequence[index + 1] : undefined;
+    if (!next) {
+      await NativeAndroidPlayer.cancelEpisodeNavigation({ playbackId: event.playbackId, requestId: event.requestId }).catch(() => {});
+      return false;
+    }
+    this.navigatingEpisode = true;
+    try {
+      // Final native journal has already saved completion/manual exit. Close old C9 lease
+      // before acquiring the next one; the normal authorization/resolver remains authoritative.
+      await this.history.syncNativeProgress();
+      if (current.run !== this.episodeRun) return false;
+      await this.releaseSession('EPISODE_TRANSITION');
+      if (current.run !== this.episodeRun) return false;
+      const result = await this.playEpisodeInternal(current.seriesId, next.id, current.model,
+        event.reason === 'select' ? undefined : { startPositionMs: 0 }, current.run,
+        { replacePlaybackId: event.playbackId, navigationRequestId: event.requestId });
+      if (!result.success && current.run === this.episodeRun) {
+        this.episodePlayback = undefined;
+        await NativeAndroidPlayer.cancelEpisodeNavigation({ playbackId: event.playbackId, requestId: event.requestId }).catch(() => {});
+      }
+      return result.success;
+    } catch (error) {
+      if (current.run === this.episodeRun) {
+        this.episodePlayback = undefined;
+        await this.handlePlaybackFailure(error);
+        await NativeAndroidPlayer.cancelEpisodeNavigation({ playbackId: event.playbackId, requestId: event.requestId }).catch(() => {});
+      }
+      return false;
+    } finally {
+      if (current.run === this.episodeRun) this.navigatingEpisode = false;
+    }
+  }
+
+  private async playEpisodeInternal(
+    seriesId: string, episodeId: string, readModel: CatalogReadModel,
+    options: { startPositionMs?: number } | undefined, run: number,
+    replacement?: { replacePlaybackId: string; navigationRequestId: string },
+  ): Promise<NativePlayerLaunchResult> {
+    const assertActive = () => { if (run !== this.episodeRun) throw new Error('EPISODE_TRANSITION_CANCELLED'); };
     const sessionId = `episode-${episodeId}-${Date.now()}`;
     this.updateSession({
       sessionId,
@@ -221,6 +302,10 @@ export class PlaybackService {
           contentKind: 'episode',
           playbackSessionId: sessionId,
         });
+        if (run !== this.episodeRun) {
+          if (guardRes.allowed) await this.sessionGuard.releaseSession('USER_EXIT');
+          assertActive();
+        }
         if (!guardRes.allowed) {
           if (guardRes.code === 'SESSION_LIMIT_REACHED') {
             throw PlaybackError.concurrentSessionLimit();
@@ -232,15 +317,18 @@ export class PlaybackService {
       }
 
       // 1. Localizar série e episódio no catálogo ativo
+      await armCastAuthorization();
+      assertActive();
       const series = readModel.seriesById.get(seriesId);
       if (series) bootTelemetry.mark('SERIES_DETAIL_RESOLVED');
       let episode = readModel.episodesById.get(episodeId);
-      if (!episode && typeof (readModel as any).loadEpisodesForSeries === "function") {
-        await (readModel as any).loadEpisodesForSeries(seriesId);
+      if (typeof readModel.loadEpisodesForSeries === 'function') {
+        await readModel.loadEpisodesForSeries(seriesId);
+        assertActive();
         episode = readModel.episodesById.get(episodeId);
       }
 
-      if (!episode) {
+      if (!series || !episode || episode.seriesId !== seriesId) {
         throw PlaybackError.streamRefNotFound(`Episódio ${episodeId}`);
       }
       bootTelemetry.mark('EPISODE_SELECTED');
@@ -255,6 +343,7 @@ export class PlaybackService {
       // 3. Localizar StreamRef canônico
       bootTelemetry.mark('EPISODE_STREAMREF_REQUESTED');
       const streamRef = await readModel.getStreamRefAsync(streamId);
+      assertActive();
       if (!streamRef) {
         throw PlaybackError.streamRefNotFound(streamId);
       }
@@ -267,14 +356,27 @@ export class PlaybackService {
         ? `${series.title} — EP ${episode.episodeNumber}: ${episode.title}`
         : episode.title;
 
+      await this.history.syncNativeProgress();
+      assertActive();
+      const fingerprint = watchFingerprint('series', series);
       const resolvedRequest = await this.resolveStream(streamRef, {
         title,
-        startPositionMs: options?.startPositionMs,
-      });
+        startPositionMs: options?.startPositionMs ?? this.history.savedPosition('series', seriesId, fingerprint, episodeId),
+      }, () => run === this.episodeRun);
+      assertActive();
 
       // 5. Iniciar player nativo
-      return await this.launchPlayer(resolvedRequest);
+      this.watchPlaybackId=this.history.begin('series',seriesId,episodeId,fingerprint,!isAdultCatalogItem(series,readModel));
+      await this.history.ready();
+      assertActive();
+      this.episodePlayback = { seriesId, episodeId, model: readModel, playbackId: this.watchPlaybackId, run };
+      return await this.launchPlayer(resolvedRequest, replacement, () => run === this.episodeRun);
     } catch (err: unknown) {
+      if (run !== this.episodeRun) {
+        if (this.sessionAcquired && !this.episodePlayback) await this.releaseSession('USER_EXIT');
+        return { success: false, state: 'NATIVE_PLAYER_ERROR', errorMessage: 'Reprodução encerrada.' };
+      }
+      this.episodePlayback = undefined;
       return await this.handlePlaybackFailure(err);
     }
   }
@@ -284,7 +386,8 @@ export class PlaybackService {
    */
   async resolveStream(
     streamRef: StreamRef,
-    options?: { title?: string; startPositionMs?: number }
+    options?: { title?: string; startPositionMs?: number },
+    isCurrent?: () => boolean,
   ): Promise<ResolvedPlaybackRequest> {
     const hasDirectUrl = Boolean(streamRef.directStreamUrl);
 
@@ -295,6 +398,7 @@ export class PlaybackService {
       });
       this.runtimeContext = resolved;
     }
+    if (isCurrent && !isCurrent()) throw new Error('EPISODE_TRANSITION_CANCELLED');
 
     if (!this.runtimeContext && !hasDirectUrl) {
       const providerFailure = this.contextProvider?.getLastFailure?.();
@@ -302,6 +406,7 @@ export class PlaybackService {
     }
 
     const resolved = await this.resolver.resolve(streamRef, this.runtimeContext, options);
+    if (isCurrent && !isCurrent()) throw new Error('EPISODE_TRANSITION_CANCELLED');
     this.updateSession({
       state: 'READY_TO_START',
       sanitizedUri: sanitizePlaybackUriForLog(resolved.uri),
@@ -314,7 +419,9 @@ export class PlaybackService {
    * Dispara o pedido de abertura do player nativo.
    */
   private async launchPlayer(
-    request: ResolvedPlaybackRequest
+    request: ResolvedPlaybackRequest,
+    replacement?: { replacePlaybackId: string; navigationRequestId: string },
+    isCurrent?: () => boolean,
   ): Promise<NativePlayerLaunchResult> {
     bootTelemetry.mark('NATIVE_PLAYER_START_REQUESTED');
     this.updateSession({ state: 'OPENING_NATIVE_PLAYER' });
@@ -334,16 +441,21 @@ export class PlaybackService {
             : 'vod';
 
       const nativeRequest: NativePlaybackRequest = {
+        playbackId:this.watchPlaybackId,
         uri: request.uri,
         title: request.title,
         kind,
         headers: request.headers,
         startPositionMs: request.startPositionMs,
+        episodeContext: kind === 'series' && this.episodePlayback
+          ? episodeContext(this.episodePlayback.model, this.episodePlayback.seriesId, this.episodePlayback.episodeId) : undefined,
+        ...replacement,
       };
 
       result = await this.playerAdapter.launch(nativeRequest);
     }
 
+    if (isCurrent && !isCurrent()) return { success: false, state: 'NATIVE_PLAYER_ERROR', errorMessage: 'Reprodução encerrada.' };
     if (result.state === 'NATIVE_PLAYER_OPENED') {
       bootTelemetry.mark('NATIVE_PLAYER_STARTED');
       bootTelemetry.mark('FIRST_FRAME_OR_PLAYER_STATE');
@@ -359,6 +471,7 @@ export class PlaybackService {
         state: 'ERROR',
         errorCategory: 'PLAYER_INIT_FAILED',
         errorMessage: result.errorMessage,
+        nativeErrorCode: result.errorCode,
       });
     }
 
@@ -373,6 +486,8 @@ export class PlaybackService {
    * Encerra a reprodução e libera a sessão concorrente de forma best-effort (Gate C9).
    */
   async stopPlayback(reason: string = 'USER_EXIT'): Promise<void> {
+    this.invalidateEpisodePlayback();
+    await stopGoogleCast();void NativeAndroidPlayer.stopPlayback().catch(()=>{});
     await this.releaseSession(reason);
     this.updateSession({ state: 'IDLE' });
   }
@@ -404,6 +519,7 @@ export class PlaybackService {
   }
 
   private async releaseSession(reason: string): Promise<void> {
+    await stopGoogleCast();
     if (!this.sessionGuard || !this.sessionAcquired) return;
     this.sessionAcquired = false;
     await this.sessionGuard.releaseSession(reason);

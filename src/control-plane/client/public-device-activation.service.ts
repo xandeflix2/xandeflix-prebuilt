@@ -91,11 +91,13 @@ export class PublicDeviceActivationService {
     sessionToken: string;
     sourceName: string;
     sourceType?: 'M3U' | 'M3U8';
+    initialScreens?: number;
     sourceUrl: string;
     epgUrl?: string;
     username?: string;
     password?: string;
   }): Promise<PublicDeviceActivationResult> {
+    if (!Number.isInteger(params.initialScreens ?? 1) || (params.initialScreens ?? 1) < 1 || (params.initialScreens ?? 1) > 4) return { success: false, code: 'INITIAL_SCREEN_LIMIT', message: 'No cadastro inicial, escolha de uma a quatro telas.' };
     const client = getSupabaseBrowserClient();
     if (!client) return { success: false, code: 'CLIENT_UNAVAILABLE', message: 'Serviço de ativação indisponível.' };
 

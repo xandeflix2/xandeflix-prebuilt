@@ -1,0 +1,7 @@
+.settings-page { width: min(1080px, 100%); margin: 0 auto; padding: clamp(18px, 3vw, 40px); }
+.settings-sections { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 24px; }
+.settings-section { background: #101624; border: 1px solid #ffffff25; border-radius: 14px; padding: clamp(20px, 3vw, 32px); }
+.settings-section h2 { font-size: clamp(20px, 2vw, 26px); margin: 0 0 16px; }
+.settings-section p { color: #bcc5d3; font-size: 16px; line-height: 1.5; margin: 12px 0; }
+.settings-section strong { color: #fff; }
+.settings-section button { margin-top: 12px; min-height: 46px; }

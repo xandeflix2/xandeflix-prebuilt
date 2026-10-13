@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import {paletteFromPixels,paletteForImage} from '../src/artwork/artwork-palette.ts';
+const pixels=(r,g,b,alpha=255,n=576)=>new Uint8ClampedArray(Array.from({length:n},()=>[r,g,b,alpha]).flat());
+const red=paletteFromPixels(pixels(220,40,30)),blue=paletteFromPixels(pixels(20,60,220));
+const rgb=value=>value.match(/\d+/g).map(Number);
+assert.ok(rgb(red.ambient)[0]>rgb(red.ambient)[2]);assert.ok(rgb(blue.ambient)[2]>rgb(blue.ambient)[0]);
+const mixed=new Uint8ClampedArray([...pixels(0,0,0,255,400),...pixels(20,60,220,255,100)]);assert.deepEqual(paletteFromPixels(mixed),blue);
+assert.equal(paletteFromPixels(pixels(0,0,0)),undefined);assert.equal(paletteFromPixels(pixels(255,255,255)),undefined);assert.equal(paletteFromPixels(pixels(220,40,30,0)),undefined);
+const luminance=channels=>channels.map(v=>v/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4).reduce((sum,v,n)=>sum+v*[.2126,.7152,.0722][n],0);
+for(const color of [red.base,red.ambient,blue.base,blue.ambient,paletteFromPixels(pixels(234,234,234)).ambient])assert.ok(1.05/(luminance(rgb(color))+.05)>=7,'white text retains at least 7:1 contrast');
+let reads=0,blocked=false;
+globalThis.document={createElement:()=>({width:0,height:0,getContext:()=>({drawImage(){},getImageData(){reads++;if(blocked)throw new Error('SecurityError');return{data:pixels(20,60,220)};}})})};
+const image=id=>({complete:true,naturalWidth:1280,currentSrc:'https://fixture.invalid/'+id,src:''});
+assert.deepEqual(paletteForImage(image(0)),blue);assert.deepEqual(paletteForImage(image(0)),blue);assert.equal(reads,1,'displayed image palette is sampled once');
+for(let n=1;n<=48;n++)paletteForImage(image(n));paletteForImage(image(0));assert.equal(reads,50,'palette LRU is bounded to 48');
+blocked=true;assert.equal(paletteForImage(image('blocked')),undefined);assert.equal(paletteForImage({...image('pending'),complete:false}),undefined);
+delete globalThis.document;
+console.log('PASS_PALETTE_DOMINANT_IMAGE_ONLY_24PX_DARK_CONTRAST_NEUTRAL_CORS_FAILURE_CACHE48');

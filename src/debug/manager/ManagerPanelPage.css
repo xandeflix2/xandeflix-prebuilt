@@ -1,0 +1,25 @@
+.manager-panel-page { box-sizing: border-box; }
+.manager-panel-page input, .manager-panel-page select { max-width: 100%; box-sizing: border-box; }
+.manager-panel-page .manager-workspace { display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 24px; align-items: start; }
+.manager-panel-page .manager-navigation { position: sticky; top: 24px; display: flex; flex-direction: column; gap: 8px; padding: 12px; border: 1px solid #29324b; border-radius: 12px; background: #101624; }
+.manager-panel-page .manager-navigation button { text-align: left; padding: 12px; border: 1px solid transparent; border-radius: 8px; background: transparent; color: #cbd5e1; cursor: pointer; font: inherit; }
+.manager-panel-page .manager-navigation button[aria-current="page"] { background: #6d28d9; border-color: #a78bfa; color: white; font-weight: 700; }
+.manager-panel-page .manager-navigation button:focus-visible { outline: 2px solid #c4b5fd; outline-offset: 2px; }
+.manager-panel-page .manager-content { min-width: 0; }
+.manager-panel-page .manager-navigation__role { padding: 8px 12px; color: #a78bfa; font-size: .8rem; font-weight: 700; }
+.manager-panel-page .manager-activation-submenu { display: flex; flex-direction: column; gap: 6px; margin-left: 8px; padding-left: 6px; border-left: 2px solid #7c3aed; }
+.manager-panel-page .manager-activation-submenu button { font-size: .8rem; padding: 10px 6px; overflow-wrap: anywhere; }
+.manager-link-view { padding: 20px; border: 1px solid #4c327c; border-radius: 8px; background: #101624; overflow-wrap: anywhere; }
+.manager-link-view label { display: block; margin: 18px 0; }
+.manager-link-view select { display: block; width: 100%; min-width: 0; padding: 10px; margin-top: 6px; border: 1px solid #475569; border-radius: 6px; background: #151d30; color: #f8fafc; }
+.manager-link-view button { min-height: 44px; padding: 10px; }
+@media (max-width: 760px) {
+  .manager-panel-page { padding: 12px !important; }
+  .manager-panel-page .manager-header, .manager-panel-page .manager-header-actions { flex-wrap: wrap; gap: 12px; }
+  .manager-panel-page .manager-header-actions { max-width: 100%; }
+  .manager-panel-page .manager-workspace { grid-template-columns: 110px minmax(0, 1fr); gap: 12px; }
+  .manager-panel-page .manager-navigation { padding: 6px; top: 12px; }
+  .manager-panel-page .manager-navigation button { padding: 10px 6px; font-size: .8rem; overflow-wrap: anywhere; }
+  .manager-panel-page .manager-content form > div { min-width: 0 !important; flex-basis: 100% !important; }
+  .manager-panel-page .manager-content div[style*="grid-template-columns"] { grid-template-columns: minmax(0, 1fr) !important; }
+}

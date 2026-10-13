@@ -1,0 +1,109 @@
+.admin-licenses-view {
+  box-sizing: border-box;
+  min-width: 0;
+  width: 100%;
+}
+
+.license-table-filters { min-width: 0; max-width: 100%; }
+.license-table-filters input { min-width: 0 !important; width: 220px; }
+.license-table-filters input, .license-table-filters select {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+.license-empty-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  max-width: 100%;
+  color: #94a3b8;
+  font-size: .82rem;
+}
+.license-table-filters .license-empty-filter input {
+  width: auto;
+  flex: 0 0 auto;
+  margin: 0;
+}
+
+.license-table { table-layout: fixed; }
+.license-table tr[hidden] { display: none !important; }
+.license-secondary-row { background: #131e30; }
+.license-secondary-row td[data-label="Código do dispositivo"] { border-left: 3px solid #6d43b9; }
+.license-device-toggle {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .15rem;
+  margin-top: .6rem;
+  padding: .4rem .2rem;
+  max-width: 100%;
+  border: 1px solid #40516c;
+  border-radius: 6px;
+  background: #1c293e;
+  color: #c4b5fd;
+  font-size: .75rem;
+  text-align: left;
+  cursor: pointer;
+}
+.license-device-toggle span { min-width: 0; overflow-wrap: anywhere; white-space: normal; }
+.license-device-toggle:focus-visible { outline: 2px solid #c4b5fd; outline-offset: 3px; }
+.license-device-value { min-height: 36px; margin-bottom: .4rem; }
+.license-device-value small, .license-slot-device { display: block; color: #94a3b8; font-size: .75rem; }
+.license-table th, .license-table td {
+  padding: .65rem .45rem !important;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+.license-table td[data-label="Status"] > span {
+  display: inline-block;
+  box-sizing: border-box;
+  max-width: 100%;
+  padding-inline: .3rem !important;
+}
+.license-table .manager-license-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: .35rem;
+}
+.license-table .manager-license-actions button {
+  box-sizing: border-box;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  padding: 0 !important;
+}
+
+@media (max-width: 600px) {
+  .license-table, .license-table tbody { display: block; }
+  .license-table colgroup { display: none; }
+  /* Keep the column headers available to assistive technology. */
+  .license-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .license-table tbody > tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    margin-bottom: 1rem;
+    padding: .5rem;
+    border: 1px solid #29324b;
+    border-radius: 8px;
+  }
+  .license-table td { display: block; min-width: 0; text-align: left !important; }
+  .license-secondary-row td:empty { display: none; }
+  .license-table tbody > tr.license-secondary-row { margin-left: .75rem; border-left: 3px solid #6d43b9; }
+  .license-table td::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: .4rem;
+    color: #94a3b8;
+    font-size: .8rem;
+    font-weight: 600;
+  }
+  .license-table td[data-label="Cliente"], .license-table td[data-label="Ações"] { grid-column: 1 / -1; }
+  .license-table .manager-license-actions { justify-content: flex-start; }
+}

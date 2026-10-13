@@ -25,6 +25,7 @@ import {
 } from './ui/navigation/route-state.ts';
 import type { CatalogItemViewModel } from './catalog/catalog-view-model.ts';
 import { AppShell } from './ui/components/AppShell.tsx';
+import { NewContentProvider } from './ui/components/NewContentProvider.tsx';
 import { PlaybackErrorNotice } from './ui/components/PlaybackErrorNotice.tsx';
 import { LoadingState } from './ui/components/LoadingState.tsx';
 import { NoActiveCatalogState } from './ui/components/NoActiveCatalogState.tsx';
@@ -39,6 +40,7 @@ import {
   type BootSyncProgress,
 } from './bootstrap/boot-sync-coordinator.ts';
 import { HomePage } from './ui/pages/HomePage.tsx';
+import { HomeCollectionPage, isHomeCollectionId } from './ui/pages/HomeCollectionPage.tsx';
 import { MoviesPage } from './ui/pages/MoviesPage.tsx';
 import { SeriesPage } from './ui/pages/SeriesPage.tsx';
 import { SearchPage } from './ui/pages/SearchPage.tsx';
@@ -46,6 +48,7 @@ import { MovieDetailPage } from './ui/pages/MovieDetailPage.tsx';
 import { SeriesDetailPage } from './ui/pages/SeriesDetailPage.tsx';
 import { LocalSourceProvisioningPage } from './ui/pages/LocalSourceProvisioningPage.tsx';
 import { ActivationPage } from './ui/pages/ActivationPage.tsx';
+import { SettingsPage } from './ui/pages/SettingsPage.tsx';
 import { PublicDeviceActivationPage } from './ui/pages/PublicDeviceActivationPage.tsx';
 import { ManagerPanelPage } from './debug/manager/ManagerPanelPage.tsx';
 import { LiveTvPage } from './ui/pages/LiveTvPage.tsx';
@@ -53,10 +56,14 @@ import { CustomerPortalPage } from './ui/portal/CustomerPortalPage.tsx';
 import {
   addNativeAndroidBackButtonListener,
   addNativePlayerResumeListener,
+  NativeAndroidPlayer,
   finishNativeAndroidApp,
 } from './playback/native-android-player.bridge.ts';
 import { defaultPlaybackService } from './playback/playback.service.ts';
-import { handleNativePlayerReturn } from './playback/native-playback-error-notice.ts';
+import { AutomaticSourceRefresh, canRefreshCatalog } from './bootstrap/automatic-source-refresh.ts';
+import { GoogleCast, hasGoogleCast } from './playback/google-cast.ts';
+import { handleNativePlayerReturn, getNativePlaybackErrorNotice } from './playback/native-playback-error-notice.ts';
+import { capturePlaybackSupportDiagnostic } from './playback/playback-support-diagnostic.ts';
 import { InstallationRegistryService } from './control-plane/client/installation-registry.service.ts';
 import { DeviceIdentityService } from './device/device-identity.service.ts';
 import { bootTelemetry } from './diagnostics/boot-telemetry.ts';
@@ -95,8 +102,11 @@ export default function App(): React.JSX.Element {
   );
   const [bootSyncError, setBootSyncError] = useState<string | undefined>();
   const [nativePlaybackErrorNotice, setNativePlaybackErrorNotice] = useState<string | null>(null);
+  const [playbackSupportDiagnostic, setPlaybackSupportDiagnostic] = useState<string | null>(null);
 
   const [routeState, setRouteState] = useState<NavigationState>(createInitialRoute());
+  const sourceRefreshView = useRef(routeState.current.view);
+  sourceRefreshView.current = routeState.current.view;
   const [authorizationGate, setAuthorizationGate] = useState<'CHECKING' | 'UNAUTHORIZED' | 'AUTHORIZED'>('CHECKING');
   const routeStateRef = useRef(routeState);
   routeStateRef.current = routeState;
@@ -129,11 +139,15 @@ export default function App(): React.JSX.Element {
   }, []);
 
   const handleBack = useCallback(() => {
+    if (!window.dispatchEvent(new Event('xandeflix:playback-error-back', { cancelable: true }))) return;
+    const dialog = document.querySelector<HTMLDialogElement>('dialog[data-detail-modal][open]');
+    if (dialog) { dialog.close(); return; }
     setRouteState((prev) => navigateBack(prev));
   }, []);
 
   const handleSelectItem = useCallback(
     (item: CatalogItemViewModel) => {
+      if (getBootSyncCoordinator().getState() === 'PROMOTING') return;
       if (item.kind === 'movie') {
         handleNavigate('movie-detail', item.id);
       } else {
@@ -170,7 +184,10 @@ export default function App(): React.JSX.Element {
     let listenerHandle: { remove: () => Promise<void> } | null = null;
 
     void addNativeAndroidBackButtonListener(() => {
+      if (!window.dispatchEvent(new Event('xandeflix:device-presentation-back', { cancelable: true }))) return;
+      if (document.querySelector('.playback-error-notice, dialog[data-detail-modal][open]')) { handleBack(); return; }
       const current = routeStateRef.current;
+      if (current.current.view === 'live' && !window.dispatchEvent(new Event('xandeflix:live-epg-back', { cancelable: true }))) return;
       const hasInternalRoute = current.history.length > 0 || current.current.view !== 'home';
       if (hasInternalRoute) {
         handleBack();
@@ -206,7 +223,10 @@ export default function App(): React.JSX.Element {
     let listenerHandle: { remove: () => Promise<void> } | null = null;
     void addNativePlayerResumeListener((event) => {
       if (disposed) return;
-      void handleNativePlayerReturn(event, (reason) => defaultPlaybackService.stopPlayback(reason), setNativePlaybackErrorNotice);
+      void handleNativePlayerReturn(event, (reason) => defaultPlaybackService.stopPlayback(reason), (notice) => {
+        setPlaybackSupportDiagnostic(notice ? capturePlaybackSupportDiagnostic(event, routeStateRef.current.current.view) : null);
+        setNativePlaybackErrorNotice(notice);
+      });
     })
       .then((handle) => {
         if (disposed) {
@@ -225,9 +245,24 @@ export default function App(): React.JSX.Element {
     };
   }, []);
 
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+    let disposed = false;
+    let handle: { remove: () => Promise<void> } | undefined;
+    void NativeAndroidPlayer.addListener('episodeNavigation', event => {
+      if (!disposed) void defaultPlaybackService.navigateEpisode(event);
+    }).then(value => { if (disposed) void value.remove(); else handle = value; }).catch(() => {});
+    return () => { disposed = true; if (handle) void handle.remove(); };
+  }, []);
+
   // A new attempt clears only the prior playback notice, not activation/catalog state.
   useEffect(() => defaultPlaybackService.subscribe((session) => {
     if (session.state === 'RESOLVING') setNativePlaybackErrorNotice(null);
+    if (session.state === 'ERROR' && session.nativeErrorCode) {
+      const event = { errorCode: session.nativeErrorCode };
+      setPlaybackSupportDiagnostic(capturePlaybackSupportDiagnostic(event, routeStateRef.current.current.view));
+      setNativePlaybackErrorNotice(getNativePlaybackErrorNotice(event));
+    }
   }), []);
 
   // Registro best-effort de instalação no boot (C2 Installation Registry)
@@ -271,15 +306,45 @@ export default function App(): React.JSX.Element {
         setBootSyncError(result.error);
       }
       if (result?.outcome === 'PROMOTED') {
+        setRouteState(current => ({ ...current, history: current.history.filter(route => route.view !== 'movie-detail' && route.view !== 'series-detail') }));
         void refresh();
       }
     });
 
     // Início assíncrono não-bloqueante
-    coordinator.startNonBlockingSync();
+    const canApplyCatalog = () => canRefreshCatalog({ visible: document.visibilityState === 'visible',
+      online: navigator.onLine !== false, view: sourceRefreshView.current,
+      playbackState: defaultPlaybackService.getCurrentSession().state,
+      modalOpen: !!document.querySelector('[data-detail-modal]'),
+    });
+    const automaticRefresh = new AutomaticSourceRefresh({
+      check: () => coordinator.coordinateBootSync({ checkContent: true, canPromote: canApplyCatalog }),
+      canRun: async () => {
+        if (!canApplyCatalog()) return false;
+        if (hasGoogleCast()) {
+          try { if ((await GoogleCast.status()).active) return false; } catch { return false; }
+        }
+        return canApplyCatalog();
+      },
+    });
+    // Legacy configuration reconciliation still runs on every authorized boot.
+    void coordinator.coordinateBootSync({ canPromote: canApplyCatalog }).then(result => {
+      if (result.outcome === 'PROMOTED') automaticRefresh.recordSuccessfulCheck();
+      return automaticRefresh.tick();
+    }).catch(() => automaticRefresh.tick());
+    const tick = () => { void automaticRefresh.tick(); };
+    const interval = window.setInterval(tick, 60000);
+    window.addEventListener('online', tick);
+    window.addEventListener('focus', tick);
+    document.addEventListener('visibilitychange', tick);
 
     return () => {
       unsubscribe();
+      automaticRefresh.stop();
+      window.clearInterval(interval);
+      window.removeEventListener('online', tick);
+      window.removeEventListener('focus', tick);
+      document.removeEventListener('visibilitychange', tick);
     };
   }, [authorizationGate, refresh]);
 
@@ -295,7 +360,7 @@ export default function App(): React.JSX.Element {
       handleNavigate('portal');
     };
     (window as any).__XANDEFLIX_SYNC_CATALOG__ = () => {
-      return getBootSyncCoordinator().coordinateBootSync().then((res) => {
+      return getBootSyncCoordinator().coordinateBootSync({ checkContent: true }).then((res) => {
         if (res.outcome === 'PROMOTED') {
           void refresh();
         }
@@ -356,8 +421,14 @@ export default function App(): React.JSX.Element {
   }, [isLoading]);
 
   // 1. Estado transitório mínimo de leitura do ponteiro local inicial
-  if (isLoading) {
+  if (isLoading && !readModel) {
     return <LoadingState message="Lendo catálogo local ativo..." />;
+  }
+
+  if (routeState.current.view === 'settings') {
+    return <AppShell currentView="settings" onNavigate={handleNavigate} onBack={handleBack} canGoBack={canGoBack}>
+      <SettingsPage onOpenActivation={() => handleNavigate('activation')} />
+    </AppShell>;
   }
 
   if (authorizationGate === 'CHECKING') {
@@ -374,6 +445,7 @@ export default function App(): React.JSX.Element {
     return (
       <ActivationPage
         onBack={() => undefined}
+        onOpenSettings={() => handleNavigate('settings')}
         onOpenSourceSetup={() => undefined}
         onCatalogImported={async () => undefined}
       />
@@ -417,7 +489,8 @@ export default function App(): React.JSX.Element {
         if (!readModel) {
           return <EmptyState message="Preparando catálogo..." />;
         }
-        return <HomePage readModel={readModel} onSelectItem={handleSelectItem} />;
+        if (isHomeCollectionId(itemId)) return <HomeCollectionPage key={`${activeCatalog?.metadata.snapshotId}:${itemId}`} collection={itemId} readModel={readModel} onSelectItem={handleSelectItem} onBack={handleBack}/>;
+        return <HomePage readModel={readModel} onSelectItem={handleSelectItem} onSelectCategory={(kind, id) => handleNavigate(kind, id)} onSelectCollection={id => handleNavigate('home', id)} />;
 
       case 'movies':
         if (!isExistingRealCatalog) {
@@ -432,7 +505,8 @@ export default function App(): React.JSX.Element {
           );
         }
         if (!readModel) return <EmptyState />;
-        return <MoviesPage readModel={readModel} onSelectItem={handleSelectItem} />;
+        return <MoviesPage readModel={readModel} onSelectItem={handleSelectItem} categoryId={itemId}
+          onSelectCategory={id => handleNavigate('movies', id)} onSelectCollection={id => handleNavigate('home', id)} />;
 
       case 'series':
         if (!isExistingRealCatalog) {
@@ -447,10 +521,11 @@ export default function App(): React.JSX.Element {
           );
         }
         if (!readModel) return <EmptyState />;
-        return <SeriesPage readModel={readModel} onSelectItem={handleSelectItem} />;
+        return <SeriesPage readModel={readModel} onSelectItem={handleSelectItem} categoryId={itemId}
+          onSelectCategory={id => handleNavigate('series', id)} onSelectCollection={id => handleNavigate('home', id)} />;
 
       case 'live':
-        return <LiveTvPage onBack={handleBack} onOpenSourceSetup={() => handleNavigate('debug-source-setup')} />;
+        return <LiveTvPage onBack={handleBack} onHome={() => handleNavigate('home')} onOpenSourceSetup={() => handleNavigate('debug-source-setup')} />;
 
       case 'search':
         if (!isExistingRealCatalog) {
@@ -471,6 +546,7 @@ export default function App(): React.JSX.Element {
         return (
           <ActivationPage
             onBack={handleBack}
+            onOpenSettings={() => handleNavigate('settings')}
             onOpenSourceSetup={() => handleNavigate('debug-source-setup')}
             onCatalogImported={handleCatalogImported}
           />
@@ -483,13 +559,13 @@ export default function App(): React.JSX.Element {
         if (typeof __XANDEFLIX_DEBUG_BUILD__ !== 'undefined' && __XANDEFLIX_DEBUG_BUILD__) {
           return <LocalSourceProvisioningPage authorizationMetadata={null} onBack={handleBack} />;
         }
-        return <HomePage readModel={readModel!} onSelectItem={handleSelectItem} />;
+        return <HomePage readModel={readModel!} onSelectItem={handleSelectItem} onSelectCategory={(kind, id) => handleNavigate(kind, id)} onSelectCollection={id => handleNavigate('home', id)} />;
 
       case 'manager-panel':
         if (typeof __XANDEFLIX_DEBUG_BUILD__ !== 'undefined' && __XANDEFLIX_DEBUG_BUILD__) {
           return <ManagerPanelPage onBack={handleBack} />;
         }
-        return <HomePage readModel={readModel!} onSelectItem={handleSelectItem} />;
+        return <HomePage readModel={readModel!} onSelectItem={handleSelectItem} onSelectCategory={(kind, id) => handleNavigate(kind, id)} onSelectCollection={id => handleNavigate('home', id)} />;
 
       case 'portal':
         return <CustomerPortalPage onBack={handleBack} />;
@@ -498,9 +574,12 @@ export default function App(): React.JSX.Element {
         if (!readModel) return <EmptyState />;
         return (
           <MovieDetailPage
+            key={itemId}
             movieId={itemId || ''}
             readModel={readModel}
             onBack={handleBack}
+            onSelectItem={handleSelectItem}
+            onHome={() => handleNavigate('home')}
           />
         );
 
@@ -508,9 +587,12 @@ export default function App(): React.JSX.Element {
         if (!readModel) return <EmptyState />;
         return (
           <SeriesDetailPage
+            key={itemId}
             seriesId={itemId || ''}
             readModel={readModel}
             onBack={handleBack}
+            onSelectItem={handleSelectItem}
+            onHome={() => handleNavigate('home')}
           />
         );
 
@@ -526,13 +608,14 @@ export default function App(): React.JSX.Element {
             />
           );
         }
-        return <HomePage readModel={readModel!} onSelectItem={handleSelectItem} />;
+        return <HomePage readModel={readModel!} onSelectItem={handleSelectItem} onSelectCategory={(kind, id) => handleNavigate(kind, id)} onSelectCollection={id => handleNavigate('home', id)} />;
     }
   };
 
   // Se já há catálogo REAL ativo mas legitimamente vazio
   if (isExistingRealCatalog && isValidEmptyCatalog) {
     return (
+      <NewContentProvider model={authorizationGate === 'AUTHORIZED' ? readModel : null}>
       <AppShell
         currentView={routeState.current.view}
         onNavigate={handleNavigate}
@@ -542,9 +625,10 @@ export default function App(): React.JSX.Element {
         catalogVersion={activeCatalog?.metadata.catalogVersion}
         warningNotice={importWarning}
       >
-        <PlaybackErrorNotice message={nativePlaybackErrorNotice} onDismiss={() => setNativePlaybackErrorNotice(null)} />
+        <PlaybackErrorNotice message={nativePlaybackErrorNotice} diagnostic={playbackSupportDiagnostic} onDismiss={() => setNativePlaybackErrorNotice(null)} />
         <EmptyState />
       </AppShell>
+      </NewContentProvider>
     );
   }
 
@@ -562,6 +646,7 @@ export default function App(): React.JSX.Element {
   }
 
   return (
+    <NewContentProvider model={authorizationGate === 'AUTHORIZED' && isExistingRealCatalog ? readModel : null}>
     <AppShell
       currentView={routeState.current.view}
       onNavigate={handleNavigate}
@@ -571,8 +656,9 @@ export default function App(): React.JSX.Element {
       catalogVersion={isExistingRealCatalog ? activeCatalog?.metadata.catalogVersion : 'Sincronizando...'}
       warningNotice={importWarning}
     >
-      <PlaybackErrorNotice message={nativePlaybackErrorNotice} onDismiss={() => setNativePlaybackErrorNotice(null)} />
+      <PlaybackErrorNotice message={nativePlaybackErrorNotice} diagnostic={playbackSupportDiagnostic} onDismiss={() => setNativePlaybackErrorNotice(null)} />
       {renderCurrentView()}
     </AppShell>
+    </NewContentProvider>
   );
 }

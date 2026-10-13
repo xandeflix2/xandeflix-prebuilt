@@ -45,6 +45,7 @@ import { DeferredSearchIndexCoordinator } from '../search/deferred-search-index-
 import { CURRENT_CLASSIFICATION_PROFILE_VERSION } from '../source/source-classification-profile.ts';
 import type { LocalCatalogStorage } from './storage/storage.interface.ts';
 import type { ProvisioningManifest } from '../provisioning/types.ts';
+import { isContentDigest, localSourceContentRepository, type SourceContentRepository } from './automatic-source-refresh.ts';
 
 installWebViewBufferCompatibility();
 
@@ -114,6 +115,7 @@ export interface BootSyncResult {
 }
 
 export interface BootSyncCoordinatorDependencies {
+  contentRepository?: SourceContentRepository;
   deviceContext?: typeof DeviceIdentityService;
   sourceResolver?: () => Promise<ResolvedSourceResult>;
   sourceDelivery?: Pick<DeviceSourceDeliveryDispatcher, 'deliver'>;
@@ -128,6 +130,7 @@ export interface BootSyncCoordinatorDependencies {
 }
 
 export class BootSyncCoordinator {
+  private readonly contentRepository: SourceContentRepository;
   private readonly deviceContext: typeof DeviceIdentityService;
   private readonly sourceResolver: () => Promise<ResolvedSourceResult>;
   private readonly sourceDeliveryProvider: () => Pick<DeviceSourceDeliveryDispatcher, 'deliver'> | undefined;
@@ -152,6 +155,7 @@ export class BootSyncCoordinator {
   private stateListeners: Set<(state: BootSyncState, result?: BootSyncResult, progress?: BootSyncProgress) => void> = new Set();
 
   constructor(deps?: BootSyncCoordinatorDependencies) {
+    this.contentRepository = deps?.contentRepository || localSourceContentRepository;
     this.deviceContext = deps?.deviceContext || DeviceIdentityService;
     this.sourceResolver = deps?.sourceResolver || (() => AuthorizedSourceResolver.resolve());
     this.sourceDeliveryProvider = deps?.sourceDelivery
@@ -288,11 +292,11 @@ export class BootSyncCoordinator {
    * Dispara a sincronização de catálogo em segundo plano SEM bloquear a inicialização da UI.
    * Se já houver uma sincronização em andamento, retorna imediatamente (DUPLICATE_IMPORT=NAO).
    */
-  startNonBlockingSync(): void {
+  startNonBlockingSync(options?: { checkContent?: boolean; canPromote?: () => boolean }): void {
     if (this.currentSyncPromise) {
       return;
     }
-    this.currentSyncPromise = this.executeSyncInternal().finally(() => {
+    this.currentSyncPromise = this.executeSyncInternal(options).finally(() => {
       this.currentSyncPromise = null;
     });
   }
@@ -308,19 +312,19 @@ export class BootSyncCoordinator {
    * Executa a coordenação do Boot Sync de forma atômica e idempotente.
    * Se já houver uma sincronização em andamento, retorna a Promise existente (DUPLICATE_IMPORT=NAO).
    */
-  async coordinateBootSync(): Promise<BootSyncResult> {
+  async coordinateBootSync(options?: { checkContent?: boolean; canPromote?: () => boolean }): Promise<BootSyncResult> {
     if (this.currentSyncPromise) {
       return this.currentSyncPromise;
     }
 
-    this.currentSyncPromise = this.executeSyncInternal().finally(() => {
+    this.currentSyncPromise = this.executeSyncInternal(options).finally(() => {
       this.currentSyncPromise = null;
     });
 
     return this.currentSyncPromise;
   }
 
-  private async executeSyncInternal(): Promise<BootSyncResult> {
+  private async executeSyncInternal(options?: { checkContent?: boolean; canPromote?: () => boolean }): Promise<BootSyncResult> {
     this.setState('CHECKING_SOURCE', undefined, 'Verificando autorização do dispositivo...');
 
     // 1. Checagem de ativação local
@@ -528,7 +532,7 @@ export class BootSyncCoordinator {
       existingRealPointer?.kind === 'REAL' &&
       existingRealPointer.sourceId === expectedSourceId &&
       existingRealPointer.sourceVersion === expectedSourceVersion &&
-      !needsProfileRebuild
+      !needsProfileRebuild && !options?.checkContent
     ) {
       const res: BootSyncResult = {
         outcome: 'NO_OP',
@@ -613,8 +617,17 @@ export class BootSyncCoordinator {
     // 6. Materialização isolada em Staging
     this.setState('STAGING', undefined, 'Processando e gravando catálogo...');
     let stageResult: ManagedStagingResult;
+    let checkpoint: ReturnType<SourceContentRepository['read']> = null;
+    try { checkpoint = this.contentRepository.read(); } catch { /* Optional cache; force fresh inspection. */ }
+    const reusableCheckpoint = !needsProfileRebuild && existingRealPointer && checkpoint &&
+      checkpoint.sourceId === expectedSourceId && checkpoint.sourceVersion === expectedSourceVersion &&
+      checkpoint.snapshotId === existingRealPointer.snapshotId && isContentDigest(checkpoint.contentDigest)
+      ? checkpoint : undefined;
     try {
-      stageResult = await this.stagingOrchestrator.stageManagedSource();
+      stageResult = await this.stagingOrchestrator.stageManagedSource(reusableCheckpoint ? {
+        sourceId: expectedSourceId, sourceVersion: expectedSourceVersion,
+        unchangedContentDigest: reusableCheckpoint.contentDigest,
+      } : undefined);
     } catch (err: unknown) {
       stageResult = {
         success: false,
@@ -626,6 +639,19 @@ export class BootSyncCoordinator {
         liveCount: 0,
         unresolvedCount: 0,
       };
+    }
+
+    if (stageResult.success && stageResult.status === 'ALREADY_ACTIVE' && reusableCheckpoint &&
+        stageResult.sourceId === expectedSourceId && stageResult.sourceVersion === expectedSourceVersion &&
+        stageResult.contentDigest === reusableCheckpoint.contentDigest) {
+      const stillActive = await this.bootstrapService.getActivePointer().catch(() => null);
+      if (stillActive?.snapshotId === reusableCheckpoint.snapshotId && stillActive.sourceId === expectedSourceId &&
+          stillActive.sourceVersion === expectedSourceVersion) {
+        const result: BootSyncResult = { outcome: 'NO_OP', syncState: 'READY', sourceId: expectedSourceId,
+          sourceVersion: expectedSourceVersion, snapshotId: stillActive.snapshotId };
+        this.setState('READY', result, 'Catálogo atualizado; nenhum conteúdo alterado');
+        return result;
+      }
     }
 
     if (!stageResult.success || !stageResult.snapshotId) {
@@ -731,6 +757,14 @@ export class BootSyncCoordinator {
     await yieldToEventLoop();
 
     // 8. Promoção Atômica
+    if (isExistingReal && options?.canPromote && !options.canPromote()) {
+      await storage.cleanupStaging(stagedSnapshotId).catch(() => {});
+      const result: BootSyncResult = { outcome: 'LOCAL_FIRST_ACTIVE_PRESERVED', syncState: 'READY',
+        snapshotId: existingRealPointer!.snapshotId, sourceId: existingRealPointer!.sourceId,
+        sourceVersion: existingRealPointer!.sourceVersion };
+      this.setState('READY', result, 'Atualização adiada até retornar ao catálogo');
+      return result;
+    }
     this.setState('PROMOTING', undefined, 'Promovendo catálogo ativo...');
     const promotion = await this.bootstrapService.promoteStagedSnapshot(stagedSnapshotId);
     if (!promotion.success || promotion.status !== 'PROMOTED') {
@@ -744,6 +778,12 @@ export class BootSyncCoordinator {
     }
 
     bootTelemetry.mark('T11_PROMOTION_COMPLETE');
+    const promotedPointer = await this.bootstrapService.getActivePointer().catch(() => null);
+    if (promotedPointer?.snapshotId === stagedSnapshotId && promotedPointer.sourceId === expectedSourceId &&
+        promotedPointer.sourceVersion === expectedSourceVersion && isContentDigest(stageResult.contentDigest)) {
+      try { this.contentRepository.write({ sourceId: expectedSourceId, sourceVersion: expectedSourceVersion,
+        snapshotId: stagedSnapshotId, contentDigest: stageResult.contentDigest }); } catch { /* Optional cache. */ }
+    }
     this.scheduleDeferredSearchBuild(stagedSnapshotId);
     bootTelemetry.logSummary();
 

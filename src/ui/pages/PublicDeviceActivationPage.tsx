@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Capacitor } from '@capacitor/core';
+import { DeviceCodeInput } from '../components/DeviceCodeInput.tsx';
 import { getPublicDeviceActivationService, type PublicDeviceActivationSession } from '../../control-plane/client/public-device-activation.service.ts';
 
 interface PublicDeviceActivationPageProps {
@@ -9,6 +10,7 @@ interface PublicDeviceActivationPageProps {
 export const PublicDeviceActivationPage: React.FC<PublicDeviceActivationPageProps> = ({ onBack }) => {
   const [displayCode, setDisplayCode] = useState('');
   const [activationKey, setActivationKey] = useState('');
+  const [initialScreens, setInitialScreens] = useState(1);
   const [sourceName, setSourceName] = useState('Minha fonte');
   const [sourceType, setSourceType] = useState<'M3U' | 'M3U8'>('M3U');
   const [sourceUrl, setSourceUrl] = useState('');
@@ -16,6 +18,7 @@ export const PublicDeviceActivationPage: React.FC<PublicDeviceActivationPageProp
   const [sourceUsername, setSourceUsername] = useState('');
   const [sourcePassword, setSourcePassword] = useState('');
   const [session, setSession] = useState<PublicDeviceActivationSession | null>(null);
+  const [completedCode, setCompletedCode] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'error' | 'success' | 'info'; text: string } | null>(null);
 
@@ -47,6 +50,7 @@ export const PublicDeviceActivationPage: React.FC<PublicDeviceActivationPageProp
         displayCode: session.displayCode,
         sessionToken: session.sessionToken,
         sourceName,
+        initialScreens,
         sourceType,
         sourceUrl,
         epgUrl,
@@ -61,6 +65,7 @@ export const PublicDeviceActivationPage: React.FC<PublicDeviceActivationPageProp
       setEpgUrl('');
       setSourceUsername('');
       setSourcePassword('');
+      setCompletedCode(session.displayCode);
       setSession(null);
       setFeedback({ type: 'success', text: 'Dispositivo autorizado. A fonte foi protegida e vinculada; abra o aplicativo para sincronizar.' });
     } finally {
@@ -103,15 +108,25 @@ export const PublicDeviceActivationPage: React.FC<PublicDeviceActivationPageProp
           Informe o código e a chave mostrados no aplicativo. Não é necessário criar uma conta ou informar senha.
         </p>
 
-        {!session ? (
+        {completedCode ? (
+          <section role="status" aria-live="polite" style={{ marginTop: 24, padding: 20, borderRadius: 12, background: '#052e16' }}>
+            <h2>Dispositivo pronto para sincronizar</h2>
+            <p>Código ID: <strong>{completedCode}</strong></p>
+            <p>A fonte foi vinculada. Mantenha o Xandeflix aberto e conectado à internet neste aparelho. A sincronização e seu progresso aparecem na tela dele.</p>
+            <p>Assim que terminar, o aplicativo abre o catálogo automaticamente.</p>
+            <button type="button" style={{ marginTop: 16, padding: 12, borderRadius: 8, border: 0, background: '#7c3aed', color: 'white', fontWeight: 700 }} onClick={() => { setCompletedCode(null); setDisplayCode(''); setFeedback(null); }}>Ativar outro dispositivo</button>
+          </section>
+        ) : !session ? (
           <form onSubmit={startSession} style={{ display: 'grid', gap: 16, marginTop: 24 }}>
-            <label>Código do dispositivo<input required value={displayCode} onChange={(event) => setDisplayCode(event.target.value.toUpperCase())} placeholder="XF-XXXX-XXXX" style={fieldStyle} autoComplete="off" /></label>
-            <label>Chave permanente do dispositivo<input required value={activationKey} onChange={(event) => setActivationKey(event.target.value.replace(/[^0-9]/g, '').slice(0, 6))} placeholder="6 dígitos exibidos no aplicativo" style={fieldStyle} autoComplete="off" inputMode="numeric" maxLength={6} pattern="[0-9]{6}" /></label>
+            <label>Código ID<DeviceCodeInput required disabled={busy} value={displayCode} onValueChange={setDisplayCode} style={fieldStyle} /></label>
+            <label>Chave de 6 dígitos<input required disabled={busy} value={activationKey} onChange={(event) => setActivationKey(event.target.value.replace(/[^0-9]/g, '').slice(0, 6))} placeholder="6 dígitos exibidos no aplicativo" style={fieldStyle} autoComplete="off" inputMode="numeric" maxLength={6} pattern="[0-9]{6}" /></label>
             <button type="submit" disabled={busy} style={{ padding: 12, borderRadius: 8, border: 0, background: '#7c3aed', color: 'white', fontWeight: 700 }}>{busy ? 'Validando…' : 'Validar dispositivo'}</button>
           </form>
         ) : (
           <form onSubmit={completeActivation} style={{ display: 'grid', gap: 16, marginTop: 24 }}>
             <p style={{ color: '#86efac' }}>Código validado. Esta etapa fica disponível por poucos minutos.</p>
+            <label>Telas do cadastro inicial<select value={initialScreens} onChange={event => setInitialScreens(Number(event.target.value))} style={fieldStyle}>{[1, 2, 3, 4].map(n => <option key={n} value={n}>{n} tela(s)</option>)}</select></label>
+            <p>Este aparelho será o principal. Até quatro telas no cadastro inicial; aparelhos secundários precisam ser vinculados pelo gestor. Cadastros existentes têm os limites alterados em Editar licença. Acima de quatro telas, o gestor deve conferir o pagamento adicional.</p>
             <label>Nome da fonte<input required value={sourceName} onChange={(event) => setSourceName(event.target.value)} style={fieldStyle} /></label>
             <label>Tipo da playlist<select value={sourceType} onChange={(event) => setSourceType(event.target.value as 'M3U' | 'M3U8')} style={fieldStyle}><option value="M3U">M3U</option><option value="M3U8">M3U8</option></select></label>
             <label>URL da playlist M3U/M3U8<input required type="url" value={sourceUrl} onChange={(event) => setSourceUrl(event.target.value)} placeholder="https://exemplo.com/playlist.m3u" style={fieldStyle} autoComplete="off" /></label>

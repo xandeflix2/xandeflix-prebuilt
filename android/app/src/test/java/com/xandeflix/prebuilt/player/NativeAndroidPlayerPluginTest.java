@@ -34,6 +34,35 @@ public class NativeAndroidPlayerPluginTest {
 
     private NativeAndroidPlayerPlugin plugin;
 
+    @Test public void testSupportDiagnosticCarriesActualCodeAndClosedCheckpoint() {
+        Map<String,Object> data = NativeAndroidPlayerPlugin.buildResumeData(1234L, false, "NATIVE_ERROR", "HTTP_ERROR", "401", 2004, "DATASOURCE_OPEN");
+        assertEquals(2004, data.get("media3ErrorCode"));
+        assertEquals(401, data.get("httpStatus"));
+        assertEquals("DATASOURCE_OPEN", data.get("checkpoint"));
+        assertEquals(7, data.size());
+    }
+
+    @Test public void testSupportDiagnosticRejectsInvalidCodesAndRawCheckpoint() {
+        for (Integer code : new Integer[]{null, -1, 0, 999}) {
+            Map<String,Object> data = NativeAndroidPlayerPlugin.buildResumeData(0L, false, "NATIVE_ERROR", "DECODER_ERROR", "401", code, "https://fixture.invalid/private?token=fixture-secret");
+            assertFalse(data.containsKey("media3ErrorCode"));
+            assertFalse(data.containsKey("checkpoint"));
+            assertFalse(data.containsKey("httpStatus"));
+            assertFalse(data.toString().contains("fixture-secret"));
+        }
+    }
+
+    @Test public void testSupportDiagnosticDoesNotChangeManualBackCompletionOrOldApi() {
+        for (boolean ended : new boolean[]{true, false}) {
+            Map<String,Object> data = NativeAndroidPlayerPlugin.buildResumeData(5678L, ended, null, "HTTP_ERROR", "401", 2004, "DATASOURCE_OPEN");
+            assertEquals(2, data.size());
+            assertEquals(5678L, data.get("positionMs"));
+            assertEquals(ended, data.get("ended"));
+        }
+        assertEquals(NativeAndroidPlayerPlugin.buildResumeData(1234L, false, "NATIVE_ERROR", "HTTP_ERROR", "401"),
+                NativeAndroidPlayerPlugin.buildResumeData(1234L, false, "NATIVE_ERROR", "HTTP_ERROR", "401", null, null));
+    }
+
     @Before
     public void setUp() {
         plugin = new NativeAndroidPlayerPlugin();
@@ -198,6 +227,59 @@ public class NativeAndroidPlayerPluginTest {
 
     // 8. Preview stop contract
     @Test
+    public void liveHandoffStopsMediaButPreservesPreviewAndPresentation() throws Exception {
+        for (int mode = 0; mode < 3; mode++) {
+            NativeAndroidPlayerPlugin owner = new NativeAndroidPlayerPlugin();
+            TestPluginCall start = new TestPluginCall();
+            start.put("uri", "https://fixture.test/live/channel1.ts"); start.put("kind", "live");
+            owner.startPreview(start);
+            String id = owner.getCurrentPreviewId();
+            java.lang.reflect.Field full = NativeAndroidPlayerPlugin.class.getDeclaredField("previewFullscreen");
+            java.lang.reflect.Field pip = NativeAndroidPlayerPlugin.class.getDeclaredField("previewInPip");
+            java.lang.reflect.Field media = NativeAndroidPlayerPlugin.class.getDeclaredField("previewPlayer");
+            java.lang.reflect.Field candidates = NativeAndroidPlayerPlugin.class.getDeclaredField("previewCandidateRequests");
+            for (java.lang.reflect.Field field : new java.lang.reflect.Field[]{full,pip,media,candidates}) field.setAccessible(true);
+            full.setBoolean(owner, mode > 0); pip.setBoolean(owner, mode == 2);
+            java.util.List<String> calls = new java.util.ArrayList<>();
+            Object player = java.lang.reflect.Proxy.newProxyInstance(getClass().getClassLoader(),
+                new Class<?>[]{androidx.media3.exoplayer.ExoPlayer.class}, (p,m,a) -> {
+                    calls.add(m.getName() + ("setPlayWhenReady".equals(m.getName()) ? ":"+a[0] : "")); return null;
+                });
+            media.set(owner, player);
+            TestPluginCall suspend = new TestPluginCall(); suspend.put("previewId", id); suspend.put("suspendPlayback", true);
+            owner.updatePreview(suspend);
+            assertTrue(suspend.resolved); assertFalse(suspend.rejected);
+            assertEquals(java.util.Arrays.asList("setPlayWhenReady:false","stop","clearMediaItems"), calls);
+            assertSame(player, media.get(owner)); assertTrue(owner.isPreviewActive());
+            assertEquals(id, owner.getCurrentPreviewId());
+            assertEquals(mode > 0, full.getBoolean(owner)); assertEquals(mode == 2, pip.getBoolean(owner));
+            assertTrue(((List<?>)candidates.get(owner)).isEmpty());
+            // Headless media-source update exercises IDs/flags without Android surface infrastructure.
+            media.set(owner, null);
+            TestPluginCall next = new TestPluginCall(); next.put("previewId", id); next.put("uri", "https://fixture.test/live/channel2.ts");
+            owner.updatePreview(next); assertTrue(next.resolved); assertFalse(next.rejected);
+            assertEquals(id, owner.getCurrentPreviewId());
+            assertEquals(mode > 0, full.getBoolean(owner)); assertEquals(mode == 2, pip.getBoolean(owner));
+        }
+    }
+
+    @Test
+    public void liveHandoffRejectsMissingStaleInactiveAndMixedRequests() {
+        TestPluginCall start = new TestPluginCall(); start.put("uri", "https://fixture.test/live/channel1.ts"); start.put("kind", "live");
+        plugin.startPreview(start);
+        for (String id : new String[]{null, "old-preview"}) {
+            TestPluginCall stale = new TestPluginCall(); stale.put("previewId", id); stale.put("suspendPlayback", true);
+            plugin.updatePreview(stale); assertTrue(stale.rejected); assertTrue(plugin.isPreviewActive());
+        }
+        TestPluginCall mixed = new TestPluginCall(); mixed.put("previewId", plugin.getCurrentPreviewId());
+        mixed.put("suspendPlayback", true); mixed.put("uri", "https://fixture.test/live/channel2.ts");
+        plugin.updatePreview(mixed); assertTrue(mixed.rejected);
+        plugin.stopPreview(new TestPluginCall());
+        TestPluginCall inactive = new TestPluginCall(); inactive.put("suspendPlayback", true);
+        plugin.updatePreview(inactive); assertTrue(inactive.rejected);
+    }
+
+    @Test
     public void testPreviewStopContract() {
         TestPluginCall startCall = new TestPluginCall();
         startCall.put("uri", "http://server.iptv:8080/live/user/pass/1.ts");
@@ -240,6 +322,21 @@ public class NativeAndroidPlayerPluginTest {
         assertEquals("com.xandeflix.prebuilt.player.NativeAndroidPlayerPlugin", NativeAndroidPlayerPlugin.class.getName());
     }
 
+    @Test
+    public void testRealJsonNumericResumePosition() {
+        assertEquals(Long.valueOf(115995), NativeAndroidPlayerPlugin.parseStartPositionMs(Integer.valueOf(115995)));
+        assertEquals(Long.valueOf(3300000), NativeAndroidPlayerPlugin.parseStartPositionMs(Integer.valueOf(3300000)));
+        assertEquals(Long.valueOf(3300123), NativeAndroidPlayerPlugin.parseStartPositionMs(Double.valueOf(3300123)));
+        assertEquals(Long.valueOf(765432), NativeAndroidPlayerPlugin.parseStartPositionMs(Long.valueOf(765432)));
+        assertEquals(Long.valueOf(0), NativeAndroidPlayerPlugin.parseStartPositionMs(null));
+        assertEquals(Long.valueOf(0), NativeAndroidPlayerPlugin.parseStartPositionMs(Integer.valueOf(0)));
+        for(Object invalid:new Object[]{-1,1.5,Double.NaN,Double.POSITIVE_INFINITY,Long.MAX_VALUE,"3300000",true})
+            assertNull(NativeAndroidPlayerPlugin.parseStartPositionMs(invalid));
+        TestPluginCall call=new TestPluginCall();call.put("startPositionMs",Integer.valueOf(115995));
+        assertEquals(Long.valueOf(0),call.getLong("startPositionMs",0L));
+        assertEquals(Long.valueOf(115995),NativeAndroidPlayerPlugin.parseStartPositionMs(call.getData().opt("startPositionMs")));
+    }
+
     // Test double para PluginCall sem necessidade de infraestrutura Android/WebView
     static class TestPluginCall extends PluginCall {
         final Map<String, Object> dataMap = new HashMap<>();
@@ -255,6 +352,11 @@ public class NativeAndroidPlayerPluginTest {
 
         public void put(String key, Object value) {
             dataMap.put(key, value);
+        }
+
+        @Override
+        public JSObject getData() {
+            return new JSObject(){@Override public Object opt(String name){return dataMap.get(name);}};
         }
 
         @Override
@@ -276,10 +378,14 @@ public class NativeAndroidPlayerPluginTest {
         @Override
         public Long getLong(String name, Long defaultValue) {
             Object val = dataMap.get(name);
-            if (val instanceof Number) {
-                return ((Number) val).longValue();
-            }
+            if (val instanceof Long) return (Long)val;
             return defaultValue;
+        }
+
+        @Override
+        public Boolean getBoolean(String name) {
+            Object value = dataMap.get(name);
+            return value instanceof Boolean ? (Boolean)value : null;
         }
 
         @Override

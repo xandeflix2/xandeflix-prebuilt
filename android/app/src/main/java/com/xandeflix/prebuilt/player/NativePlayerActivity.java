@@ -53,11 +53,97 @@ import okhttp3.OkHttpClient;
  * 2. SECRETS_PROTECTION: URLs de diagnÃ³stico sÃ£o mascaradas; credenciais nunca trafegam em plain text.
  * 3. T1_INTEGRATION: Consome estritamente o engine de NativeStreamRequest para candidatos e fallback.
  * 4. CANDIDATE_FALLBACK: Fallback acionado SOMENTE para cÃ³digos de erro HTTP invÃ¡lidos (HTTP 4xx/5xx).
- * 5. IMMERSIVE_FULLSCREEN: OcultaÃ§Ã£o obrigatÃ³ria de status bar e navigation bar com reaplicaÃ§Ã£o em foco.
+ * 5. SYSTEM_BARS: Fullscreen video is immersive on every device; reapplied on focus.
  * 6. DPAD_NAVIGATION: Controles completos de TV/controle remoto (play/pause, seek Â±15s/5s, menu, back).
  * 7. CLEAN_RELEASE: LiberaÃ§Ã£o idempotente e completa de recursos em onDestroy.
  */
 public class NativePlayerActivity extends AppCompatActivity {
+    private MobilePipController pipController;
+    private final MobilePipLifecycle pipLifecycle = new MobilePipLifecycle();
+    private android.widget.ImageButton castButton;
+    private boolean controlsVisible;
+    private boolean inPipMode;
+    private String watchPlaybackId;
+    private boolean wasCasting;
+    private boolean playerForeground;
+    private PlayerControls controls;
+    private final EpisodeNavigationState episodeNavigation = new EpisodeNavigationState();
+    private Runnable episodeTimeout;
+    private org.json.JSONObject episodeContext;
+    private final Runnable watchProgressProbe=new Runnable(){@Override public void run(){emitWatchProgress(false);observabilityHandler.postDelayed(this,5000);}};
+    private void emitWatchProgress(boolean ended) {
+        if(player!=null && !wasCasting)NativeAndroidPlayerPlugin.notifyPlaybackProgress(watchPlaybackId,player.getCurrentPosition(),player.getDuration(),ended);
+    }
+    private static java.lang.ref.WeakReference<NativePlayerActivity> activeActivity = new java.lang.ref.WeakReference<>(null);
+    public static void stopActivePlayback() {
+        NativePlayerActivity activity=activeActivity.get();
+        if(activity!=null)activity.runOnUiThread(() -> { activity.releasePlayer(); activity.finish(); });
+    }
+    public interface EpisodeReply { void accept(boolean accepted); }
+    public static void replaceEpisode(Intent intent,String expectedId,String requestId,EpisodeReply completion) {
+        NativePlayerActivity activity=activeActivity.get();
+        if(activity==null){Log.i(TAG,"EPISODE_REPLACE_REJECT reason=NO_ACTIVITY");completion.accept(false);return;}
+        activity.runOnUiThread(()->{
+            if(activity.isFinishing()||activity.isDestroyed()||activity.player==null||activity.wasCasting
+                    ||!activity.episodeNavigation.acceptsVisible(expectedId,requestId,activity.playerForeground,activity.inPipMode)) {
+                Log.i(TAG,"EPISODE_REPLACE_REJECT foreground="+activity.playerForeground+" pip="+activity.inPipMode
+                        +" finishing="+activity.isFinishing()+" player="+(activity.player!=null)+" cast="+activity.wasCasting
+                        +" correlated="+activity.episodeNavigation.accepts(expectedId,requestId));
+                completion.accept(false);return;
+            }
+            ParsedPlaybackIntent parsed=parseIntent(intent);
+            if(!parsed.valid||!"series".equals(parsed.kind)){completion.accept(false);return;}
+            activity.emitWatchProgress(activity.player.getPlaybackState()==Player.STATE_ENDED);
+            if(activity.candidateRequests!=null&&activity.currentCandidateIndex<activity.candidateRequests.size())
+                com.xandeflix.prebuilt.cast.CastController.get().detach(activity.candidateRequests.get(activity.currentCandidateIndex));
+            activity.setupFromIntent(intent);
+            activity.setIntent(intent);
+            activity.watchPlaybackId=intent.getStringExtra("watchPlaybackId");
+            activity.episodeNavigation.started(activity.watchPlaybackId);
+            if(activity.episodeTimeout!=null)activity.observabilityHandler.removeCallbacks(activity.episodeTimeout);
+            activity.terminalEventEmitted=false;activity.lastMedia3ErrorCode=-1;
+            activity.bindEpisodeControls(intent);
+            activity.playCandidate(0,activity.initialStartPositionMs);
+            Log.i(TAG,"EPISODE_REPLACE_ACCEPT uptime="+android.os.SystemClock.uptimeMillis());
+            completion.accept(true);
+        });
+    }
+    public static void cancelEpisodeNavigation(String id,String requestId) {
+        NativePlayerActivity activity=activeActivity.get();if(activity==null)return;
+        activity.runOnUiThread(()->{if(activity.episodeNavigation.accepts(id,requestId))activity.failEpisodeTransition();});
+    }
+    private void bindEpisodeControls(Intent intent) {
+        episodeContext=null;
+        if("series".equals(currentKind))try{episodeContext=new org.json.JSONObject(intent.getStringExtra("episodeContext"));}catch(Exception ignored){}
+        if(controls!=null)controls.bind(currentTitle,currentKind,episodeContext);
+    }
+    private boolean requestEpisode(String reason,@Nullable String episodeId) {
+        if(controls==null||wasCasting||!"series".equals(currentKind)||episodeContext==null
+                ||!NativeAndroidPlayerPlugin.validPlaybackId(watchPlaybackId)||isFinishing()
+                ||("select".equals(reason)?!controls.containsEpisode(episodeId):!controls.hasNext()))return false;
+        if(episodeNavigation.pending())return true;
+        String requestId=java.util.UUID.randomUUID().toString();
+        if(!episodeNavigation.request(watchPlaybackId,requestId))return false;
+        Log.i(TAG,"EPISODE_NAVIGATION_REQUEST reason="+reason+" uptime="+android.os.SystemClock.uptimeMillis());
+        emitWatchProgress("ended".equals(reason));
+        if(player!=null)player.pause();
+        controls.close();
+        controls.setTransitioning(true);
+        episodeTimeout=()->{if(episodeNavigation.accepts(watchPlaybackId,requestId))failEpisodeTransition();};
+        observabilityHandler.postDelayed(episodeTimeout,30000);
+        NativeAndroidPlayerPlugin.notifyEpisodeNavigation(watchPlaybackId,requestId,reason,episodeId);
+        return true;
+    }
+    private void failEpisodeTransition() {
+        Log.i(TAG,"EPISODE_NAVIGATION_FAILED uptime="+android.os.SystemClock.uptimeMillis());
+        episodeNavigation.close();
+        emitTerminalEvent(false,"NEXT_EPISODE_FAILED");releasePlayer();finish();
+    }
+    public static void terminateCastPlayback(boolean ended,String errorCode) {
+        NativePlayerActivity activity=activeActivity.get();
+        if(activity!=null && !activity.isFinishing())activity.runOnUiThread(()->{activity.emitTerminalEvent(ended,errorCode);activity.releasePlayer();activity.finish();});
+        else NativeAndroidPlayerPlugin.notifyPlaybackTerminal(0,ended,errorCode);
+    }
 
     public static final String TAG = "NativePlayerActivity";
     public static final int AUTO_HIDE_CONTROLLER_MS = 3500;
@@ -72,6 +158,7 @@ public class NativePlayerActivity extends AppCompatActivity {
     private String currentTitle = "";
     private long initialStartPositionMs = 0L;
     private boolean terminalEventEmitted = false;
+    private int lastMedia3ErrorCode = -1;
     private final Handler observabilityHandler = new Handler(Looper.getMainLooper());
     private boolean moviePositionAdvancedLogged = false;
     private final ExecutorService diagnosticExecutor = Executors.newSingleThreadExecutor();
@@ -109,9 +196,24 @@ public class NativePlayerActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_native_player);
         playerView = findViewById(R.id.native_player_view);
+        activeActivity = new java.lang.ref.WeakReference<>(this);
         MainActivity.bindSafeInsets(playerView);
+        controls=new PlayerControls(this,playerView,()->player,
+                ()->{emitTerminalEvent(false,null);releasePlayer();finish();},
+                ()->requestEpisode("next",null), id->requestEpisode("select",id));
+        if(com.xandeflix.prebuilt.cast.CastController.mobile(this)) {
+            castButton=com.xandeflix.prebuilt.cast.CastController.get().button(this);
+            android.widget.FrameLayout slot=playerView.findViewById(R.id.player_cast_slot);
+            slot.addView(castButton,new android.widget.FrameLayout.LayoutParams(-1,-1));
+            controlsVisible=playerView.isControllerFullyVisible();
+            playerView.setControllerVisibilityListener((PlayerView.ControllerVisibilityListener) visibility -> {
+                controlsVisible=visibility==View.VISIBLE;
+                updateCastButtonVisibility();
+            });
+            updateCastButtonVisibility();
+        }
 
-        // AplicaÃ§Ã£o do modo imersivo em tela cheia (status bar e navigation bar ocultas)
+        // Fullscreen video hides system bars; browsing restores them on handhelds.
         applyImmersiveFullscreen(getWindow());
 
         Intent intent = getIntent();
@@ -128,7 +230,11 @@ public class NativePlayerActivity extends AppCompatActivity {
             return;
         }
 
+        watchPlaybackId=intent.getStringExtra("watchPlaybackId");
+        episodeNavigation.started(watchPlaybackId);
+        bindEpisodeControls(intent);
         playCandidate(0, initialStartPositionMs);
+        if(NativeAndroidPlayerPlugin.validPlaybackId(watchPlaybackId))observabilityHandler.postDelayed(watchProgressProbe,5000);
     }
 
     /**
@@ -260,10 +366,15 @@ public class NativePlayerActivity extends AppCompatActivity {
         HttpDataSource.Factory httpFactory = buildHttpDataSourceFactory(request, SecurePlaybackDiagnosticProbe.enabled(this));
         DefaultMediaSourceFactory mediaSourceFactory = new DefaultMediaSourceFactory(this)
                 .setDataSourceFactory(httpFactory);
+        PlaybackBufferPolicy.Profile bufferProfile = PlaybackBufferPolicy.forDevice(this, currentKind);
+        bufferProfile.configureMediaSource(mediaSourceFactory);
 
         if (player == null) {
-            DefaultLoadControl loadControl = buildLoadControl(2500, 12000, 500, 1000);
+            DefaultLoadControl loadControl = bufferProfile.buildLoadControl();
+            bufferProfile.logConfiguration();
             player = new ExoPlayer.Builder(this)
+                    .setSeekBackIncrementMs(10000)
+                    .setSeekForwardIncrementMs(10000)
                     .setLoadControl(loadControl)
                     .setMediaSourceFactory(mediaSourceFactory)
                     .build();
@@ -271,9 +382,14 @@ public class NativePlayerActivity extends AppCompatActivity {
             if (playerView != null) {
                 playerView.setPlayer(player);
                 playerView.setControllerShowTimeoutMs(AUTO_HIDE_CONTROLLER_MS);
+                pipController = new MobilePipController(this,playerView,player,currentKind);
             }
 
             player.addListener(new Player.Listener() {
+                @Override public void onTracksChanged(@NonNull androidx.media3.common.Tracks tracks){if(controls!=null)controls.updateTracks();}
+                @Override public void onIsPlayingChanged(boolean playing) {
+                    if(!playing)emitWatchProgress(player!=null && player.getPlaybackState()==Player.STATE_ENDED);
+                }
                 @Override
                 public void onPlayerError(@NonNull PlaybackException error) {
                     handlePlaybackError(error);
@@ -300,14 +416,16 @@ public class NativePlayerActivity extends AppCompatActivity {
                 @Override
                 public void onPlaybackStateChanged(int playbackState) {
                     Log.i(TAG, "PLAYBACK_STATE_" + movieStateName(playbackState) + " playAttemptId=" + playAttemptId);
+                    if (player != null && (playbackState == Player.STATE_BUFFERING || playbackState == Player.STATE_READY)) {
+                        Log.i(TAG, "BUFFER_STATE state=" + playbackState + " bufferedMs=" + player.getTotalBufferedDuration());
+                    }
                     if (playbackState == Player.STATE_READY) checkpoint("PLAYER_READY");
                     if ("movie".equalsIgnoreCase(currentKind)) {
                         Log.i(TAG, "MOVIE_PLAYER_STATE=" + movieStateName(playbackState));
                     }
                     if (playbackState == Player.STATE_ENDED) {
                         Log.i(TAG, "ReproduÃ§Ã£o finalizada (STATE_ENDED).");
-                        emitTerminalEvent(true, null);
-                        finish();
+                        if(!requestEpisode("ended",null)){emitTerminalEvent(true, null);finish();}
                     }
                 }
             });
@@ -331,6 +449,10 @@ public class NativePlayerActivity extends AppCompatActivity {
 
         player.setPlayWhenReady(true);
         player.prepare();
+        if(com.xandeflix.prebuilt.cast.CastController.mobile(this))com.xandeflix.prebuilt.cast.CastController.get().attach(this,request,currentTitle,currentKind,watchPlaybackId,
+                ()->player!=null ? player.getCurrentPosition() : 0,
+                ()->{wasCasting=true;if(player!=null)player.pause();},
+                position->{wasCasting=false;if(player!=null){player.seekTo(position);player.play();}});
         if ("movie".equalsIgnoreCase(currentKind)) {
             Log.i(TAG, "MOVIE_PREPARE_CALLED=SIM");
             observabilityHandler.removeCallbacks(moviePositionProbe);
@@ -345,6 +467,7 @@ public class NativePlayerActivity extends AppCompatActivity {
         String category = categorizeError(error);
         String statusCode = NativeStreamRequest.describeHttpStatus(error);
         int errorCode = error != null ? error.errorCode : -1;
+        lastMedia3ErrorCode = errorCode;
 
         if ("movie".equalsIgnoreCase(currentKind)) {
             Log.e(TAG, "MOVIE_PLAYBACK_ERROR_CODE=" + category + ", httpStatus=" + statusCode);
@@ -454,8 +577,9 @@ public class NativePlayerActivity extends AppCompatActivity {
         if (diagnosticsEnabled) factory.setTransferListener(new TransferListener() {
             private long total;
             private boolean first;
-            @Override public void onTransferInitializing(DataSource source, DataSpec spec, boolean network) { Log.i(TAG, "DATASOURCE_OPEN_REQUESTED"); }
-            @Override public void onTransferStart(DataSource source, DataSpec spec, boolean network) { Log.i(TAG, "DATASOURCE_OPEN_SUCCESS DATASOURCE_TRANSFER_STARTED"); }
+            private long requestedPosition;
+            @Override public void onTransferInitializing(DataSource source, DataSpec spec, boolean network) { requestedPosition=spec.position; Log.i(TAG, "DATASOURCE_OPEN_REQUESTED"); }
+            @Override public void onTransferStart(DataSource source, DataSpec spec, boolean network) { Log.i(TAG, "DATASOURCE_OPEN_SUCCESS DATASOURCE_TRANSFER_STARTED"); if(source instanceof HttpDataSource) { HttpDataSource http=(HttpDataSource)source; Log.i(TAG, describeHttpRange(requestedPosition,http.getResponseCode(),http.getResponseHeaders())); } }
             @Override public void onBytesTransferred(DataSource source, DataSpec spec, boolean network, int bytes) { total += bytes; if (!first && bytes > 0) { first=true; Log.i(TAG, "PLAYER_DATASOURCE_FIRST_BYTE"); } Log.i(TAG, "DATASOURCE_BYTES_TRANSFERRED=" + total); }
             @Override public void onTransferEnd(DataSource source, DataSpec spec, boolean network) { Log.i(TAG, "DATASOURCE_TRANSFER_ENDED DATASOURCE_CLOSED bytes=" + total); }
         });
@@ -464,6 +588,27 @@ public class NativePlayerActivity extends AppCompatActivity {
             factory.setDefaultRequestProperties(new LinkedHashMap<>(request.getRequestHeaders()));
         }
         return factory;
+    }
+
+    /** Closed debug breadcrumb. Never formats a URL or a raw header value. */
+    public static String describeHttpRange(long requestedPosition, int status, Map<String, java.util.List<String>> headers) {
+        String result="ABSENT", start="UNAVAILABLE";
+        if(headers!=null) for(Map.Entry<String,java.util.List<String>> entry:headers.entrySet()) {
+            if(!"Content-Range".equalsIgnoreCase(entry.getKey())) continue;
+            result="INVALID";
+            if(entry.getValue()!=null && entry.getValue().size()==1 && entry.getValue().get(0)!=null) {
+                java.util.regex.Matcher matcher=java.util.regex.Pattern.compile("(?i)bytes ([0-9]+)-([0-9]+)/([0-9]+|\\*)").matcher(entry.getValue().get(0));
+                if(matcher.matches()) try {
+                    long first=Long.parseLong(matcher.group(1)), last=Long.parseLong(matcher.group(2));
+                    long total="*".equals(matcher.group(3))?Long.MAX_VALUE:Long.parseLong(matcher.group(3));
+                    if(last>=first && total>last) { start=Long.toString(first); result=first==requestedPosition?"MATCH":"MISMATCH"; }
+                } catch(NumberFormatException ignored) { }
+            }
+            break;
+        }
+        return "HTTP_RANGE requested="+(requestedPosition>=0?Long.toString(requestedPosition):"UNAVAILABLE")
+                +" status="+(status>=100 && status<=599?Integer.toString(status):"UNAVAILABLE")
+                +" start="+start+" result="+result;
     }
 
     /** Compatibility overload used by existing unit tests and non-diagnostic callers. */
@@ -491,7 +636,7 @@ public class NativePlayerActivity extends AppCompatActivity {
     }
 
     /**
-     * Aplica o modo imersivo em tela cheia com proteÃ§Ã£o contra barras de sistema visÃ­veis.
+     * Applies the shared handheld/TV system-bar policy to the player window.
      */
     public static void applyImmersiveFullscreen(Window window) {
         if (window != null && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
@@ -499,7 +644,7 @@ public class NativePlayerActivity extends AppCompatActivity {
             lp.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
             window.setAttributes(lp);
         }
-        MainActivity.applyAppSystemUiPolicy(window);
+        MainActivity.applyAppSystemUiPolicy(window, true);
     }
 
     /**
@@ -632,6 +777,22 @@ public class NativePlayerActivity extends AppCompatActivity {
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
+        if(event!=null&&controls!=null) {
+            int key=event.getKeyCode();
+            if(episodeNavigation.pending()&&(key==KeyEvent.KEYCODE_MEDIA_PLAY||key==KeyEvent.KEYCODE_MEDIA_PAUSE||key==KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE
+                    ||key==KeyEvent.KEYCODE_MEDIA_FAST_FORWARD||key==KeyEvent.KEYCODE_MEDIA_REWIND))return true;
+            if(controls.dialogOpen())return super.dispatchKeyEvent(event);
+            if(key==KeyEvent.KEYCODE_MEDIA_NEXT){if(event.getAction()==KeyEvent.ACTION_DOWN)requestEpisode("next",null);return true;}
+            if(key==KeyEvent.KEYCODE_DPAD_LEFT||key==KeyEvent.KEYCODE_DPAD_RIGHT||key==KeyEvent.KEYCODE_DPAD_UP||key==KeyEvent.KEYCODE_DPAD_DOWN
+                    ||key==KeyEvent.KEYCODE_DPAD_CENTER||key==KeyEvent.KEYCODE_ENTER||key==KeyEvent.KEYCODE_NUMPAD_ENTER) {
+                if(controls.locked())return super.dispatchKeyEvent(event);
+                if(!playerView.isControllerFullyVisible()) {
+                    if(event.getAction()==KeyEvent.ACTION_DOWN){playerView.showController();playerView.findViewById(androidx.media3.ui.R.id.exo_play_pause).requestFocus();}
+                    return true;
+                }
+                return super.dispatchKeyEvent(event);
+            }
+        }
         if (event != null && handleDpadKey(event.getKeyCode(), event.getAction(), currentKind)) {
             return true;
         }
@@ -649,23 +810,31 @@ public class NativePlayerActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        playerForeground=true;
+        pipLifecycle.resumed();
         applyImmersiveFullscreen(getWindow());
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (player != null) {
+        playerForeground=false;
+        emitWatchProgress(false);
+        if (player != null && (pipController == null || !pipController.eligible())) {
             player.pause();
         }
     }
 
     @Override
     protected void onStop() {
+        pipLifecycle.stopped(true, isFinishing(), isChangingConfigurations(), wasCasting,
+                () -> { if (player != null) player.pause(); },
+                () -> {
+                    emitTerminalEvent(false, null);
+                    releasePlayer();
+                    finish();
+                });
         super.onStop();
-        if (player != null) {
-            player.stop();
-        }
     }
 
     @Override
@@ -673,6 +842,7 @@ public class NativePlayerActivity extends AppCompatActivity {
         emitTerminalEvent(false, null);
         super.onDestroy();
         observabilityHandler.removeCallbacks(moviePositionProbe);
+        observabilityHandler.removeCallbacks(watchProgressProbe);
         releasePlayer();
     }
 
@@ -680,6 +850,15 @@ public class NativePlayerActivity extends AppCompatActivity {
      * LiberaÃ§Ã£o estritamente segura e idempotente do player e views associadas.
      */
     public void releasePlayer() {
+        episodeNavigation.close();
+        if(episodeTimeout!=null)observabilityHandler.removeCallbacks(episodeTimeout);
+        if(controls!=null)controls.close();
+        pipLifecycle.close();
+        observabilityHandler.removeCallbacks(moviePositionProbe);
+        observabilityHandler.removeCallbacks(watchProgressProbe);
+        emitWatchProgress(false);
+        if(candidateRequests!=null && currentCandidateIndex<candidateRequests.size())com.xandeflix.prebuilt.cast.CastController.get().detach(candidateRequests.get(currentCandidateIndex));
+        if(pipController!=null){pipController.close();pipController=null;}
         if (playerView != null) {
             playerView.setPlayer(null);
         }
@@ -700,13 +879,31 @@ public class NativePlayerActivity extends AppCompatActivity {
             return;
         }
         terminalEventEmitted = true;
+        emitWatchProgress(ended);
         long positionMs = player != null ? Math.max(0L, player.getCurrentPosition()) : 0L;
-        NativeAndroidPlayerPlugin.notifyPlaybackTerminal(positionMs, ended, errorCode, errorCategory, httpStatus);
+        NativeAndroidPlayerPlugin.notifyPlaybackTerminal(positionMs, ended, errorCode, errorCategory, httpStatus,
+                errorCategory != null && lastMedia3ErrorCode >= 1000 ? lastMedia3ErrorCode : null,
+                errorCategory != null ? lastPlaybackCheckpoint : null);
     }
 
     // Getters para validaÃ§Ã£o e testes unitÃ¡rios
     public ExoPlayer getPlayer() {
         return player;
+    }
+
+    @Override protected void onUserLeaveHint() {
+        super.onUserLeaveHint();if(pipController!=null)pipController.onLeave();
+    }
+    @Override public void onPictureInPictureModeChanged(boolean pip, android.content.res.Configuration config) {
+        super.onPictureInPictureModeChanged(pip,config);
+        pipLifecycle.modeChanged(pip);
+        inPipMode=pip;
+        if(pipController!=null)pipController.modeChanged(pip);
+        updateCastButtonVisibility();
+    }
+
+    private void updateCastButtonVisibility() {
+        if(castButton!=null)castButton.setVisibility(controlsVisible && !inPipMode ? View.VISIBLE : View.GONE);
     }
 
     public List<NativeStreamRequest> getCandidateRequests() {

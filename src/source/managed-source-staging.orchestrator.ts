@@ -49,6 +49,7 @@ export type ManagedStagingErrorCode =
 
 export interface ManagedStagingResult {
   success: boolean;
+  contentDigest?: string;
   status: 'STAGED' | 'ALREADY_ACTIVE' | 'REJECTED';
   errorCode?: ManagedStagingErrorCode;
   errorStage?: RealImportErrorStage;
@@ -177,7 +178,7 @@ export class ManagedSourceStagingOrchestrator {
    * Resolve a autoridade Managed, lê o registro seguro, importa e materializa
    * o pacote em staging. Esta função não possui caminho de promoção.
    */
-  async stageManagedSource(): Promise<ManagedStagingResult> {
+  async stageManagedSource(check?: { sourceId: string; sourceVersion: number; unchangedContentDigest: string }): Promise<ManagedStagingResult> {
     const result = emptyResult();
     let authority: ResolvedSourceResult;
 
@@ -263,11 +264,15 @@ export class ManagedSourceStagingOrchestrator {
         sourceId: authority.sourceId!,
         sourceVersion: authority.sourceVersion!,
       };
+      const requestOptions = toTransientRequestOptions(record, provenance, storage);
+      if (check?.sourceId === authority.sourceId && check.sourceVersion === authority.sourceVersion) {
+        requestOptions.unchangedContentDigest = check.unchangedContentDigest;
+      }
       imported = record.protocol === 'M3U'
-        ? await this.importer.importM3u(runtimeConfig, toTransientRequestOptions(record, provenance, storage))
-        : await this.importer.importXtream(runtimeConfig, toTransientRequestOptions(record, provenance, storage));
+        ? await this.importer.importM3u(runtimeConfig, requestOptions)
+        : await this.importer.importXtream(runtimeConfig, requestOptions);
     } catch (stageError) {
-      console.info('[STAGE_MANAGED_SOURCE_ERROR]', stageError);
+      console.info('[STAGE_MANAGED_SOURCE_ERROR]', { result: 'SOURCE_FETCH_FAILED' });
       result.errorCode = 'REAL_SOURCE_FETCH_FAILED';
       result.errorStage = 'FETCH';
       result.sanitizedErrorClass = 'SOURCE_FETCH_FAILED';
@@ -282,7 +287,13 @@ export class ManagedSourceStagingOrchestrator {
 
     result.transport = imported.transport;
     result.sourcePayloadSizeBytes = imported.sourcePayloadSizeBytes;
+    result.contentDigest = imported.contentDigest;
     applyImportMetrics(result, imported);
+    if (imported.success && imported.notModified && requestOptionsDigestMatches(check, authority, imported)) {
+      result.success = true;
+      result.status = 'ALREADY_ACTIVE';
+      return result;
+    }
     if (!imported.success || !imported.catalog || !imported.liveCatalog) {
       if (imported.error === 'SOURCE_PROCESSING_FAILED') {
         result.errorCode = 'SOURCE_PROCESSING_FAILED';
@@ -424,6 +435,15 @@ export class ManagedSourceStagingOrchestrator {
       return result;
     }
   }
+}
+
+function requestOptionsDigestMatches(
+  check: { sourceId: string; sourceVersion: number; unchangedContentDigest: string } | undefined,
+  authority: ResolvedSourceResult,
+  imported: RealImportResult,
+): boolean {
+  return !!check && check.sourceId === authority.sourceId && check.sourceVersion === authority.sourceVersion &&
+    /^[a-f0-9]{64}$/.test(check.unchangedContentDigest) && imported.contentDigest === check.unchangedContentDigest;
 }
 
 

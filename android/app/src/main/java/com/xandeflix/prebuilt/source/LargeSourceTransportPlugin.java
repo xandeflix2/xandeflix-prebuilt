@@ -20,6 +20,7 @@ import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.UnknownHostException;
+import java.security.MessageDigest;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.Iterator;
@@ -192,6 +193,7 @@ public final class LargeSourceTransportPlugin extends Plugin {
         public final String stage;
         public final boolean retryable;
         public final String transportType;
+        public final String sourceContentDigest;
 
         public DownloadResult(
                 boolean success,
@@ -205,6 +207,13 @@ public final class LargeSourceTransportPlugin extends Plugin {
                 boolean retryable,
                 String transportType
         ) {
+            this(success, downloadId, httpResponseReceived, httpStatusClass, bytesWritten,
+                    maxSourceFileBytes, errorCode, stage, retryable, transportType, null);
+        }
+
+        public DownloadResult(boolean success, String downloadId, String httpResponseReceived,
+                String httpStatusClass, long bytesWritten, long maxSourceFileBytes, String errorCode,
+                String stage, boolean retryable, String transportType, String sourceContentDigest) {
             this.success = success;
             this.downloadId = downloadId;
             this.httpResponseReceived = httpResponseReceived;
@@ -215,6 +224,7 @@ public final class LargeSourceTransportPlugin extends Plugin {
             this.stage = stage;
             this.retryable = retryable;
             this.transportType = transportType;
+            this.sourceContentDigest = sourceContentDigest;
         }
 
         public JSObject toJSObject() {
@@ -235,6 +245,7 @@ public final class LargeSourceTransportPlugin extends Plugin {
             obj.put("stage", stage);
             obj.put("retryable", retryable);
             obj.put("transportType", transportType);
+            if (success && sourceContentDigest != null) obj.put("sourceContentDigest", sourceContentDigest);
             return obj;
         }
     }
@@ -314,6 +325,7 @@ public final class LargeSourceTransportPlugin extends Plugin {
             }
 
             session.stage = "FILE_WRITE";
+            MessageDigest contentDigest = MessageDigest.getInstance("SHA-256");
             try (InputStream input = body.byteStream();
                  BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(tempFile))) {
                 byte[] buffer = new byte[DOWNLOAD_BUFFER_BYTES];
@@ -326,6 +338,7 @@ public final class LargeSourceTransportPlugin extends Plugin {
                         return failure("RESPONSE_TOO_LARGE", session.httpStatusClass, true, "FILE_SIZE_GUARD", false);
                     }
                     output.write(buffer, 0, read);
+                    contentDigest.update(buffer, 0, read);
                     session.bytesWritten += read;
                 }
                 output.flush();
@@ -333,6 +346,14 @@ public final class LargeSourceTransportPlugin extends Plugin {
 
             if (session.bytesWritten == 0L) {
                 return failure("RESPONSE_EMPTY", session.httpStatusClass, true, "DOWNLOAD_COMPLETE", false);
+            }
+            if (contentLength >= 0L && session.bytesWritten != contentLength) {
+                return failure("FILE_IO_FAILURE", session.httpStatusClass, true, "FILE_WRITE", true);
+            }
+            StringBuilder digestHex = new StringBuilder(64);
+            for (byte value : contentDigest.digest()) {
+                digestHex.append(Character.forDigit((value >>> 4) & 15, 16));
+                digestHex.append(Character.forDigit(value & 15, 16));
             }
 
             session.stage = "DOWNLOAD_COMPLETE";
@@ -348,7 +369,8 @@ public final class LargeSourceTransportPlugin extends Plugin {
                     null,
                     session.stage,
                     false,
-                    TRANSPORT_TYPE
+                    TRANSPORT_TYPE,
+                    digestHex.toString()
             );
         } catch (Exception error) {
             String code = classifyException(error, session);

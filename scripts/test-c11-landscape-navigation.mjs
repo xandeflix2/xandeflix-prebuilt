@@ -35,6 +35,7 @@ const output = ts.transpileModule(source, { compilerOptions: { module: ts.Module
 const listeners = new Map();
 let cleanup;
 let state;
+let selectedType = null;
 const win = { innerWidth: 1280, innerHeight: 800, screen: { width: 1280, height: 800, orientation: { type: 'landscape-primary' } },
   addEventListener: (key, callback) => { assert.ok(!listeners.has(key)); listeners.set(key, callback); },
   removeEventListener: (key, callback) => { assert.equal(listeners.get(key), callback); listeners.delete(key); } };
@@ -43,7 +44,9 @@ vm.runInNewContext(output, { exports, window: win, navigator: { userAgent: 'Andr
   require: (name) => name === 'react' ? {
     useState: (initial) => { state = initial(); return [state, (next) => { state = next; }]; },
     useEffect: (effect) => { cleanup = effect(); },
-  } : { shouldUseSideNavigation },
+  } : name.includes('useDevicePresentation') ? { useDevicePresentation: () => selectedType }
+    : name.includes('device-presentation') ? { getDevicePresentation: () => selectedType }
+    : { shouldUseSideNavigation },
 });
 assert.equal(exports.useLandscapeNavigation(), true);
 win.innerWidth = 800; win.innerHeight = 1280;
@@ -51,5 +54,12 @@ listeners.get('resize')(); assert.equal(state, false);
 win.innerWidth = 1280; win.innerHeight = 800;
 listeners.get('orientationchange')(); assert.equal(state, true);
 cleanup(); assert.equal(listeners.size, 0);
+selectedType = 'TV'; win.innerWidth = 390; win.innerHeight = 844;
+assert.equal(exports.useLandscapeNavigation(), true); cleanup(); assert.equal(listeners.size, 0);
+selectedType = 'PHONE'; win.innerWidth = 1280; win.innerHeight = 720;
+assert.equal(exports.useLandscapeNavigation(), false); cleanup(); assert.equal(listeners.size, 0);
+selectedType = 'TABLET';
+assert.equal(exports.useLandscapeNavigation(), true); cleanup(); assert.equal(listeners.size, 0);
+console.log('PASS THREE_EXPLICIT_PRESENTATION_OVERRIDES_AND_CLEANUP');
 console.log('PASS REAL_LAYOUT_HOOK_RESIZE_ORIENTATION_AND_CLEANUP');
 console.log('C11_LANDSCAPE_NAVIGATION_POLICY=PASS_18_CASES_AND_REAL_HOOK');

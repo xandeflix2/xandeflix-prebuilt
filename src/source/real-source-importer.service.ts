@@ -6,6 +6,7 @@
  */
 
 import type { SourceRuntimeConfig } from '../debug/source/source-runtime-config.ts';
+import { normalizeArtworkUri } from '../artwork/artwork-uri.ts';
 import type {
   PrebuiltCatalog,
   Movie,
@@ -18,7 +19,6 @@ import type {
   StreamRef,
 } from '../contracts/catalog.ts';
 import type { LiveCatalog, LiveGroup, LiveChannel } from '../catalog/live/live-tv.types.ts';
-import { LiveCatalogService } from '../catalog/live/live-catalog.service.ts';
 import {
   fetchDeviceDirectM3uStream,
   type FetchDiagnosticsOptions,
@@ -32,6 +32,8 @@ import {
 import { iterateUtf8Lines } from './m3u-line-stream.ts';
 import { parseM3uEpisodeIdentity, parseM3uExtInfLine } from './m3u-extinf-parser.ts';
 import { bootTelemetry } from '../diagnostics/boot-telemetry.ts';
+import { yieldToEventLoop } from '../diagnostics/boot-telemetry.ts';
+import { createSha256Stream } from '../security/artifact-hash.ts';
 import type {
   LocalCatalogStorage,
   SegmentedCatalogManifest,
@@ -87,19 +89,8 @@ function canonicalCategoryId(groupName: string): string {
   return `cat:m3u:${slug}`;
 }
 
-const SAFE_URI_PATTERN = /^(?!.*:\/\/[^/]*:[^/]*@)https?:\/\/[A-Za-z0-9_.:~%#?&=/+-]+$/;
-
 function toSafeArtworkUri(rawUri: string | undefined): string | null {
-  if (!rawUri || typeof rawUri !== 'string') return null;
-  const trimmed = rawUri.trim();
-  if (!trimmed) return null;
-  if (SAFE_URI_PATTERN.test(trimmed)) return trimmed;
-  try {
-    const encoded = encodeURI(trimmed);
-    return SAFE_URI_PATTERN.test(encoded) ? encoded : null;
-  } catch {
-    return null;
-  }
+  return normalizeArtworkUri(rawUri) || null;
 }
 
 export interface RealImportMetrics {
@@ -146,6 +137,8 @@ export interface RealImportMetrics {
 
 export interface RealImportResult {
   success: boolean;
+  notModified?: boolean;
+  contentDigest?: string;
   error?: string;
   errorStage?: RealImportErrorStage;
   transport?: SanitizedTransportObservation;
@@ -220,6 +213,7 @@ interface CompactSeriesAccumulator {
 }
 
 export interface RealSourceImportOptions {
+  unchangedContentDigest?: string;
   sourceId?: string;
   provenance?: SegmentedCatalogProvenance;
   persistLiveCatalog?: boolean;
@@ -278,20 +272,23 @@ export class RealSourceImporterService {
       Accept: 'application/json',
       ...options?.requestHeaders,
     };
-    const handshakeRes = await fetch(handshakeUrl, { headers: requestHeaders });
+    const fetchApi = options?.fetchImpl || fetch;
+    const handshakeRes = await fetchApi(handshakeUrl, { headers: requestHeaders });
     if (!handshakeRes.ok) {
       return { success: false, error: `HANDSHAKE_FAILED_HTTP_${handshakeRes.status}` };
     }
-    await handshakeRes.json();
+    const handshake = await handshakeRes.json();
+    if (String(handshake?.user_info?.auth) !== '1') return { success: false, error: 'HANDSHAKE_AUTH_REJECTED', errorStage: 'FETCH' };
     const sourceDetectionMs = Math.round(performance.now() - tDetectStart);
     const sourceConnectionMs = sourceDetectionMs;
 
     const fetchJson = async (action: string) => {
       const url = `${baseApi}&action=${action}`;
-      const res = await fetch(url, { headers: requestHeaders });
-      if (!res.ok) return [];
-      const data = await res.json().catch(() => []);
-      return Array.isArray(data) ? data : [];
+      const res = await fetchApi(url, { headers: requestHeaders });
+      if (!res.ok) throw new Error('XTREAM_LIST_FETCH_FAILED');
+      const data = await res.json();
+      if (!Array.isArray(data)) throw new Error('XTREAM_LIST_INVALID');
+      return data;
     };
 
     const tLiveStart = performance.now();
@@ -315,6 +312,18 @@ export class RealSourceImporterService {
     ]);
     const seriesFetchMs = Math.round(performance.now() - tSeriesStart);
 
+    const hasher = createSha256Stream(), encoder = new TextEncoder();
+    for (const list of [liveCategories, liveStreams, vodCategories, vodStreams, seriesCategories, seriesStreams]) {
+      hasher.update(encoder.encode('['));
+      for (let i = 0; i < list.length; i++) {
+        hasher.update(encoder.encode(JSON.stringify(list[i]) + '\n'));
+        if (i % 200 === 199) await yieldToEventLoop();
+      }
+      hasher.update(encoder.encode(']'));
+    }
+    const contentDigest = hasher.digest();
+    if (contentDigest === options?.unchangedContentDigest) return { success: true, notModified: true, contentDigest };
+
     const tParseStart = performance.now();
     const rawLiveCount = liveStreams.length;
     const rawMovieCount = vodStreams.length;
@@ -325,6 +334,9 @@ export class RealSourceImporterService {
     const tNormStart = performance.now();
     const snapshotId = options?.snapshotId || `real-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
     const nowIso = new Date().toISOString();
+    const writer = new M3uBoundedStagingWriter({ snapshotId, storage: options?.storage, batchSize: IMPORT_BATCH_SIZE });
+
+    try {
 
     const categories: Category[] = [];
     const genres: Genre[] = [{ id: 'genre:1', name: 'Geral' }];
@@ -345,15 +357,12 @@ export class RealSourceImporterService {
       });
     }
 
-    const firstFoldMovies: Movie[] = [];
     const firstFoldSeries: Series[] = [];
-    const firstFoldStreams: StreamRef[] = [];
-    const firstFoldArtworks: ArtworkRef[] = [];
 
     let countM = 0;
     for (const m of vodStreams) {
       countM++;
-      if (countM <= 100) {
+      {
         const movieId = `movie:${m.stream_id}`;
         const title = String(m.name || 'Sem T�tulo').trim();
         const catId = `cat:vod:${m.category_id}`;
@@ -366,16 +375,12 @@ export class RealSourceImporterService {
           if (!isNaN(y) && y > 1900 && y < 2100) year = y;
         }
 
-        if (m.stream_icon) {
-          firstFoldArtworks.push({ id: artworkId, kind: 'poster', uri: String(m.stream_icon) });
-        }
-
-        firstFoldStreams.push({
+        const stream: StreamRef = {
           id: streamId,
           sourceItemId: String(m.stream_id),
           contentKind: 'movie',
           containerExtension: m.container_extension || 'mp4',
-        });
+        };
 
         const movieObj: Movie = {
           id: movieId,
@@ -392,27 +397,24 @@ export class RealSourceImporterService {
           (movieObj as any).posterUri = String(m.stream_icon);
           (movieObj as any).cover = String(m.stream_icon);
         }
-        firstFoldMovies.push(movieObj);
+        writer.addMovie(movieObj, stream);
+        if (writer.shouldFlush()) await writer.flushBatch(countM);
       }
     }
 
     let countS = 0;
+    let seriesBatch: Series[] = [];
     for (const s of seriesStreams) {
       countS++;
-      if (countS <= 100) {
+      {
         const seriesId = `series:${s.series_id}`;
         const title = String(s.name || 'Sem T�tulo').trim();
         const catId = `cat:series:${s.category_id}`;
-        const artworkId = `art:series:${s.series_id}`;
 
         let year: number | undefined = undefined;
         if (s.year) {
           const y = parseInt(String(s.year), 10);
           if (!isNaN(y) && y > 1900 && y < 2100) year = y;
-        }
-
-        if (s.cover) {
-          firstFoldArtworks.push({ id: artworkId, kind: 'poster', uri: String(s.cover) });
         }
 
         const seriesObj: Series = {
@@ -421,7 +423,7 @@ export class RealSourceImporterService {
           year,
           genreIds: ['genre:1'],
           categoryIds: [catId],
-          artworkIds: s.cover ? [artworkId] : [],
+          artworkIds: [],
           seasonIds: [],
           externalIds: { sourceItemId: String(s.series_id) },
         };
@@ -430,9 +432,17 @@ export class RealSourceImporterService {
           (seriesObj as any).posterUri = String(s.cover);
           (seriesObj as any).cover = String(s.cover);
         }
-        firstFoldSeries.push(seriesObj);
+        if (countS <= 100) firstFoldSeries.push(seriesObj);
+        seriesBatch.push(seriesObj);
+        if (seriesBatch.length >= IMPORT_BATCH_SIZE) {
+          await writer.writeSeriesBatch(seriesBatch);
+          seriesBatch = [];
+          await yieldToEventLoop();
+        }
       }
     }
+
+    if (seriesBatch.length) await writer.writeSeriesBatch(seriesBatch);
 
     const liveGroups: LiveGroup[] = [];
     for (const g of liveCategories) {
@@ -442,12 +452,11 @@ export class RealSourceImporterService {
       });
     }
 
-    const firstFoldLive: LiveChannel[] = [];
     let countL = 0;
     for (const ch of liveStreams) {
       countL++;
-      if (countL <= 100) {
-        firstFoldLive.push({
+      {
+        const channel: LiveChannel = {
           id: `live:${ch.stream_id}`,
           name: String(ch.name || 'Canal').trim(),
           groupId: String(ch.category_id || '0'),
@@ -459,44 +468,22 @@ export class RealSourceImporterService {
           logoUrl: ch.stream_icon ? String(ch.stream_icon) : undefined,
           num: ch.num ? parseInt(String(ch.num), 10) : undefined,
           epgChannelId: ch.epg_channel_id ? String(ch.epg_channel_id) : undefined,
-        });
+        };
+        writer.addLiveChannel(channel);
+        if (writer.shouldFlush()) await writer.flushBatch(rawMovieCount + countL);
       }
     }
 
     const normalizationMs = Math.round(performance.now() - tNormStart);
 
-    const catalog: PrebuiltCatalog = {
-      metadata: {
-        schemaVersion: 1,
-        catalogVersion: '1.0.0',
-        snapshotId,
-        generatedAt: nowIso,
-        generator: 'RealSourceImporterService/R7C',
-        counts: {
-          movies: rawMovieCount,
-          series: rawSeriesCount,
-          seasons: 0,
-          episodes: 0,
-          categories: categories.length,
-          genres: genres.length,
-          streams: rawMovieCount,
-          artworks: firstFoldArtworks.length,
-        },
-      },
-      categories,
-      genres,
-      movies: firstFoldMovies,
-      series: firstFoldSeries,
-      seasons: [],
-      episodes: [],
-      streams: firstFoldStreams,
-      artworks: firstFoldArtworks,
-      extensions: {
-        isSegmented: true,
-      },
-    };
+    await writer.flushBatch(rawItemCount);
+    const finalized = await writer.finalizeStaging({
+      provenance: options?.provenance, nowIso, rawItemCount,
+      movieCount: rawMovieCount, seriesCount: rawSeriesCount, seasonCount: 0,
+      episodeCount: 0, liveCount: rawLiveCount, categories, genres, liveGroups,
+      categoryProvenance: [], firstFoldSeries, firstFoldSeasons: [],
+    });
 
-    const liveCatalog = LiveCatalogService.buildCatalog(snapshotId, liveGroups, firstFoldLive);
     const catalogBuildMs = 10;
     const totalColdImportMs = Math.round(performance.now() - t0);
 
@@ -543,10 +530,16 @@ export class RealSourceImporterService {
 
     return {
       success: true,
-      catalog,
-      liveCatalog,
+      contentDigest,
+      catalog: finalized.catalogHeader,
+      liveCatalog: finalized.liveCatalog,
       metrics,
+      segmentedStaging: { snapshotId, manifest: finalized.manifest, catalogHeader: finalized.catalogHeader },
     };
+    } catch (error) {
+      await options?.storage?.cleanupStaging(snapshotId).catch(() => {});
+      throw error;
+    }
   }
 
   static async importM3u(
@@ -559,6 +552,8 @@ export class RealSourceImporterService {
     let transportObservation: SanitizedTransportObservation | undefined;
     let chunkIterator: AsyncIterable<Uint8Array | string>;
     let getSourcePayloadSizeBytes: (() => number | undefined) | undefined;
+    let nativeContentDigest: string | undefined;
+    let cleanupTransport = async (): Promise<void> => {};
     const tFetchStart = performance.now();
 
     if (options?.fetchImpl) {
@@ -631,6 +626,21 @@ export class RealSourceImporterService {
       }
       chunkIterator = fetched.stream.readChunks();
       getSourcePayloadSizeBytes = fetched.getSourcePayloadSizeBytes;
+      nativeContentDigest = fetched.sourceContentDigest;
+      cleanupTransport = () => fetched.stream!.cleanup();
+    }
+
+    if (nativeContentDigest && nativeContentDigest === options?.unchangedContentDigest) {
+      await cleanupTransport();
+      return { success: true, notModified: true, contentDigest: nativeContentDigest, sourcePayloadSizeBytes: getSourcePayloadSizeBytes?.() };
+    }
+    const sourceHasher = createSha256Stream();
+    async function* hashingChunks(chunks: AsyncIterable<Uint8Array | string>): AsyncIterable<Uint8Array | string> {
+      const encoder = new TextEncoder();
+      for await (const chunk of chunks) {
+        if (!nativeContentDigest) sourceHasher.update(typeof chunk === 'string' ? encoder.encode(chunk) : chunk);
+        yield chunk;
+      }
     }
 
     const moviesFetchMs = Math.round(performance.now() - tFetchStart);
@@ -640,6 +650,8 @@ export class RealSourceImporterService {
       storage: options?.storage,
       batchSize: IMPORT_BATCH_SIZE,
     });
+
+    try {
 
     const expectedTotal = options?.expectedSourceRecordCount || 0;
     const memoryCheckpointsEmitted = new Set<RealImportMemoryCheckpointName>();
@@ -701,7 +713,7 @@ export class RealSourceImporterService {
     const tParseStart = performance.now();
     let currentExtInf: ReturnType<typeof parseM3uExtInfLine> | undefined;
 
-    for await (const line of iterateUtf8Lines(chunkIterator)) {
+    for await (const line of iterateUtf8Lines(hashingChunks(chunkIterator))) {
       const trimmed = line.trim();
       if (!trimmed || trimmed === '#EXTM3U') continue;
 
@@ -780,6 +792,8 @@ export class RealSourceImporterService {
             seasons: new Map(),
           };
           seriesMap.set(seriesKey, seriesAcc);
+        } else if (!seriesAcc.logo && safeLogo) {
+          seriesAcc.logo = safeLogo;
         }
 
         let seasonMeta = seriesAcc.seasons.get(seasonNumber);
@@ -914,6 +928,11 @@ export class RealSourceImporterService {
       }
     }
 
+    const contentDigest = nativeContentDigest || sourceHasher.digest();
+    if (contentDigest === options?.unchangedContentDigest) {
+      await options?.storage?.cleanupStaging(snapshotId);
+      return { success: true, notModified: true, contentDigest, sourcePayloadSizeBytes: getSourcePayloadSizeBytes?.() };
+    }
     await writer.flushBatch(rawItemCount);
     const parseMs = Math.round(performance.now() - tParseStart);
 
@@ -1085,6 +1104,7 @@ export class RealSourceImporterService {
 
     return {
       success: true,
+      contentDigest,
       sourcePayloadSizeBytes: getSourcePayloadSizeBytes?.(),
       catalog: finalized.catalogHeader,
       catalogJson: JSON.stringify(finalized.catalogHeader),
@@ -1096,7 +1116,11 @@ export class RealSourceImporterService {
         catalogHeader: finalized.catalogHeader,
       },
     };
+    } catch (error) {
+      await options?.storage?.cleanupStaging(snapshotId).catch(() => {});
+      throw error;
+    } finally {
+      await cleanupTransport();
+    }
   }
 }
-
-

@@ -1,4 +1,5 @@
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
+import { normalizeArtworkUri } from '../artwork/artwork-uri.ts';
 import type { Movie, Series, Season, Episode, ArtworkRef, StreamRef, Category, Genre, PrebuiltCatalog } from '../contracts/catalog.ts';
 import type { LiveCatalog, LiveGroup, LiveChannel } from '../catalog/live/live-tv.types.ts';
 import { LiveCatalogService } from '../catalog/live/live-catalog.service.ts';
@@ -246,6 +247,15 @@ export class M3uBoundedStagingWriter {
     totalCatalogBytes: number;
   }> {
     const catalogSha256 = this.streamingHash.digest();
+    // Only references retained by the first-fold; no full-catalog artwork array.
+    const firstFoldArtworks: ArtworkRef[] = [];
+    for (const item of [...this.firstFoldMovies, ...this.firstFoldEpisodes]) {
+      const fields = item as unknown as Record<string, unknown>;
+      const uri = normalizeArtworkUri(fields.thumbnailUri || fields.posterUri);
+      if (uri && item.artworkIds[0]) firstFoldArtworks.push({
+        id: item.artworkIds[0], kind: 'episodeNumber' in item ? 'thumbnail' : 'poster', uri,
+      });
+    }
 
     const catalogHeader: PrebuiltCatalog = {
       metadata: {
@@ -262,7 +272,7 @@ export class M3uBoundedStagingWriter {
           categories: params.categories.length,
           genres: params.genres.length,
           streams: params.movieCount + params.episodeCount,
-          artworks: 0,
+          artworks: firstFoldArtworks.length,
         },
       },
       categories: params.categories,
@@ -272,7 +282,7 @@ export class M3uBoundedStagingWriter {
       seasons: params.firstFoldSeasons,
       episodes: this.firstFoldEpisodes,
       streams: this.firstFoldStreams,
-      artworks: [],
+      artworks: firstFoldArtworks,
       extensions: {
         categoryProvenance: params.categoryProvenance,
         isSegmented: true,
@@ -307,7 +317,7 @@ export class M3uBoundedStagingWriter {
         episodes: params.episodeCount,
         live: params.liveCount,
         streams: params.movieCount + params.episodeCount,
-        artworks: 0,
+        artworks: firstFoldArtworks.length,
         categories: params.categories.length,
         genres: params.genres.length,
       },

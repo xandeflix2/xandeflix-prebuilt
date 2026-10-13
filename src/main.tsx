@@ -7,6 +7,10 @@ installWebViewBufferCompatibility();
 bootTelemetry.mark('T1_WEBVIEW_READY');
 
 import App from './App';
+import { AppUpdatePrompt } from './app-update/AppUpdatePrompt.tsx';
+import { DevicePresentationGate } from './ui/components/DevicePresentationGate.tsx';
+import { ManagerPasswordRecovery } from './debug/manager/ManagerPasswordRecovery.tsx';
+import { isManagerRecoveryLocation } from './debug/manager/manager-password-recovery.ts';
 import './index.css';
 import {
   getSupabaseBrowserClient,
@@ -32,6 +36,11 @@ import {
   DeviceSourceDeliveryDispatcher,
 } from './security/device-source-delivery-dispatcher.ts';
 
+const passwordRecoveryRequested = isManagerRecoveryLocation(window.location);
+// Capture intent before the SDK consumes and removes the callback fragment.
+const recoveryHash = new URLSearchParams(window.location.hash.slice(1));
+const recoveryLink = recoveryHash.get('type') === 'recovery';
+const recoveryLinkError = recoveryHash.has('error') || new URLSearchParams(window.location.search).has('error');
 const supabaseClient = getSupabaseBrowserClient();
 if (supabaseClient) {
   configureRemoteControlPlaneAuthority(
@@ -66,6 +75,7 @@ if (supabaseClient) {
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <App />
+    {!passwordRecoveryRequested && <AppUpdatePrompt />}
+    {passwordRecoveryRequested ? <ManagerPasswordRecovery client={supabaseClient} recoveryLink={recoveryLink} linkError={recoveryLinkError} /> : <DevicePresentationGate><App /></DevicePresentationGate>}
   </React.StrictMode>
 );

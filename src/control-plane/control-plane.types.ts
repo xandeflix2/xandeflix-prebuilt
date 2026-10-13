@@ -555,6 +555,7 @@ export interface DeviceResolveSelfServiceSourceResult {
 // =============================================================================
 
 export interface ManagerLicenseListItem {
+  devices?: ManagerLicenseDetailDeviceItem[];
   licenseId: string;
   customerId: string | null;
   customerNickname: string | null;
@@ -575,6 +576,12 @@ export interface ManagerLicenseListItem {
 }
 
 export interface ManagerLicenseDetailDeviceItem {
+  slotNumber?: number;
+  sourceLinks?: Array<{ sourceId: string; name: string; deviceCount: number }>;
+  deviceRole?: 'PRIMARY' | 'SECONDARY';
+  primaryDisplayCode?: string;
+  licenseBindingStatus?: string;
+  platform?: string;
   deviceId: string;
   displayCode: string;
   deviceType: DeviceType;
@@ -582,6 +589,14 @@ export interface ManagerLicenseDetailDeviceItem {
   status: string;
   boundAt: string;
   lastSeenAt?: string;
+}
+
+export interface ManagerCustomerDeletePreview {
+  customerId: string;
+  nickname: string;
+  licenses: string[];
+  devices: Array<{ deviceId: string; displayCode: string; deviceLabel: string }>;
+  snapshot: string;
 }
 
 export interface ManagerLicenseDetailManagedSourceItem {
@@ -604,6 +619,8 @@ export interface ManagerLicenseDetailCustomerSourceItem {
 }
 
 export interface ManagerLicenseDetail {
+  editorSnapshot?: string;
+  screenAllowance?: { baseScreens: number; paidExtraScreens: number };
   success: boolean;
   license: {
     licenseId: string;
@@ -677,8 +694,8 @@ export interface ManagerCustomerDetail {
 export interface ManagerAuditLogItem {
   id: string;
   managerId: string;
-  action: 'CUSTOMER_STATUS_CHANGED' | 'LICENSE_LIMITS_CHANGED' | 'LICENSE_SUSPENDED' | 'LICENSE_REVOKED';
-  targetType: 'CUSTOMER' | 'LICENSE';
+  action: 'CUSTOMER_STATUS_CHANGED' | 'LICENSE_LIMITS_CHANGED' | 'LICENSE_SUSPENDED' | 'LICENSE_REVOKED' | 'LICENSE_MANUALLY_ACTIVATED' | 'LICENSE_RENEWED' | 'DEVICE_PERMANENTLY_DELETED' | 'CUSTOMER_ADMIN_ASSIGNED' | 'ADDITIONAL_DEVICE_APPROVED' | 'LICENSE_DEVICE_UPDATED' | 'LICENSE_SOURCE_REPLACED' | 'CUSTOMER_PERMANENTLY_DELETED';
+  targetType: 'CUSTOMER' | 'LICENSE' | 'DEVICE';
   targetId: string;
   beforeState: Record<string, unknown> | null;
   afterState: Record<string, unknown> | null;

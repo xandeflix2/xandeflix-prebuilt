@@ -5,7 +5,7 @@
  * estratégias de Early Termination, Score Upper Bounding e Top-K Pruning.
  *
  * Princípios:
- * - EXACT_PARITY_WITH_V2 = SIM (100% idêntico em Top-K e ordenação)
+ * - EXACT_TITLE_FIRST = SIM (não exclui prefixos ou variações disponíveis)
  * - BOUNDED_MIN_HEAP = K=50 (estrutura fixa O(log K) para descarte O(1))
  * - TIERED_PROCESSING = SIM (ExactTitle -> Multi-token match tiers)
  * - SCORE_UPPER_BOUND_PRUNING = SIM (terminação antecipada exata baseada em limites teóricos)
@@ -246,9 +246,10 @@ export class CompactSearchEngineV2Pruned {
     let scoredCandidateCount = 0;
 
     // =========================================================================
-    // TIER 1: EXACT TITLE LOOKUP ESPECIALIZADO (SHORT-CIRCUIT CANÔNICO)
+    // TIER 1: Seed exact titles first; continue collecting related title matches.
     // =========================================================================
     const exactDocIds = this.lookupExactTitle(normalizedQuery);
+    const exactSet = new Set(exactDocIds);
     if (exactDocIds.length > 0) {
       rawCandidateCount = exactDocIds.length;
       for (let i = 0; i < exactDocIds.length; i++) {
@@ -260,22 +261,15 @@ export class CompactSearchEngineV2Pruned {
         }
       }
 
-      const durationMs = Number((performance.now() - startTime).toFixed(2));
-      return {
-        items: heap.toSortedResults(),
-        rawCandidateCount,
-        scoredCandidateCount,
-        prunedCandidateCount: 0,
-        durationMs,
-        earlyTerminated: true,
-        terminationTier: 'TIER_1_EXACT_TITLE',
-      };
     }
 
     // =========================================================================
     // TIER 2: INVERTED INDEX CANDIDATE COLLECTION
     // =========================================================================
     const m = queryTokens.length;
+    // Short numeric prefixes can score without a prefix posting. The tier's
+    // token count is then not a safe score bound; retain bounded heap scoring.
+    const allowPruning = queryTokens.every(token => token.length >= MIN_PREFIX_LENGTH);
 
     // Verificar se a query possui tokens numéricos de 4 dígitos (para limite de ano)
     let queryHasYear = false;
@@ -374,7 +368,7 @@ export class CompactSearchEngineV2Pruned {
       // Pode ter Title Prefix (+500)? Apenas se hasAnyTitlePrefix for true!
       const maxPossibleBonus = (hasAnyTitlePrefix ? 500 : 0) + (k === m ? 250 : 0) + (k * 100) + 120 + (queryHasYear ? 30 : 0);
 
-      if (heap.isFull() && heap.getWorstScore() > maxPossibleBonus) {
+      if (allowPruning && heap.isFull() && heap.getWorstScore() > maxPossibleBonus) {
         earlyTerminated = true;
         terminationTier = `TIER_3_PRUNED_BUCKET_${k}`;
         break;
@@ -390,11 +384,12 @@ export class CompactSearchEngineV2Pruned {
 
       for (let i = 0; i < bucketDocs.length; i++) {
         const docId = bucketDocs[i];
+        if (exactSet.has(docId)) continue;
 
         if (!this.passesFilter(docId, filter)) continue;
 
         // Poda individual exata O(1) quando o heap está cheio:
-        if (heap.isFull()) {
+        if (allowPruning && heap.isFull()) {
           const worst = heap.peek()!;
           const worstScore = worst.score;
 
@@ -447,7 +442,7 @@ export class CompactSearchEngineV2Pruned {
       }
 
       // Após processar o balde k, verificar se o próximo balde (k - 1) pode ser completamente descartado
-      if (k > 1 && heap.isFull()) {
+      if (allowPruning && k > 1 && heap.isFull()) {
         const maxNextBucket = 500 + (k - 1) * 100 + 120 + (queryHasYear ? 30 : 0);
         if (heap.getWorstScore() > maxNextBucket) {
           earlyTerminated = true;

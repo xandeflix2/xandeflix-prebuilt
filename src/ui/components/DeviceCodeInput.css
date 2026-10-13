@@ -1,0 +1,4 @@
+.device-code-input { display: inline-flex !important; align-items: center; box-sizing: border-box; gap: 0; }
+.device-code-input__prefix { flex: 0 0 auto; font-weight: 700; opacity: .85; }
+.device-code-input input { min-width: 0; width: 100%; padding: 0 !important; margin: 0 !important; background: transparent !important; border: 0 !important; border-radius: 0; color: inherit; font: inherit; outline: none; }
+.device-code-input:focus-within { outline: 2px solid #ff344e; outline-offset: 2px; box-shadow: 0 0 10px #ff183b88; }

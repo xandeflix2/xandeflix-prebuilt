@@ -39,7 +39,10 @@ export const AdminAuditView: React.FC<AdminAuditViewProps> = ({
       case 'LICENSE_SUSPENDED':
         return { bg: '#78350f', text: '#fbbf24', border: '#d97706' };
       case 'LICENSE_REVOKED':
+      case 'DEVICE_PERMANENTLY_DELETED':
         return { bg: '#7f1d1d', text: '#f87171', border: '#ef4444' };
+      default:
+        return { bg: '#172033', text: '#cbd5e1', border: '#475569' };
     }
   };
 

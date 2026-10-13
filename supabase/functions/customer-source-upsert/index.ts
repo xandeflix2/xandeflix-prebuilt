@@ -1,5 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.116.0";
+import { ensureSignalIndex, signalFingerprint, signalVaultKey } from '../_shared/signal-policy.ts';
 
 type Protocol = "M3U" | "M3U8" | "XTREAM";
 type RecordValue = Record<string, unknown>;
@@ -10,6 +11,7 @@ const M3U_KEYS = new Set(["playlistUrl", "token", "runtimeOptions"]);
 const XTREAM_KEYS = new Set(["endpoint", "username", "password", "token", "runtimeOptions"]);
 
 const SAFE_ERROR_CODES = new Set([
+  'ADDITIONAL_DEVICE_REQUIRES_APPROVAL', 'SOURCE_POLICY_REQUIRED', 'SOURCE_POLICY_UNAVAILABLE', 'SOURCE_POLICY_PREPARING',
   "METHOD_NOT_ALLOWED",
   "AUTH_REQUIRED",
   "UNAUTHORIZED_LICENSE_ACCESS",
@@ -37,6 +39,9 @@ const SAFE_ERROR_CODES = new Set([
 ]);
 
 const ERROR_MESSAGES: Record<string, string> = {
+  ADDITIONAL_DEVICE_REQUIRES_APPROVAL: 'Esta fonte já está vinculada a outro dispositivo. Solicite liberação ao seu ADMIN ou MASTER.',
+  SOURCE_POLICY_PREPARING: 'Estamos preparando a autorização. Tente novamente em alguns instantes.',
+  SOURCE_POLICY_UNAVAILABLE: 'Não foi possível conferir a autorização. Entre em contato com seu ADMIN ou MASTER.',
   METHOD_NOT_ALLOWED: "Método HTTP não permitido para esta boundary.",
   AUTH_REQUIRED: "Autenticação de sessão de cliente obrigatória.",
   UNAUTHORIZED_LICENSE_ACCESS: "Acesso não autorizado a esta licença comercial.",
@@ -206,7 +211,7 @@ export async function encryptCustomerSourceConfig(
 
   const key = await crypto.subtle.importKey(
     "raw",
-    keyBytes,
+    new Uint8Array(keyBytes).buffer,
     { name: "AES-GCM" },
     false,
     ["encrypt"],
@@ -308,7 +313,13 @@ export async function handleCustomerSourceUpsert(request: Request): Promise<Resp
     fail("INVALID_REQUEST");
   }
 
+  const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+  if (!serviceKey) fail('SOURCE_POLICY_UNAVAILABLE');
+  const policyClient = createClient(supabaseUrl, serviceKey);
+  const vaultKey = signalVaultKey();
+
   if (operation === "CREATE_CUSTOMER_SOURCE") {
+    await ensureSignalIndex(policyClient, vaultKey);
     const licenseId = body.licenseId;
     if (typeof licenseId !== "string" || licenseId.length === 0) fail("INVALID_LICENSE");
     const protocol = body.sourceType;
@@ -325,7 +336,9 @@ export async function handleCustomerSourceUpsert(request: Request): Promise<Resp
     const envelope = await encryptCustomerSourceConfig(sourceId, initialVersion, protocol, sourceConfig);
 
     // Persiste atomicamente no banco via RPC
-    const { data, error } = await supabase.rpc("rpc_customer_create_source", {
+    const { data, error } = await policyClient.rpc("rpc_signal_customer_write", {
+      p_customer_id: userData.user.id, p_operation: operation, p_source_id: sourceId,
+      p_fingerprint: await signalFingerprint(sourceConfig as RecordValue, protocol, vaultKey), p_expected_version: null,
       p_license_id: licenseId,
       p_source_type: protocol,
       p_display_name: displayName,
@@ -356,6 +369,10 @@ export async function handleCustomerSourceUpsert(request: Request): Promise<Resp
     const protocol = body.sourceType;
     assertProtocol(protocol);
 
+    const { data: typeCheck, error: typeError } = await supabase.from('customer_sources').select('source_type,customer_id,version').eq('source_id', sourceId).single();
+    if (typeError || !typeCheck || typeCheck.customer_id !== userData.user.id || typeCheck.source_type !== protocol) fail('INVALID_SOURCE_TYPE');
+    await ensureSignalIndex(policyClient, vaultKey, { kind: 'CUSTOMER', sourceId, version: typeCheck.version });
+
     if (typeof body.expectedVersion === "number") {
       const { data: currentSource } = await supabase
         .from("customer_sources")
@@ -372,7 +389,11 @@ export async function handleCustomerSourceUpsert(request: Request): Promise<Resp
     envelope = await encryptCustomerSourceConfig(sourceId, nextVersion, protocol, sourceConfig);
   }
 
-  const { data, error } = await supabase.rpc("rpc_customer_update_source", {
+  const { data, error } = await policyClient.rpc("rpc_signal_customer_write", {
+    p_customer_id: userData.user.id, p_operation: operation, p_license_id: null,
+    p_source_type: typeof body.sourceType === 'string' ? body.sourceType : null,
+    p_fingerprint: sourceConfig ? await signalFingerprint(sourceConfig as RecordValue, body.sourceType as string, vaultKey) : null,
+    p_expected_version: typeof body.expectedVersion === 'number' ? body.expectedVersion : 1,
     p_source_id: sourceId,
     p_display_name: displayName ?? null,
     p_ciphertext: envelope?.ciphertext ?? null,

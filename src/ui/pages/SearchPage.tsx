@@ -10,7 +10,7 @@
  * - DPAD_NAVIGATION = SIM
  */
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import type { CatalogReadModel } from '../../catalog/catalog-read-model.ts';
 import type { CatalogItemViewModel } from '../../catalog/catalog-view-model.ts';
 import type {
@@ -44,22 +44,23 @@ export const SearchPage: React.FC<SearchPageProps> = ({
   const [filterKind, setFilterKind] = useState<'all' | 'movie' | 'series'>('all');
   const [status, setStatus] = useState<SearchStatus>('SEARCH_INDEX_LOADING');
   const [results, setResults] = useState<SearchResultItem[]>([]);
+  const pendingQuery = useRef({ query: '', kind: 'all' as 'all' | 'movie' | 'series' });
 
   // Inicializa o SearchService
   useEffect(() => {
     let isMounted = true;
 
-    searchService.initialize().then((initialStatus) => {
-      if (isMounted) {
-        setStatus(initialStatus);
-      }
-    });
-
     const unsubscribe = searchService.subscribe((newStatus, newResults) => {
       if (isMounted) {
         setStatus(newStatus);
         setResults(newResults);
+        if (newStatus === 'SEARCH_READY' && pendingQuery.current.query.trim()) {
+          searchService.search(pendingQuery.current.query, { kind: pendingQuery.current.kind });
+        }
       }
+    });
+    void searchService.initialize().catch(() => {
+      if (isMounted) { setStatus('SEARCH_FAILED'); setResults([]); }
     });
 
     return () => {
@@ -72,10 +73,11 @@ export const SearchPage: React.FC<SearchPageProps> = ({
   const handleQueryChange = useCallback(
     (newQuery: string) => {
       setQuery(newQuery);
+      pendingQuery.current = { query: newQuery, kind: filterKind };
       const filter: SearchFilter = {
         kind: filterKind,
       };
-      searchService.search(newQuery, filter);
+      if (searchService.isSearchReady()) searchService.search(newQuery, filter);
     },
     [searchService, filterKind]
   );
@@ -83,17 +85,19 @@ export const SearchPage: React.FC<SearchPageProps> = ({
   const handleFilterChange = useCallback(
     (kind: 'all' | 'movie' | 'series') => {
       setFilterKind(kind);
+      pendingQuery.current = { query, kind };
       const filter: SearchFilter = {
         kind,
       };
-      searchService.search(query, filter);
+      if (searchService.isSearchReady()) searchService.search(query, filter);
     },
     [searchService, query]
   );
 
   const handleClear = useCallback(() => {
     setQuery('');
-    searchService.search('');
+    pendingQuery.current.query = '';
+    if (searchService.isSearchReady()) searchService.search('');
   }, [searchService]);
 
   const showResults = status === 'SEARCH_RESULTS' && results.length > 0;

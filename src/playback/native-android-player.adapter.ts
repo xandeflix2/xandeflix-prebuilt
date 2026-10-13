@@ -38,6 +38,7 @@ export class NativeAndroidPlayerAdapter implements NativePlayerAdapter {
       success: bridgeResult.success,
       state: bridgeResult.state,
       errorMessage: bridgeResult.errorMessage,
+      errorCode: bridgeResult.errorCode,
     };
   }
 }

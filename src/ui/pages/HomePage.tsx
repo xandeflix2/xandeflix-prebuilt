@@ -11,31 +11,48 @@
  * - FOCUS SAFETY: Sem focus traps; classes .focusable-item preservadas em todas as faixas carregadas.
  */
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import type { CatalogReadModel } from '../../catalog/catalog-read-model.ts';
 import type { CatalogItemViewModel } from '../../catalog/catalog-view-model.ts';
-import { getHeroItem, movieToViewModel, seriesToViewModel } from '../../catalog/catalog-selectors.ts';
-import { SegmentedBrowseService } from '../../catalog/segmented-browse.service.ts';
+import { movieToViewModel, seriesToViewModel } from '../../catalog/catalog-selectors.ts';
+import { SegmentedBrowseService, type BrowseKind } from '../../catalog/segmented-browse.service.ts';
 import { getClientBootstrapService } from '../../bootstrap/client.ts';
-import { Hero } from '../components/Hero.tsx';
+import { HomeHero } from '../components/HomeHero.tsx';
+import { useHeroPlayback } from '../hooks/useHeroPlayback.ts';
+import { RecentTitles } from '../components/RecentTitles.tsx';
+import { useHomeHero } from '../hooks/useHomeHero.ts';
 import { MediaRail } from '../components/MediaRail.tsx';
 import { AsyncCategoryRail, SimpleRailQueue } from '../components/AsyncCategoryRail.tsx';
 import { EmptyState } from '../components/EmptyState.tsx';
+import { useCategoryPreviews } from '../hooks/useCategoryPreviews.ts';
+import { StartupArtworkPreparation } from '../components/StartupArtworkPreparation.tsx';
+import { isReleaseCategory } from '../../catalog/category-presentation.ts';
+import type { HomeCollectionId } from './HomeCollectionPage.tsx';
+import { useSeriesHighlights } from '../hooks/useSeriesHighlights.ts';
+import { prioritizeSeries } from '../../catalog/series-content-updates.ts';
 
 interface HomePageProps {
   readModel: CatalogReadModel;
   onSelectItem: (item: CatalogItemViewModel) => void;
+  onSelectCategory: (kind: BrowseKind, id: string) => void;
+  onSelectCollection: (id: HomeCollectionId) => void;
 }
 
-export const HomePage: React.FC<HomePageProps> = ({ readModel, onSelectItem }) => {
+export const HomePage: React.FC<HomePageProps> = ({ readModel, onSelectItem, onSelectCategory, onSelectCollection }) => {
+  const root = useRef<HTMLElement>(null);
+  const [preparingArtwork, setPreparingArtwork] = useState(false);
   const browseService = useMemo(
     () => new SegmentedBrowseService(getClientBootstrapService().getStorage()),
-    []
+    [readModel.catalog.metadata.snapshotId]
   );
 
   const queue = useMemo(() => new SimpleRailQueue(2), []);
 
-  const heroItem = useMemo(() => getHeroItem(readModel), [readModel]);
+  const storage = getClientBootstrapService().getStorage();
+  const previewIndex = useCategoryPreviews(readModel, storage);
+  const hero = useHomeHero(readModel, storage);
+  const heroPlayback = useHeroPlayback(readModel);
+  const recentSeries = useSeriesHighlights();
 
   // Faixas em destaque (first-fold imediato)
   const featuredMovies = useMemo(
@@ -47,16 +64,22 @@ export const HomePage: React.FC<HomePageProps> = ({ readModel, onSelectItem }) =
   );
 
   const featuredSeries = useMemo(
-    () =>
+    () => prioritizeSeries(recentSeries,
       readModel.catalog.series
         .slice(0, 20)
-        .map((s) => seriesToViewModel(readModel, s)),
-    [readModel]
+        .map((s) => seriesToViewModel(readModel, s)), 20),
+    [readModel, recentSeries]
   );
 
   // Categorias canônicas por tipo
   const movieCategories = useMemo(
-    () => readModel.getCategoriesForKind('movie'),
+    () => {
+      const categories = readModel.getCategoriesForKind('movie');
+      return [
+        ...categories.filter(category => isReleaseCategory(category.name)),
+        ...categories.filter(category => !isReleaseCategory(category.name)),
+      ];
+    },
     [readModel]
   );
 
@@ -64,6 +87,31 @@ export const HomePage: React.FC<HomePageProps> = ({ readModel, onSelectItem }) =
     () => readModel.getCategoriesForKind('series'),
     [readModel]
   );
+
+  const renderMovieCategory = (cat: (typeof movieCategories)[number], index: number) => {
+    const initial = readModel.moviesByCategoryId
+      .get(cat.id)
+      ?.slice(0, 20)
+      .map((m) => movieToViewModel(readModel, m));
+    return (
+      <AsyncCategoryRail
+        key={`${readModel.catalog.metadata.snapshotId}-cat-movie-${cat.id}`}
+        id={`rail-cat-${cat.id}-movie`}
+        title={cat.name}
+        kind="movies"
+        categoryId={cat.id}
+        initialItems={initial}
+        readModel={readModel}
+        browseService={browseService}
+        queue={queue}
+        loadWhenVisible
+        previewIndex={previewIndex}
+        onItemClick={onSelectItem}
+        onViewAll={() => onSelectCategory('movies', cat.id)}
+        startupArtworkCount={preparingArtwork && index === 0 ? 8 : 0}
+      />
+    );
+  };
 
   const isEmpty =
     readModel.catalog.movies.length === 0 &&
@@ -78,17 +126,25 @@ export const HomePage: React.FC<HomePageProps> = ({ readModel, onSelectItem }) =
   }
 
   return (
-    <main className="page-container home-page">
-      {heroItem && <Hero item={heroItem} onSelect={onSelectItem} />}
+    <main ref={root} className="page-container home-page">
+      <StartupArtworkPreparation root={root} snapshot={readModel.catalog.metadata.snapshotId} onPreparing={setPreparingArtwork}/>
+      <HomeHero {...hero} {...heroPlayback} options={hero.candidates} onSelect={onSelectItem} />
 
       <div className="home-rails-container">
-        {/* 1º: Faixas de Destaque */}
+        {movieCategories.map((cat, index) =>
+          isReleaseCategory(cat.name) ? renderMovieCategory(cat, index) : null
+        )}
+
+        <RecentTitles readModel={readModel} onViewAll={() => onSelectCollection('recent-watched')}/>
+
         {featuredMovies.length > 0 && (
           <MediaRail
             id="rail-movies"
             title="Filmes em Destaque"
             items={featuredMovies}
             onItemClick={onSelectItem}
+            onViewAll={() => onSelectCollection('featured-movies')}
+            startupArtworkCount={preparingArtwork ? 8 : 0}
           />
         )}
 
@@ -97,41 +153,27 @@ export const HomePage: React.FC<HomePageProps> = ({ readModel, onSelectItem }) =
             id="rail-series"
             title="Séries em Destaque"
             items={featuredSeries}
+            preserveOrder
             onItemClick={onSelectItem}
+            onViewAll={() => onSelectCollection('featured-series')}
+            startupArtworkCount={preparingArtwork ? 8 : 0}
           />
         )}
 
-        {/* 2º: Todas as 20 categorias de Filmes */}
-        {movieCategories.map((cat) => {
-          const initial = readModel.moviesByCategoryId
-            .get(cat.id)
-            ?.slice(0, 20)
-            .map((m) => movieToViewModel(readModel, m));
-          return (
-            <AsyncCategoryRail
-              key={`cat-movie-${cat.id}`}
-              id={`rail-cat-${cat.id}-movie`}
-              title={cat.name}
-              kind="movies"
-              categoryId={cat.id}
-              initialItems={initial}
-              readModel={readModel}
-              browseService={browseService}
-              queue={queue}
-              onItemClick={onSelectItem}
-            />
-          );
-        })}
+        {/* Demais categorias de filmes na ordem relativa existente. */}
+        {movieCategories.map((cat, index) =>
+          !isReleaseCategory(cat.name) ? renderMovieCategory(cat, index) : null
+        )}
 
-        {/* 3º: Todas as 23 categorias de Séries */}
-        {seriesCategories.map((cat) => {
+        {/* Categorias de séries na ordem relativa existente. */}
+        {seriesCategories.map((cat, index) => {
           const initial = readModel.seriesByCategoryId
             .get(cat.id)
             ?.slice(0, 20)
             .map((s) => seriesToViewModel(readModel, s));
           return (
             <AsyncCategoryRail
-              key={`cat-series-${cat.id}`}
+              key={`${readModel.catalog.metadata.snapshotId}-cat-series-${cat.id}`}
               id={`rail-cat-${cat.id}-series`}
               title={cat.name}
               kind="series"
@@ -140,7 +182,11 @@ export const HomePage: React.FC<HomePageProps> = ({ readModel, onSelectItem }) =
               readModel={readModel}
               browseService={browseService}
               queue={queue}
+              loadWhenVisible
+              previewIndex={previewIndex}
               onItemClick={onSelectItem}
+              onViewAll={() => onSelectCategory('series', cat.id)}
+              startupArtworkCount={preparingArtwork && index === 0 ? 8 : 0}
             />
           );
         })}

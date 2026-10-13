@@ -1,0 +1,23 @@
+import assert from 'node:assert/strict';
+import { HeroArtworkService, decodeHeroImage } from '../src/artwork/hero-artwork.service.ts';
+const row=n=>({id:'m'+n,title:'Movie '+n,kind:'movie',genreLabels:[],categoryLabels:[],externalIds:{tmdbId:n+1}});
+let calls=0,active=0,peak=0,decodes=[];
+const provider=async item=>{calls++;peak=Math.max(peak,++active);await new Promise(r=>setTimeout(r,2));active--;return{kind:'movie',tmdbId:item.externalIds.tmdbId,genres:[],posterUri:'https://image.tmdb.org/t/p/w342/vertical.jpg',heroPosterUris:['https://image.tmdb.org/t/p/w780/alternative.jpg'],backdropUri:item.id==='m0'?undefined:'https://image.tmdb.org/t/p/w1280/'+(item.id==='m2'?'broken':'horizontal')+'.jpg'};};
+const service=new HeroArtworkService(provider,async(uri,profile)=>{decodes.push({uri,profile});return!uri.includes('broken')});
+const items=[row(0),row(1),row(2)];
+const results=await Promise.all(items.map(item=>service.resolve(item,'horizontal')));
+assert.deepEqual(results,[undefined,'https://image.tmdb.org/t/p/w1280/horizontal.jpg',undefined]);assert.equal(peak,2);
+assert.equal((await service.resolve(items[0],'vertical')),'https://image.tmdb.org/t/p/w780/alternative.jpg');
+const before=calls;await Promise.all([service.resolve(items[1],'horizontal'),service.resolve(items[1],'horizontal')]);assert.equal(calls,before);
+service.invalidate(items[1],'horizontal');assert.equal(service.peek(items[1],'horizontal'),undefined);service.retryFailures();assert.ok(await service.resolve(items[1],'horizontal'));
+const wrong=new HeroArtworkService(async()=>({backdropUri:'https://source.synthetic.invalid/image.jpg',genres:[]}),async()=>{throw Error('Must not decode source image')});assert.equal(await wrong.resolve(row(9),'horizontal'),undefined);
+const dedup=new HeroArtworkService(provider,async()=>true);const start=calls;await Promise.all(Array.from({length:8},()=>dedup.resolve(row(20),'horizontal')));assert.equal(calls,start+1);
+const Original=globalThis.Image;
+class FakeImage{naturalWidth=1280;naturalHeight=720;decode=async()=>{};removeAttribute(){};set src(value){this.url=value;queueMicrotask(()=>this.onload?.());}}
+globalThis.Image=FakeImage;
+assert.equal(await decodeHeroImage('public','horizontal'),true);assert.equal(await decodeHeroImage('public','vertical'),false);
+FakeImage.prototype.decode=async()=>{throw Error('Decode failed')};
+class BrokenImage extends FakeImage{decode=async()=>{throw Error('Decode failed')}}globalThis.Image=BrokenImage;
+assert.equal(await decodeHeroImage('public-broken','horizontal'),false);
+globalThis.Image=Original;
+console.log('PASS_HERO_SKIP_MISSING_BACKDROP_DECODE_FAILURE_VERTICAL_PROFILE_CACHE_TWO_ACTIVE_DEDUP_SOURCE_EXCLUSION');

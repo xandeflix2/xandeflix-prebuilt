@@ -1,8 +1,11 @@
 import type { NativePlayerResumeEvent } from './native-android-player.bridge.ts';
+import { castFailureNotice } from './cast-failure.ts';
 
 /** Only controlled categories/numbers enter UI text; raw native messages are never rendered. */
 export function getNativePlaybackErrorNotice(event: NativePlayerResumeEvent): string | null {
   if (typeof event.errorCode !== 'string' || !event.errorCode.trim()) return null;
+  const castNotice = castFailureNotice(event.errorCode);
+  if (castNotice) return castNotice;
 
   switch (event.errorCategory) {
     case 'HTTP_ERROR': {
@@ -22,6 +25,7 @@ export function getNativePlaybackErrorNotice(event: NativePlayerResumeEvent): st
     case 'SOURCE_UNAVAILABLE':
       return 'Não foi possível ler o vídeo da fonte. Tente novamente.';
     case 'MEDIA_PARSER_FAILURE':
+      if (event.media3ErrorCode === 3001) return 'Não foi possível interpretar os dados deste vídeo (Media3 3001).';
       return 'O formato do vídeo não pôde ser interpretado pelo player.';
     case 'MEDIA_ERROR':
       return 'O player não conseguiu processar este vídeo.';

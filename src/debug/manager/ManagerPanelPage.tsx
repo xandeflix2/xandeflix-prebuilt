@@ -13,12 +13,24 @@
  * - MONOTONIC_VERSIONING: Cada alteração válida de fonte incrementa source_version sem desvincular aparelhos.
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import './ManagerPanelPage.css';
+import { managerSections, type ManagerSection } from './manager-access.ts';
+import { ManagerDeviceDeletion } from './ManagerDeviceDeletion.tsx';
+import { ManagerUsersView } from './ManagerUsersView.tsx';
+import { ManagerMultiDeviceContact } from './ManagerMultiDeviceContact.tsx';
+import { ManagerPlaybackErrors } from './ManagerPlaybackErrors.tsx';
+import { ManagerAppUpdates } from './ManagerAppUpdates.tsx';
+import { ManagerActivationRequests } from './ManagerActivationRequests.tsx';
+import { ManagerDeviceLinkView } from './ManagerDeviceLinkView.tsx';
+import { DeviceCodeInput } from '../../ui/components/DeviceCodeInput.tsx';
+import { tvPlatformLabels, type ActivationNotificationClaim } from '../../control-plane/client/activation-handoff.service.ts';
 import { getControlPlaneEngine } from '../../control-plane/engine/control-plane-engine.ts';
 import {
   getManagerRemoteControlPlaneAuthority,
   sanitizeManagerErrorMessage,
   type ManagerAuthSession,
+  type ManagerAccessProfile,
   type ManagerManagedSourceConfig,
   type ManagerSourceType,
   type ManagerControlPlaneSnapshot,
@@ -48,6 +60,8 @@ import type { ManagerDeviceReactivationRequest } from '../../control-plane/devic
 import { getSupabaseRuntimeConfigStatus } from '../../integrations/supabase/runtime-config.ts';
 import { AdminCustomersView } from './AdminCustomersView.tsx';
 import { AdminLicensesView } from './AdminLicensesView.tsx';
+import { ManagerDeviceRegistrationFields } from './ManagerDeviceRegistrationFields.tsx';
+import { managerActivationFailure } from './manager-activation-feedback.ts';
 import { AdminInstallationsView } from './AdminInstallationsView.tsx';
 import { AdminAuditView } from './AdminAuditView.tsx';
 import { AdminCustomerSourcesView } from './AdminCustomerSourcesView.tsx';
@@ -146,7 +160,8 @@ export const ManagerPanelPage: React.FC<ManagerPanelPageProps> = ({ onBack }) =>
   const [reactivationBusyRequestId, setReactivationBusyRequestId] = useState<string | null>(null);
   const [installations, setInstallations] = useState<ManagerInstallationListItem[]>([]);
   const [customers, setCustomers] = useState<ManagerCustomerListItem[]>([]);
-  const [activeTab, setActiveTab] = useState<'CLIENTES' | 'LICENCAS' | 'INSTALACOES' | 'DISPOSITIVOS' | 'FONTES' | 'AUDITORIA' | 'SISTEMA'>('CLIENTES');
+  const [activeTab, setActiveTab] = useState<ManagerSection>('CLIENTES');
+  const [activationSection, setActivationSection] = useState<'ACTIVATE' | 'LINK'>('ACTIVATE');
   const [managerLicenses, setManagerLicenses] = useState<ManagerLicenseListItem[]>([]);
   const [customerSources, setCustomerSources] = useState<ManagerCustomerSourceListItem[]>([]);
   const [auditLogs, setAuditLogs] = useState<ManagerAuditLogItem[]>([]);
@@ -155,7 +170,7 @@ export const ManagerPanelPage: React.FC<ManagerPanelPageProps> = ({ onBack }) =>
 
   // Criação de Licença
   const [newLicMode, setNewLicMode] = useState<LicenseMode>('MANAGED');
-  const [newLicMaxDevices, setNewLicMaxDevices] = useState<number>(2);
+  const [newLicMaxDevices, setNewLicMaxDevices] = useState<number>(1);
   const [createdRawKey, setCreatedRawKey] = useState<string | null>(null);
 
   // Cadastro de Nova Fonte Gerenciada
@@ -187,6 +202,9 @@ export const ManagerPanelPage: React.FC<ManagerPanelPageProps> = ({ onBack }) =>
   const [sourceFeedback, setSourceFeedback] = useState<Record<string, SourceFeedback>>({});
   const [sourceSaveLoading, setSourceSaveLoading] = useState<Record<string, boolean>>({});
   const [managerSession, setManagerSession] = useState<ManagerAuthSession | null>(null);
+  const [managerProfile, setManagerProfile] = useState<ManagerAccessProfile | null>(null);
+  const refreshEpochRef = useRef(0);
+  const authEpochRef = useRef(0);
   const [managerAuthChecking, setManagerAuthChecking] = useState(false);
   const [managerAuthBusy, setManagerAuthBusy] = useState(false);
   const [managerAuthEmail, setManagerAuthEmail] = useState('');
@@ -199,9 +217,15 @@ export const ManagerPanelPage: React.FC<ManagerPanelPageProps> = ({ onBack }) =>
   const [deviceActivationCode, setDeviceActivationCode] = useState('');
   const [deviceActivationKey, setDeviceActivationKey] = useState('');
   const [deviceActivationSession, setDeviceActivationSession] = useState<PublicDeviceActivationSession | null>(null);
+  const [activationNotificationClaim, setActivationNotificationClaim] = useState<ActivationNotificationClaim | null>(null);
+  useEffect(() => { setActivationNotificationClaim(null); }, [managerSession?.userId, managerProfile?.role]);
   const [deviceActivationBusy, setDeviceActivationBusy] = useState(false);
   const [activationFlowMode, setActivationFlowMode] = useState<'NEW_CUSTOMER' | 'EXISTING_CUSTOMER'>('NEW_CUSTOMER');
   const [assistedNewCustomerName, setAssistedNewCustomerName] = useState('');
+  const [assistedDeviceLabel, setAssistedDeviceLabel] = useState('');
+  const [assistedDeviceRole, setAssistedDeviceRole] = useState<'' | 'PRIMARY' | 'SECONDARY'>('');
+  const [assistedMaxDevices, setAssistedMaxDevices] = useState('1');
+  const [assistedMaxSessions, setAssistedMaxSessions] = useState('1');
   const [assistedExistingDeviceCode, setAssistedExistingDeviceCode] = useState('');
   const [assistedDeviceCode, setAssistedDeviceCode] = useState('');
   const [assistedDeviceKey, setAssistedDeviceKey] = useState('');
@@ -216,78 +240,102 @@ export const ManagerPanelPage: React.FC<ManagerPanelPageProps> = ({ onBack }) =>
   const [assistedSourcePass, setAssistedSourcePass] = useState('');
   const [assistedSourceToken, setAssistedSourceToken] = useState('');
   const [assistedActivationBusy, setAssistedActivationBusy] = useState(false);
+  useEffect(() => {
+    if (!activationNotificationClaim || activeTab !== 'ATIVACAO') return;
+    const frame = requestAnimationFrame(() => document.querySelector<HTMLInputElement>('[data-activation-customer-name]')?.focus({ preventScroll: true }));
+    return () => cancelAnimationFrame(frame);
+  }, [activationNotificationClaim, activeTab]);
 
   const refreshData = useCallback(async (): Promise<ManagerControlPlaneSnapshot | undefined> => {
+    if (!managerRemote?.getAccessProfile) return undefined;
+    const epoch = ++refreshEpochRef.current;
+    let profile: ManagerAccessProfile;
+    try { profile = await managerRemote.getAccessProfile(); } catch {
+      if (epoch !== refreshEpochRef.current) return undefined;
+      setManagerProfile(null); setManagerSession(null); return undefined;
+    }
+    if (epoch !== refreshEpochRef.current) return undefined;
+    setManagerProfile(profile);
+    setActiveTab(current => profile.role === 'ADMIN' && (current === 'SISTEMA' || current === 'GESTORES' || current === 'ATUALIZACOES') ? 'CLIENTES' : current);
     setDataLoading(true);
     if (managerRemote) {
       try {
         const snapshot = await managerRemote.readControlPlane();
+        if (epoch !== refreshEpochRef.current) return undefined;
         setLicenses(snapshot.licenses);
         setDevices(snapshot.devices);
         setLicenseBindings(snapshot.licenseBindings || []);
         setManagedSources(snapshot.managedSources);
         setSourceBindings(snapshot.sourceBindings);
         try {
-          setDeviceReactivationRequests(await managerRemote.listDeviceReactivationRequests());
+          { const result = await managerRemote.listDeviceReactivationRequests(); if (epoch !== refreshEpochRef.current) return undefined; setDeviceReactivationRequests(result); }
         } catch {
+          if (epoch !== refreshEpochRef.current) return undefined;
           setDeviceReactivationRequests([]);
         }
         try {
           if (managerRemote.listInstallations) {
-            setInstallations(await managerRemote.listInstallations());
+            { const result = await managerRemote.listInstallations(); if (epoch !== refreshEpochRef.current) return undefined; setInstallations(result); }
           } else {
             setInstallations([]);
           }
         } catch {
+          if (epoch !== refreshEpochRef.current) return undefined;
           setInstallations([]);
         }
         try {
           if (managerRemote.listCustomers) {
-            setCustomers(await managerRemote.listCustomers());
+            { const result = await managerRemote.listCustomers(); if (epoch !== refreshEpochRef.current) return undefined; setCustomers(result); }
           } else {
             setCustomers([]);
           }
         } catch {
+          if (epoch !== refreshEpochRef.current) return undefined;
           setCustomers([]);
         }
         try {
           if (managerRemote.listLicenses) {
-            setManagerLicenses(await managerRemote.listLicenses());
+            { const result = await managerRemote.listLicenses(); if (epoch !== refreshEpochRef.current) return undefined; setManagerLicenses(result); }
           } else {
             setManagerLicenses([]);
           }
         } catch {
+          if (epoch !== refreshEpochRef.current) return undefined;
           setManagerLicenses([]);
         }
         try {
           if (managerRemote.listCustomerSources) {
-            setCustomerSources(await managerRemote.listCustomerSources());
+            { const result = await managerRemote.listCustomerSources(); if (epoch !== refreshEpochRef.current) return undefined; setCustomerSources(result); }
           } else {
             setCustomerSources([]);
           }
         } catch {
+          if (epoch !== refreshEpochRef.current) return undefined;
           setCustomerSources([]);
         }
         try {
           if (managerRemote.listAuditLogs) {
-            setAuditLogs(await managerRemote.listAuditLogs());
+            { const result = await managerRemote.listAuditLogs(); if (epoch !== refreshEpochRef.current) return undefined; setAuditLogs(result); }
           } else {
             setAuditLogs([]);
           }
         } catch {
+          if (epoch !== refreshEpochRef.current) return undefined;
           setAuditLogs([]);
         }
         try {
           if (managerRemote.listDeviceActivationEvents) {
-            setDeviceActivationEvents(await managerRemote.listDeviceActivationEvents());
+            { const result = await managerRemote.listDeviceActivationEvents(); if (epoch !== refreshEpochRef.current) return undefined; setDeviceActivationEvents(result); }
           } else {
             setDeviceActivationEvents([]);
           }
         } catch {
+          if (epoch !== refreshEpochRef.current) return undefined;
           setDeviceActivationEvents([]);
         }
         return snapshot;
       } catch {
+          if (epoch !== refreshEpochRef.current) return undefined;
         // Nunca repopula a UI remota com a copia local stale.
         setLicenses([]);
         setDevices([]);
@@ -303,7 +351,7 @@ export const ManagerPanelPage: React.FC<ManagerPanelPageProps> = ({ onBack }) =>
         setDeviceActivationEvents([]);
         return undefined;
       } finally {
-        setDataLoading(false);
+        if (epoch === refreshEpochRef.current) setDataLoading(false);
       }
     }
 
@@ -323,63 +371,23 @@ export const ManagerPanelPage: React.FC<ManagerPanelPageProps> = ({ onBack }) =>
   }, [engine, managerRemote]);
 
   useEffect(() => {
-    if (!managerRemote) {
-      void engine.loadSyncState().then(() => refreshData()).catch(() => refreshData());
-      return;
-    }
-
+    if (!managerRemote?.auth || !managerRemote.getAccessProfile) return;
     let active = true;
+    const epoch = ++authEpochRef.current;
     setManagerAuthChecking(true);
-    void managerRemote.auth?.getSession()
-      .then(async (session) => {
-        if (!active) return;
-        if (session && managerRemote.listCustomers) {
-          try {
-            await managerRemote.listCustomers();
-            if (!active) return;
-            setManagerSession(session);
-            setManagerAuthChecking(false);
-            void refreshData();
-          } catch {
-            if (!active) return;
-            setManagerSession(null);
-            setManagerAuthChecking(false);
-            setManagerAuthFeedback('Acesso negado: o usuario autenticado nao possui privilegios de gestor (MANAGER_NOT_AUTHORIZED).');
-            setLicenses([]);
-            setDevices([]);
-            setLicenseBindings([]);
-            setManagedSources([]);
-            setSourceBindings([]);
-          }
-        } else {
-          setManagerSession(session);
-          setManagerAuthChecking(false);
-          if (session) {
-            void refreshData();
-          } else {
-            setLicenses([]);
-            setDevices([]);
-            setLicenseBindings([]);
-            setManagedSources([]);
-            setSourceBindings([]);
-          }
-        }
-      })
-      .catch(() => {
-        if (!active) return;
-        setManagerSession(null);
-        setManagerAuthChecking(false);
-        setLicenses([]);
-        setDevices([]);
-        setLicenseBindings([]);
-        setManagedSources([]);
-        setSourceBindings([]);
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [engine, managerRemote, refreshData]);
+    void managerRemote.auth.getSession().then(async session => {
+      if (!active || epoch !== authEpochRef.current || !session) return;
+      const profile = await managerRemote.getAccessProfile!();
+      if (!active || epoch !== authEpochRef.current || profile.userId !== session.userId) return;
+      setManagerProfile(profile); setManagerSession(session);
+      void refreshData();
+    }).catch(() => {
+      if (!active || epoch !== authEpochRef.current) return;
+      setManagerProfile(null); setManagerSession(null);
+      setManagerAuthFeedback('Acesso restrito a MASTER ou ADMIN autorizado.');
+    }).finally(() => { if (active && epoch === authEpochRef.current) setManagerAuthChecking(false); });
+    return () => { active = false; authEpochRef.current++; refreshEpochRef.current++; };
+  }, [managerRemote, refreshData]);
 
   const showFeedback = (msg: string, type: 'info' | 'success' | 'error' = 'info') => {
     setFeedback(msg);
@@ -389,10 +397,11 @@ export const ManagerPanelPage: React.FC<ManagerPanelPageProps> = ({ onBack }) =>
   const handleValidateDeviceCodeKey = async (event?: React.FormEvent<HTMLFormElement>) => {
     event?.preventDefault();
     if (!managerSession) {
-      showFeedback('AUTH_REQUIRED: autentique a sessao do gestor antes de validar.', 'error');
+      showFeedback('Entre no painel para validar o código e a chave do aparelho.', 'error');
       return;
     }
 
+    setActivationNotificationClaim(null);
     const displayCode = deviceActivationCode.trim().toUpperCase();
     const activationKey = deviceActivationKey.trim();
     if (!/^XF-[0-9A-Z]{4}-[0-9A-Z]{4}$/.test(displayCode)) {
@@ -406,20 +415,25 @@ export const ManagerPanelPage: React.FC<ManagerPanelPageProps> = ({ onBack }) =>
 
     setDeviceActivationBusy(true);
     setDeviceActivationSession(null);
+    const epoch = authEpochRef.current;
     try {
       const result = await getPublicDeviceActivationService().start(displayCode, activationKey);
+      if (epoch !== authEpochRef.current) return;
       if ('sessionToken' in result) {
         setDeviceActivationSession(result);
+        setAssistedDeviceCode(displayCode);
+        setAssistedDeviceKey(activationKey);
+        setAssistedDeviceRole(''); setAssistedDeviceLabel('');
         setDeviceActivationKey('');
         showFeedback(
-          'CODE_KEY_VALIDATED=SIM. SOURCE_SETUP_UNLOCKED=SIM. DEVICE_AUTHORIZED=NAO_AINDA.',
+          'Código e chave conferidos. Informe o cliente, o Local/Tipo e a fonte para concluir a ativação do aparelho.',
           'success',
         );
       } else {
-        showFeedback(result.message || result.code || 'Codigo e chave nao validados.', 'error');
+        showFeedback(managerActivationFailure(new Error(result.code || 'INVALID_ACTIVATION_KEY')), 'error');
       }
     } catch (error) {
-      showFeedback(sanitizeManagerErrorMessage(error), 'error');
+      showFeedback(managerActivationFailure(error), 'error');
     } finally {
       setDeviceActivationBusy(false);
     }
@@ -428,18 +442,31 @@ export const ManagerPanelPage: React.FC<ManagerPanelPageProps> = ({ onBack }) =>
   const handleManagerDeviceActivation = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!managerRemote || !managerSession) {
-      showFeedback('AUTH_REQUIRED: autentique a sessao Master antes de ativar.', 'error');
+      showFeedback('Entre no painel com uma conta autorizada para ativar este aparelho.', 'error');
       return;
     }
 
     const displayCode = assistedDeviceCode.trim().toUpperCase();
     const activationKey = assistedDeviceKey.trim();
+    const deviceLabel = assistedDeviceLabel.trim();
+    if (!assistedDeviceRole) { showFeedback('Selecione se o aparelho é principal ou secundário.', 'error'); return; }
+    if (assistedDeviceRole === 'SECONDARY' && activationFlowMode !== 'EXISTING_CUSTOMER') { showFeedback('Um secundário deve ser vinculado a um cliente já ativo e ao seu aparelho principal.', 'error'); return; }
+    const maxDevices = Number(assistedMaxDevices);
+    const maxConcurrentSessions = Number(assistedMaxSessions);
+    if (!deviceLabel || deviceLabel.length > 100) { showFeedback('Informe o Local/Tipo do novo aparelho, com até 100 caracteres.', 'error'); return; }
+    if (!Number.isInteger(maxDevices) || maxDevices < 1 || maxDevices > 100) { showFeedback('Informe uma quantidade de aparelhos entre 1 e 100.', 'error'); return; }
+    if (!Number.isInteger(maxConcurrentSessions) || maxConcurrentSessions < 1 || maxConcurrentSessions > 50) { showFeedback('Informe um limite de reproduções simultâneas entre 1 e 50.', 'error'); return; }
+    const notification = activationNotificationClaim;
+    if (notification && (notification.displayCode !== displayCode || Date.parse(notification.expiresAt) <= Date.now())) {
+      setActivationNotificationClaim(null); setDeviceActivationSession(null);
+      showFeedback('Solicitação expirada. Abra novamente a mensagem em Solicitações de ativação.', 'error'); return;
+    }
 
     if (!/^XF-[0-9A-Z]{4}-[0-9A-Z]{4}$/.test(displayCode)) {
       showFeedback('Informe um Codigo ID valido no formato XF-XXXX-XXXX para o novo dispositivo.', 'error');
       return;
     }
-    if (!/^[0-9]{6}$/.test(activationKey)) {
+    if (!notification && !/^[0-9]{6}$/.test(activationKey)) {
       showFeedback('Informe uma Chave permanente de 6 digitos valida para o novo dispositivo.', 'error');
       return;
     }
@@ -459,30 +486,34 @@ export const ManagerPanelPage: React.FC<ManagerPanelPageProps> = ({ onBack }) =>
       try {
         const result = await managerRemote.activateSourceForDevice({
           flowMode: 'EXISTING_CUSTOMER',
+          deviceLabel, maxDevices, maxConcurrentSessions, deviceRole: assistedDeviceRole,
+          ...(assistedDeviceRole === 'SECONDARY' ? { primaryDisplayCode: assistedExistingDeviceCode } : {}),
           customerId: assistedCustomerId.trim(),
           existingDeviceCode: existingCode,
           displayCode,
           activationKey,
+        ...(notification ? { activationNotificationId: notification.id } : {}),
           ...(assistedLicenseId.trim() ? { licenseId: assistedLicenseId.trim() } : {}),
         });
         showFeedback(
-          `MANAGER_PATH=AUTHORIZED. DEVICE_STATUS=${result.deviceAuthorizationState}. SOURCE_BINDING=${result.sourceBindingStatus}. SOURCE_RESOLUTION=${result.sourceResolution}. SOURCE_REUSED=SIM.`,
+          `O aparelho ${result.displayCode} foi ativado como “${deviceLabel}” usando a fonte do cliente. A licença permite ${maxDevices} aparelho(s) e ${maxConcurrentSessions} reprodução(ões) simultânea(s).`,
           'success',
         );
         setAssistedDeviceKey('');
+        setDeviceActivationSession(null); setActivationNotificationClaim(null);
         setAssistedLicenseId('');
         setShowAmbiguitySelector(false);
-        await refreshData();
+        try { if (!await refreshData()) showFeedback('Aparelho ativado. Não foi possível atualizar a lista agora; atualize o painel para conferir.', 'info'); }
+        catch { showFeedback('Aparelho ativado. Atualize o painel para conferir os dados.', 'info'); }
       } catch (error) {
-        const sanitizedMsg = sanitizeManagerErrorMessage(error);
-        if (sanitizedMsg.includes('MANAGED_LICENSE_AMBIGUOUS')) {
+        if (error instanceof Error && error.message.includes('MANAGED_LICENSE_AMBIGUOUS')) {
           setShowAmbiguitySelector(true);
           showFeedback(
-            'Multiplas licencas elegiveis encontradas (MANAGED_LICENSE_AMBIGUOUS). Selecione a licenca desejada para prosseguir.',
+            'Este cliente tem mais de uma licença disponível. Selecione a licença desejada para continuar.',
             'error',
           );
         } else {
-          showFeedback(sanitizedMsg, 'error');
+          showFeedback(managerActivationFailure(error), 'error');
         }
       } finally {
         setAssistedActivationBusy(false);
@@ -521,25 +552,29 @@ export const ManagerPanelPage: React.FC<ManagerPanelPageProps> = ({ onBack }) =>
     try {
       const result = await managerRemote.activateSourceForDevice({
         flowMode: 'NEW_CUSTOMER',
+        deviceLabel, maxDevices, maxConcurrentSessions, deviceRole: assistedDeviceRole,
+          ...(assistedDeviceRole === 'SECONDARY' ? { primaryDisplayCode: assistedExistingDeviceCode } : {}),
         newCustomerName: assistedNewCustomerName.trim(),
         displayCode,
         activationKey,
+        ...(notification ? { activationNotificationId: notification.id } : {}),
         name: assistedSourceName.trim(),
         protocol: assistedSourceType,
         sourceConfig,
       });
       showFeedback(
-        `MANAGER_PATH=AUTHORIZED. DEVICE_STATUS=${result.deviceAuthorizationState}. SOURCE_BINDING=${result.sourceBindingStatus}. SOURCE_RESOLUTION=${result.sourceResolution}.`,
+        `Cliente cadastrado e aparelho ${result.displayCode} ativado como “${deviceLabel}”. Foram liberadas ${maxDevices} vaga(s), com até ${maxConcurrentSessions} reprodução(ões) simultânea(s).`,
         'success',
       );
       setAssistedDeviceKey('');
+      setDeviceActivationSession(null); setActivationNotificationClaim(null);
       setAssistedSourcePass('');
       setAssistedNewCustomerName('');
       setShowAmbiguitySelector(false);
-      await refreshData();
+      try { if (!await refreshData()) showFeedback('Cliente e aparelho ativados. Não foi possível atualizar a lista agora; atualize o painel para conferir.', 'info'); }
+      catch { showFeedback('Cliente e aparelho ativados. Atualize o painel para conferir os dados.', 'info'); }
     } catch (error) {
-      const sanitizedMsg = sanitizeManagerErrorMessage(error);
-      showFeedback(sanitizedMsg, 'error');
+      showFeedback(managerActivationFailure(error), 'error');
     } finally {
       setAssistedActivationBusy(false);
     }
@@ -696,6 +731,10 @@ export const ManagerPanelPage: React.FC<ManagerPanelPageProps> = ({ onBack }) =>
       return;
     }
 
+    refreshEpochRef.current++;
+    const epoch = ++authEpochRef.current;
+    setManagerAuthChecking(false);
+    setManagerSession(null); setManagerProfile(null);
     setManagerAuthBusy(true);
     setManagerAuthFeedback(null);
     try {
@@ -703,26 +742,41 @@ export const ManagerPanelPage: React.FC<ManagerPanelPageProps> = ({ onBack }) =>
         managerAuthEmail.trim(),
         managerAuthPassword,
       );
-      // Validação estrita de autoridade de gestor antes de conceder acesso privilegiado
-      if (managerRemote.listCustomers) {
-        await managerRemote.listCustomers();
-      }
+      if (epoch !== authEpochRef.current) return;
+      if (!managerRemote.getAccessProfile) throw new Error('MANAGER_NOT_AUTHORIZED');
+      const profile = await managerRemote.getAccessProfile();
+      if (epoch !== authEpochRef.current) return;
+      if (profile.userId !== session.userId) throw new Error('MANAGER_NOT_AUTHORIZED');
+      setManagerProfile(profile);
       setManagerSession(session);
       setManagerAuthPassword('');
       setManagerAuthFeedback('Sessao do gestor autenticada.');
       await refreshData();
     } catch (error) {
+      if (epoch !== authEpochRef.current) return;
       try {
         await managerRemote.auth.signOut();
       } catch {}
+      if (epoch !== authEpochRef.current) return;
       setManagerSession(null);
+      setManagerProfile(null); setManagerAuthPassword('');
       setManagerAuthFeedback(sanitizeManagerErrorMessage(error));
     } finally {
-      setManagerAuthBusy(false);
+      if (epoch === authEpochRef.current) setManagerAuthBusy(false);
     }
   };
 
   const handleManagerSignOut = async () => {
+    refreshEpochRef.current++;
+    authEpochRef.current++;
+    setManagerAuthChecking(false);
+    setManagerSession(null); setManagerProfile(null);
+    setActivationNotificationClaim(null); setDeviceActivationSession(null); setDeviceActivationKey('');
+    setAssistedDeviceKey(''); setAssistedPlaylistUrl(''); setAssistedSourceHost('');
+    setAssistedSourcePass(''); setAssistedSourceUser(''); setAssistedSourceToken('');
+    setSourcePass(''); setSourceUser(''); setSourceToken(''); setSourcePlaylistUrl(''); setSourceHost('');
+    setEditPass(''); setEditUser(''); setEditToken(''); setEditPlaylistUrl(''); setEditHost('');
+    setRevealedDeviceSensitive({}); setVaultPreflight(null);
     if (!managerRemote?.auth) return;
     setManagerAuthBusy(true);
     try {
@@ -1238,9 +1292,10 @@ export const ManagerPanelPage: React.FC<ManagerPanelPageProps> = ({ onBack }) =>
         fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
       }}
     >
-      <div style={{ maxWidth: '1080px', margin: '0 auto' }}>
+      <div style={{ width: '100%', minWidth: 0 }}>
         {/* Top Header */}
         <div
+          className="manager-header"
           style={{
             display: 'flex',
             justifyContent: 'space-between',
@@ -1275,10 +1330,22 @@ export const ManagerPanelPage: React.FC<ManagerPanelPageProps> = ({ onBack }) =>
             </h1>
           </div>
 
-          <div style={{ display: 'flex', gap: '0.75rem' }}>
+          <div className="manager-header-actions" style={{ display: 'flex', gap: '0.75rem' }}>
+            <ManagerPlaybackErrors userId={managerProfile ? managerSession?.userId : undefined} />
+            <ManagerActivationRequests userId={managerProfile ? managerSession?.userId : undefined} onOpenClaim={claim => {
+              if (!managerSession || !managerProfile) return;
+              setActiveTab('ATIVACAO'); setActivationSection('ACTIVATE'); setDeviceActivationSession(null); setActivationNotificationClaim(claim);
+              setDeviceActivationCode(claim.displayCode); setDeviceActivationKey('');
+              setAssistedDeviceCode(claim.displayCode); setAssistedDeviceKey(''); setAssistedNewCustomerName(claim.nickname);
+              setAssistedDeviceRole(''); setAssistedDeviceLabel(''); setAssistedMaxDevices('1'); setAssistedMaxSessions('1');
+              setActivationFlowMode('NEW_CUSTOMER'); setAssistedCustomerId(''); setAssistedExistingDeviceCode(''); setAssistedLicenseId('');
+              setAssistedSourceName(''); setAssistedPlaylistUrl(''); setAssistedSourceHost(''); setAssistedSourceUser(''); setAssistedSourcePass(''); setAssistedSourceToken('');
+              showFeedback('Solicitação validada. Informe a fonte e confirme a ativação.', 'success');
+            }} />
             <button
               type="button"
               className="focusable-item"
+              disabled={!managerSession || !managerProfile || dataLoading}
               onClick={() => {
                 if (managerRemote) {
                   void refreshData().then((snapshot) => {
@@ -1342,13 +1409,13 @@ export const ManagerPanelPage: React.FC<ManagerPanelPageProps> = ({ onBack }) =>
           >
             {managerAuthChecking ? (
               <span style={{ color: '#cbd5e1', fontSize: '0.85rem' }}>Verificando sessao do gestor...</span>
-            ) : managerSession ? (
+            ) : managerSession && managerProfile ? (
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
                 <span style={{ color: '#34d399', fontSize: '0.85rem' }}>
-                  Sessao Manager autenticada para operacoes privilegiadas.
+                  Sessão {managerProfile?.role} autenticada.
                 </span>
                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                  <button
+                  {managerProfile.role === 'MASTER' && <button
                     type="button"
                     className="focusable-item"
                     disabled={vaultPreflightBusy}
@@ -1365,7 +1432,7 @@ export const ManagerPanelPage: React.FC<ManagerPanelPageProps> = ({ onBack }) =>
                     }}
                   >
                     {vaultPreflightBusy ? 'Verificando vault...' : 'Preflight do vault'}
-                  </button>
+                  </button>}
                   <button
                     type="button"
                     className="focusable-item"
@@ -1390,7 +1457,7 @@ export const ManagerPanelPage: React.FC<ManagerPanelPageProps> = ({ onBack }) =>
               <form onSubmit={(event) => void handleManagerSignIn(event)} style={{ display: 'flex', alignItems: 'end', gap: '0.75rem', flexWrap: 'wrap' }}>
                 <div style={{ minWidth: '220px', flex: '1 1 220px' }}>
                   <label style={{ display: 'block', color: '#94a3b8', fontSize: '0.75rem', marginBottom: '0.25rem' }}>
-                    Email do gestor
+                    Usuário do gestor (email)
                   </label>
                   <input
                     type="email"
@@ -1422,6 +1489,7 @@ export const ManagerPanelPage: React.FC<ManagerPanelPageProps> = ({ onBack }) =>
                 >
                   {managerAuthBusy ? 'Autenticando...' : 'Autenticar sessao do gestor'}
                 </button>
+                <a href="/manager-reset-password" className="focusable-item" style={{ color: '#c4b5fd', padding: '0.55rem' }}>Esqueci minha senha</a>
               </form>
             ) : (
               <span style={{ color: '#f87171', fontSize: '0.85rem' }}>AUTH_REQUIRED: autoridade de sessao indisponivel.</span>
@@ -1463,7 +1531,27 @@ export const ManagerPanelPage: React.FC<ManagerPanelPageProps> = ({ onBack }) =>
           </div>
         )}
 
-        {managerSession && (
+        {managerSession && managerProfile && (
+          <div className="manager-workspace">
+            <nav className="manager-navigation" aria-label="Funções do gestor">
+              <span className="manager-navigation__role">{managerProfile.role}</span>
+              {managerSections(managerProfile).map(section => <React.Fragment key={section.id}><button type="button"
+                className="focusable-item" aria-current={section.id !== 'ATIVACAO' && activeTab === section.id ? 'page' : undefined}
+                aria-expanded={section.id === 'ATIVACAO' ? activeTab === 'ATIVACAO' : undefined}
+                aria-controls={section.id === 'ATIVACAO' ? 'manager-activation-submenu' : undefined}
+                onClick={() => { setActiveTab(section.id); if (section.id === 'ATIVACAO') setActivationSection('ACTIVATE'); }}>{section.label}</button>
+                {section.id === 'ATIVACAO' && activeTab === 'ATIVACAO' && <div id="manager-activation-submenu" className="manager-activation-submenu" role="group" aria-label="Opções de ativação">
+                  <button type="button" className="focusable-item" aria-current={activationSection === 'ACTIVATE' ? 'page' : undefined} onClick={() => setActivationSection('ACTIVATE')}>Ativação por Código + Chave</button>
+                  <button type="button" className="focusable-item" aria-current={activationSection === 'LINK' ? 'page' : undefined} onClick={() => setActivationSection('LINK')}>Vincular dispositivo</button>
+                </div>}
+              </React.Fragment>)}
+            </nav>
+            <div className="manager-content">
+        {activeTab === 'ATUALIZACOES' && managerProfile.role === 'MASTER' && <ManagerAppUpdates key={managerProfile.userId} />}
+        {managerRemote && (activeTab === 'USUARIOS' || (activeTab === 'GESTORES' && managerProfile.role === 'MASTER')) &&
+          <ManagerUsersView key={`${managerProfile.userId}:${managerProfile.role}:${activeTab}`} authority={managerRemote} profile={managerProfile} staffOnly={activeTab === 'GESTORES'} />}
+        {managerRemote && activeTab === 'ATIVACAO' && activationSection === 'LINK' && <ManagerDeviceLinkView licenses={managerLicenses} authority={managerRemote} isMaster={managerProfile.role === 'MASTER'} onUpdated={refreshData} />}
+        {managerSession && activeTab === 'ATIVACAO' && activationSection === 'ACTIVATE' && (
           <section
             style={{
               backgroundColor: '#101624',
@@ -1482,10 +1570,11 @@ export const ManagerPanelPage: React.FC<ManagerPanelPageProps> = ({ onBack }) =>
                 <label style={{ display: 'block', color: '#cbd5e1', fontSize: '0.75rem', marginBottom: '0.25rem' }}>
                   Codigo ID
                 </label>
-                <input
+                <DeviceCodeInput
                   required
                   value={deviceActivationCode}
-                  onChange={(event) => setDeviceActivationCode(event.target.value.toUpperCase())}
+                  disabled={deviceActivationBusy}
+                  onValueChange={code => { setDeviceActivationCode(code); setDeviceActivationSession(null); setActivationNotificationClaim(null); setAssistedDeviceKey(''); }}
                   placeholder="XF-XXXX-XXXX"
                   autoComplete="off"
                   style={{ width: '100%', padding: '0.5rem', backgroundColor: '#151d30', color: '#fff', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.1)' }}
@@ -1498,7 +1587,8 @@ export const ManagerPanelPage: React.FC<ManagerPanelPageProps> = ({ onBack }) =>
                 <input
                   required
                   value={deviceActivationKey}
-                  onChange={(event) => setDeviceActivationKey(event.target.value.replace(/[^0-9]/g, '').slice(0, 6))}
+                  disabled={deviceActivationBusy}
+                  onChange={(event) => { setDeviceActivationKey(event.target.value.replace(/[^0-9]/g, '').slice(0, 6)); setActivationNotificationClaim(null); setDeviceActivationSession(null); setAssistedDeviceKey(''); }}
                   inputMode="numeric"
                   maxLength={6}
                   pattern="[0-9]{6}"
@@ -1515,34 +1605,13 @@ export const ManagerPanelPage: React.FC<ManagerPanelPageProps> = ({ onBack }) =>
                 {deviceActivationBusy ? 'Validando...' : 'Validar'}
               </button>
             </form>
-            {deviceActivationSession && (
-              <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-                <div style={{ color: '#34d399', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.8rem' }}>
-                  CODE_KEY_VALIDATED=SIM | SOURCE_SETUP_UNLOCKED=SIM | DEVICE_AUTHORIZED=NAO_AINDA
-                </div>
-                <div style={{ color: '#cbd5e1', fontSize: '0.78rem', marginBottom: '0.75rem' }}>
-                  Proxima etapa liberada. Nenhuma fonte foi preenchida, salva ou autorizada neste ciclo.
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.75rem' }}>
-                  <label style={{ color: '#94a3b8', fontSize: '0.75rem' }}>
-                    URL da fonte
-                    <input disabled placeholder="Disponivel no proximo gate" style={{ display: 'block', width: '100%', marginTop: '0.25rem', padding: '0.5rem', backgroundColor: '#0f172a', color: '#64748b', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.08)' }} />
-                  </label>
-                  <label style={{ color: '#94a3b8', fontSize: '0.75rem' }}>
-                    Usuario (opcional)
-                    <input disabled placeholder="Disponivel no proximo gate" style={{ display: 'block', width: '100%', marginTop: '0.25rem', padding: '0.5rem', backgroundColor: '#0f172a', color: '#64748b', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.08)' }} />
-                  </label>
-                  <label style={{ color: '#94a3b8', fontSize: '0.75rem' }}>
-                    Senha (opcional)
-                    <input type="password" disabled placeholder="Disponivel no proximo gate" style={{ display: 'block', width: '100%', marginTop: '0.25rem', padding: '0.5rem', backgroundColor: '#0f172a', color: '#64748b', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.08)' }} />
-                  </label>
-                </div>
-              </div>
-            )}
+            {(deviceActivationSession || activationNotificationClaim) && <p role="status" style={{ marginTop: 16, color: '#86efac' }}>
+              Código validado. Informe o cliente e a fonte no formulário abaixo para concluir a ativação.
+            </p>}
           </section>
         )}
 
-        {managerSession && (
+        {managerSession && (deviceActivationSession || activationNotificationClaim) && activeTab === 'ATIVACAO' && activationSection === 'ACTIVATE' && (
           <section
             style={{
               backgroundColor: '#101624',
@@ -1557,12 +1626,13 @@ export const ManagerPanelPage: React.FC<ManagerPanelPageProps> = ({ onBack }) =>
               O Gestor Master valida o par do dispositivo, grava a fonte no vault gerenciado e conclui a autorizacao em uma unica operacao.
             </p>
 
+            {activationNotificationClaim && <p role="status">TV · {tvPlatformLabels[activationNotificationClaim.platform]} · {activationNotificationClaim.nickname}. Chave validada pela solicitação; confirmação do gestor ainda necessária.</p>}
             {/* Seletor de Modo: Novo cliente vs Cliente já ativo */}
             <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
               <button
                 type="button"
                 className="focusable-item"
-                onClick={() => setActivationFlowMode('NEW_CUSTOMER')}
+                onClick={() => { setActivationFlowMode('NEW_CUSTOMER'); setAssistedDeviceRole(''); setAssistedMaxDevices('1'); setAssistedMaxSessions('1'); }}
                 style={{
                   padding: '0.45rem 1rem',
                   backgroundColor: activationFlowMode === 'NEW_CUSTOMER' ? '#059669' : '#1e293b',
@@ -1603,6 +1673,7 @@ export const ManagerPanelPage: React.FC<ManagerPanelPageProps> = ({ onBack }) =>
                       Nome do cliente
                       <input
                         required
+                        data-activation-customer-name
                         value={assistedNewCustomerName}
                         onChange={(event) => setAssistedNewCustomerName(event.target.value)}
                         placeholder="Ex: Alexandre Santos"
@@ -1612,10 +1683,10 @@ export const ManagerPanelPage: React.FC<ManagerPanelPageProps> = ({ onBack }) =>
                     </label>
                     <label style={{ color: '#cbd5e1', fontSize: '0.75rem' }}>
                       Código do novo dispositivo
-                      <input
+                      <DeviceCodeInput
                         required
                         value={assistedDeviceCode}
-                        onChange={(event) => setAssistedDeviceCode(event.target.value.toUpperCase())}
+                        onValueChange={code => { setAssistedDeviceCode(code); setActivationNotificationClaim(null); setDeviceActivationSession(null); }}
                         placeholder="XF-XXXX-XXXX"
                         autoComplete="off"
                         style={{ display: 'block', width: '100%', marginTop: '0.25rem', padding: '0.5rem', backgroundColor: '#151d30', color: '#fff', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.1)' }}
@@ -1624,8 +1695,8 @@ export const ManagerPanelPage: React.FC<ManagerPanelPageProps> = ({ onBack }) =>
                     <label style={{ color: '#cbd5e1', fontSize: '0.75rem' }}>
                       Chave permanente do novo dispositivo
                       <input
-                        required
-                        value={assistedDeviceKey}
+                        required={!activationNotificationClaim} readOnly={!!activationNotificationClaim}
+                        value={activationNotificationClaim ? 'Validada pela solicitação' : assistedDeviceKey}
                         onChange={(event) => setAssistedDeviceKey(event.target.value.replace(/[^0-9]/g, '').slice(0, 6))}
                         inputMode="numeric"
                         maxLength={6}
@@ -1725,7 +1796,12 @@ export const ManagerPanelPage: React.FC<ManagerPanelPageProps> = ({ onBack }) =>
                     <select
                       required
                       value={assistedCustomerId}
-                      onChange={(event) => setAssistedCustomerId(event.target.value)}
+                      onChange={(event) => {
+                        const customerId = event.target.value; setAssistedCustomerId(customerId);
+                        setAssistedLicenseId(''); setShowAmbiguitySelector(false); setAssistedExistingDeviceCode('');
+                        const eligible = managerLicenses.filter(license => license.customerId === customerId && license.mode === 'MANAGED' && (license.status === 'ACTIVE' || license.status === 'TRIAL'));
+                        if (eligible.length === 1) { setAssistedMaxDevices(String(eligible[0].maxDevices)); setAssistedMaxSessions(String(eligible[0].maxConcurrentSessions)); }
+                      }}
                       style={{
                         display: 'block',
                         width: '100%',
@@ -1751,22 +1827,30 @@ export const ManagerPanelPage: React.FC<ManagerPanelPageProps> = ({ onBack }) =>
                     </select>
                   </label>
                   <label style={{ color: '#cbd5e1', fontSize: '0.75rem' }}>
-                    Código do dispositivo já vinculado ao cliente
-                    <input
+                    {assistedDeviceRole === 'SECONDARY' ? 'Código do aparelho principal' : 'Código do aparelho que fornece a fonte do cliente'}
+                    <DeviceCodeInput
                       required
                       value={assistedExistingDeviceCode}
-                      onChange={(event) => setAssistedExistingDeviceCode(event.target.value.toUpperCase())}
+                      onValueChange={setAssistedExistingDeviceCode}
                       placeholder="XF-XXXX-XXXX"
                       autoComplete="off"
                       style={{ display: 'block', width: '100%', marginTop: '0.25rem', padding: '0.5rem', backgroundColor: '#151d30', color: '#fff', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.1)' }}
                     />
+                    {assistedDeviceRole === 'SECONDARY' && <select aria-label="Selecionar aparelho principal" value={assistedExistingDeviceCode} onChange={event => {
+                      setAssistedExistingDeviceCode(event.target.value);
+                      const license = managerLicenses.find(l => l.customerId === assistedCustomerId && l.devices?.some(d => d.displayCode === event.target.value));
+                      if (license) { setAssistedLicenseId(license.licenseId); setAssistedMaxDevices(String(license.maxDevices)); setAssistedMaxSessions(String(license.maxConcurrentSessions)); }
+                    }} style={{ display: 'block', width: '100%', marginTop: '.5rem', padding: '.5rem', background: '#151d30', color: '#fff' }}>
+                      <option value="">Selecione o principal ou digite o código acima</option>
+                      {managerLicenses.filter(l => l.customerId === assistedCustomerId && l.mode === 'MANAGED' && (l.status === 'ACTIVE' || l.status === 'TRIAL')).flatMap(l => (l.devices || []).filter(d => d.status === 'AUTHORIZED' && (!d.licenseBindingStatus || d.licenseBindingStatus === 'ACTIVE') && d.deviceRole === 'PRIMARY' && d.displayCode !== assistedDeviceCode).map(d => <option key={l.licenseId + d.deviceId} value={d.displayCode}>{d.displayCode} — {d.deviceLabel || 'Local não informado'}</option>))}
+                    </select>}
                   </label>
                   <label style={{ color: '#cbd5e1', fontSize: '0.75rem' }}>
                     Código do novo dispositivo
-                    <input
+                    <DeviceCodeInput
                       required
                       value={assistedDeviceCode}
-                      onChange={(event) => setAssistedDeviceCode(event.target.value.toUpperCase())}
+                      onValueChange={code => { setAssistedDeviceCode(code); setActivationNotificationClaim(null); setDeviceActivationSession(null); }}
                       placeholder="XF-XXXX-XXXX"
                       autoComplete="off"
                       style={{ display: 'block', width: '100%', marginTop: '0.25rem', padding: '0.5rem', backgroundColor: '#151d30', color: '#fff', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.1)' }}
@@ -1775,8 +1859,8 @@ export const ManagerPanelPage: React.FC<ManagerPanelPageProps> = ({ onBack }) =>
                   <label style={{ color: '#cbd5e1', fontSize: '0.75rem' }}>
                     Chave permanente do novo dispositivo
                     <input
-                      required
-                      value={assistedDeviceKey}
+                      required={!activationNotificationClaim} readOnly={!!activationNotificationClaim}
+                      value={activationNotificationClaim ? 'Validada pela solicitação' : assistedDeviceKey}
                       onChange={(event) => setAssistedDeviceKey(event.target.value.replace(/[^0-9]/g, '').slice(0, 6))}
                       inputMode="numeric"
                       maxLength={6}
@@ -1822,6 +1906,8 @@ export const ManagerPanelPage: React.FC<ManagerPanelPageProps> = ({ onBack }) =>
                 </div>
               )}
 
+              <ManagerDeviceRegistrationFields deviceRole={assistedDeviceRole} onDeviceRole={role => { setAssistedDeviceRole(role); if (role === 'SECONDARY') { setActivationFlowMode('EXISTING_CUSTOMER'); setAssistedExistingDeviceCode(''); } }} label={assistedDeviceLabel} maxDevices={assistedMaxDevices} maxSessions={assistedMaxSessions}
+                onLabel={setAssistedDeviceLabel} onMaxDevices={setAssistedMaxDevices} onMaxSessions={setAssistedMaxSessions} readOnlyLimits disabled={assistedActivationBusy} />
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '0.5rem' }}>
                 <button
                   type="submit"
@@ -1843,8 +1929,8 @@ export const ManagerPanelPage: React.FC<ManagerPanelPageProps> = ({ onBack }) =>
                 </button>
                 <span style={{ color: '#94a3b8', fontSize: '0.75rem' }}>
                   {activationFlowMode === 'NEW_CUSTOMER'
-                    ? 'Cria cliente + licença MVP (1 slot) + cofre de fonte + ativação em operação atômica.'
-                    : 'Reutiliza a fonte gerenciada ativa e a licença com capacidade do cliente existente.'}
+                    ? 'Cadastra o cliente, libera a quantidade informada e ativa este aparelho com a fonte escolhida.'
+                    : 'Vincula este aparelho à fonte do cliente e salva a quantidade permitida na licença.'}
                 </span>
               </div>
             </form>
@@ -1886,67 +1972,6 @@ export const ManagerPanelPage: React.FC<ManagerPanelPageProps> = ({ onBack }) =>
           </div>
         )}
 
-        {/* Navegação por Abas (C8 Admin Management) */}
-        <div
-          style={{
-            display: 'flex',
-            gap: '0.5rem',
-            borderBottom: '1px solid rgba(255,255,255,0.1)',
-            marginBottom: '1.5rem',
-            overflowX: 'auto',
-            paddingBottom: '0.5rem',
-          }}
-        >
-          {[
-            { id: 'CLIENTES', label: '👥 Clientes', count: customers.length },
-            { id: 'LICENCAS', label: '🔑 Licenças', count: managerLicenses.length || licenses.length },
-            { id: 'INSTALACOES', label: '💻 Instalações', count: installations.length },
-            { id: 'DISPOSITIVOS', label: '📱 Dispositivos', count: devices.length },
-            { id: 'FONTES', label: '🌐 Fontes', count: managedSources.length + customerSources.length },
-            { id: 'AUDITORIA', label: '📜 Auditoria', count: auditLogs.length },
-            { id: 'SISTEMA', label: '⚙️ Sistema' },
-          ].map((tab) => {
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                className="focusable-item"
-                onClick={() => setActiveTab(tab.id as typeof activeTab)}
-                style={{
-                  padding: '0.65rem 1.1rem',
-                  backgroundColor: isActive ? '#7c3aed' : '#1e293b',
-                  color: isActive ? '#ffffff' : '#94a3b8',
-                  border: isActive ? '1px solid #a78bfa' : '1px solid rgba(255,255,255,0.06)',
-                  borderRadius: '6px',
-                  fontWeight: isActive ? 700 : 500,
-                  fontSize: '0.85rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.4rem',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                <span>{tab.label}</span>
-                {typeof tab.count === 'number' && (
-                  <span
-                    style={{
-                      padding: '0.1rem 0.4rem',
-                      borderRadius: '999px',
-                      fontSize: '0.72rem',
-                      backgroundColor: isActive ? 'rgba(0,0,0,0.3)' : '#0f172a',
-                      color: isActive ? '#f8fafc' : '#cbd5e1',
-                    }}
-                  >
-                    {tab.count}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </div>
-
         {/* ABA 1: CLIENTES */}
         {activeTab === 'CLIENTES' && (
           <AdminCustomersView
@@ -1962,7 +1987,12 @@ export const ManagerPanelPage: React.FC<ManagerPanelPageProps> = ({ onBack }) =>
         {/* ABA 2: LICENÇAS */}
         {activeTab === 'LICENCAS' && (
           <AdminLicensesView
+            authority={managerRemote ?? undefined}
+            isMaster={managerProfile?.role === 'MASTER'}
+            onUpdated={refreshData}
             licenses={managerLicenses.length > 0 ? managerLicenses : fallbackLocalLicenses}
+            sourceBindings={sourceBindings}
+            customerSources={customerSources}
             loading={dataLoading}
             onInspectLicense={handleInspectLicense}
             onUpdateLimits={handleUpdateLimits}
@@ -2332,6 +2362,13 @@ export const ManagerPanelPage: React.FC<ManagerPanelPageProps> = ({ onBack }) =>
                               </button>
                             )}
 
+                            {managerProfile?.role === 'MASTER' && managerRemote?.deleteDevicePermanently && (
+                              <ManagerDeviceDeletion displayCode={d.displayCode} onDelete={async code => {
+                                await managerRemote.deleteDevicePermanently!(d.deviceId, code);
+                                await refreshData();
+                              }} />
+                            )}
+
                             {d.status !== 'REVOKED' && (
                               <button
                                 type="button"
@@ -2352,7 +2389,7 @@ export const ManagerPanelPage: React.FC<ManagerPanelPageProps> = ({ onBack }) =>
                               </button>
                             )}
 
-                            {managerSession && managerRemote && (
+                            {managerProfile?.role === 'MASTER' && managerSession && managerRemote && (
                               <button
                                 type="button"
                                 className="focusable-item"
@@ -3048,7 +3085,9 @@ export const ManagerPanelPage: React.FC<ManagerPanelPageProps> = ({ onBack }) =>
         )}
 
         {/* ABA 7: SISTEMA */}
-        {activeTab === 'SISTEMA' && (
+        {activeTab === 'SISTEMA' && managerProfile?.role === 'MASTER' && (
+          <>
+          <ManagerMultiDeviceContact key={managerSession?.userId || 'signed-out'} sessionUserId={managerSession?.userId} />
           <div style={{ backgroundColor: '#101624', padding: '1.5rem', borderRadius: '8px', marginBottom: '1.5rem' }}>
             <h2 style={{ fontSize: '1.15rem', marginBottom: '1rem', fontWeight: 700 }}>Gerar Nova Licença</h2>
             <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
@@ -3072,7 +3111,7 @@ export const ManagerPanelPage: React.FC<ManagerPanelPageProps> = ({ onBack }) =>
                     type="number"
                     min="1"
                     max="10"
-                    value={newLicMaxDevices}
+                    readOnly value={newLicMaxDevices}
                     onChange={(e) => setNewLicMaxDevices(parseInt(e.target.value) || 1)}
                     style={{ marginLeft: '0.5rem', width: '60px', padding: '0.45rem', backgroundColor: '#151d30', color: '#fff', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.1)' }}
                   />
@@ -3104,6 +3143,10 @@ export const ManagerPanelPage: React.FC<ManagerPanelPageProps> = ({ onBack }) =>
                 <code style={{ fontSize: '1.15rem', color: '#38bdf8', fontWeight: 800 }}>{createdRawKey}</code>
               </div>
             )}
+          </div>
+          </>
+        )}
+            </div>
           </div>
         )}
       </div>

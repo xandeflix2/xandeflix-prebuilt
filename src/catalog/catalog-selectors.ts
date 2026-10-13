@@ -10,6 +10,7 @@
  */
 
 import type { Category, Movie, Series } from '../contracts/catalog.ts';
+import { normalizeArtworkUri } from '../artwork/artwork-uri.ts';
 import { CatalogReadModel } from './catalog-read-model.ts';
 import {
   type CatalogItemViewModel,
@@ -21,23 +22,36 @@ import {
   HOME_RAIL_MAX_ITEMS_INITIAL,
 } from './catalog-view-model.ts';
 
+function sourceArtwork(readModel: CatalogReadModel, item: Movie | Series, kind: 'poster' | 'backdrop'): string | undefined {
+  const fields = item as unknown as Record<string, unknown>;
+  const names = kind === 'poster'
+    ? ['posterUri', 'posterUrl', 'logo', 'cover', 'poster', 'stream_icon']
+    : ['backdropUri', 'backdropUrl'];
+  for (const name of names) {
+    const uri = normalizeArtworkUri(fields[name]);
+    if (uri) return uri;
+  }
+  for (const id of item.artworkIds || []) {
+    const art = readModel.artworkById.get(id);
+    if (art?.kind === kind) {
+      const uri = normalizeArtworkUri(art.uri);
+      if (uri) return uri;
+    }
+  }
+  return undefined;
+}
+
 export function movieToViewModel(readModel: CatalogReadModel, movie: Movie): CatalogItemViewModel {
   return {
     id: movie.id,
+    externalIds: movie.externalIds?.tmdbId ? { tmdbId: movie.externalIds.tmdbId } : undefined,
     kind: 'movie',
     title: movie.title,
     originalTitle: movie.originalTitle,
     yearFormatted: readModel.formatYear(movie.year),
     overviewSnippet: movie.overview,
-    posterUri:
-      (movie as any).posterUri ||
-      (movie as any).posterUrl ||
-      (movie as any).logo ||
-      (movie as any).cover ||
-      (movie as any).poster ||
-      (movie as any).stream_icon ||
-      readModel.resolveArtworkUri(movie.artworkIds, 'poster'),
-    backdropUri: readModel.resolveArtworkUri(movie.artworkIds, 'backdrop'),
+    posterUri: sourceArtwork(readModel, movie, 'poster'),
+    backdropUri: sourceArtwork(readModel, movie, 'backdrop'),
     genreLabels: readModel.resolveGenreLabels(movie.genreIds),
     categoryLabels: readModel.resolveCategoryLabels(movie.categoryIds),
     durationFormatted: readModel.formatDuration(movie.durationSeconds),
@@ -47,20 +61,14 @@ export function movieToViewModel(readModel: CatalogReadModel, movie: Movie): Cat
 export function seriesToViewModel(readModel: CatalogReadModel, series: Series): CatalogItemViewModel {
   return {
     id: series.id,
+    externalIds: series.externalIds?.tmdbId ? { tmdbId: series.externalIds.tmdbId } : undefined,
     kind: 'series',
     title: series.title,
     originalTitle: series.originalTitle,
     yearFormatted: readModel.formatYear(series.year),
     overviewSnippet: series.overview,
-    posterUri:
-      (series as any).posterUri ||
-      (series as any).posterUrl ||
-      (series as any).logo ||
-      (series as any).cover ||
-      (series as any).poster ||
-      (series as any).stream_icon ||
-      readModel.resolveArtworkUri(series.artworkIds, 'poster'),
-    backdropUri: readModel.resolveArtworkUri(series.artworkIds, 'backdrop'),
+    posterUri: sourceArtwork(readModel, series, 'poster'),
+    backdropUri: sourceArtwork(readModel, series, 'backdrop'),
     genreLabels: readModel.resolveGenreLabels(series.genreIds),
     categoryLabels: readModel.resolveCategoryLabels(series.categoryIds),
   };
@@ -68,16 +76,15 @@ export function seriesToViewModel(readModel: CatalogReadModel, series: Series): 
 
 /**
  * Retorna o item de destaque (Hero) do catálogo.
- * Prioriza primeiro filme ou série disponível.
+ * Prioriza uma imagem disponível entre os itens limitados do first-fold.
  */
 export function getHeroItem(readModel: CatalogReadModel): CatalogItemViewModel | null {
-  if (readModel.catalog.movies.length > 0) {
-    return movieToViewModel(readModel, readModel.catalog.movies[0]);
-  }
-  if (readModel.catalog.series.length > 0) {
-    return seriesToViewModel(readModel, readModel.catalog.series[0]);
-  }
-  return null;
+  const items = [
+    ...readModel.catalog.movies.slice(0, HOME_RAIL_MAX_ITEMS_INITIAL).map((movie) => movieToViewModel(readModel, movie)),
+    ...readModel.catalog.series.slice(0, HOME_RAIL_MAX_ITEMS_INITIAL).map((series) => seriesToViewModel(readModel, series)),
+  ];
+  return items.find((item) => item.backdropUri && item.backdropUri !== item.posterUri)
+    || items.find((item) => item.posterUri) || items[0] || null;
 }
 
 /**
@@ -269,25 +276,12 @@ export function getMovieDetail(
   const movie = readModel.moviesById.get(movieId);
   if (!movie) return null;
 
-  const posterUri =
-    (movie as any).posterUrl ||
-    (movie as any).posterUri ||
-    (movie as any).logo ||
-    (movie as any).cover ||
-    (movie as any).stream_icon ||
-    readModel.resolveArtworkUri(movie.artworkIds, 'poster') ||
-    '';
-
-  const backdropUri =
-    (movie as any).backdropUrl ||
-    (movie as any).backdropUri ||
-    (movie as any).posterUrl ||
-    (movie as any).posterUri ||
-    readModel.resolveArtworkUri(movie.artworkIds, 'backdrop') ||
-    posterUri;
+  const posterUri = sourceArtwork(readModel, movie, 'poster');
+  const backdropUri = sourceArtwork(readModel, movie, 'backdrop');
 
   return {
     id: movie.id,
+    externalIds: movie.externalIds?.tmdbId ? { tmdbId: movie.externalIds.tmdbId } : undefined,
     title: movie.title,
     originalTitle: movie.originalTitle,
     yearFormatted: readModel.formatYear(movie.year),
@@ -311,22 +305,8 @@ export function getSeriesDetail(
   const series = readModel.seriesById.get(seriesId);
   if (!series) return null;
 
-  const seriesPoster =
-    (series as any).posterUrl ||
-    (series as any).posterUri ||
-    (series as any).logo ||
-    (series as any).cover ||
-    (series as any).stream_icon ||
-    readModel.resolveArtworkUri(series.artworkIds, 'poster') ||
-    '';
-
-  const seriesBackdrop =
-    (series as any).backdropUrl ||
-    (series as any).backdropUri ||
-    (series as any).posterUrl ||
-    (series as any).posterUri ||
-    readModel.resolveArtworkUri(series.artworkIds, 'backdrop') ||
-    seriesPoster;
+  const seriesPoster = sourceArtwork(readModel, series, 'poster');
+  const seriesBackdrop = sourceArtwork(readModel, series, 'backdrop');
 
   const rawSeasons = readModel.seasonsBySeriesId.get(seriesId) || [];
 
@@ -362,6 +342,7 @@ export function getSeriesDetail(
 
   return {
     id: series.id,
+    externalIds: series.externalIds?.tmdbId ? { tmdbId: series.externalIds.tmdbId } : undefined,
     title: series.title,
     originalTitle: series.originalTitle,
     yearFormatted: readModel.formatYear(series.year),
