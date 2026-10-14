@@ -5,7 +5,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import com.getcapacitor.JSObject;
 import com.xandeflix.prebuilt.player.ResilientDns;
 
 import org.junit.After;
@@ -13,6 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -26,7 +26,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import okhttp3.Dns;
 
@@ -106,6 +109,40 @@ public class LargeSourceTransportPluginTest {
                 serverSocket.close();
             } catch (Exception ignored) {}
         }
+    }
+
+    private void startProgressiveMockServer(byte[] payload, int firstPartBytes,
+                                            CountDownLatch firstPartSent,
+                                            CountDownLatch allowFinish) throws Exception {
+        startProgressiveMockServer(payload, firstPartBytes, firstPartSent, allowFinish, true);
+    }
+
+    private void startProgressiveMockServer(byte[] payload, int firstPartBytes,
+                                            CountDownLatch firstPartSent,
+                                            CountDownLatch allowFinish, boolean sendRest) throws Exception {
+        serverSocket = new ServerSocket(0);
+        serverPort = serverSocket.getLocalPort();
+        serverThread = new Thread(() -> {
+            try (Socket socket = serverSocket.accept()) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
+                String line;
+                while ((line = reader.readLine()) != null && !line.isEmpty()) {}
+                OutputStream os = socket.getOutputStream();
+                String headers = "HTTP/1.1 200 OK\r\n"
+                        + "Content-Length: " + payload.length + "\r\n"
+                        + "Connection: close\r\n\r\n";
+                os.write(headers.getBytes(StandardCharsets.UTF_8));
+                os.write(payload, 0, firstPartBytes);
+                os.flush();
+                firstPartSent.countDown();
+                if (allowFinish.await(5, TimeUnit.SECONDS) && sendRest) {
+                    os.write(payload, firstPartBytes, payload.length - firstPartBytes);
+                    os.flush();
+                }
+            } catch (Exception ignored) {}
+        });
+        serverThread.setDaemon(true);
+        serverThread.start();
     }
 
     // TEST_A: SYSTEM_DNS_SUCCESS -> transport funciona sem acionar fallback
@@ -292,6 +329,179 @@ public class LargeSourceTransportPluginTest {
 
         assertFalse(result.success);
         session.closeAndDelete();
+    }
+
+    @Test
+    public void testI_ProgressiveReadStartsBeforeResponseEofAndPreservesOrder() throws Exception {
+        byte[] payload = ("Ação São Paulo 🐉東京\r\n").repeat(40000).getBytes(StandardCharsets.UTF_8);
+        CountDownLatch firstPartSent = new CountDownLatch(1);
+        CountDownLatch allowFinish = new CountDownLatch(1);
+        startProgressiveMockServer(payload, 384 * 1024, firstPartSent, allowFinish);
+
+        Dns mockDns = hostname -> Collections.singletonList(InetAddress.getByName("127.0.0.1"));
+        LargeSourceTransportPlugin.setSharedDnsForTesting(mockDns);
+        LargeSourceTransportPlugin.DownloadSession session = new LargeSourceTransportPlugin.DownloadSession(
+                "test-i", "http://progressive-source.test:" + serverPort + "/playlist.m3u",
+                Collections.emptyMap(), 5000, 5000, 2 * 1024 * 1024
+        );
+        CountDownLatch ready = new CountDownLatch(1);
+        AtomicReference<LargeSourceTransportPlugin.DownloadResult> terminal = new AtomicReference<>();
+        Thread downloadThread = new Thread(() -> {
+            LargeSourceTransportPlugin.DownloadResult result = LargeSourceTransportPlugin.executeDownload(
+                    session, tempDir, LargeSourceTransportPlugin.getSharedHttpClient(), readyResult -> ready.countDown());
+            terminal.set(result);
+        });
+        downloadThread.start();
+
+        try {
+            assertTrue("Transport must release the consumer before EOF", ready.await(2, TimeUnit.SECONDS));
+            assertTrue("The first part must reach the client", firstPartSent.await(2, TimeUnit.SECONDS));
+            long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(2);
+            while (session.getBytesWritten() < 256 * 1024 && System.nanoTime() < deadline) Thread.sleep(10);
+            assertTrue("Call must remain active while the consumer reads", session.hasActiveCall());
+            assertFalse("Response must still be open", session.isFinished());
+
+            LargeSourceTransportPlugin.ChunkReadResult first = LargeSourceTransportPlugin.readChunkState(session, 128 * 1024);
+            assertFalse("Available data cannot be reported as pending", first.pending);
+            assertTrue("First chunk must contain bytes", first.bytesRead > 0);
+
+            ByteArrayOutputStream received = new ByteArrayOutputStream(payload.length);
+            received.write(java.util.Base64.getDecoder().decode(first.dataBase64));
+            boolean pendingObserved = false;
+            for (int attempts = 0; attempts < 30; attempts++) {
+                LargeSourceTransportPlugin.ChunkReadResult chunk = LargeSourceTransportPlugin.readChunkState(session, 127 * 1024 + 1);
+                assertFalse("Temporary EOF cannot complete the stream", chunk.done);
+                assertTrue("An open response cannot fail this fixture", chunk.errorCode == null);
+                if (chunk.pending) { pendingObserved = true; break; }
+                received.write(java.util.Base64.getDecoder().decode(chunk.dataBase64));
+            }
+            assertTrue("Temporary EOF must be explicit pending", pendingObserved);
+            allowFinish.countDown();
+            downloadThread.join(5000);
+            assertFalse("Synthetic download must finish", downloadThread.isAlive());
+            assertTrue("Complete download must succeed", terminal.get() != null && terminal.get().success);
+
+            boolean done = false;
+            for (int attempts = 0; attempts < 100 && !done; attempts++) {
+                LargeSourceTransportPlugin.ChunkReadResult chunk = LargeSourceTransportPlugin.readChunkState(session, 128 * 1024);
+                assertTrue("Progressive read cannot hide an error", chunk.errorCode == null);
+                if (chunk.pending) {
+                    Thread.sleep(10);
+                    continue;
+                }
+                done = chunk.done;
+                if (!done) received.write(java.util.Base64.getDecoder().decode(chunk.dataBase64));
+            }
+            assertTrue("Real EOF must finish the consumer", done);
+            assertEquals("All bytes must be delivered once", payload.length, received.size());
+            assertTrue("Content order must be preserved", java.util.Arrays.equals(payload, received.toByteArray()));
+        } finally {
+            allowFinish.countDown();
+            session.closeAndDelete();
+        }
+    }
+
+    @Test
+    public void testK_TruncatedBodyFailsAfterProgressiveStartAndDeletesOnlyItsFile() throws Exception {
+        byte[] payload = new byte[512 * 1024];
+        CountDownLatch firstPartSent = new CountDownLatch(1), allowFinish = new CountDownLatch(1);
+        startProgressiveMockServer(payload, 256 * 1024, firstPartSent, allowFinish, false);
+        File preserved = new File(tempDir, "unrelated-active-fixture");
+        Files.write(preserved.toPath(), new byte[]{1, 2, 3});
+        LargeSourceTransportPlugin.DownloadSession session = new LargeSourceTransportPlugin.DownloadSession(
+                "test-k", "http://127.0.0.1:" + serverPort + "/playlist.m3u",
+                Collections.emptyMap(), 5000, 5000, 2 * 1024 * 1024);
+        AtomicReference<LargeSourceTransportPlugin.DownloadResult> terminal = new AtomicReference<>();
+        Thread worker = new Thread(() -> terminal.set(LargeSourceTransportPlugin.executeDownload(
+                session, tempDir, LargeSourceTransportPlugin.getSharedHttpClient(), ready -> {})));
+        worker.start();
+        assertTrue(firstPartSent.await(2, TimeUnit.SECONDS));
+        allowFinish.countDown();
+        worker.join(5000);
+        assertFalse(worker.isAlive());
+        assertNotNull(terminal.get());
+        assertFalse("Truncation cannot become success", terminal.get().success);
+        LargeSourceTransportPlugin.ChunkReadResult failed = LargeSourceTransportPlugin.readChunkState(session, 1024);
+        assertFalse("Late transport error cannot be EOF", failed.done);
+        assertNotNull(failed.errorCode);
+        assertTrue("Unrelated active fixture must remain", preserved.exists());
+        assertTrue("Failed temp must be removed", session.getFile() == null);
+    }
+
+    @Test
+    public void testL_ImmediateCleanupFromReadyDoesNotRecreateTempFile() throws Exception {
+        byte[] payload = new byte[512 * 1024];
+        CountDownLatch firstPartSent = new CountDownLatch(1), allowFinish = new CountDownLatch(1);
+        startProgressiveMockServer(payload, 256 * 1024, firstPartSent, allowFinish);
+        LargeSourceTransportPlugin.DownloadSession session = new LargeSourceTransportPlugin.DownloadSession(
+                "test-l", "http://127.0.0.1:" + serverPort + "/playlist.m3u",
+                Collections.emptyMap(), 5000, 5000, 2 * 1024 * 1024);
+        try {
+            LargeSourceTransportPlugin.DownloadResult result = LargeSourceTransportPlugin.executeDownload(
+                    session, tempDir, LargeSourceTransportPlugin.getSharedHttpClient(), ready -> session.closeAndDelete());
+            assertFalse(result.success);
+            assertEquals("ABORTED", result.errorCode);
+            assertEquals("Cleanup must not leave an orphan", 0, tempDir.listFiles().length);
+        } finally { allowFinish.countDown(); session.closeAndDelete(); }
+    }
+
+    @Test
+    public void testM_TotalCallDeadlineFailsWithoutPromotingPartialBody() throws Exception {
+        byte[] payload = new byte[512 * 1024];
+        CountDownLatch firstPartSent = new CountDownLatch(1), allowFinish = new CountDownLatch(1);
+        startProgressiveMockServer(payload, 256 * 1024, firstPartSent, allowFinish);
+        LargeSourceTransportPlugin.DownloadSession session = new LargeSourceTransportPlugin.DownloadSession(
+                "test-m", "http://127.0.0.1:" + serverPort + "/playlist.m3u",
+                Collections.emptyMap(), 5000, 5000, 2 * 1024 * 1024);
+        okhttp3.OkHttpClient client = LargeSourceTransportPlugin.getSharedHttpClient().newBuilder()
+                .callTimeout(500, TimeUnit.MILLISECONDS).build();
+        try {
+            LargeSourceTransportPlugin.DownloadResult result = LargeSourceTransportPlugin.executeDownload(
+                    session, tempDir, client, ready -> {});
+            assertFalse(result.success);
+            assertEquals("READ_TIMEOUT", result.errorCode);
+            assertTrue(result.retryable);
+            assertEquals("READ_TIMEOUT", LargeSourceTransportPlugin.readChunkState(session, 1024).errorCode);
+            assertTrue("Deadline must delete partial temp", session.getFile() == null);
+        } finally { allowFinish.countDown(); session.closeAndDelete(); }
+    }
+
+    @Test
+    public void testJ_ProgressiveCancellationKeepsCallReachableUntilBodyEnds() throws Exception {
+        byte[] payload = new byte[512 * 1024];
+        CountDownLatch firstPartSent = new CountDownLatch(1);
+        CountDownLatch allowFinish = new CountDownLatch(1);
+        startProgressiveMockServer(payload, 256 * 1024, firstPartSent, allowFinish);
+
+        Dns mockDns = hostname -> Collections.singletonList(InetAddress.getByName("127.0.0.1"));
+        LargeSourceTransportPlugin.setSharedDnsForTesting(mockDns);
+        LargeSourceTransportPlugin.DownloadSession session = new LargeSourceTransportPlugin.DownloadSession(
+                "test-j", "http://cancel-progressive.test:" + serverPort + "/playlist.m3u",
+                Collections.emptyMap(), 5000, 5000, 2 * 1024 * 1024
+        );
+        CountDownLatch ready = new CountDownLatch(1);
+        AtomicReference<LargeSourceTransportPlugin.DownloadResult> terminal = new AtomicReference<>();
+        Thread downloadThread = new Thread(() -> {
+            LargeSourceTransportPlugin.DownloadResult result = LargeSourceTransportPlugin.executeDownload(
+                    session, tempDir, LargeSourceTransportPlugin.getSharedHttpClient(), readyResult -> ready.countDown());
+            terminal.set(result);
+        });
+        downloadThread.start();
+
+        try {
+            assertTrue(ready.await(2, TimeUnit.SECONDS));
+            assertTrue(firstPartSent.await(2, TimeUnit.SECONDS));
+            assertTrue("Call must remain cancellable while body is open", session.hasActiveCall());
+            session.closeAndDelete();
+            downloadThread.join(5000);
+            assertFalse("Cancellation must unblock native read", downloadThread.isAlive());
+            assertNotNull(terminal.get());
+            assertFalse("Late cancellation cannot become success", terminal.get().success);
+            assertEquals("ABORTED", terminal.get().errorCode);
+        } finally {
+            allowFinish.countDown();
+            session.closeAndDelete();
+        }
     }
 
     // TEST_H: NO_SECRET_LOGGING -> Hostname mascarado em logs

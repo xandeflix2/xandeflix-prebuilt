@@ -110,6 +110,11 @@ export default function App(): React.JSX.Element {
   const [authorizationGate, setAuthorizationGate] = useState<'CHECKING' | 'UNAUTHORIZED' | 'AUTHORIZED'>('CHECKING');
   const routeStateRef = useRef(routeState);
   routeStateRef.current = routeState;
+  const beforeLiveLeaveRef = useRef<(() => Promise<void>) | null>(null);
+  const navigationIntentRef = useRef(0);
+  const registerBeforeLiveLeave = useCallback((prepare: (() => Promise<void>) | null) => {
+    beforeLiveLeaveRef.current = prepare;
+  }, []);
 
   useEffect(() => {
     installViewportMetricsDiagnostic();
@@ -134,16 +139,31 @@ export default function App(): React.JSX.Element {
     };
   }, []);
 
-  const handleNavigate = useCallback((view: AppView, itemId?: string) => {
-    setRouteState((prev) => navigateTo(prev, view, itemId));
+  const commitRoute = useCallback((transition: (previous: NavigationState) => NavigationState) => {
+    const previous = routeStateRef.current;
+    const next = transition(previous);
+    if (next === previous) return;
+    const intent = ++navigationIntentRef.current;
+    const commit = () => {
+      if (navigationIntentRef.current !== intent) return;
+      setRouteState(current => current === previous ? next : current);
+    };
+    const prepare = previous.current.view === 'live' && next.current.view !== 'live'
+      ? beforeLiveLeaveRef.current : null;
+    if (prepare) void prepare().then(commit, () => { /* Live retains the error and allows retry. */ });
+    else commit();
   }, []);
+
+  const handleNavigate = useCallback((view: AppView, itemId?: string) => {
+    commitRoute((prev) => navigateTo(prev, view, itemId));
+  }, [commitRoute]);
 
   const handleBack = useCallback(() => {
     if (!window.dispatchEvent(new Event('xandeflix:playback-error-back', { cancelable: true }))) return;
     const dialog = document.querySelector<HTMLDialogElement>('dialog[data-detail-modal][open]');
     if (dialog) { dialog.close(); return; }
-    setRouteState((prev) => navigateBack(prev));
-  }, []);
+    commitRoute((prev) => navigateBack(prev));
+  }, [commitRoute]);
 
   const handleSelectItem = useCallback(
     (item: CatalogItemViewModel) => {
@@ -156,6 +176,11 @@ export default function App(): React.JSX.Element {
     },
     [handleNavigate]
   );
+
+  const handleSelectLive = useCallback((channelId: string) => {
+    if (getBootSyncCoordinator().getState() === 'PROMOTING') return;
+    handleNavigate('live', channelId);
+  }, [handleNavigate]);
 
   const handleCatalogImported = useCallback(async () => {
     await refresh();
@@ -525,7 +550,7 @@ export default function App(): React.JSX.Element {
           onSelectCategory={id => handleNavigate('series', id)} onSelectCollection={id => handleNavigate('home', id)} />;
 
       case 'live':
-        return <LiveTvPage onBack={handleBack} onHome={() => handleNavigate('home')} onOpenSourceSetup={() => handleNavigate('debug-source-setup')} />;
+        return <LiveTvPage initialChannelId={itemId} onBack={handleBack} onHome={() => handleNavigate('home')} onOpenSourceSetup={() => handleNavigate('debug-source-setup')} registerBeforeLeave={registerBeforeLiveLeave} />;
 
       case 'search':
         if (!isExistingRealCatalog) {
@@ -540,7 +565,7 @@ export default function App(): React.JSX.Element {
           );
         }
         if (!readModel) return <EmptyState />;
-        return <SearchPage readModel={readModel} onSelectItem={handleSelectItem} />;
+        return <SearchPage readModel={readModel} onSelectItem={handleSelectItem} onSelectLive={handleSelectLive} />;
 
       case 'activation':
         return (

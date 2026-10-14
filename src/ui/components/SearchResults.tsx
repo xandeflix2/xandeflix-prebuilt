@@ -10,17 +10,20 @@ import type { CatalogReadModel } from '../../catalog/catalog-read-model.ts';
 import type { CatalogItemViewModel } from '../../catalog/catalog-view-model.ts';
 import { movieToViewModel, seriesToViewModel } from '../../catalog/catalog-selectors.ts';
 import { MediaCard } from './MediaCard.tsx';
+import { Artwork } from './Artwork.tsx';
 
 interface SearchResultsProps {
   results: SearchResultItem[];
   readModel: CatalogReadModel;
   onSelectItem: (item: CatalogItemViewModel) => void;
+  onSelectLive?: (channelId: string) => void;
 }
 
 export const SearchResults: React.FC<SearchResultsProps> = ({
   results,
   readModel,
   onSelectItem,
+  onSelectLive,
 }) => {
   const [, setResolvedVersion] = React.useState(0);
 
@@ -29,6 +32,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
     void (async () => {
       for (const r of results) {
         if (!active) break;
+        if (r.kind === 'live') continue;
         try {
           const resolved = r.kind === 'movie'
             ? await readModel.resolveMovieById(r.id)
@@ -47,7 +51,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
   }
 
   // Hidrata cada SearchResultItem através do CatalogReadModel
-  const viewModels: CatalogItemViewModel[] = [];
+  const cards: Array<{ kind: 'catalog'; item: CatalogItemViewModel } | { kind: 'live'; result: SearchResultItem; posterUri: string }> = [];
 
   for (const r of results) {
     const rawPoster =
@@ -57,6 +61,11 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
       (r as any).cover ||
       '';
 
+    if (r.kind === 'live') {
+      cards.push({ kind: 'live', result: r, posterUri: rawPoster });
+      continue;
+    }
+
     if (r.kind === 'movie') {
       const movie = readModel.moviesById.get(r.id);
       if (movie) {
@@ -64,9 +73,9 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
         if (!vm.posterUri && rawPoster) {
           vm.posterUri = rawPoster;
         }
-        viewModels.push(vm);
+        cards.push({ kind: 'catalog', item: vm });
       } else {
-        viewModels.push({
+        cards.push({ kind: 'catalog', item: {
           id: r.id,
           kind: 'movie',
           title: r.title,
@@ -74,7 +83,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
           posterUri: rawPoster,
           genreLabels: [],
           categoryLabels: [],
-        });
+        } });
       }
     } else {
       const series = readModel.seriesById.get(r.id);
@@ -83,9 +92,9 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
         if (!vm.posterUri && rawPoster) {
           vm.posterUri = rawPoster;
         }
-        viewModels.push(vm);
+        cards.push({ kind: 'catalog', item: vm });
       } else {
-        viewModels.push({
+        cards.push({ kind: 'catalog', item: {
           id: r.id,
           kind: 'series',
           title: r.title,
@@ -93,7 +102,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
           posterUri: rawPoster,
           genreLabels: [],
           categoryLabels: [],
-        });
+        } });
       }
     }
   }
@@ -102,15 +111,32 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
     <section className="search-results-section" aria-label="Resultados da Busca">
       <div className="search-results-header">
         <h2 className="search-results-count">
-          {viewModels.length} {viewModels.length === 1 ? 'resultado encontrado' : 'resultados encontrados'}
+          {cards.length} {cards.length === 1 ? 'resultado encontrado' : 'resultados encontrados'}
         </h2>
       </div>
 
       <div className="catalog-grid search-results-grid">
-        {viewModels.map((item) => (
+        {cards.map((card) => card.kind === 'live' ? (
+          <button
+            key={`live:${card.result.id}`}
+            type="button"
+            className="focusable-item media-card search-result-card"
+            onClick={() => onSelectLive?.(card.result.id)}
+            disabled={!onSelectLive}
+            aria-label={`${card.result.title} - Canal ao vivo`}
+          >
+            <div className="media-card-poster-wrapper">
+              <Artwork uri={card.posterUri} title={card.result.title} kind="poster" className="media-card-poster" prepare={false} />
+              <div className="media-card-badge">AO VIVO</div>
+            </div>
+            <div className="media-card-info">
+              <h3 className="media-card-title">{card.result.title}</h3>
+            </div>
+          </button>
+        ) : (
           <MediaCard
-            key={item.id}
-            item={item}
+            key={`${card.item.kind}:${card.item.id}`}
+            item={card.item}
             onClick={onSelectItem}
             className="search-result-card"
           />

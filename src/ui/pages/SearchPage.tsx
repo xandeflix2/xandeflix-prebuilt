@@ -1,7 +1,7 @@
 /**
  * Xandeflix Prebuilt — SearchPage (Gate G7)
  *
- * Tela de busca unificada de filmes e séries consumindo exclusivamente
+ * Tela de busca unificada de filmes, séries e canais consumindo exclusivamente
  * o índice de busca local persistido e o CatalogReadModel.
  *
  * Princípios:
@@ -27,12 +27,14 @@ import { SearchState } from '../components/SearchState.tsx';
 interface SearchPageProps {
   readModel: CatalogReadModel;
   onSelectItem: (item: CatalogItemViewModel) => void;
+  onSelectLive?: (channelId: string) => void;
   searchServiceOverride?: SearchService;
 }
 
 export const SearchPage: React.FC<SearchPageProps> = ({
   readModel,
   onSelectItem,
+  onSelectLive,
   searchServiceOverride,
 }) => {
   const searchService = useMemo(
@@ -164,6 +166,7 @@ export const SearchPage: React.FC<SearchPageProps> = ({
             results={results}
             readModel={readModel}
             onSelectItem={onSelectItem}
+            onSelectLive={onSelectLive}
           />
         ) : (
           <SearchState status={status} query={query} />

@@ -27,6 +27,7 @@ export function heroSwipeDirection(dx: number, dy: number, elapsed: number, widt
 
 export const HomeHero: React.FC<HomeHeroProps> = ({ options: incoming, onSelect, onPlay, playbackBusy, playbackMessage, nextBatch, displayed, contentKind, headingLevel = 1 }) => {
   const phone = useHeroLayout();
+  const fireStick = typeof navigator !== 'undefined' && /\bAFT\w*/i.test(navigator.userAgent);
   const candidates = useMemo(() => contentKind ? incoming.filter(option => option.item.kind === contentKind) : incoming, [incoming, contentKind]);
   const items = useMemo(()=>candidates.map(option=>option.item),[candidates]);
   const artwork = useHeroArtwork(items,phone?'vertical':'horizontal',20,10);
@@ -45,11 +46,12 @@ export const HomeHero: React.FC<HomeHeroProps> = ({ options: incoming, onSelect,
   const [gesturing, setGesturing] = useState(false), [interacting, setInteracting] = useState(false), [hovered, setHovered] = useState(false);
   const [visible, setVisible] = useState(false), [hidden, setHidden] = useState(false), [reduced, setReduced] = useState(false), [loading, setLoading] = useState(false);
   const root = useRef<HTMLDivElement>(null), pending = useRef(false);
-  const gesture = useRef<{ pointerId: number; x: number; y: number; time: number; width: number; key: string }>();
+  const gesture = useRef<{ pointerId: number; x: number; y: number; time: number; width: number; key: string; moved: boolean }>();
   const pointerType = useRef(''), suppressClickUntil = useRef(0);
   const item = options[index];
   const dotStart = Math.max(0, Math.min(index - 2, options.length - 5));
   const hasOptions = options.length > 0;
+  const canRotate = options.length > 1;
   useEffect(() => {
     const visibility = () => setHidden(document.hidden);
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)'), updateMotion = () => setReduced(motion.matches);
@@ -73,19 +75,26 @@ export const HomeHero: React.FC<HomeHeroProps> = ({ options: incoming, onSelect,
     pending.current = true; setLoading(true);
     try { if (!(await nextBatch())) setCursor({ options, index: 0 }); } finally { pending.current = false; setLoading(false); }
   };
-  const cancelGesture = () => { gesture.current = undefined; setGesturing(false); };
+  const advanceRef = useRef(advance);
+  advanceRef.current = advance;
+  const cancelGesture = (suppressClick = false) => {
+    if (suppressClick && gesture.current) suppressClickUntil.current = performance.now() + 400;
+    gesture.current = undefined; setGesturing(false);
+  };
   const startGesture = (event: React.PointerEvent<HTMLDivElement>) => {
     pointerType.current = event.pointerType;
     if (event.pointerType !== 'touch' && event.pointerType !== 'pen') return;
-    if (!event.isPrimary) { cancelGesture(); return; }
-    if (loading || playbackBusy || options.length < 2 || (event.target as Element).closest('button, a, input, select, textarea, [role="button"]')) return;
+    if (!event.isPrimary) { cancelGesture(true); return; }
+    const control = (event.target as Element).closest('button, a, input, select, textarea, [role="button"]');
+    if (loading || playbackBusy || (control && !control.classList.contains('hero-artwork-link'))) return;
     if (event.currentTarget.contains(document.activeElement)) (document.activeElement as HTMLElement)?.blur();
-    gesture.current = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, time: event.timeStamp, width: event.currentTarget.clientWidth, key: item?.key };
+    gesture.current = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, time: event.timeStamp, width: event.currentTarget.clientWidth, key: item?.key, moved: false };
     setGesturing(true);
   };
   const moveGesture = (event: React.PointerEvent<HTMLDivElement>) => {
     const start = gesture.current;
     if (!start || start.pointerId !== event.pointerId) return;
+    if (Math.hypot(event.clientX - start.x, event.clientY - start.y) > 10) start.moved = true;
     if (heroSwipeDirection(event.clientX - start.x, event.clientY - start.y, event.timeStamp - start.time, start.width)) {
       if (!event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.setPointerCapture(event.pointerId);
     }
@@ -94,7 +103,8 @@ export const HomeHero: React.FC<HomeHeroProps> = ({ options: incoming, onSelect,
     const start = gesture.current;
     if (!start || start.pointerId !== event.pointerId) return;
     cancelGesture();
-    if (loading || playbackBusy || start.key !== item?.key) return;
+    if (start.moved || Math.hypot(event.clientX - start.x, event.clientY - start.y) > 10) suppressClickUntil.current = performance.now() + 400;
+    if (loading || playbackBusy || start.key !== item?.key) { suppressClickUntil.current = performance.now() + 400; return; }
     const direction = heroSwipeDirection(event.clientX - start.x, event.clientY - start.y, event.timeStamp - start.time, start.width);
     if (!direction) return;
     suppressClickUntil.current = performance.now() + 400;
@@ -102,16 +112,16 @@ export const HomeHero: React.FC<HomeHeroProps> = ({ options: incoming, onSelect,
     else setCursor({ options, index: (index + options.length - 1) % options.length });
   };
   useEffect(() => {
-    if (options.length < 2 || gesturing || interacting || hovered || !visible || hidden || reduced || loading || playbackBusy) return;
-    const timer = setTimeout(() => { void advance(); }, 10000);
+    if (!canRotate || gesturing || ((interacting || hovered) && !fireStick) || !visible || hidden || reduced || loading || playbackBusy) return;
+    const timer = setTimeout(() => { void advanceRef.current(); }, 10000);
     return () => clearTimeout(timer);
-  }, [options, index, gesturing, interacting, hovered, visible, hidden, reduced, loading, playbackBusy, nextBatch]);
+  }, [canRotate, item?.key, fireStick, gesturing, interacting, hovered, visible, hidden, reduced, loading, playbackBusy]);
   if (!item) return <div ref={root} className="home-hero-carousel"><HeroPreparing pending={artwork.pending} vertical={phone}/></div>;
   return <div ref={root} className="home-hero-carousel" aria-roledescription="carrossel" aria-label={contentKind === 'movie' ? 'Destaques de filmes' : contentKind === 'series' ? 'Destaques de séries' : 'Destaques de filmes e séries'}
     onFocusCapture={() => setInteracting(true)} onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setInteracting(false); }}
     onPointerEnter={(event) => { if (event.pointerType === 'mouse') setHovered(true); }} onPointerLeave={(event) => { if (event.pointerType === 'mouse') setHovered(false); }}
-    onPointerDown={startGesture} onPointerMove={moveGesture} onPointerUp={finishGesture} onPointerCancel={cancelGesture}
-    onLostPointerCapture={(event) => { if (event.target === event.currentTarget) cancelGesture(); }}
+    onPointerDown={startGesture} onPointerMove={moveGesture} onPointerUp={finishGesture} onPointerCancel={() => cancelGesture(true)}
+    onLostPointerCapture={(event) => { if (event.target === event.currentTarget) cancelGesture(true); }}
     onClickCapture={(event) => { if (event.detail > 0 && performance.now() < suppressClickUntil.current) { event.preventDefault(); event.stopPropagation(); } }}
     onClick={(event) => { if (event.detail > 0 && (pointerType.current === 'touch' || pointerType.current === 'pen') && event.currentTarget.contains(document.activeElement)) (document.activeElement as HTMLElement)?.blur(); }}>
     <Hero item={item.item} onPlay={onPlay} playbackBusy={playbackBusy} playbackMessage={playbackMessage} headingLevel={headingLevel} artworkUri={artwork.eligible.find(v=>v.item.id===item.item.id&&v.item.kind===item.item.kind)?.uri} onArtworkError={()=>artwork.reject(item.item)} onSelect={onSelect} mobilePoster={phone} controls={options.length > 1 ? <div className="hero-carousel-controls" role="group" aria-label="Selecionar destaque">

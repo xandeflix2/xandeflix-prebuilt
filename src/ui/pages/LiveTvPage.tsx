@@ -15,7 +15,7 @@
  * - DPAD_NAVIGATION_READY: Suporte a teclado/D-pad e retorno via Escape/Back.
  */
 
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useCallback, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import type { LiveCatalog, LiveChannel } from '../../catalog/live/live-tv.types.ts';
 import { LiveCatalogService, resolveCanonicalLiveTotal, type LiveChannelPage } from '../../catalog/live/live-catalog.service.ts';
@@ -35,6 +35,7 @@ import { bootTelemetry } from '../../diagnostics/boot-telemetry.ts';
 import { armCastAuthorization,stopGoogleCast } from '../../playback/google-cast.ts';
 import { CastButton } from '../components/CastButton.tsx';
 import { LiveEpgPanel } from '../components/LiveEpgPanel.tsx';
+import { ContinuousLiveChannelList } from '../components/ContinuousLiveChannelList.tsx';
 import { useLivePresentation } from '../hooks/useLivePresentation.ts';
 import { chooseInitialLiveChannel, lastLiveChannel } from '../../playback/last-live-channel.ts';
 import { liveChannelFingerprint } from '../../playback/last-live-channel.ts';
@@ -49,12 +50,14 @@ interface LiveTvPageProps {
   onBack: () => void;
   onHome?: () => void;
   onOpenSourceSetup?: () => void;
+  initialChannelId?: string;
+  registerBeforeLeave?: (prepare: (() => Promise<void>) | null) => void;
 }
 
 const LIVE_GROUP_PAGE_SIZE = 48;
 const EMPTY_LIVE_PAGE: LiveChannelPage = { channels: [], offset: 0, totalAvailable: 0, nextOffset: null };
 
-export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSourceSetup }) => {
+export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSourceSetup, initialChannelId, registerBeforeLeave }) => {
   const [liveCatalog, setLiveCatalog] = useState<LiveCatalog | null>(null);
   const [canonicalGroupCounts, setCanonicalGroupCounts] = useState<Record<string, number> | null>(null);
   const [groupPage, setGroupPage] = useState<LiveChannelPage>(EMPTY_LIVE_PAGE);
@@ -62,6 +65,8 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
   const [selectedGroupId, setSelectedGroupId] = useState<string>('');
   const [selectedChannel, setSelectedChannel] = useState<LiveChannel | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [selectionError, setSelectionError] = useState<string | null>(null);
+  const initialBrowsePage = useRef<{ groupId: string; offset: number } | null>(null);
   const [streamError, setStreamError] = useState<string | null>(null);
   const [channelFilter, setChannelFilter] = useState<string>('');
   const [previewRetryNonce, setPreviewRetryNonce] = useState(0);
@@ -87,6 +92,8 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
   const resumeFullscreen = useRef(false);
   const switchingChannel = useRef(false);
   const previewMounted = useRef(false);
+  const previewLeaving = useRef(false);
+  const cancelPreviewOperation = useRef<(() => Promise<void>) | null>(null);
   const desiredPreviewChannel = useRef(selectedChannel);
   desiredPreviewChannel.current = selectedChannel;
   useEffect(() => {
@@ -124,6 +131,22 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
   const previewIdRef = useRef<string | null>(null);
   const fullscreenRequestIdRef = useRef<string | null>(null);
 
+  const prepareToLeave = useCallback(async () => {
+    previewLeaving.current = true;
+    liveOperation.current?.abort();
+    try {
+      if (cancelPreviewOperation.current) await cancelPreviewOperation.current();
+      else await previewLifecycle.current;
+    } catch {
+      setStreamError('LIVE_PREVIEW_OPEN_FAILED');
+      throw new Error('LIVE_PREVIEW_CLOSE_FAILED');
+    }
+  }, []);
+  useLayoutEffect(() => {
+    registerBeforeLeave?.(prepareToLeave);
+    return () => { registerBeforeLeave?.(null); };
+  }, [registerBeforeLeave, prepareToLeave]);
+
   const getPreviewBounds = useCallback(() => {
     const element = previewContainerRef.current;
     if (!element) return null;
@@ -158,33 +181,48 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
     let mounted = true;
     const controller = new AbortController();
     setIsLoading(true);
+    setSelectionError(null);
+    setSelectedChannel(null);
+    setSelectedGroupId('');
+    setGroupPage(EMPTY_LIVE_PAGE);
+    initialBrowsePage.current = null;
 
     LiveCatalogService.loadLiveCatalog()
       .then(async (cat) => {
         if (!mounted) return;
-        setLiveCatalog(cat);
 
         if (cat && Array.isArray(cat.groups) && cat.groups.length > 0) {
-          const channel = await chooseInitialLiveChannel(cat, {
-            loadPage: (groupId, offset, pageSize) => LiveCatalogService.loadChannelPageForGroup(groupId, offset, pageSize),
-            activeSnapshot: async () => (await LiveCatalogService.loadLiveCatalog())?.snapshotId,
+          const requested = initialChannelId ? await LiveCatalogService.loadChannelById(initialChannelId, {
+            expectedSnapshotId: cat.snapshotId,
             signal: controller.signal,
-          });
+            pageSize: LIVE_GROUP_PAGE_SIZE,
+          }) : undefined;
+          const channel = initialChannelId ? requested?.channel : await chooseInitialLiveChannel(cat, {
+              loadPage: (groupId, offset, pageSize) => LiveCatalogService.loadChannelPageForGroup(groupId, offset, pageSize),
+              activeSnapshot: async () => (await LiveCatalogService.loadLiveCatalog())?.snapshotId,
+              signal: controller.signal,
+            });
           if (!mounted) return;
+          if (requested) initialBrowsePage.current = { groupId: requested.channel.groupId, offset: requested.pageOffset };
+          if (initialChannelId && !channel) setSelectionError('O canal encontrado na busca não está disponível no catálogo ativo. Faça a busca novamente.');
           setSelectedGroupId(channel?.groupId || cat.groups[0].id);
           setSelectedChannel(channel || null);
         }
+        setLiveCatalog(cat);
         setIsLoading(false);
       })
       .catch(() => {
-        if (mounted) setIsLoading(false);
+        if (mounted) {
+          setSelectionError('Não foi possível carregar o canal. Volte à busca e tente novamente.');
+          setIsLoading(false);
+        }
       });
 
     return () => {
       mounted = false;
       controller.abort();
     };
-  }, []);
+  }, [initialChannelId]);
 
   // Grupo efetivo e canais do grupo
   const effectiveGroupId =
@@ -195,9 +233,8 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
 
   const groupRequest = useRef<AbortController | null>(null);
   const browseGroupRef = useRef(effectiveGroupId); browseGroupRef.current = effectiveGroupId;
-  const channelListRef = useRef<HTMLDivElement | null>(null);
-  const pendingPageFocus = useRef(false);
-  const requestGroupPage = useCallback(async (groupId: string, offset: number, focusFirst = false) => {
+  const [channelScrollRequest, setChannelScrollRequest] = useState({ groupId: '', offset: 0, nonce: 0, focus: false });
+  const requestGroupPage = useCallback(async (groupId: string, offset: number, focusFirst = false, navigate = false) => {
     if (!liveCatalog) return;
     groupRequest.current?.abort();
     const controller = new AbortController(); groupRequest.current = controller;
@@ -206,23 +243,20 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
       const page = await LiveCatalogService.loadChannelPageForGroup(groupId, offset, LIVE_GROUP_PAGE_SIZE);
       const active = await LiveCatalogService.loadLiveCatalog();
       if (controller.signal.aborted || browseGroupRef.current !== groupId || active?.snapshotId !== liveCatalog.snapshotId) return;
-      pendingPageFocus.current = focusFirst;
       setGroupPage(page);
+      if (navigate || focusFirst) setChannelScrollRequest(previous => ({ groupId, offset: page.offset, nonce: previous.nonce + 1, focus: focusFirst }));
     } catch {
       if (!controller.signal.aborted) setLiveMessage('Não foi possível carregar os canais. Tente novamente.');
     } finally {
       if (groupRequest.current === controller) { groupRequest.current = null; setIsGroupPageLoading(false); }
     }
   }, [liveCatalog?.snapshotId]);
-  useEffect(() => {
-    const list = channelListRef.current;
-    if (list) { list.scrollTop = 0; if (pendingPageFocus.current) list.querySelector<HTMLElement>('[data-live-channel]')?.focus({ preventScroll: true }); }
-    pendingPageFocus.current = false;
-  }, [groupPage]);
   // Hidrata uma página do grupo selecionado; nunca o catálogo Live completo.
   useEffect(() => {
     if (!liveCatalog || !effectiveGroupId) return;
-    void requestGroupPage(effectiveGroupId, 0);
+    const initial = initialBrowsePage.current;
+    initialBrowsePage.current = null;
+    void requestGroupPage(effectiveGroupId, initial?.groupId === effectiveGroupId ? initial.offset : 0, false, initial?.groupId === effectiveGroupId);
     return () => { groupRequest.current?.abort(); };
   }, [effectiveGroupId, requestGroupPage]);
 
@@ -234,21 +268,10 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
     ?? groupPage.totalAvailable
     ?? 0;
 
-  const loadNextGroupPage = useCallback(() => {
-    if (!effectiveGroupId || groupPage.nextOffset === null || isGroupPageLoading) return;
-    void requestGroupPage(effectiveGroupId, groupPage.nextOffset, true);
-  }, [effectiveGroupId, groupPage.nextOffset, isGroupPageLoading, requestGroupPage]);
-  const loadPreviousGroupPage = useCallback(() => {
-    if (!effectiveGroupId || groupPage.offset === 0 || isGroupPageLoading) return;
-    void requestGroupPage(effectiveGroupId, Math.max(0, groupPage.offset - LIVE_GROUP_PAGE_SIZE), true);
-  }, [effectiveGroupId, groupPage.offset, isGroupPageLoading, requestGroupPage]);
-
-  // Canais filtrados pelo campo de busca dentro do grupo
-  const filteredChannels = useMemo(() => {
-    if (!channelFilter.trim()) return currentGroupChannels;
-    const q = channelFilter.toLowerCase().trim();
-    return currentGroupChannels.filter((c) => c.name.toLowerCase().includes(q));
-  }, [currentGroupChannels, channelFilter]);
+  const loadContinuousPage = useCallback((offset: number, signal: AbortSignal) =>
+    LiveCatalogService.loadContinuousChannelPage(effectiveGroupId, offset, {
+      expectedSnapshotId: liveCatalog?.snapshotId || '', signal, filter: channelFilter,
+    }), [liveCatalog?.snapshotId, effectiveGroupId, channelFilter]);
 
   const liveContext = useMemo<NativeLiveContext>(() => {
     const text = (value: string | undefined, max: number) => value && !/https?:\/\//i.test(value) ? value.replace(/[\u0000-\u001f\u007f]/g, ' ').slice(0, max) : '';
@@ -423,8 +446,11 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
     const rememberPlayingChannel = () => { if (!cancelled && liveCatalog) lastLiveChannel.remember(selectedChannel, liveCatalog); };
     const closePreview = async () => {
       const id = previewIdRef.current;
+      if (id) {
+        const stopped = await stopNativeAndroidPreview({ previewId: id });
+        if (!stopped.success) throw new Error('LIVE_PREVIEW_CLOSE_FAILED');
+      }
       previewIdRef.current = null; previewChannelId.current = '';
-      if (id) await stopNativeAndroidPreview({ previewId: id });
       if (previewMounted.current) setIsPreviewFullscreen(false);
     };
     const startPreview = async () => {
@@ -540,24 +566,30 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
       }
     };
 
-    const task = previewLifecycle.current.then(() => { if (!cancelled) return startPreview(); });
+    const task = previewLifecycle.current.then(() => { if (!cancelled && !previewLeaving.current) return startPreview(); });
     previewLifecycle.current = task.catch(() => {});
 
-    return () => {
+    let cleanupTask: Promise<void> | null = null;
+    const cleanup = () => {
       cancelled = true;
       void playingListener?.remove();
       unsubscribeTermination?.();
       unsubscribeTermination = undefined;
-      previewLifecycle.current = task.catch(() => {}).then(async () => {
-        await stopGoogleCast();
+      if (cleanupTask) return cleanupTask;
+      cleanupTask = task.catch(() => {}).then(async () => {
         const previewId = previewIdRef.current;
-        if (previewId && previewMounted.current && desiredPreviewChannel.current) {
+        if (previewId && previewMounted.current && !previewLeaving.current && desiredPreviewChannel.current) {
           const suspended = await updateNativeAndroidPreview({ previewId, suspendPlayback: true });
           if (!suspended.success) await closePreview();
         } else await closePreview();
+        await stopGoogleCast();
         if (sessionAcquired && sessionGuard) { sessionAcquired = false; await sessionGuard.releaseSession('USER_EXIT'); }
-      }).catch(() => {});
+      });
+      previewLifecycle.current = cleanupTask.catch(() => { cleanupTask = null; });
+      return cleanupTask;
     };
+    cancelPreviewOperation.current = cleanup;
+    return () => { void cleanup().catch(() => {}); };
   }, [getPreviewBounds, mapPreviewErrorCode, previewRetryNonce, selectedChannel, liveCatalog]);
 
   // Mantém a PlayerView nativa alinhada à área DOM em resize, orientação, layout e scroll.
@@ -660,7 +692,7 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
       } else if (action === 'pageNext' || action === 'pagePrevious') {
         const offset = action === 'pageNext' ? groupPage.nextOffset : Math.max(0, groupPage.offset - 48);
         if (offset === null) return;
-        await requestGroupPage(effectiveGroupId, offset);
+        await requestGroupPage(effectiveGroupId, offset, false, true);
       }
     } catch { if (current()) setLiveMessage('Não foi possível carregar os canais. Tente novamente.'); }
     finally { if (liveOperation.current === controller) { liveOperation.current = null; setLiveBusy(false); } }
@@ -770,9 +802,9 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
       <div className="bootstrap-state-container" role="alert" style={{ padding: '3rem', textAlign: 'center' }}>
         <div className="bootstrap-state-card" style={{ maxWidth: '600px', margin: '0 auto' }}>
           <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📺</div>
-          <h1 className="bootstrap-state-title">Nenhum Canal ao Vivo Disponível</h1>
+          <h1 className="bootstrap-state-title">{selectionError ? 'Não foi possível abrir o canal' : 'Nenhum Canal ao Vivo Disponível'}</h1>
           <p className="bootstrap-state-desc">
-            A fonte configurada atualmente não possui canais ao vivo importados ou a importação ainda não foi executada.
+            {selectionError || 'A fonte configurada atualmente não possui canais ao vivo importados ou a importação ainda não foi executada.'}
           </p>
           <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '1.5rem' }}>
             <button type="button" className="focusable-item btn-primary" onClick={onBack}>
@@ -1027,128 +1059,14 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
             />
           </div>
 
-          {/* Lista de Canais */}
-          <div ref={channelListRef} className="live-channel-list" aria-busy={isGroupPageLoading} style={{ flex: 1, overflowY: 'auto', padding: '0.5rem' }}>
-            {groupPage.channels.length > 0 && <p className="live-page-range" role="status">Canais {groupPage.offset + 1}–{groupPage.offset + groupPage.channels.length} de {currentGroupTotal}</p>}
-            {groupPage.offset > 0 && <button type="button" className="focusable-item live-page-button" data-live-page="previous" disabled={isGroupPageLoading} onClick={loadPreviousGroupPage}>Canais anteriores</button>}
-            {filteredChannels.length === 0 ? (
-              <div style={{ color: '#64748b', padding: '2rem 1rem', textAlign: 'center', fontSize: '0.85rem' }}>
-                Nenhum canal encontrado.
-              </div>
-            ) : (
-              filteredChannels.map((channel, index) => {
-                const isChannelSelected = selectedChannel?.id === channel.id;
-                return (
-                  <button
-                    key={channel.id}
-                    data-live-channel={channel.id}
-                    type="button"
-                    className={`focusable-item ${isChannelSelected ? 'active-channel' : ''}`}
-                    onClick={() => handleChannelSelect(channel)}
-                    onKeyDown={(event) => {
-                      if (event.key === 'ArrowDown' && index === filteredChannels.length - 1 && groupPage.nextOffset !== null) {
-                        event.preventDefault();
-                        loadNextGroupPage();
-                      }
-                      if (event.key === 'ArrowUp' && index === 0 && groupPage.offset > 0) {
-                        event.preventDefault(); loadPreviousGroupPage();
-                      }
-                    }}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.75rem',
-                      width: '100%',
-                      padding: '0.6rem 0.75rem',
-                      marginBottom: '0.3rem',
-                      backgroundColor: isChannelSelected ? '#1e3a8a' : '#131d2e',
-                      border: isChannelSelected ? '1px solid #60a5fa' : '1px solid #1e293b',
-                      borderRadius: '6px',
-                      color: isChannelSelected ? '#ffffff' : '#e2e8f0',
-                      cursor: 'pointer',
-                      textAlign: 'left',
-                      transition: 'all 0.1s ease',
-                    }}
-                  >
-                    {channel.logoUrl ? (
-                      <img
-                        src={channel.logoUrl}
-                        alt={channel.name}
-                        style={{
-                          width: '32px',
-                          height: '32px',
-                          objectFit: 'contain',
-                          borderRadius: '4px',
-                          backgroundColor: '#0f172a',
-                          flexShrink: 0,
-                        }}
-                        onError={(e) => {
-                          (e.target as HTMLElement).style.display = 'none';
-                        }}
-                      />
-                    ) : (
-                      <div
-                        style={{
-                          width: '32px',
-                          height: '32px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          backgroundColor: '#0f172a',
-                          borderRadius: '4px',
-                          fontSize: '1rem',
-                          flexShrink: 0,
-                        }}
-                      >
-                        📺
-                      </div>
-                    )}
-
-                    <div style={{ flex: 1, overflow: 'hidden' }}>
-                      <div
-                        style={{
-                          fontWeight: isChannelSelected ? 700 : 500,
-                          fontSize: '0.85rem',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {channel.name}
-                      </div>
-                      <div style={{ fontSize: '0.7rem', color: isChannelSelected ? '#93c5fd' : '#64748b' }}>
-                        {channel.num ? `Canal #${channel.num}` : (channel.streamRef?.containerExtension?.toUpperCase() || 'LIVE')}
-                      </div>
-                    </div>
-
-                    {isChannelSelected && (
-                      <span style={{ fontSize: '0.75rem', color: '#60a5fa', flexShrink: 0 }}>
-                        ▶
-                      </span>
-                    )}
-                  </button>
-                );
-              })
-            )}
-            {groupPage.nextOffset !== null && (
-              <button
-                type="button"
-                className="focusable-item"
-                data-live-page="next"
-                disabled={isGroupPageLoading}
-                onClick={loadNextGroupPage}
-                style={{
-                  width: '100%', padding: '0.65rem', marginTop: '0.35rem',
-                  background: '#1e293b', color: '#bfdbfe', border: '1px solid #334155',
-                  borderRadius: '6px', cursor: 'pointer', fontWeight: 600,
-                }}
-              >
-                {isGroupPageLoading
-                  ? 'Carregando…'
-                  : `Próximos canais (${groupPage.nextOffset + 1}–${Math.min(currentGroupTotal, groupPage.nextOffset + LIVE_GROUP_PAGE_SIZE)} de ${currentGroupTotal})`}
-              </button>
-            )}
-          </div>
+          {/* Uma rolagem contínua, com janela local bounded em todos os layouts. */}
+          <ContinuousLiveChannelList key={[liveCatalog?.snapshotId, effectiveGroupId, channelFilter.trim().toLocaleLowerCase()].join(':')}
+            total={channelFilter.trim() ? 0 : currentGroupTotal}
+            seed={channelFilter.trim() ? undefined : groupPage}
+            selectedId={selectedChannel?.id}
+            request={!channelFilter.trim() && channelScrollRequest.groupId === effectiveGroupId ? channelScrollRequest : { offset: 0, nonce: 0, focus: false }}
+            loadPage={loadContinuousPage} onSelect={handleChannelSelect}
+            onWindowPage={channelFilter.trim() ? undefined : setGroupPage}/>
         </div>
         )}
 
@@ -1450,6 +1368,7 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
             </>
           ) : (
             <div
+              role={selectionError ? 'alert' : undefined}
               style={{
                 flex: 1,
                 display: 'flex',
@@ -1459,7 +1378,7 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
                 padding: '2rem',
               }}
             >
-              Selecione um canal para visualizar a transmissão e a programação.
+              {selectionError || 'Selecione um canal para visualizar a transmissão e a programação.'}
             </div>
           )}
         </div>

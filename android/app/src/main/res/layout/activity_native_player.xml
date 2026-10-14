@@ -14,4 +14,21 @@
         app:show_buffering="always"
         app:resize_mode="fit" />
 
+    <TextView
+        android:id="@+id/native_seek_feedback"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|end"
+        android:layout_marginLeft="48dp"
+        android:layout_marginRight="48dp"
+        android:padding="12dp"
+        android:background="#B31C1E26"
+        android:textColor="#FFFFFF"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:clickable="false"
+        android:focusable="false"
+        android:accessibilityLiveRegion="polite"
+        android:visibility="gone" />
+
 </FrameLayout>

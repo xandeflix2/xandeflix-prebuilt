@@ -19,8 +19,14 @@ import { CatalogReadModel } from '../../catalog/catalog-read-model.ts';
 import type { StreamRef, Episode, Season } from '../../contracts/catalog.ts';
 import { resolveSegmentRelativePath } from '../../bootstrap/storage/segment-path-resolver.ts';
 import { CanonicalItemResolver } from '../../catalog/canonical-item-resolver.ts';
+import { DIRECTORY_ROOTS_MODE } from '../../source/source-directory-api.ts';
+import { SourceDirectoryDetailsResolver } from '../../source/source-directory-details.ts';
 
-function createSegmentedStreamResolver(service: BootstrapService): (streamId: string) => Promise<StreamRef | undefined> {
+async function assertSnapshot(service: BootstrapService, snapshotId: string): Promise<void> {
+  if ((await service.getActivePointer())?.snapshotId !== snapshotId) throw new Error('CATALOG_GENERATION_CHANGED');
+}
+
+function createSegmentedStreamResolver(service: BootstrapService, snapshotId: string): (streamId: string) => Promise<StreamRef | undefined> {
   let streamSegmentsPromise: Promise<string[]> | null = null;
 
   const getStreamSegments = async (): Promise<string[]> => {
@@ -28,6 +34,7 @@ function createSegmentedStreamResolver(service: BootstrapService): (streamId: st
       streamSegmentsPromise = (async () => {
         const storage = service.getStorage();
         const manifest = await storage.readActiveManifest();
+        if (manifest?.snapshotId !== snapshotId) throw new Error('CATALOG_GENERATION_CHANGED');
         const segments = (manifest as (typeof manifest & {
           segments?: Array<{ kind: string; fileName: string }>;
         }) | null)?.segments;
@@ -42,6 +49,7 @@ function createSegmentedStreamResolver(service: BootstrapService): (streamId: st
   };
 
   return async (streamId: string): Promise<StreamRef | undefined> => {
+    await assertSnapshot(service, snapshotId);
     const readSegment = service.getStorage().readActiveSegment;
     if (!readSegment || !streamId) return undefined;
 
@@ -52,23 +60,29 @@ function createSegmentedStreamResolver(service: BootstrapService): (streamId: st
         const records = JSON.parse(raw) as StreamRef[];
         if (!Array.isArray(records)) continue;
         const match = records.find((record) => record?.id === streamId);
-        if (match) return match;
+        if (match) {
+          await assertSnapshot(service, snapshotId);
+          return match;
+        }
       } catch {
         // Um segmento inválido não deve impedir a leitura dos demais.
       }
     }
+    await assertSnapshot(service, snapshotId);
     return undefined;
   };
 }
 
 
-function createSegmentedEpisodeResolver(service: BootstrapService): (seriesId: string) => Promise<Episode[]> {
+function createSegmentedEpisodeResolver(service: BootstrapService, snapshotId: string): (seriesId: string) => Promise<Episode[]> {
   return async (seriesId: string): Promise<Episode[]> => {
+    await assertSnapshot(service, snapshotId);
     const storage = service.getStorage();
     const readSegment = storage.readActiveSegment;
     if (!readSegment || !seriesId) return [];
 
     const manifest = await storage.readActiveManifest();
+    if (manifest?.snapshotId !== snapshotId) throw new Error('CATALOG_GENERATION_CHANGED');
     const segments = (manifest as any)?.segments;
     if (!Array.isArray(segments)) return [];
 
@@ -89,17 +103,20 @@ function createSegmentedEpisodeResolver(service: BootstrapService): (seriesId: s
         }
       } catch {}
     }
+    await assertSnapshot(service, snapshotId);
     return matched;
   };
 }
 
-function createSegmentedSeasonResolver(service: BootstrapService): (seriesId: string) => Promise<Season[]> {
+function createSegmentedSeasonResolver(service: BootstrapService, snapshotId: string): (seriesId: string) => Promise<Season[]> {
   return async (seriesId: string): Promise<Season[]> => {
+    await assertSnapshot(service, snapshotId);
     const storage = service.getStorage();
     const readSegment = storage.readActiveSegment;
     if (!readSegment || !seriesId) return [];
 
     const manifest = await storage.readActiveManifest();
+    if (manifest?.snapshotId !== snapshotId) throw new Error('CATALOG_GENERATION_CHANGED');
     const segments = (manifest as any)?.segments;
     if (!Array.isArray(segments)) return [];
 
@@ -120,8 +137,36 @@ function createSegmentedSeasonResolver(service: BootstrapService): (seriesId: st
         }
       } catch {}
     }
+    await assertSnapshot(service, snapshotId);
     return matched;
   };
+}
+
+/** Each model owns generation-bound resolvers; no service-wide segment list survives a refresh. */
+export function createActiveCatalogReadModel(
+  service: BootstrapService,
+  catalog: PrebuiltCatalog,
+  directoryOptions?: ConstructorParameters<typeof SourceDirectoryDetailsResolver>[2],
+): CatalogReadModel {
+  const snapshotId = catalog.metadata.snapshotId;
+  const storage = service.getStorage();
+  const items = new CanonicalItemResolver(storage, snapshotId);
+  const segmentedStreamResolver = createSegmentedStreamResolver(service, snapshotId);
+  const directory = catalog.extensions?.sourceInventoryMode === DIRECTORY_ROOTS_MODE
+    ? new SourceDirectoryDetailsResolver(storage, snapshotId, directoryOptions) : undefined;
+  return new CatalogReadModel(catalog, {
+    streamRefResolver: directory
+      ? id => id.startsWith('str:episode:') ? directory.resolveStreamRef(id) : segmentedStreamResolver(id)
+      : segmentedStreamResolver,
+    episodeResolver: createSegmentedEpisodeResolver(service, snapshotId),
+    seasonResolver: createSegmentedSeasonResolver(service, snapshotId),
+    movieResolver: id => items.resolveMovieById(id),
+    seriesResolver: id => items.resolveSeriesById(id),
+    assertCurrentGeneration: directory ? () => directory.assertCurrentGeneration() : () => assertSnapshot(service, snapshotId),
+    ...(directory ? {
+      seriesDetailsResolver: id => directory.resolveSeriesDetails(id),
+    } : {}),
+  });
 }
 
 export interface UseActiveCatalogReturn {
@@ -142,9 +187,6 @@ export function useActiveCatalog(serviceOverride?: BootstrapService): UseActiveC
   const [summary, setSummary] = useState<BootstrapSummary | null>(null);
   const [activeCatalog, setActiveCatalog] = useState<PrebuiltCatalog | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const streamRefResolver = useMemo(() => createSegmentedStreamResolver(service), [service]);
-  const episodeResolver = useMemo(() => createSegmentedEpisodeResolver(service), [service]);
-  const seasonResolver = useMemo(() => createSegmentedSeasonResolver(service), [service]);
 
   const loadData = useCallback(async () => {
     setIsLoading(true);
@@ -186,15 +228,8 @@ export function useActiveCatalog(serviceOverride?: BootstrapService): UseActiveC
 
   const readModel = useMemo(() => {
     if (!activeCatalog) return null;
-    const itemResolver = new CanonicalItemResolver(service.getStorage(), activeCatalog.metadata.snapshotId);
-    return new CatalogReadModel(activeCatalog, {
-      streamRefResolver,
-      episodeResolver,
-      seasonResolver,
-      movieResolver: (id) => itemResolver.resolveMovieById(id),
-      seriesResolver: (id) => itemResolver.resolveSeriesById(id),
-    });
-  }, [activeCatalog, episodeResolver, seasonResolver, service, streamRefResolver]);
+    return createActiveCatalogReadModel(service, activeCatalog);
+  }, [activeCatalog, service]);
 
   const isNoActiveCatalog = status === 'NO_ACTIVE_CATALOG';
 

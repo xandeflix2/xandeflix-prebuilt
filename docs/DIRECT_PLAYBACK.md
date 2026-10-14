@@ -367,3 +367,15 @@ As seguintes decisões permanecem expressamente abertas:
 - [x] Testes unitários Android com Media3 compilando e passando (`ANDROID_UNIT_TESTS = PASS`).
 - [x] Build Android concluído com sucesso (`ANDROID_DEBUG_BUILD = PASS`).
 - [x] Regressões de todos os Gates anteriores preservadas (G2, G3, G4, G5, G6, G7).
+
+## C105 — referências do inventário da mesma fonte
+
+No catálogo DIRECTORY_ROOTS_V1, filmes/canais recebem referências diretas
+equivalentes da fonte autorizada no dispositivo; temporadas/episódios da série
+selecionada são resolvidos pela API dessa mesma origem e credenciais locais.
+Protocolo selado, sourceVersion lógica e configuração remota não mudam. Cache de
+detalhes é privado em RAM, limitado e vinculado ao snapshot/fonte/versão; cada
+resolução exige autoridade atual e rejeita mudança de geração. C9, resolver,
+player nativo, progress/favoritos e transporte device-to-source são reutilizados.
+Não há mídia, busca nem catálogo entregues pelo Control Plane. Falha de detalhe
+permanece erro com tentativa posterior; nunca é publicada como série vazia.

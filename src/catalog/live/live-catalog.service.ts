@@ -35,6 +35,55 @@ export interface LiveChannelPage {
   readonly nextOffset: number | null;
 }
 
+export interface LiveChannelSelection {
+  readonly channel: LiveChannel;
+  readonly pageOffset: number;
+}
+
+/** Resolve somente o canal pedido, preservando a ordem da paginação local. */
+export async function readLiveChannelByIdFromSegments(
+  catalog: LiveCatalog,
+  channelId: string,
+  segmentFiles: string[],
+  readSegment: LiveSegmentRead,
+  pageSize = 48,
+): Promise<LiveChannelSelection | undefined> {
+  const safePageSize = Math.max(1, Math.floor(pageSize));
+  const groupIds = new Set(catalog.groups.map(group => group.id));
+  const seen = new Set<string>();
+  const groupCounts = new Map<string, number>();
+  const inspect = (value: unknown): LiveChannelSelection | undefined => {
+    if (!value || typeof value !== 'object') return undefined;
+    const channel = value as LiveChannel;
+    if (typeof channel.id !== 'string' || !channel.id || !groupIds.has(channel.groupId) || seen.has(channel.id)) return undefined;
+    seen.add(channel.id);
+    const offset = groupCounts.get(channel.groupId) || 0;
+    groupCounts.set(channel.groupId, offset + 1);
+    return channel.id === channelId
+      ? { channel, pageOffset: Math.floor(offset / safePageSize) * safePageSize }
+      : undefined;
+  };
+  for (const fileName of segmentFiles) {
+    const json = await readSegment(fileName);
+    if (!json) throw new Error('LIVE_SELECTION_SEGMENT_UNAVAILABLE');
+    let records: unknown;
+    try { records = JSON.parse(json); }
+    catch { throw new Error('LIVE_SELECTION_SEGMENT_INVALID'); }
+    if (!Array.isArray(records)) throw new Error('LIVE_SELECTION_SEGMENT_INVALID');
+    for (const value of records) {
+      const found = inspect(value);
+      if (found) return found;
+    }
+  }
+  for (const group of catalog.groups) {
+    for (const channel of catalog.channelsByGroup[group.id] || []) {
+      const found = inspect(channel);
+      if (found) return found;
+    }
+  }
+  return undefined;
+}
+
 /** A origem do total global é o manifesto; os grupos são fallback para snapshots legados. */
 export function resolveCanonicalLiveTotal(
   catalog: Pick<LiveCatalog, 'totalChannels'>,
@@ -57,11 +106,13 @@ export async function readLiveChannelPageForGroupFromSegments(
   readSegment: LiveSegmentRead,
   offset = 0,
   pageSize = 48,
+  filter = '',
 ): Promise<LiveChannelPage> {
   const safeOffset = Math.max(0, Math.floor(offset));
   const safePageSize = Math.max(1, Math.floor(pageSize));
   const channels: LiveChannel[] = [];
   const seenIds = new Set<string>();
+  const query = filter.trim().toLocaleLowerCase();
   let totalAvailable = 0;
 
   for (const fileName of segmentFiles) {
@@ -79,6 +130,7 @@ export async function readLiveChannelPageForGroupFromSegments(
       const channel = value as LiveChannel;
       if (channel.groupId !== groupId || typeof channel.id !== 'string' || !channel.id || seenIds.has(channel.id)) continue;
       seenIds.add(channel.id);
+      if (query && !channel.name?.toLocaleLowerCase().includes(query)) continue;
       if (totalAvailable >= safeOffset && channels.length < safePageSize) channels.push(channel);
       totalAvailable += 1;
     }
@@ -89,6 +141,7 @@ export async function readLiveChannelPageForGroupFromSegments(
   for (const channel of catalog.channelsByGroup[groupId] || []) {
     if (typeof channel.id !== 'string' || !channel.id || seenIds.has(channel.id)) continue;
     seenIds.add(channel.id);
+    if (query && !channel.name?.toLocaleLowerCase().includes(query)) continue;
     if (totalAvailable >= safeOffset && channels.length < safePageSize) channels.push(channel);
     totalAvailable += 1;
   }
@@ -247,6 +300,68 @@ export class LiveCatalogService {
       offset,
       pageSize,
     );
+  }
+
+  /** Janela contínua local; filtro cobre o grupo completo sem retê-lo em RAM. */
+  static async loadContinuousChannelPage(groupId: string, offset: number, options: {
+    expectedSnapshotId: string;
+    signal: AbortSignal;
+    filter?: string;
+  }): Promise<LiveChannelPage> {
+    const check = async () => {
+      if (options.signal.aborted) throw new Error('LIVE_SELECTION_CANCELLED');
+      if ((await this.readActivePointer())?.snapshotId !== options.expectedSnapshotId) throw new Error('LIVE_SELECTION_CHANGED');
+      if (options.signal.aborted) throw new Error('LIVE_SELECTION_CANCELLED');
+    };
+    await check();
+    const catalog = await this.loadLiveCatalog();
+    if (!catalog || catalog.snapshotId !== options.expectedSnapshotId || !catalog.groups.some(group => group.id === groupId)) {
+      throw new Error('LIVE_SELECTION_CHANGED');
+    }
+    const files = await this.resolveLiveSegmentFiles(options.expectedSnapshotId, catalog);
+    const page = await readLiveChannelPageForGroupFromSegments(catalog, groupId, files, async file => {
+      await check();
+      const value = await this.readActiveSegment(options.expectedSnapshotId, file);
+      await check();
+      if (!value) throw new Error('LIVE_SELECTION_SEGMENT_UNAVAILABLE');
+      try { if (!Array.isArray(JSON.parse(value))) throw new Error(); }
+      catch { throw new Error('LIVE_SELECTION_SEGMENT_INVALID'); }
+      return value;
+    }, offset, 48, options.filter);
+    await check();
+    return page;
+  }
+
+  /** Busca de ID no snapshot ativo; não hidrata outros grupos nem consulta rede. */
+  static async loadChannelById(channelId: string, options?: {
+    expectedSnapshotId?: string;
+    signal?: AbortSignal;
+    pageSize?: number;
+  }): Promise<LiveChannelSelection | undefined> {
+    if (!channelId) return undefined;
+    const pointer = await this.readActivePointer();
+    if (!pointer?.snapshotId || (options?.expectedSnapshotId && options.expectedSnapshotId !== pointer.snapshotId)) {
+      throw new Error('LIVE_SELECTION_CHANGED');
+    }
+    const check = async () => {
+      if (options?.signal?.aborted) throw new Error('LIVE_SELECTION_CANCELLED');
+      if ((await this.readActivePointer())?.snapshotId !== pointer.snapshotId) throw new Error('LIVE_SELECTION_CHANGED');
+      if (options?.signal?.aborted) throw new Error('LIVE_SELECTION_CANCELLED');
+    };
+    await check();
+    const catalog = await this.loadLiveCatalog();
+    await check();
+    if (!catalog || catalog.snapshotId !== pointer.snapshotId) throw new Error('LIVE_SELECTION_CHANGED');
+    const segmentFiles = await this.resolveLiveSegmentFiles(pointer.snapshotId, catalog);
+    await check();
+    const selected = await readLiveChannelByIdFromSegments(catalog, channelId, segmentFiles, async fileName => {
+      await check();
+      const json = await this.readActiveSegment(pointer.snapshotId, fileName);
+      await check();
+      return json;
+    }, options?.pageSize);
+    await check();
+    return selected;
   }
 
   /**

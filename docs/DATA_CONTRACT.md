@@ -297,3 +297,16 @@ que valida a conformidade contra o JSON Schema, verifica unicidade de IDs, afere
 | **G7** | Indexa campos de texto (`title`, `overview`, `genres`) para busca local. |
 | **G8** | Mapeia `StreamRef.sourceItemId` para reproducao direta. |
 | **G9** | Aplica deltas e mutacoes preservando `schemaVersion=1`. |
+
+## C105 — inventário completo de raízes e detalhes locais sob demanda
+
+`extensions.sourceInventoryMode=DIRECTORY_ROOTS_V1` identifica o catálogo completo
+de filmes, séries e canais da mesma fonte autorizada. As seis listas completas
+e autenticadas precedem staging e promoção atômica, sem alterar schemaVersion,
+manifest, hashes ou validação. Zero episódios/temporadas no snapshot significa
+que detalhes ainda não foram materializados; não significa série sem episódios.
+Detalhes da série selecionada são validados e mantidos em RAM privada limitada,
+fora do snapshot imutável, vinculados à fonte/geração/snapshot e à autoridade atual.
+IDs de provedor permanecem estáveis em refreshes do modo. Catálogos M3U legados
+mantêm seus IDs e seu caminho de importação. Busca de todas as raízes continua
+local. Especificação: [C11_FAST_HOME_ON_DEMAND_CONTENT](architecture/C11_FAST_HOME_ON_DEMAND_CONTENT.md).

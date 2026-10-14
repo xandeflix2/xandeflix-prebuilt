@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -67,6 +68,11 @@ public class NativePlayerActivity extends AppCompatActivity {
     private boolean wasCasting;
     private boolean playerForeground;
     private PlayerControls controls;
+    private VodTouchSeekController seekGestures;
+    private android.widget.TextView seekFeedback;
+    private final Runnable hideSeekFeedback = () -> {
+        if (seekFeedback != null) seekFeedback.setVisibility(View.GONE);
+    };
     private final EpisodeNavigationState episodeNavigation = new EpisodeNavigationState();
     private Runnable episodeTimeout;
     private org.json.JSONObject episodeContext;
@@ -201,6 +207,11 @@ public class NativePlayerActivity extends AppCompatActivity {
         controls=new PlayerControls(this,playerView,()->player,
                 ()->{emitTerminalEvent(false,null);releasePlayer();finish();},
                 ()->requestEpisode("next",null), id->requestEpisode("select",id));
+        seekFeedback = findViewById(R.id.native_seek_feedback);
+        seekGestures = new VodTouchSeekController(playerView, this::canSeekFromTouch, direction -> {
+            long delta = seekFromDoubleTap(currentKind, direction, player);
+            if (delta != 0) showSeekFeedback(delta);
+        });
         if(com.xandeflix.prebuilt.cast.CastController.mobile(this)) {
             castButton=com.xandeflix.prebuilt.cast.CastController.get().button(this);
             android.widget.FrameLayout slot=playerView.findViewById(R.id.player_cast_slot);
@@ -775,6 +786,52 @@ public class NativePlayerActivity extends AppCompatActivity {
         return false;
     }
 
+    public static long seekFromDoubleTap(String kind, int direction, @Nullable Player targetPlayer) {
+        if (!VodSeekGesturePolicy.isVod(kind) || targetPlayer == null || targetPlayer.isPlayingAd()
+                || !targetPlayer.isCurrentMediaItemSeekable()
+                || !targetPlayer.isCommandAvailable(Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM)) return 0;
+        long position = targetPlayer.getCurrentPosition();
+        long target = VodSeekGesturePolicy.target(position, targetPlayer.getDuration(), direction);
+        if (target < 0 || target == position) return 0;
+        targetPlayer.seekTo(target);
+        return target - position;
+    }
+
+    private boolean canSeekFromTouch() {
+        return playerForeground && !isFinishing() && !isDestroyed() && !inPipMode && !wasCasting
+                && controls != null && !controls.locked() && !controls.dialogOpen() && !episodeNavigation.pending()
+                && VodSeekGesturePolicy.isVod(currentKind) && player != null && !player.isPlayingAd()
+                && player.isCurrentMediaItemSeekable() && player.getDuration() > 0
+                && player.isCommandAvailable(Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM);
+    }
+
+    private void showSeekFeedback(long delta) {
+        if (seekFeedback == null) return;
+        long amount = Math.abs(delta);
+        String seconds = amount % 1000 == 0 ? Long.toString(amount / 1000)
+                : String.format(java.util.Locale.ROOT, "%.1f", Math.max(0.1, amount / 1000d)).replace('.', ',');
+        android.widget.FrameLayout.LayoutParams layout = (android.widget.FrameLayout.LayoutParams)seekFeedback.getLayoutParams();
+        layout.gravity = android.view.Gravity.CENTER_VERTICAL | (delta > 0 ? android.view.Gravity.RIGHT : android.view.Gravity.LEFT);
+        seekFeedback.setLayoutParams(layout);
+        seekFeedback.setText((delta > 0 ? "+" : "\u2212") + seconds + "s");
+        seekFeedback.setContentDescription((delta > 0 ? "Avançou " : "Retrocedeu ") + seconds + " segundos");
+        seekFeedback.removeCallbacks(hideSeekFeedback);
+        seekFeedback.setVisibility(View.VISIBLE);
+        seekFeedback.postDelayed(hideSeekFeedback, 900);
+    }
+
+    private void cancelSeekGestures() {
+        if (seekGestures != null) seekGestures.cancel();
+        if (seekFeedback != null) seekFeedback.removeCallbacks(hideSeekFeedback);
+        hideSeekFeedback.run();
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        if (seekGestures != null && seekGestures.dispatch(event)) return true;
+        return super.dispatchTouchEvent(event);
+    }
+
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         if(event!=null&&controls!=null) {
@@ -819,6 +876,7 @@ public class NativePlayerActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         playerForeground=false;
+        cancelSeekGestures();
         emitWatchProgress(false);
         if (player != null && (pipController == null || !pipController.eligible())) {
             player.pause();
@@ -850,6 +908,7 @@ public class NativePlayerActivity extends AppCompatActivity {
      * LiberaÃ§Ã£o estritamente segura e idempotente do player e views associadas.
      */
     public void releasePlayer() {
+        cancelSeekGestures();
         episodeNavigation.close();
         if(episodeTimeout!=null)observabilityHandler.removeCallbacks(episodeTimeout);
         if(controls!=null)controls.close();

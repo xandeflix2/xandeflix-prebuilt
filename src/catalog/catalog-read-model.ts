@@ -29,6 +29,12 @@ export interface CategoryProvenance {
   canonicalKind: TypedCategoryKind;
 }
 
+export interface CatalogSeriesDetails {
+  seasons: Season[];
+  episodes: Episode[];
+  streams: StreamRef[];
+}
+
 export interface CatalogReadModelOptions {
   categoryProvenance?: readonly CategoryProvenance[];
   /** Resolve uma StreamRef ausente no first-fold lendo um segmento por vez. */
@@ -40,6 +46,10 @@ export interface CatalogReadModelOptions {
   /** Reidrata apenas a entidade solicitada quando ela não pertence ao first-fold. */
   movieResolver?: (movieId: string) => Promise<Movie | undefined>;
   seriesResolver?: (seriesId: string) => Promise<Series | undefined>;
+  /** Complete details of one selected directory root; failures remain visible. */
+  seriesDetailsResolver?: (seriesId: string) => Promise<CatalogSeriesDetails>;
+  /** Directory caches never substitute remote authorization/current generation. */
+  assertCurrentGeneration?: () => Promise<void>;
 }
 
 export interface TypedCategoryProjection {
@@ -76,6 +86,9 @@ export class CatalogReadModel {
   private readonly seasonResolver?: (seriesId: string) => Promise<Season[]>;
   private readonly movieResolver?: (movieId: string) => Promise<Movie | undefined>;
   private readonly seriesResolver?: (seriesId: string) => Promise<Series | undefined>;
+  private readonly seriesDetailsResolver?: (seriesId: string) => Promise<CatalogSeriesDetails>;
+  private readonly assertCurrentGeneration?: () => Promise<void>;
+  private readonly hydratedDirectorySeries = new Set<string>();
   private readonly episodesLoadedForSeries = new Set<string>();
 
   constructor(catalog: PrebuiltCatalog, options: CatalogReadModelOptions = {}) {
@@ -85,6 +98,8 @@ export class CatalogReadModel {
     this.seasonResolver = options.seasonResolver;
     this.movieResolver = options.movieResolver;
     this.seriesResolver = options.seriesResolver;
+    this.seriesDetailsResolver = options.seriesDetailsResolver;
+    this.assertCurrentGeneration = options.assertCurrentGeneration;
     const extensionProvenance = catalog.extensions?.categoryProvenance;
     const pipelineProvenance = Array.isArray(extensionProvenance)
       ? extensionProvenance
@@ -382,6 +397,28 @@ export class CatalogReadModel {
    */
   
   async loadEpisodesForSeries(seriesId: string): Promise<Episode[]> {
+    await this.assertCurrentGeneration?.();
+    if (this.seriesDetailsResolver) {
+      const details = await this.seriesDetailsResolver(seriesId);
+      await this.assertCurrentGeneration?.();
+      // Install only a complete selected-series response. Keep at most four
+      // selected series in UI memory; the immutable catalog remains untouched.
+      this.removeHydratedDirectorySeries(seriesId);
+      for (const season of details.seasons) this.seasonsById.set(season.id, season);
+      this.seasonsBySeriesId.set(seriesId, [...details.seasons]);
+      for (const episode of details.episodes) {
+        this.episodesById.set(episode.id, episode);
+        const rows = this.episodesBySeasonId.get(episode.seasonId) || [];
+        rows.push(episode); this.episodesBySeasonId.set(episode.seasonId, rows);
+      }
+      for (const rows of this.episodesBySeasonId.values()) rows.sort((a, b) => a.episodeNumber - b.episodeNumber);
+      for (const stream of details.streams) this.streamsById.set(stream.id, stream);
+      const series = this.seriesById.get(seriesId);
+      if (series) this.seriesById.set(seriesId, { ...series, seasonIds: details.seasons.map(season => season.id) });
+      this.hydratedDirectorySeries.add(seriesId);
+      while (this.hydratedDirectorySeries.size > 4) this.removeHydratedDirectorySeries(this.hydratedDirectorySeries.values().next().value!);
+      return this.getEpisodesForSeries(seriesId);
+    }
     if (this.episodesLoadedForSeries.has(seriesId)) {
       return this.getEpisodesForSeries(seriesId);
     }
@@ -429,6 +466,19 @@ export class CatalogReadModel {
     return this.getEpisodesForSeries(seriesId);
   }
 
+  private removeHydratedDirectorySeries(seriesId: string): void {
+    for (const season of this.seasonsBySeriesId.get(seriesId) || []) {
+      for (const episode of this.episodesBySeasonId.get(season.id) || []) {
+        for (const streamId of episode.streamIds) this.streamsById.delete(streamId);
+        this.episodesById.delete(episode.id);
+      }
+      this.episodesBySeasonId.delete(season.id);
+      this.seasonsById.delete(season.id);
+    }
+    this.seasonsBySeriesId.delete(seriesId);
+    this.hydratedDirectorySeries.delete(seriesId);
+  }
+
   getEpisodesForSeries(seriesId: string): Episode[] {
     const seasons = this.seasonsBySeriesId.get(seriesId) || [];
     const result: Episode[] = [];
@@ -440,10 +490,12 @@ export class CatalogReadModel {
   }
 
   async getStreamRefAsync(id: string): Promise<StreamRef | undefined> {
+    await this.assertCurrentGeneration?.();
     const local = this.getStreamRef(id);
     if (local) return local;
     if (!this.streamRefResolver) return undefined;
     const resolved = await this.streamRefResolver(id);
+    await this.assertCurrentGeneration?.();
     if (resolved) this.streamsById.set(resolved.id, resolved);
     return resolved;
   }

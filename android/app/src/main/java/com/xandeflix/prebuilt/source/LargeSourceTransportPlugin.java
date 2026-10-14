@@ -15,13 +15,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InterruptedIOException;
 import java.io.RandomAccessFile;
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.UnknownHostException;
 import java.security.MessageDigest;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -44,6 +44,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import okio.ByteString;
 
 /**
  * Device-direct file-backed source transport with resilient DNS.
@@ -63,6 +64,7 @@ public final class LargeSourceTransportPlugin extends Plugin {
     private static final long DEFAULT_MAX_SOURCE_FILE_BYTES = 256L * 1024L * 1024L;
     private static final long MIN_SAFE_FILE_BYTES = 16L * 1024L * 1024L;
     private static final int DOWNLOAD_BUFFER_BYTES = 64 * 1024;
+    private static final int STREAM_PUBLISH_BYTES = 256 * 1024;
     private static final int READ_CHUNK_MAX_BYTES = 4 * 1024 * 1024; // 4 MB máximo suportado
     private static final int DEFAULT_CONNECT_TIMEOUT_MS = 20_000;
     private static final int DEFAULT_READ_TIMEOUT_MS = 20_000;
@@ -121,7 +123,8 @@ public final class LargeSourceTransportPlugin extends Plugin {
         DownloadSession session = new DownloadSession(downloadId, url, headers, connectTimeoutMs, readTimeoutMs, requestedMax);
         sessions.put(downloadId, session);
 
-        executor.execute(() -> download(call, session));
+        boolean progressive = Boolean.TRUE.equals(call.getBoolean("progressive"));
+        executor.execute(() -> download(call, session, progressive));
     }
 
     @PluginMethod
@@ -131,7 +134,7 @@ public final class LargeSourceTransportPlugin extends Plugin {
         }
         String downloadId = call.getString("downloadId");
         DownloadSession session = downloadId == null ? null : sessions.get(downloadId);
-        if (session == null || !session.completed || session.file == null) {
+        if (session == null || (!session.ready && !session.completed)) {
             call.resolve(failureChunk("INVALID_NATIVE_RESPONSE", false));
             return;
         }
@@ -149,11 +152,7 @@ public final class LargeSourceTransportPlugin extends Plugin {
         String downloadId = call.getString("downloadId");
         DownloadSession session = downloadId == null ? null : sessions.get(downloadId);
         if (session != null) {
-            session.cancelled.set(true);
-            Call activeCall = session.activeCall;
-            if (activeCall != null) {
-                activeCall.cancel();
-            }
+            session.cancel();
         }
         JSObject result = new JSObject();
         result.put("success", session != null);
@@ -250,18 +249,43 @@ public final class LargeSourceTransportPlugin extends Plugin {
         }
     }
 
-    private void download(PluginCall call, DownloadSession session) {
+    private void download(PluginCall call, DownloadSession session, boolean progressive) {
         File cacheDir = getContext() == null ? null : getContext().getCacheDir();
-        DownloadResult result = executeDownload(session, cacheDir, getSharedHttpClient());
-        if (!result.success) {
+        AtomicBoolean startResolved = new AtomicBoolean(false);
+        DownloadReadyListener readyListener = readyResult -> {
+            if (startResolved.compareAndSet(false, true)) {
+                call.resolve(readyResult.toJSObject());
+            }
+        };
+        DownloadResult result = executeDownload(session, cacheDir, getSharedHttpClient(), progressive ? readyListener : null);
+        if (!session.ready && !result.success) {
             sessions.remove(session.id);
         }
-        call.resolve(result.toJSObject());
+        if (startResolved.compareAndSet(false, true)) {
+            call.resolve(result.toJSObject());
+        }
     }
 
     public static DownloadResult executeDownload(DownloadSession session, File cacheDir, OkHttpClient client) {
+        return executeDownload(session, cacheDir, client, null);
+    }
+
+    interface DownloadReadyListener {
+        void onReady(DownloadResult result);
+    }
+
+    static DownloadResult executeDownload(DownloadSession session, File cacheDir, OkHttpClient client,
+                                          @Nullable DownloadReadyListener readyListener) {
+        DownloadResult result = executeDownloadBody(session, cacheDir, client, readyListener);
+        result = session.finish(result);
+        if (!result.success) session.closeAndDelete();
+        return result;
+    }
+
+    private static DownloadResult executeDownloadBody(DownloadSession session, File cacheDir, OkHttpClient client,
+                                                      @Nullable DownloadReadyListener readyListener) {
         File tempFile = null;
-        boolean keepFile = false;
+        Response response = null;
         try {
             session.stage = "FILE_CREATE";
             if (cacheDir == null) {
@@ -302,8 +326,7 @@ public final class LargeSourceTransportPlugin extends Plugin {
             session.activeCall = call;
 
             session.stage = "HTTP_RESPONSE";
-            Response response = call.execute();
-            session.activeCall = null;
+            response = call.execute();
             session.httpResponseReceived = true;
             int status = response.code();
             session.httpStatusClass = statusClass(status);
@@ -328,7 +351,16 @@ public final class LargeSourceTransportPlugin extends Plugin {
             MessageDigest contentDigest = MessageDigest.getInstance("SHA-256");
             try (InputStream input = body.byteStream();
                  BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(tempFile))) {
+                if (session.cancelled.get()) {
+                    return failure("ABORTED", session.httpStatusClass, true, session.stage, false);
+                }
+                if (readyListener != null) {
+                    session.ready = true;
+                    readyListener.onReady(new DownloadResult(true, session.id, "SIM", session.httpStatusClass,
+                            session.bytesWritten, effectiveMax, null, session.stage, false, TRANSPORT_TYPE));
+                }
                 byte[] buffer = new byte[DOWNLOAD_BUFFER_BYTES];
+                long lastPublishedBytes = 0L;
                 int read;
                 while ((read = input.read(buffer)) != -1) {
                     if (session.cancelled.get()) {
@@ -340,6 +372,10 @@ public final class LargeSourceTransportPlugin extends Plugin {
                     output.write(buffer, 0, read);
                     contentDigest.update(buffer, 0, read);
                     session.bytesWritten += read;
+                    if (readyListener != null && session.bytesWritten - lastPublishedBytes >= STREAM_PUBLISH_BYTES) {
+                        output.flush();
+                        lastPublishedBytes = session.bytesWritten;
+                    }
                 }
                 output.flush();
             }
@@ -357,8 +393,9 @@ public final class LargeSourceTransportPlugin extends Plugin {
             }
 
             session.stage = "DOWNLOAD_COMPLETE";
-            session.completed = true;
-            keepFile = true;
+            if (session.cancelled.get()) {
+                return failure("ABORTED", session.httpStatusClass, true, session.stage, false);
+            }
             return new DownloadResult(
                     true,
                     session.id,
@@ -376,33 +413,98 @@ public final class LargeSourceTransportPlugin extends Plugin {
             String code = classifyException(error, session);
             return failure(code, session.httpStatusClass, session.httpResponseReceived, session.stage, isRetryable(code));
         } finally {
-            if (!keepFile) {
-                session.closeAndDelete();
-            }
+            session.activeCall = null;
+            if (response != null) response.close();
         }
     }
 
     private void readChunkInternal(PluginCall call, DownloadSession session, int maxBytes) {
+        call.resolve(readChunkState(session, maxBytes).toJSObject());
+    }
+
+    static final class ChunkReadResult {
+        final boolean done;
+        final boolean pending;
+        final String dataText;
+        final String dataBase64;
+        final int bytesRead;
+        final String errorCode;
+        final boolean retryable;
+
+        ChunkReadResult(boolean done, boolean pending, String dataText, int bytesRead,
+                        @Nullable String errorCode, boolean retryable) {
+            this.done = done;
+            this.pending = pending;
+            this.dataText = dataText;
+            this.dataBase64 = null;
+            this.bytesRead = bytesRead;
+            this.errorCode = errorCode;
+            this.retryable = retryable;
+        }
+
+        ChunkReadResult(byte[] bytes) {
+            this.done = false;
+            this.pending = false;
+            this.dataText = null;
+            this.dataBase64 = ByteString.of(bytes).base64();
+            this.bytesRead = bytes.length;
+            this.errorCode = null;
+            this.retryable = false;
+        }
+
+        JSObject toJSObject() {
+            JSObject result = new JSObject();
+            result.put("done", done);
+            result.put("pending", pending);
+            result.put("bytesRead", bytesRead);
+            result.put("stage", "FILE_READ");
+            if (dataText != null) result.put("dataText", dataText);
+            if (dataBase64 != null) result.put("dataBase64", dataBase64);
+            if (errorCode != null) result.put("errorCode", errorCode);
+            result.put("retryable", retryable);
+            return result;
+        }
+    }
+
+    static ChunkReadResult readChunkState(DownloadSession session, int maxBytes) {
         synchronized (session) {
             try {
+                DownloadResult terminalResult = session.terminalResult;
+                if (session.cancelled.get() || (terminalResult != null && !terminalResult.success)) {
+                    return failureChunkState(terminalResult != null && !terminalResult.success ? terminalResult.errorCode : "ABORTED",
+                            terminalResult != null && !terminalResult.success && terminalResult.retryable);
+                }
+                if (session.file == null) {
+                    if (terminalResult != null && !terminalResult.success) {
+                        return failureChunkState(terminalResult.errorCode, terminalResult.retryable);
+                    }
+                    return failureChunkState("INVALID_NATIVE_RESPONSE", false);
+                }
                 if (session.randomAccessFile == null) {
                     session.randomAccessFile = new RandomAccessFile(session.file, "r");
                 }
-                byte[] buffer = new byte[maxBytes];
-                int read = session.randomAccessFile.read(buffer);
-                JSObject result = new JSObject();
-                if (read < 0) {
-                    result.put("done", true);
-                    result.put("bytesRead", 0);
-                } else {
-                    result.put("done", false);
-                    result.put("dataText", new String(buffer, 0, read, java.nio.charset.StandardCharsets.UTF_8));
-                    result.put("bytesRead", read);
+                long available = session.file.length() - session.randomAccessFile.getFilePointer();
+                if (available > 0L) {
+                    int boundedRead = (int) Math.min((long) maxBytes, available);
+                    byte[] buffer = new byte[boundedRead];
+                    int read = session.randomAccessFile.read(buffer);
+                    if (read <= 0) {
+                        return new ChunkReadResult(false, true, null, 0, null, false);
+                    }
+                    if (session.ready) return new ChunkReadResult(read == buffer.length ? buffer : copyOf(buffer, read));
+                    return new ChunkReadResult(false, false,
+                            new String(buffer, 0, read, java.nio.charset.StandardCharsets.UTF_8),
+                            read, null, false);
                 }
-                result.put("stage", "FILE_READ");
-                call.resolve(result);
+                if (!session.finished || !session.completed) {
+                    return new ChunkReadResult(false, true, null, 0, null, false);
+                }
+                if (terminalResult != null && !terminalResult.success) {
+                    return failureChunkState(terminalResult.errorCode, terminalResult.retryable);
+                }
+                return new ChunkReadResult(true, false, null, 0, null, false);
             } catch (Exception ignored) {
-                call.resolve(failureChunk("FILE_IO_FAILURE", false));
+                return failureChunkState("FILE_IO_FAILURE", false);
             }
         }
     }
@@ -429,13 +531,11 @@ public final class LargeSourceTransportPlugin extends Plugin {
     }
 
     private static JSObject failureChunk(String code, boolean retryable) {
-        JSObject result = new JSObject();
-        result.put("done", true);
-        result.put("bytesRead", 0);
-        result.put("stage", "FILE_READ");
-        result.put("errorCode", code);
-        result.put("retryable", retryable);
-        return result;
+        return failureChunkState(code, retryable).toJSObject();
+    }
+
+    private static ChunkReadResult failureChunkState(String code, boolean retryable) {
+        return new ChunkReadResult(false, false, null, 0, code, retryable);
     }
 
     private static boolean isRetryable(String code) {
@@ -452,6 +552,9 @@ public final class LargeSourceTransportPlugin extends Plugin {
         }
         if (error instanceof UnknownHostException) return "DNS_FAILURE";
         if (error instanceof SocketTimeoutException) {
+            return session.httpResponseReceived ? "READ_TIMEOUT" : "CONNECT_TIMEOUT";
+        }
+        if (error instanceof InterruptedIOException) {
             return session.httpResponseReceived ? "READ_TIMEOUT" : "CONNECT_TIMEOUT";
         }
         if (error instanceof SSLHandshakeException) return "TLS_HANDSHAKE_FAILED";
@@ -517,7 +620,10 @@ public final class LargeSourceTransportPlugin extends Plugin {
         private volatile Call activeCall;
         private volatile File file;
         private volatile RandomAccessFile randomAccessFile;
+        private volatile boolean ready;
+        private volatile boolean finished;
         private volatile boolean completed;
+        private volatile DownloadResult terminalResult;
         private volatile boolean httpResponseReceived;
         private volatile String httpStatusClass = "UNKNOWN";
         private volatile String stage = "REQUEST_START";
@@ -538,15 +644,31 @@ public final class LargeSourceTransportPlugin extends Plugin {
         public String getUrl() { return url; }
         public File getFile() { return file; }
         public boolean isCompleted() { return completed; }
+        public boolean isReady() { return ready; }
+        public boolean isFinished() { return finished; }
+        public boolean hasActiveCall() { return activeCall != null; }
         public long getBytesWritten() { return bytesWritten; }
         public String getStage() { return stage; }
         public String getHttpStatusClass() { return httpStatusClass; }
 
+        synchronized DownloadResult finish(DownloadResult result) {
+            terminalResult = cancelled.get() && result.success
+                    ? failure("ABORTED", httpStatusClass, httpResponseReceived, stage, false)
+                    : result;
+            completed = terminalResult.success;
+            finished = true;
+            return terminalResult;
+        }
+
+        void cancel() {
+            cancelled.set(true);
+            Call call = activeCall;
+            if (call != null) call.cancel();
+        }
+
         public synchronized boolean closeAndDelete() {
-            if (activeCall != null) {
-                activeCall.cancel();
-                activeCall = null;
-            }
+            cancel();
+            activeCall = null;
             boolean success = true;
             try {
                 if (randomAccessFile != null) randomAccessFile.close();
@@ -557,9 +679,11 @@ public final class LargeSourceTransportPlugin extends Plugin {
             if (file != null && file.exists()) {
                 // Cache files are always private and owned by this import session.
                 //noinspection ResultOfMethodCallIgnored
-                success = file.delete() && success;
+                if (file.delete()) file = null;
+                else success = false; // Retain ownership so cleanup can retry after the writer closes.
+            } else {
+                file = null;
             }
-            file = null;
             return success;
         }
     }

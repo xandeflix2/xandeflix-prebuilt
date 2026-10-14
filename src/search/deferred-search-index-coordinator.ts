@@ -25,7 +25,8 @@ import { resolveSegmentRelativePath } from '../bootstrap/storage/segment-path-re
 export { SEGMENT_PATH_ROOT_CAUSE_FIXED, CANONICAL_SEGMENT_PATH_RESOLVER } from '../bootstrap/storage/segment-path-resolver.ts';
 import type { LocalCatalogStorage } from '../bootstrap/storage/storage.interface.ts';
 import type { PrebuiltCatalog, Movie, Series } from '../contracts/catalog.ts';
-import type { LiveCatalog } from '../catalog/live/live-tv.types.ts';
+import type { LiveCatalog, LiveChannel } from '../catalog/live/live-tv.types.ts';
+import { DIRECTORY_ROOTS_MODE } from '../source/source-directory-api.ts';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 
 export const SEARCH_INCREMENTAL_BUILDER = true;
@@ -87,7 +88,15 @@ export class DeferredSearchIndexCoordinator {
       const binary = await storage.readActiveSearchIndexBuffer?.();
       if (binary && binary.byteLength > 0) {
         const parsed = deserializeCompactIndexV2(binary);
-        return parsed.metadata.catalogSnapshotId === snapshotId;
+        if (parsed.metadata.catalogSnapshotId !== snapshotId) return false;
+        const catalog = await storage.readActiveCatalog();
+        if (catalog?.extensions?.sourceInventoryMode === DIRECTORY_ROOTS_MODE) {
+          const manifest = await storage.readActiveManifest();
+          const counts = (manifest as unknown as { counts?: { movies: number; series: number; live?: number } })?.counts;
+          return Boolean(manifest?.snapshotId === snapshotId && counts &&
+            parsed.metadata.documentCount === counts.movies + counts.series + (counts.live || 0));
+        }
+        return true;
       }
 
       const legacy = await storage.readActiveSearchIndex();
@@ -140,6 +149,13 @@ export class DeferredSearchIndexCoordinator {
     if (!catalog) {
       throw new Error('[DEFERRED_SEARCH] Catálogo não disponível para indexação.');
     }
+    const directoryRoots = catalog.extensions?.sourceInventoryMode === DIRECTORY_ROOTS_MODE;
+    const assertDirectoryGeneration = async (): Promise<void> => {
+      if (directoryRoots && (await storage.readActivePointer())?.snapshotId !== snapshotId) {
+        throw new Error('[SEARCH_GENERATION_CHANGED] Active directory changed');
+      }
+    };
+    await assertDirectoryGeneration();
 
     const builder = new IncrementalCompactSearchIndexV2Builder({
       catalogHeader: catalog,
@@ -168,6 +184,7 @@ export class DeferredSearchIndexCoordinator {
     if (hasSegments) {
       const segments = (manifest as any).segments as Array<{ fileName: string; kind: string }>;
       for (const seg of segments) {
+        await assertDirectoryGeneration();
         if (seg.kind === 'movies') {
           const segPath = resolveSegmentRelativePath(seg.fileName);
           const data = await (storage.readActiveSegment as (path: string) => Promise<string | null>)(segPath);
@@ -237,6 +254,18 @@ export class DeferredSearchIndexCoordinator {
           // T52: Liberação explícita dos objetos Series do segmento antes de ler o próximo
           segSeries.length = 0;
           await yieldToEventLoop();
+        } else if (seg.kind === 'live') {
+          const data = await storage.readActiveSegment!(resolveSegmentRelativePath(seg.fileName));
+          if (data === null || data === undefined) throw new Error('[SEARCH_MISSING_SEGMENT] Live segment unavailable');
+          let channels: LiveChannel[];
+          try { channels = JSON.parse(data); if (!Array.isArray(channels)) throw new Error('Invalid segment'); }
+          catch { throw new Error('[SEARCH_CORRUPT_SEGMENT] Live segment invalid'); }
+          if (channels.some(channel => !channel || typeof channel.id !== 'string' || typeof channel.name !== 'string')) {
+            throw new Error('[SEARCH_CORRUPT_SEGMENT] Live records invalid');
+          }
+          builder.ingestLive(channels);
+          channels.length = 0;
+          await yieldToEventLoop();
         }
       }
     }
@@ -244,6 +273,13 @@ export class DeferredSearchIndexCoordinator {
     await yieldToEventLoop();
 
     const searchIndex = builder.build();
+    await assertDirectoryGeneration();
+    if (directoryRoots) {
+      const counts = (manifest as unknown as { counts?: { movies: number; series: number; live?: number } } | null)?.counts;
+      if (!counts || searchIndex.metadata.documentCount !== counts.movies + counts.series + (counts.live || 0)) {
+        throw new Error('[SEARCH_DIRECTORY_INCOMPLETE] Full roots were not indexed');
+      }
+    }
     const { buffer: indexSerialized } = serializeCompactIndexV2(searchIndex);
     const durationMs = Math.round(performance.now() - t0);
 

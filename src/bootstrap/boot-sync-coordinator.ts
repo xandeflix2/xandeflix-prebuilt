@@ -46,6 +46,7 @@ import { CURRENT_CLASSIFICATION_PROFILE_VERSION } from '../source/source-classif
 import type { LocalCatalogStorage } from './storage/storage.interface.ts';
 import type { ProvisioningManifest } from '../provisioning/types.ts';
 import { isContentDigest, localSourceContentRepository, type SourceContentRepository } from './automatic-source-refresh.ts';
+import { DIRECTORY_ROOTS_MODE } from '../source/source-directory-api.ts';
 
 installWebViewBufferCompatibility();
 
@@ -623,11 +624,23 @@ export class BootSyncCoordinator {
       checkpoint.sourceId === expectedSourceId && checkpoint.sourceVersion === expectedSourceVersion &&
       checkpoint.snapshotId === existingRealPointer.snapshotId && isContentDigest(checkpoint.contentDigest)
       ? checkpoint : undefined;
+    // Never replace IDs of an existing legacy snapshot with a different inventory.
+    // Directory snapshots retain provider IDs on every subsequent refresh.
+    let directoryRoots: 'PREFER' | 'REQUIRE' | undefined;
+    if (!isExistingReal) {
+      directoryRoots = 'PREFER';
+    } else {
+      const activeCatalog = await this.bootstrapService.getActiveCatalog().catch(() => null);
+      if (activeCatalog && activeCatalog.metadata.snapshotId === existingRealPointer?.snapshotId &&
+          activeCatalog.extensions?.sourceInventoryMode === DIRECTORY_ROOTS_MODE) {
+        directoryRoots = 'REQUIRE';
+      }
+    }
     try {
       stageResult = await this.stagingOrchestrator.stageManagedSource(reusableCheckpoint ? {
         sourceId: expectedSourceId, sourceVersion: expectedSourceVersion,
         unchangedContentDigest: reusableCheckpoint.contentDigest,
-      } : undefined);
+      } : undefined, directoryRoots ? { directoryRoots } : undefined);
     } catch (err: unknown) {
       stageResult = {
         success: false,

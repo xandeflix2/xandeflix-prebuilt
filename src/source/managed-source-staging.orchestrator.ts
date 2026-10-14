@@ -25,6 +25,7 @@ import {
   type SanitizedTransportObservation,
 } from './device-direct-fetch.ts';
 import type { SegmentedCatalogProvenance } from '../bootstrap/storage/storage.interface.ts';
+import { deriveDirectoryRuntimeConfig } from './source-directory-api.ts';
 
 export const MANAGED_FETCH_TO_STAGING_LOCK_ID = 'MANAGED_FETCH_TO_STAGING_LOCK_V1';
 export const SEGMENTED_STAGING_RESULT_USED = true;
@@ -85,6 +86,11 @@ export interface ManagedSourceStagingOrchestratorOptions {
   packageBuilder?: CatalogPackageBuilder;
   bootstrapService?: StagingBootstrap;
   allowSelfServiceBoundSource?: boolean;
+}
+
+export interface ManagedSourceInventoryOptions {
+  /** PREFER only on first import; REQUIRE prevents provider IDs reverting to M3U ordinals. */
+  directoryRoots?: 'PREFER' | 'REQUIRE';
 }
 
 function emptyResult(): ManagedStagingResult {
@@ -178,7 +184,10 @@ export class ManagedSourceStagingOrchestrator {
    * Resolve a autoridade Managed, lê o registro seguro, importa e materializa
    * o pacote em staging. Esta função não possui caminho de promoção.
    */
-  async stageManagedSource(check?: { sourceId: string; sourceVersion: number; unchangedContentDigest: string }): Promise<ManagedStagingResult> {
+  async stageManagedSource(
+    check?: { sourceId: string; sourceVersion: number; unchangedContentDigest: string },
+    inventory?: ManagedSourceInventoryOptions,
+  ): Promise<ManagedStagingResult> {
     const result = emptyResult();
     let authority: ResolvedSourceResult;
 
@@ -268,9 +277,31 @@ export class ManagedSourceStagingOrchestrator {
       if (check?.sourceId === authority.sourceId && check.sourceVersion === authority.sourceVersion) {
         requestOptions.unchangedContentDigest = check.unchangedContentDigest;
       }
-      imported = record.protocol === 'M3U'
-        ? await this.importer.importM3u(runtimeConfig, requestOptions)
-        : await this.importer.importXtream(runtimeConfig, requestOptions);
+      const directoryConfig = inventory?.directoryRoots
+        ? deriveDirectoryRuntimeConfig(runtimeConfig)
+        : undefined;
+      if (directoryConfig) {
+        // The sealed protocol/configuration and public provenance remain unchanged.
+        // Only this authorized device uses an equivalent inventory endpoint.
+        try {
+          imported = await this.importer.importXtream(directoryConfig, {
+            ...requestOptions, directoryRoots: true,
+          });
+        } catch {
+          imported = { success: false, error: 'REAL_SOURCE_FETCH_FAILED', errorStage: 'FETCH' };
+        }
+        if (!imported.success && inventory?.directoryRoots === 'PREFER') {
+          imported = record.protocol === 'M3U'
+            ? await this.importer.importM3u(runtimeConfig, requestOptions)
+            : await this.importer.importXtream(runtimeConfig, requestOptions);
+        }
+      } else if (inventory?.directoryRoots === 'REQUIRE') {
+        imported = { success: false, error: 'REAL_SOURCE_FETCH_FAILED', errorStage: 'FETCH' };
+      } else {
+        imported = record.protocol === 'M3U'
+          ? await this.importer.importM3u(runtimeConfig, requestOptions)
+          : await this.importer.importXtream(runtimeConfig, requestOptions);
+      }
     } catch (stageError) {
       console.info('[STAGE_MANAGED_SOURCE_ERROR]', { result: 'SOURCE_FETCH_FAILED' });
       result.errorCode = 'REAL_SOURCE_FETCH_FAILED';

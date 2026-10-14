@@ -8,7 +8,7 @@
  * - SOURCE FIRST: Complemento opcional sem modificar o catálogo local.
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { artworkIdentityKey, chooseHeroPoster, tmdbPosterPath, type ArtworkMetadata } from '../../artwork/tmdb-metadata.service.ts';
 import type { CatalogItemViewModel } from '../../catalog/catalog-view-model.ts';
 import { Artwork } from './Artwork.tsx';
@@ -16,6 +16,14 @@ import { useArtworkMetadata } from '../hooks/useArtworkMetadata.ts';
 import { useCachedArtwork } from '../hooks/useCachedArtwork.ts';
 import { useImmersiveArtwork } from '../hooks/useImmersiveArtwork.ts';
 import { useContentBadge } from './NewContentProvider.tsx';
+import { useDevicePresentation } from '../hooks/useDevicePresentation.ts';
+import { isTelevisionPresentation, type DevicePresentation } from '../device-presentation.ts';
+
+export function canOpenHeroArtworkDetails(choice: DevicePresentation | null, userAgent: string, touchPoints = 0): boolean {
+  if (choice) return choice === 'PHONE' || choice === 'TABLET';
+  if (isTelevisionPresentation(userAgent, choice)) return false;
+  return /android|iphone|ipad|ipod/i.test(userAgent) || (/macintosh/i.test(userAgent) && touchPoints > 1);
+}
 
 interface HeroProps {
   item: CatalogItemViewModel;
@@ -41,6 +49,16 @@ function HeroPoster({ item, metadata }: { item: CatalogItemViewModel; metadata: 
 }
 
 export const Hero: React.FC<HeroProps> = ({ item, onSelect, onPlay, playbackBusy = false, playbackMessage, headingLevel = 1, mobilePoster = false, controls, artworkUri, onArtworkError }) => {
+  const presentation = useDevicePresentation();
+  const artworkDetails = canOpenHeroArtworkDetails(presentation, typeof navigator === 'undefined' ? '' : navigator.userAgent,
+    typeof navigator === 'undefined' ? 0 : navigator.maxTouchPoints);
+  const artworkGesture = useRef<{ pointerId: number; x: number; y: number; key: string; moved: boolean }>();
+  const suppressArtworkClickUntil = useRef(0);
+  const artworkKey = `${item.kind}:${item.id}`;
+  const trackArtworkMovement = (event: React.PointerEvent<HTMLButtonElement>) => {
+    const start = artworkGesture.current;
+    if (start?.pointerId === event.pointerId && Math.hypot(event.clientX - start.x, event.clientY - start.y) > 10) start.moved = true;
+  };
   const badge = useContentBadge(item.kind, item.title);
   const immersive=useImmersiveArtwork(`${item.kind}:${item.id}:${artworkUri||''}`);
   const Title = headingLevel === 1 ? 'h1' : 'h2';
@@ -68,6 +86,21 @@ export const Hero: React.FC<HeroProps> = ({ item, onSelect, onPlay, playbackBusy
           className="hero-backdrop-img"
         />}
         <div className="hero-overlay-gradient" />
+        {artworkDetails && <button type="button" className="hero-artwork-link"
+          aria-label={`Ver detalhes de ${item.title}`}
+          onPointerDown={event => {
+            if (!event.isPrimary) { suppressArtworkClickUntil.current = performance.now() + 400; return; }
+            artworkGesture.current = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, key: artworkKey, moved: false };
+          }} onPointerMove={trackArtworkMovement} onPointerUp={trackArtworkMovement}
+          onPointerCancel={() => { suppressArtworkClickUntil.current = performance.now() + 400; artworkGesture.current = undefined; }}
+          onClick={event => {
+            const start = artworkGesture.current;
+            artworkGesture.current = undefined;
+            if (event.detail > 0 && (performance.now() < suppressArtworkClickUntil.current || start?.moved || (start && start.key !== artworkKey))) {
+              event.preventDefault(); return;
+            }
+            onSelect(item);
+          }}/>}
       </div>
       <div className="hero-content">
         <div className="hero-copy">

@@ -34,6 +34,7 @@ import { parseM3uEpisodeIdentity, parseM3uExtInfLine } from './m3u-extinf-parser
 import { bootTelemetry } from '../diagnostics/boot-telemetry.ts';
 import { yieldToEventLoop } from '../diagnostics/boot-telemetry.ts';
 import { createSha256Stream } from '../security/artifact-hash.ts';
+import { DIRECTORY_ROOTS_MODE, deriveDirectoryRuntimeConfig, fetchDirectoryJson, buildDirectoryStreamUrl } from './source-directory-api.ts';
 import type {
   LocalCatalogStorage,
   SegmentedCatalogManifest,
@@ -213,6 +214,7 @@ interface CompactSeriesAccumulator {
 }
 
 export interface RealSourceImportOptions {
+  directoryRoots?: boolean;
   unchangedContentDigest?: string;
   sourceId?: string;
   provenance?: SegmentedCatalogProvenance;
@@ -260,9 +262,14 @@ export class RealSourceImporterService {
     options?: RealSourceImportOptions,
   ): Promise<RealImportResult> {
     const t0 = performance.now();
-    const host = this.normalizeHost(config.host!);
-    const username = encodeURIComponent(config.username!.trim());
-    const password = encodeURIComponent(config.password!.trim());
+    const directoryConfig = options?.directoryRoots ? deriveDirectoryRuntimeConfig(config) : undefined;
+    if (options?.directoryRoots && !directoryConfig) throw new Error('DIRECTORY_SOURCE_UNSUPPORTED');
+    const directoryLiveOutput = directoryConfig?.playlistUrl && new URL(directoryConfig.playlistUrl).searchParams.get('output');
+    const directoryLiveExtension = directoryLiveOutput === 'ts' ? 'ts' : 'm3u8';
+    const apiConfig = directoryConfig || config;
+    const host = this.normalizeHost(apiConfig.host!);
+    const username = encodeURIComponent(apiConfig.username!.trim());
+    const password = encodeURIComponent(apiConfig.password!.trim());
 
     const baseApi = `${host}/player_api.php?username=${username}&password=${password}`;
 
@@ -273,16 +280,45 @@ export class RealSourceImporterService {
       ...options?.requestHeaders,
     };
     const fetchApi = options?.fetchImpl || fetch;
-    const handshakeRes = await fetchApi(handshakeUrl, { headers: requestHeaders });
-    if (!handshakeRes.ok) {
-      return { success: false, error: `HANDSHAKE_FAILED_HTTP_${handshakeRes.status}` };
+    let handshake: any;
+    if (directoryConfig) {
+      handshake = await fetchDirectoryJson(directoryConfig, undefined, undefined,
+        { headers: requestHeaders, fetchImpl: options?.fetchImpl });
+    } else {
+      const handshakeRes = await fetchApi(handshakeUrl, { headers: requestHeaders });
+      if (!handshakeRes.ok) {
+        return { success: false, error: `HANDSHAKE_FAILED_HTTP_${handshakeRes.status}` };
+      }
+      handshake = await handshakeRes.json();
     }
-    const handshake = await handshakeRes.json();
     if (String(handshake?.user_info?.auth) !== '1') return { success: false, error: 'HANDSHAKE_AUTH_REJECTED', errorStage: 'FETCH' };
+    if (directoryConfig && handshake?.user_info?.status !== undefined
+        && String(handshake.user_info.status).toLowerCase() !== 'active') {
+      return { success: false, error: 'HANDSHAKE_AUTH_REJECTED', errorStage: 'FETCH' };
+    }
     const sourceDetectionMs = Math.round(performance.now() - tDetectStart);
     const sourceConnectionMs = sourceDetectionMs;
 
     const fetchJson = async (action: string) => {
+      if (directoryConfig) {
+        const data = await fetchDirectoryJson(directoryConfig, action, undefined,
+          { headers: requestHeaders, fetchImpl: options?.fetchImpl });
+        if (!Array.isArray(data)) throw new Error('XTREAM_LIST_INVALID');
+        const categoryList = action.endsWith('_categories');
+        const idField = categoryList ? 'category_id' : action === 'get_series' ? 'series_id' : 'stream_id';
+        const titleField = categoryList ? 'category_name' : 'name';
+        const ids = new Set<string>();
+        for (const row of data) {
+          const id = String(row?.[idField] ?? '');
+          const validId = categoryList ? /^\d+$/.test(id) : /^[1-9]\d{0,18}$/.test(id);
+          if (!row || typeof row !== 'object' || Array.isArray(row) || !validId
+              || typeof row[titleField] !== 'string' || !row[titleField].trim() || ids.has(id)) {
+            throw new Error('XTREAM_LIST_INVALID');
+          }
+          ids.add(id);
+        }
+        return data;
+      }
       const url = `${baseApi}&action=${action}`;
       const res = await fetchApi(url, { headers: requestHeaders });
       if (!res.ok) throw new Error('XTREAM_LIST_FETCH_FAILED');
@@ -380,6 +416,7 @@ export class RealSourceImporterService {
           sourceItemId: String(m.stream_id),
           contentKind: 'movie',
           containerExtension: m.container_extension || 'mp4',
+          ...(directoryConfig ? { directStreamUrl: buildDirectoryStreamUrl(directoryConfig, 'movie', String(m.stream_id), m.container_extension || 'mp4') } : {}),
         };
 
         const movieObj: Movie = {
@@ -401,6 +438,7 @@ export class RealSourceImporterService {
         if (writer.shouldFlush()) await writer.flushBatch(countM);
       }
     }
+    if (directoryConfig) vodStreams.length = 0;
 
     let countS = 0;
     let seriesBatch: Series[] = [];
@@ -443,6 +481,7 @@ export class RealSourceImporterService {
     }
 
     if (seriesBatch.length) await writer.writeSeriesBatch(seriesBatch);
+    if (directoryConfig) seriesStreams.length = 0;
 
     const liveGroups: LiveGroup[] = [];
     for (const g of liveCategories) {
@@ -463,7 +502,8 @@ export class RealSourceImporterService {
           streamId: String(ch.stream_id),
           streamRef: {
             sourceItemId: String(ch.stream_id),
-            containerExtension: 'm3u8',
+            containerExtension: directoryConfig ? directoryLiveExtension : 'm3u8',
+            ...(directoryConfig ? { directStreamUrl: buildDirectoryStreamUrl(directoryConfig, 'live', String(ch.stream_id), directoryLiveExtension) } : {}),
           },
           logoUrl: ch.stream_icon ? String(ch.stream_icon) : undefined,
           num: ch.num ? parseInt(String(ch.num), 10) : undefined,
@@ -473,6 +513,7 @@ export class RealSourceImporterService {
         if (writer.shouldFlush()) await writer.flushBatch(rawMovieCount + countL);
       }
     }
+    if (directoryConfig) liveStreams.length = 0;
 
     const normalizationMs = Math.round(performance.now() - tNormStart);
 
@@ -482,6 +523,7 @@ export class RealSourceImporterService {
       movieCount: rawMovieCount, seriesCount: rawSeriesCount, seasonCount: 0,
       episodeCount: 0, liveCount: rawLiveCount, categories, genres, liveGroups,
       categoryProvenance: [], firstFoldSeries, firstFoldSeasons: [],
+      ...(directoryConfig ? { extensions: { sourceInventoryMode: DIRECTORY_ROOTS_MODE } } : {}),
     });
 
     const catalogBuildMs = 10;
@@ -612,6 +654,7 @@ export class RealSourceImporterService {
         { headers: options?.requestHeaders },
         {
           maxSourceFileBytes: options?.maxSourceFileBytes,
+          progressiveDownload: !options?.unchangedContentDigest,
           nativeTransport: options?.nativeTransport,
         },
       );

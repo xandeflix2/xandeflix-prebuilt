@@ -98,6 +98,7 @@ export interface DeviceDirectTextFetchResult {
 
 export interface FetchDiagnosticsOptions {
   fetchImpl?: typeof fetch;
+  progressiveDownload?: boolean;
   connectTimeoutMs?: number;
   readTimeoutMs?: number;
   maxResponseBytes?: number;
@@ -502,6 +503,7 @@ export async function fetchDeviceDirectM3uStream(
     try {
       const result = await nativeTransport.startDownload({
         url: input,
+        progressive: options?.progressiveDownload === true,
         headers,
         connectTimeoutMs,
         readTimeoutMs,
@@ -525,14 +527,30 @@ export async function fetchDeviceDirectM3uStream(
 
       const downloadId = result.downloadId;
       let finished = false;
+      let cancelled = false;
+      const progressiveDownload = result.stage === 'FILE_WRITE';
+      let sourcePayloadSizeBytes = progressiveDownload ? 0 : result.bytesWritten;
       const stream: DeviceDirectM3uStreamHandle = {
         async *readChunks(): AsyncIterable<Uint8Array | string> {
-          while (!finished) {
+          while (true) {
+            if (cancelled) throw new Error('NATIVE_DOWNLOAD_ABORTED');
+            if (finished) return;
             const chunk = await nativeTransport.readChunk({
               downloadId,
               maxBytes: NATIVE_READ_CHUNK_BYTES,
             });
+            if (cancelled) throw new Error('NATIVE_DOWNLOAD_ABORTED');
+            if (chunk.errorCode) {
+              markTransportFailure(observation, chunk.errorCode, chunk.stage || 'FILE_READ', chunk.retryable);
+              finished = true;
+              throw new Error('NATIVE_CHUNK_READ_FAILED');
+            }
+            if (chunk.pending) {
+              await new Promise<void>((resolve) => setTimeout(resolve, 100));
+              continue;
+            }
             if (chunk.done) {
+              markTransportSuccess(observation, 'DOWNLOAD_COMPLETE');
               finished = true;
               return;
             }
@@ -541,6 +559,7 @@ export async function fetchDeviceDirectM3uStream(
               finished = true;
               throw new Error('NATIVE_CHUNK_READ_FAILED');
             }
+            if (progressiveDownload) sourcePayloadSizeBytes += chunk.bytesRead;
             if (typeof chunk.dataText === 'string') {
               yield chunk.dataText;
             } else if (chunk.dataBase64) {
@@ -556,6 +575,7 @@ export async function fetchDeviceDirectM3uStream(
           finished = true;
         },
         async cancel(): Promise<void> {
+          cancelled = true;
           await nativeTransport.cancelDownload({ downloadId });
           markTransportFailure(observation, 'ABORTED', 'FILE_WRITE', false);
           finished = true;
@@ -565,9 +585,9 @@ export async function fetchDeviceDirectM3uStream(
       return {
         success: true,
         observation,
-        sourcePayloadSizeBytes: result.bytesWritten,
+        sourcePayloadSizeBytes,
         sourceContentDigest: /^[a-f0-9]{64}$/.test(result.sourceContentDigest || '') ? result.sourceContentDigest : undefined,
-        getSourcePayloadSizeBytes: () => result.bytesWritten,
+        getSourcePayloadSizeBytes: () => sourcePayloadSizeBytes,
         stream,
       };
   } catch (streamInitError) {
@@ -679,7 +699,8 @@ export async function fetchDeviceDirectM3uStream(
     async cleanup(): Promise<void> {
       finished = true;
       try {
-        await reader.cancel();
+        if (body.locked) await reader.cancel();
+        else await body.cancel();
       } catch {
         // A resposta já pode estar encerrada.
       }
@@ -688,7 +709,8 @@ export async function fetchDeviceDirectM3uStream(
       finished = true;
       controller?.abort();
       try {
-        await reader.cancel();
+        if (body.locked) await reader.cancel();
+        else await body.cancel();
       } catch {
         // A resposta já pode estar encerrada.
       }

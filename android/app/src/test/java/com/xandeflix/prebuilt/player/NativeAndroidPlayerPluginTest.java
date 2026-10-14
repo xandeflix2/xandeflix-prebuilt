@@ -295,6 +295,25 @@ public class NativeAndroidPlayerPluginTest {
     }
 
     // 9. Resume payload sanitized
+    @Test public void stopRejectsStaleOwnerAndMatchingStopIsIdempotent() {
+        TestPluginCall start = new TestPluginCall();
+        start.put("uri", "https://fixture.test/live/channel.ts");
+        plugin.startPreview(start);
+        String id = plugin.getCurrentPreviewId();
+        TestPluginCall stale = new TestPluginCall(); stale.put("previewId", "old-page-preview");
+        plugin.stopPreview(stale);
+        assertTrue(stale.rejected);
+        assertTrue(plugin.isPreviewActive());
+        assertEquals(id, plugin.getCurrentPreviewId());
+        for (int attempt = 0; attempt < 2; attempt++) {
+            TestPluginCall stop = new TestPluginCall(); stop.put("previewId", id);
+            plugin.stopPreview(stop);
+            assertTrue(stop.resolved);
+            assertFalse(stop.rejected);
+            assertFalse(plugin.isPreviewActive());
+        }
+    }
+
     @Test
     public void testResumePayloadSanitized() {
         JSObject payloadNormal = NativeAndroidPlayerPlugin.buildResumePayload(15000L, false, null);

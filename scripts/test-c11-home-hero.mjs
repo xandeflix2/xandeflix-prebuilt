@@ -149,6 +149,8 @@ function loadUi(relative) {
     if(name.endsWith('useHeroLayout.ts'))return {useHeroLayout:()=>false};
     if(name.endsWith('useHeroPlayback.ts'))return {useHeroPlayback:()=>({onPlay(){},playbackBusy:false,playbackMessage:null})};
   if(name.endsWith('usePhoneLayout.ts'))return{usePhoneLayout:()=>false};
+  if(name.endsWith('useDevicePresentation.ts'))return{useDevicePresentation:()=>null};
+  if(name.endsWith('device-presentation.ts'))return{isTelevisionPresentation:()=>false};
   if(name.endsWith('useDetailInitialFocus.ts'))return{useDetailInitialFocus:()=>{}};
   if(name.endsWith('useHeroArtwork.ts'))return{useHeroArtwork:()=>({eligible:[],pending:true,revision:0,reject(){}})};
   if(name.endsWith('CategoryHero.tsx'))return loadUi('../src/ui/components/CategoryHero.tsx');

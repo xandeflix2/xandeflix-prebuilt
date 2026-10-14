@@ -42,6 +42,7 @@ export type LargeSourceTransportType = 'NATIVE_FILE_BACKED';
 
 export interface LargeSourceDownloadStartOptions {
   url: string;
+  progressive?: boolean;
   headers?: Record<string, string>;
   connectTimeoutMs?: number;
   readTimeoutMs?: number;
@@ -64,6 +65,7 @@ export interface LargeSourceDownloadStartResult {
 
 export interface LargeSourceDownloadChunkResult {
   done: boolean;
+  pending?: boolean;
   dataBase64?: string;
   dataText?: string;
   bytesRead: number;

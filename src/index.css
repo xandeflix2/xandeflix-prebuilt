@@ -278,11 +278,27 @@ html, body {
   z-index: 1;
 }
 
+.hero-banner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 5;
+}
+
 .hero-backdrop-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
+
+.hero-artwork-link {
+  position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%;
+  padding: 0; border: 0; border-radius: inherit; background: transparent; cursor: pointer;
+}
+.hero-artwork-link:focus-visible { outline: 2px solid var(--accent-primary); outline-offset: -3px; }
 
 .hero-overlay-gradient {
   position: absolute;
@@ -3250,6 +3266,18 @@ html, body {
 #root .app-shell .catalog-grid { column-gap: 8px !important; row-gap: 12px !important; }
 
 #root .app-shell--fire-stick { --fire-hero-frame-gap: max(clamp(16px, 3vh, 24px), env(safe-area-inset-top, 0px)); }
+#root .app-shell--fire-stick.app-shell--side-nav { --side-nav-width: 56px; }
+#root .app-shell--fire-stick.app-shell--side-nav .app-header {
+  padding-left: max(5px, env(safe-area-inset-left, 0px)) !important;
+  padding-right: 5px !important;
+}
+#root .app-shell--fire-stick.app-shell--side-nav .nav-link {
+  min-width: 44px;
+  padding-left: 6px !important;
+  padding-right: 6px !important;
+}
+#root .app-shell--fire-stick .live-continuous-name { font-size: var(--tv-font-xs, 0.85rem); }
+#root .app-shell--fire-stick .live-continuous-format { font-size: min(0.7rem, var(--tv-font-xs, 0.7rem)); }
 #root .app-shell--fire-stick :is(.home-page, .movies-page, .series-page) { padding-top: var(--fire-hero-frame-gap) !important; }
 #root .app-shell--fire-stick .home-page .hero-banner,
 #root .app-shell--fire-stick .movies-page .hero-banner,
@@ -3282,6 +3310,23 @@ html, body {
 #root .app-shell--tablet :is(.home-page, .movies-page, .series-page) .hero-banner:not(.hero-banner--vertical) .hero-backdrop-img img {
   object-fit: contain;
   object-position: center;
+}
+/* Fire Stick: a slightly shorter full artwork frame, preserving all controls. */
+#root .app-shell--fire-stick :is(.home-page, .movies-page, .series-page) .hero-banner:not(.hero-banner--vertical) {
+  width: 100%;
+  aspect-ratio: 16 / 8.46;
+  height: auto !important;
+  min-height: min(329px, calc((100vh - 2 * var(--fire-hero-frame-gap)) * 0.94)) !important;
+  max-height: calc((100vh - 2 * var(--fire-hero-frame-gap)) * 0.94) !important;
+}
+#root .app-shell--fire-stick :is(.home-page, .movies-page, .series-page) .hero-banner:not(.hero-banner--vertical) .hero-backdrop-img,
+#root .app-shell--fire-stick :is(.home-page, .movies-page, .series-page) .hero-banner:not(.hero-banner--vertical) .hero-backdrop-img img {
+  object-fit: contain;
+  object-position: center;
+}
+#root .app-shell--fire-stick :is(.movies-page, .series-page) .hero-banner:not(.hero-banner--vertical) {
+  min-height: min(329px, calc((100vh - 2 * var(--fire-hero-frame-gap) - 64px) * 0.94)) !important;
+  max-height: calc((100vh - 2 * var(--fire-hero-frame-gap) - 64px) * 0.94) !important;
 }
 .catalog-grid-sentinel { min-height: 48px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; color: var(--text-muted); padding: 12px 0; }
 #root .series-phone-related .media-card { width: 100%; max-width: 100%; flex: unset; }
@@ -3423,3 +3468,34 @@ html, body {
 @keyframes startup-loading-turn { to { transform: rotate(360deg); } }
 @keyframes startup-loading-pulse { 50% { opacity: .6; transform: scale(.92); } }
 @media (prefers-reduced-motion: reduce) { .startup-loading-orbit, .startup-loading-play { animation: none; } }
+
+/* Compact markers close to the hero edge; touch/D-pad targets stay 44px tall. */
+#root .app-shell :is(.home-page, .movies-page, .series-page) .hero-carousel-controls { gap: 0; }
+#root .app-shell :is(.home-page, .movies-page, .series-page) .hero-carousel-dot {
+  align-items: flex-end;
+  padding-bottom: 6px;
+}
+#root .app-shell :is(.home-page, .movies-page, .series-page) .hero-banner--actions:not(.hero-banner--vertical) .hero-carousel-controls {
+  position: absolute;
+  right: 8px;
+  bottom: 4px;
+  margin: 0;
+}
+#root .app-shell :is(.home-page, .movies-page, .series-page) .hero-banner--actions.hero-banner--vertical .hero-content {
+  padding-bottom: 4px !important;
+}
+/* A phone rotated to landscape keeps its compact footer centered as well. */
+@media (orientation: landscape) and (min-aspect-ratio: 4 / 3) {
+  html[data-device-presentation="phone"] #root .app-shell :is(.home-page, .movies-page, .series-page) .hero-footer {
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+  html[data-device-presentation="phone"] #root .app-shell :is(.home-page, .movies-page, .series-page) .hero-carousel-controls {
+    position: static;
+    margin: 0 auto;
+  }
+  html[data-device-presentation="phone"] #root .app-shell :is(.home-page, .movies-page, .series-page) .hero-content {
+    padding-bottom: 4px !important;
+  }
+}

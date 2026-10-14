@@ -239,6 +239,7 @@ export class M3uBoundedStagingWriter {
     categoryProvenance: any[];
     firstFoldSeries: Series[];
     firstFoldSeasons: Season[];
+    extensions?: PrebuiltCatalog['extensions'];
   }): Promise<{
     catalogHeader: PrebuiltCatalog;
     liveCatalog: LiveCatalog;
@@ -284,6 +285,7 @@ export class M3uBoundedStagingWriter {
       streams: this.firstFoldStreams,
       artworks: firstFoldArtworks,
       extensions: {
+        ...params.extensions,
         categoryProvenance: params.categoryProvenance,
         isSegmented: true,
       },

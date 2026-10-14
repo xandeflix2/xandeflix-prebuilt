@@ -624,10 +624,16 @@ public class NativeAndroidPlayerPlugin extends Plugin {
             return;
         }
 
+        String requestedPreviewId = call != null ? call.getString("previewId") : null;
+        if (requestedPreviewId != null && currentPreviewId != null && !requestedPreviewId.equals(currentPreviewId)) {
+            rejectWithSanitizedError(call, ERROR_INVALID_REQUEST, "Preview diferente da sessão atual.");
+            return;
+        }
         String releasedPreviewId = currentPreviewId;
         releasePreview();
 
         JSObject result = new JSObject();
+        result.put("accepted", true);
         result.put("previewStopped", true);
         if (releasedPreviewId != null) {
             result.put("previewId", releasedPreviewId);
@@ -885,6 +891,8 @@ public class NativeAndroidPlayerPlugin extends Plugin {
     }
 
     private void releasePreview() {
+        // Hide the native overlay before decoder/Cast/PiP teardown can delay removal.
+        if (previewView != null) previewView.setVisibility(View.GONE);
         if (liveControls != null) { liveControls.close(); liveControls = null; }
         pipLifecycle.close();
         if(currentPreviewCandidateIndex<previewCandidateRequests.size())com.xandeflix.prebuilt.cast.CastController.get().detach(previewCandidateRequests.get(currentPreviewCandidateIndex));

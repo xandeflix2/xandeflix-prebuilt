@@ -2082,3 +2082,126 @@ harness de staging corrigido após inventário parcial worktree/index, sem reset
 Este complemento registra confirmação observada após o envio do código.
 [Evidência](evidence/C11_GITHUB_SYNCHRONIZATION_20261013.md).
 CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO; sem backend/deploy/instalação/PR.
+
+## C100 — Duplo toque/clique lateral no player VOD — 2026-10-13
+Implementado localmente no player Android: direita+10s/esquerda−10s, toque
+simples mantém controles. Gestos somente na imagem; widgets/arraste/multitouch/
+lock/diálogos/transição/Cast/PiP preservados. Seek limitado e sem play/pause.
+Compilação XML/Java e191 JVM (13 novos), quatro regressões e lock PASS.
+Interfaces próprias preservam compatibilidade do novo caminho com API23.
+[Evidência](evidence/C11_VOD_DOUBLE_TAP_SEEK.md). APK18/HEAD preservados; validação
+física depende do próximo APK. Sem build APK/instalação/Git/backend.
+CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO.
+
+## C101 — APK19 instalado no Fire Stick — 2026-10-13
+Pedido explícito de instalação no192.168.3.101; Amazon AFTSSS/API28 atualizado
+via install -r de code13 para19/name1.0.19, mesma assinatura. Build produção,
+sete assets/config/Dex,191 JVM/33 suites e lock PASS. Implementação C100 incluída;
+APK18 e HEAD preservados. Falha inicial de espaço resolvida removendo apenas
+~23MiB de cache reconstruível do próprio Xandeflix; não houve reset/uninstall.
+Cinco privados de cadastro/ativação/token e1603 arquivos de catálogo iguais em
+RAM antes/depois, UID/firstInstallTime originais e hash do APK instalado iguais.
+App não aberto; validação física de UI/reprodução/gesto permanece com usuário.
+Erros operacionais de quoting/patch documental corrigidos sem mudar testes.
+[Evidência](evidence/C11_FIRESTICK_APK19_INSTALL.md). Artefato recuperável local
+tmp/c101-firestick-apk19/Xandeflix-v1.0.19-duplo-toque.apk. Nenhum outro aparelho,
+backend ou Git operado. CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO.
+
+## C102 — Diagnóstico de armazenamento no Fire Stick — 2026-10-13
+Consumo alto confirmado em files/prebuilt, anterior ao update APK19: seis
+gerações completas (~204MiB cada) e três staging antigos (~326MiB). Ativo e
+fallback somam408MiB; quatro gerações não referenciadas815MiB. Excesso candidato
+~1,20GB decimal, sem apagar nada. Novo staging crescente durante medição deve
+ser protegido como importação em andamento; medidas ao vivo variam.
+Código não poda gerações antigas e limpa somente staging do candidato atual;
+erros de limpeza ignorados/processo interrompido podem deixar temporários.
+Métrica interna totalAppDataBytes não contabiliza históricos/resíduos.
+Defeito de retenção/limpeza permanece pendente, diagnóstico concluído.
+Correção futura deve proteger ativo/recovery/leitores/job e identidade/ativação,
+validar integridade e repetir ponteiros antes de remover candidatos.
+[Evidência](evidence/C11_FIRESTICK_STORAGE_DIAGNOSIS.md). Sem patch funcional,
+testes/build/limpeza/instalação/backend/Git. CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO.
+
+## C103 — Limpeza e reinstalação física — 2026-10-13
+Pedido explícito executado no Fire Stick AFTSSS e tablet SM-X610: limpar
+gerações obsoletas/staging/cache e reinstall -r APK19, preservando cadastro.
+Fire liberou1195960KiB (~1,22GB), restante417636KiB (~408MiB); tablet liberou
+2499469KiB (~2,56GB), restante458082KiB (~447MiB), somente catálogos medidos.
+Preservados ativo/recovery,412/452 segmentos declarados e422/462 arquivos,
+cinco privados de identidade/ativação/token em cada aparelho, UID e datas.
+Assinatura/lock PASS; instalados APKs idênticos ao artefato19. Nenhum reset,
+uninstall ou troca de fonte; app não aberto automaticamente, UI/gesto pendentes.
+Celular192.168.3.109 pareado, aguardando porta de conexão; sem limpeza/instalação
+nesse alvo até conexão/identificação. Retenção automática ainda pendente C102.
+[Evidência](evidence/C11_DEVICE_CATALOG_CLEANUP_AND_REINSTALL.md). Sem código
+funcional/build/backend/Git. CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO.
+
+## C104 — Transporte progressivo e teste limpo — 2026-10-14
+
+Correção autorizada e especificada antes do código em
+[C11_PROGRESSIVE_SOURCE_DOWNLOAD](architecture/C11_PROGRESSIVE_SOURCE_DOWNLOAD.md).
+Primeira importação lê bytes enquanto baixa; C60 mantém digest antecipado e
+evita parse de conteúdo inalterado. Unicode/digest byte-exatos, EOF/falhas/
+cancelamento fail-closed, deadline15min; promoção e autoridade preservadas.
+Lock26+27+9,196 JVM/33 suites,8 integrações progressivas,19 C60,83 bounded,
+transporte/retensão/TypeScript/build/assemble PASS. Harness legado de
+observabilidade falha também em HEAD (linha9MiB não capturada), sem alteração.
+APK de teste19-C104/hash3bf889d8...e640d instalado-r e ponte real verificada:
+primeiros bytes253ms antes do EOF, pendência/falha/cancelamento/limpeza PASS.
+Depois usuário pediu instalação do zero: uninstall/install autorizado somente
+no Fire AFTSS G071CQ070344374G; sem dados restaurados e usuário ativou pelo painel.
+App7917ms, shell11755ms; parser5,8s e primeiro batch9,6s após fetch real.
+Catálogo/Home/hero/capas completos ainda em medição. APK antigo19 concluiu
+após~40min de download/~3m32s de parse/promoção; diagnóstico inicial de EOF
+travado superseded por crescimento do arquivo e promoção posterior.
+[Evidência C104](evidence/C11_PROGRESSIVE_SOURCE_DOWNLOAD.md). Sem Git/backend/
+troca de fonte/código de UI/player/ativação; CURRENT_GATE=NONE;
+CURRENT_LOCAL_CYCLE=C104; NEXT_GATE_STARTED=NAO.
+
+## C105 — raízes completas e refinamentos de apresentação — 2026-10-14
+
+Contrato anterior ao código em architecture/C11_FAST_HOME_ON_DEMAND_CONTENT.md.
+API de diretório comprovada na mesma fonte, sem backend/protocolo/credencial
+persistida nova. Catálogo completo de filmes/séries/canais promovido pelo fluxo
+canônico; episódios sob demanda em RAM com geração/auth/source guard. IDs
+estáveis do provedor e fallback inicial/legado M3U separados. Transporte web
+oversized agora cancela body após releaseLock. Testes de lista/falha/tamanho/
+estabilidade/autoridade, busca completa e seleção Live PASS.
+
+Medição limpa reduziu baseline anterior40min+parse para aproximadamente2m25 até
+hero/capas, mas NÃO atingiu90s. Resposta de séries93,9s explica grande parte do
+tempo observado; não é SLA nem homologação geral. Deadline15min C104 removido.
+Arte visível precede demais slides, mantendo qualidade/identidade/limites e
+retry contínuo bounded. Direção atual mantém busca local completa de raízes.
+
+Últimos pedidos: hero ampliado/menu estreito somente Fire; pontos pequenos
+próximos à borda, direita tablet/TV e centro celular. Coluna Canais contínua
+virtualizada em todas as telas, sem botões de página, filtro de todo o grupo,
+D-pad através de limites48 e sem trocar canal ao navegar. C9/EPG/fullscreen/
+favoritos/painel nativo mantidos. QA encontrou e corrigiu altura de Filmes/
+Séries e seed inicial reposicionando scroll; regressão mais recente prevalece.
+Browser real/StrictMode e serviço guardado PASS; Fire físico234 canais PASS.
+
+Build/assinatura/assets/lock PASS; candidato19-C105 local e recuperação C104/
+primeiro C105 preservados. Atualização-r nos alvos autorizados, mantendo dados;
+celular reconectado e candidato final instalado USB; Fire USB e tablet Wi-Fi
+também idênticos. UI contínua real234 canais PASS em todos. Evidência detalhada em
+evidence/C11_FAST_HOME_ON_DEMAND_CONTENT.md. Sem commit/push/PR, publicação,
+alteração comercial/backend/env/reset adicional. NEXT_GATE_STARTED=NAO.
+
+## 2026-10-14 — C106, refinamentos do hero e lifecycle da prévia Live
+
+Toque na arte reutiliza onSelect/item atual somente PHONE/TABLET e preserva
+swipes, ações e teclado. Fire foco/hover standby deixa timer10000ms avançar;
+ref evita reset na chegada de arte. Fonte de Canais usa escala atual de
+Categorias, sem aumentá-la. Moldura CSS1px em todos; Fire aproximadamente6%
+mais baixo, arte contain e ações internas. Saída Live central aguarda cleanup
+confirmado, incluindo start tardio; nativo oculta overlay antes de release,
+accepted compatível com bridge e ID stale rejeitado. Troca de canal/C9 mantidos.
+
+16 testes novos, regressões dirigidas/lock/JVM197/build/7 assets/assinatura
+PASS. Candidato1.0.19-C106 e C105 de recuperação retidos. Update-r três alvos
+aprovados com dados preservados; QA touch/mesmo item nas3 páginas celular e
+tablet, Fire autoplay3 páginas/fonte10px/234 canais e3 saídas Live→Home após
+ack nativo PASS. Probes sanitizados e limitações em evidence/C11_HERO_ARTWORK_DETAILS_TAP.md.
+Sem Git/backend/publicação/reset, meta90s não reavaliada, próximo Gate não iniciado.
