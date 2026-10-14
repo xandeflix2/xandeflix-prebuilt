@@ -52,3 +52,11 @@ Retenção de snapshots C102 continua pendente. APKs ficam locais/ignorados.
 
 `CURRENT_GATE=NONE; CURRENT_LOCAL_CYCLE=C106_GIT_PUBLICATION;
 NEXT_GATE_STARTED=NAO`.
+
+## Resultado do envio consolidado
+
+Commit66b6c90445456cf15ad7fd7ab79ea2a6acbec4c8 enviado à main esperada e
+confirmado independentemente por ls-remote, divergência0/0. Registro final
+somente documental autorizado acima em
+[evidência](../evidence/C11_C100_C106_GIT_PUBLICATION.md).
+Código funcional/artefato permanecem exatamente como entregues no C106.

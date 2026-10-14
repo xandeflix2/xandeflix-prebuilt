@@ -2205,3 +2205,14 @@ aprovados com dados preservados; QA touch/mesmo item nas3 páginas celular e
 tablet, Fire autoplay3 páginas/fonte10px/234 canais e3 saídas Live→Home após
 ack nativo PASS. Probes sanitizados e limitações em evidence/C11_HERO_ARTWORK_DETAILS_TAP.md.
 Sem Git/backend/publicação/reset, meta90s não reavaliada, próximo Gate não iniciado.
+
+## 2026-10-14 — C100–C106 consolidados no GitHub
+
+Pedido posterior autorizou commit e push das otimizações. Stage nominal66
+arquivos de código/testes/docs, index idêntico ao auditado, sem segredos ou
+binários privados. Commit66b6c90445456cf15ad7fd7ab79ea2a6acbec4c8 enviado
+normalmente à origin/main e confirmado por ls-remote/0 divergência. Lock26+27+9
+e16 testes C106 PASS;197 testes/builds/QA anteriores preservados.49 arquivos
+de patches protegidos e digest do APK C106 inalterados. Registro final apenas
+documental; sem PR/rewrite/backend/updater/novo Gate. Limites C105/C102 mantidos.
+[Evidência](evidence/C11_C100_C106_GIT_PUBLICATION.md).

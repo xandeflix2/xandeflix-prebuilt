@@ -1979,3 +1979,17 @@ JVM197/lock/TypeScript/regressões/assinatura/assets/install-r/preservação PAS
 APK C106e0ff71de... instalado três alvos, evidência C11_HERO_ARTWORK_DETAILS_TAP.md.
 Home90s, playback filme/episódio e retenção C102 continuam pendentes. Nenhum
 Git/backend/reset/publicação/novo Gate. CURRENT_LOCAL_CYCLE=C106_UI_INSTALLED.
+
+## 2026-10-14 — C100_C106_GIT_PUSH_VERIFIED
+
+Nenhum bloqueio de commit/autenticação/push: consolidação66b6c90445456cf15ad7fd7ab79ea2a6acbec4c8
+enviada e SHA remoto confirmado. Auditoria sanitizada sem achados; lock e16
+testes C106 PASS. Helper inicialmente classificou build.gradle como artefato;
+regex de boundary corrigida antes do staging. Diretório default de hooks
+ausente, confirmado sem criação/bypass. diff-check documental apontou hard-
+break Markdown/EOF já existentes; mantidos como evidência histórica, runtime/
+testes/Android sem problemas de whitespace. Mensagem PowerShell levou BOM,
+sem efeito no código; próximas mensagens UTF-8 sem BOM, histórico sem amend.
+Proveniência/artefato/privados mantidos, registro final apenas documental.
+Home90s/playback VOD/retenção C102 seguem pendentes; envio Git não os resolve.
+[Comprovante](evidence/C11_C100_C106_GIT_PUBLICATION.md).

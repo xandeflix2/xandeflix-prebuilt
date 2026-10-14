@@ -1730,3 +1730,17 @@ APK disponível para transferência ao outro aparelho; nenhum alvo novo operado.
 Home90s/playback VOD/retenção C102 continuam pendentes; sem novo SLA/Gate,
 Git/backend/publicação/reset. [Evidência C106](evidence/C11_HERO_ARTWORK_DETAILS_TAP.md).
 CURRENT_GATE=NONE; CURRENT_LOCAL_CYCLE=C106_UI_INSTALLED; NEXT_GATE_STARTED=NAO.
+
+## C100–C106 — otimizações enviadas ao GitHub — 2026-10-14
+
+Commit/push explicitamente autorizados.66 arquivos de código/testes/docs
+consolidados no commit66b6c90445456cf15ad7fd7ab79ea2a6acbec4c8, enviado por
+push normal à main de xandeflix2/xandeflix-prebuilt. ls-remote confirmou o mesmo
+SHA, divergência0/0. Lock26+27+9 e hero/Live16 testes PASS; staging/auditoria
+sanitizada/proveniência/49 patches protegidos conferidos. APK e segredos/tmp
+fora do Git, binário C106 preservado. Segundo commit apenas registra o envio.
+Nenhum patch funcional/backend/reset/instalação/updater/novo Gate.
+Home90s, playback VOD e retenção C102 permanecem pendentes.
+[Comprovante](evidence/C11_C100_C106_GIT_PUBLICATION.md).
+CURRENT_GATE=NONE; CURRENT_LOCAL_CYCLE=C106_GIT_PUBLICATION_VERIFIED;
+NEXT_GATE_STARTED=NAO; GIT_COMMIT_AUTHORIZED=SIM; GIT_PUSH_AUTHORIZED=SIM.
