@@ -3058,3 +3058,10 @@ alterado. APK149 preservado. Git commit/push corretivos continuam autorizados
 pela solicitacao de publicacao; envio confirmado sera registrado abaixo.
 A nova implantacao deve usar o novo commit de main, e nao repetir b9d8535.
 Nenhuma operacao em conta Vercel incorreta. NEXT_GATE_STARTED=NAO.
+
+
+C153 envio confirmado: ed62082f6d8723c4173ba8946355d6298baa16f8 em origin/main, remoto conferido
+por ls-remote e divergencia0/0.8 caminhos/blobs iguais ao manifesto auditado.
+Correcao do ENOENT esta no GitHub; este fechamento altera somente evidencia
+e memorias. Build completo local PASS; resultado Linux da Vercel e login
+online ainda precisam de verificacao na conta correta. NEXT_GATE_STARTED=NAO.
