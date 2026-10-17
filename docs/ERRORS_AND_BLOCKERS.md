@@ -3143,3 +3143,21 @@ assinatura/package C149,205 testes nativos/35 suites,1412 recursos iguais.
 Arquivo tmp/c156-web-pin/Xandeflix-v1.0.31-C156.apk. Instalacao nao executada. Git/frontend pendentes deste
 registro, autorizados para concluir. Evidencia/contrato C156 detalham.
 CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO.
+
+## C156 — producao e APK entregaveis — 2026-10-17
+
+Auditoria1217/1198 preservados PASS,19 alterados(inclui retirada legado)+9
+novos na allowlist, memorias append-only e sem segredos. Commit funcional
+33febc619a09ea08f2f9a60617b9d06a36459b6f push origin/main, remoto igual e
+arvore limpa. Vercel xandeflix2/xandeflix-prebuilt-nm3x
+J5UVT8PSrFLqp8NkRUuP84MEN7UJ success; HTTP dos dois aliases e Chrome
+publico PASS, /admin separado de /app, arquivos privados404 e nenhum PUK
+no login web. Logs privados Vercel indisponiveis, sem claim de scan limpo.
+APK1.0.31/code31 pronto tmp/c156-web-pin/Xandeflix-v1.0.31-C156.apk, mesma
+assinatura/package anterior; instalacao nao executada. Atualizar in-place
+preserva dados. Configuracoes -> PIN web usa PUK local e PIN independente;
+cadastro remoto anterior exige PIN web atual uma vez para vincular recovery.
+PUK/verificadores nunca enviados, fixture sintetico removido, nenhum cliente
+real alterado. Homologacao fisica/fonte/playback reais pendentes, sem impedir
+entrega do recurso testado. Fechamento documental nao altera bundles/APK.
+CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO.

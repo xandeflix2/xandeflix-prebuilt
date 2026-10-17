@@ -115,3 +115,14 @@ focados, typecheck, builds site e APK; Chrome isolado da janela e login.
 Backend aditivo antes de publicar frontend; Git/Vercel somente equipe2 atual,
 com monitoramento por GitHub/HTTPS se integracao continuar sem acesso aos logs.
 Concluir com APK verificavel, sem prometer homologacao fisica de dispositivos.
+
+## Resultado consolidado — 2026-10-17
+
+IMPLEMENTADO=SIM; BACKEND_CANONICO_IMPLANTADO=SIM; FRONTEND_PUBLICADO=SIM;
+APK_GERADO=SIM; INSTALACAO_FISICA_EXECUTADA=NAO; NEXT_GATE_STARTED=NAO.
+Commit funcional33febc619a09ea08f2f9a60617b9d06a36459b6f em origin/main,
+Vercel equipe2/projeto xandeflix-prebuilt-nm3x concluido; HTTP/Chrome publico
+verificados. APK1.0.31/code31 assinado com certificado anterior, arquivo
+tmp/c156-web-pin/Xandeflix-v1.0.31-C156.apk. Contrato, testes, hashes,
+limites e operacao detalhados na evidencia C11_SEPARATE_WEB_PIN_RECOVERY.md.
+Nenhum reset/instalacao, fonte real ou playback fisico executado pelo agente.

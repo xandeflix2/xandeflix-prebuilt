@@ -109,3 +109,40 @@ conteudo restrito automaticamente. Fonte/catalogo/playback reais nao
 homologados neste ciclo; entrega nao requer contato com fonte real.
 Publicacao frontend/Git ainda pendente deste registro; backend ja ativo.
 CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO.
+
+## Auditoria e publicacao concluidas — 2026-10-17
+
+Auditoria PASS: baseline1217,1198 hashes preservados,19 arquivos existentes
+alterados (incluindo remocao do antigo WebPinEnrollment)+9 novos estritamente
+allowlisted;3 memorias append-only; source/vault/delivery/catalogo/search/
+player/Java/native/AGENTS/package-lock intactos; Gradle somente30->31;
+nenhuma dependencia nova, diff --check PASS, sem literais privados conhecidos
+ou padroes de segredo no codigo/docs/assets publicos. APK C149 preservado.
+
+28 arquivos staged exatos, blobs/commit/remocao conferidos, commit funcional
+33febc619a09ea08f2f9a60617b9d06a36459b6f enviado a origin/main sem force/PR,
+arvore limpa e remoto/HEAD iguais. GitHub Vercel status success do projeto:
+https://vercel.com/xandeflix2/xandeflix-prebuilt-nm3x/J5UVT8PSrFLqp8NkRUuP84MEN7UJ
+Sem operar equipe antiga; integracao Git existente tambem dispara projeto
+irmao da equipe2, sem configuracao externa alterada pelo agente.
+
+HTTP real PASS nos origins xandeflix.vercel.app e
+xandeflix-prebuilt-nm3x.vercel.app: / e /admin200 painel, /app e /app/200
+consumidor separado,4 assets de entrada por origin200/MIME correto,
+DENY/nosniff, /.env.local e /api/control-plane/state404. Mesmo HTML /app
+SHA25698b2afe2b69affe2b367cde6794669e9c6e4c3c3cbf1593ae0494eb9e8b415ba.
+Chrome publico isolado confirma3 campos obrigatorios e mascarados, storage
+e IndexedDB vazios antes de login e nenhuma identidade/ativacao nova.
+Chrome local confirma namespaces reais Storage/IDB preservando gestor.
+Instrucao de recuperar PIN no aparelho presente; nenhum campo PUK no login.
+Logs privados/runtime/drains Vercel continuam inacessiveis nesta conexao;
+nao foi repetida tentativa sem permissao nem declarado scan limpo.
+
+APK pronto para atualizacao manual in-place nos dispositivos, sem apagar
+dados/PUK/ativacao. Fluxo para usuario sem PIN web: PUK + novo PIN diferente
+do parental + confirmacao. Cadastro remoto existente exige PIN web atual
+uma vez para preparar recovery. Depois disso, recuperacao exige PUK no
+aparelho preparado. Atualizacao do aplicativo nao cadastra/recupera PINs de
+clientes automaticamente. Nenhum dispositivo real foi instalado ou testado.
+Fechamento documental posterior nao modifica os bundles/APK ja verificados.
+CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO.
