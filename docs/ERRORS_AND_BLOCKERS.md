@@ -2882,3 +2882,17 @@ Vercel correta autenticada; usuario proibiu xandeflix4 e solicitou nova.
 CUA No browser is available. Sem deploy, novo Supabase, emails, roles/RLS ou
 operacao em contas reais. Git commit/push explicitamente autorizados em main,
 fechamento registrara resultado real. NEXT_GATE_STARTED=NAO.
+
+
+## C151 - commit e push confirmados - 2026-10-17
+
+Commit principal 1496c6b9a7c3336ea6895a2be158db8b0803c90f enviado a origin/main e conferido
+independentemente por ls-remote, divergencia0/0 e arvore limpa.136 caminhos
+e blobs iguais ao manifesto auditado, zero achados reais de segredos,
+2 fixtures negativas antigas revisadas; arquivos privados/APK149 excluidos
+e preservados. Auditoria C151 baseline1182/1177 preservados,11 novos,
+6 assets do painel verificados; builds/testes/lock PASS. GitHub agora contem
+a configuracao dedicada Vercel e os patches C133-C150. Este fechamento e
+exclusivamente documental, sem nova mudanca funcional. Publicacao Vercel
+ainda nao iniciada: nova conta/conexao correta necessarias; nenhum uso ou
+mutacao de xandeflix4, Supabase ou dispositivos. NEXT_GATE_STARTED=NAO.
