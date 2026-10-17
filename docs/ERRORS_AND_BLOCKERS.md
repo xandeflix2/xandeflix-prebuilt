@@ -2918,3 +2918,10 @@ com nomes baseados no caminho completo antes de editar. Python jsonschema
 nao instalado; usado AJV existente, sem instalar pacote. Sem segredo em logs.
 Atual validacao corrige somente o bloqueio do schema: deploy/login remoto
 ainda precisam ser conferidos na nova conta Vercel. NEXT_GATE_STARTED=NAO.
+
+
+C152 envio confirmado: 4bf07a79fbced8c999f962a318bcec33579b43e2 em origin/main, remoto conferido
+por ls-remote/divergencia0/0.7 caminhos/blobs iguais ao manifesto, nenhuma
+mudanca funcional adicional. Falha public corrigida no repositorio; este
+fechamento altera somente evidencia/memorias. Publicacao remota nao foi
+executada pelo agente, sem acesso a nova conta. NEXT_GATE_STARTED=NAO.
