@@ -1,31 +1,35 @@
-import { useEffect, useId, useRef, type ReactNode } from 'react';
+import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { useDevicePresentation } from '../hooks/useDevicePresentation.ts';
 import { devicePresentationModels, getDevicePresentationModel, openDevicePresentation } from '../device-presentation.ts';
 import './SettingsPage.css';
 import { AppUpdateSettings } from '../../app-update/AppUpdateSettings.tsx';
 import { ActiveSourceSettings } from '../components/ActiveSourceSettings.tsx';
 import { openSettingsDestination, openSettingsWindow } from '../settings/settings-window.ts';
+import { WebPinSettings } from '../../web-production/WebPinSettings.tsx';
+import { isPublicConsumerWeb } from '../../web-production/session-context.ts';
 
 const labels = { PHONE: 'Celular', TABLET: 'Tablet', TV: 'TV' };
 
-function SettingsOption({ title, description, children }: { title: string; description: string; children: ReactNode }) {
+function SettingsOption({ title, description, children, mountOnOpen = false }: { title: string; description: string; children: ReactNode; mountOnOpen?: boolean }) {
   const dialog = useRef<HTMLDialogElement>(null), trigger = useRef<HTMLButtonElement>(null);
   const cleanup = useRef<(() => void) | undefined>(), titleId = useId();
+  const [contentOpen, setContentOpen] = useState(false);
   useEffect(() => () => cleanup.current?.(), []);
   return <div className="settings-option">
     <button ref={trigger} type="button" className="focusable-item settings-option-summary" aria-haspopup="dialog" onClick={() => {
       if (!dialog.current || !trigger.current) return;
+      if (mountOnOpen) setContentOpen(true);
       cleanup.current?.(); cleanup.current = openSettingsWindow(dialog.current, trigger.current);
     }}>
       <span className="settings-option-copy"><span className="settings-option-title">{title}</span><span className="settings-option-description">{description}</span></span>
       <span className="settings-option-chevron" aria-hidden="true">›</span>
     </button>
     <dialog ref={dialog} data-settings-modal className="settings-window" aria-labelledby={titleId}
-      onCancel={event => { event.preventDefault(); event.currentTarget.close(); }}>
+      onClose={() => { if (mountOnOpen) setContentOpen(false); }} onCancel={event => { event.preventDefault(); event.currentTarget.close(); }}>
       <div className="settings-window-header"><h2 id={titleId}>{title}</h2>
         <button type="button" className="focusable-item settings-window-close btn-secondary" data-settings-close onClick={() => dialog.current?.close()}>Fechar</button>
       </div>
-      <div className="settings-window-body">{children}</div>
+      <div className="settings-window-body">{!mountOnOpen || contentOpen ? children : null}</div>
     </dialog>
   </div>;
 }
@@ -48,6 +52,9 @@ export function SettingsPage({ onOpenActivation, onOpenParental, onOpenAdult }: 
         <button className="focusable-item btn-secondary" type="button" onClick={() => openSettingsDestination(onOpenParental)}>Abrir controle parental</button>
       </section>
       </SettingsOption>
+      {!isPublicConsumerWeb() && <SettingsOption title="PIN web" description="Crie o acesso ao navegador e recupere seu PIN com o PUK." mountOnOpen>
+        <WebPinSettings />
+      </SettingsOption>}
       <SettingsOption title="Tela e dispositivo" description="Escolha o tipo de dispositivo e a interface.">
       <section className="settings-section" aria-labelledby="settings-display">
         <h2 id="settings-display">Tela e dispositivo</h2>

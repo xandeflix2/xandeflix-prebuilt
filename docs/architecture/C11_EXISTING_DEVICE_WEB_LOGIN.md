@@ -405,3 +405,21 @@ Chrome isolado confirmam /app nos dois enderecos. Painel continua em /admin.
 https://xandeflix.vercel.app/app e o acesso consumidor; cadastrar PIN web no
 painel antes do primeiro login. Fonte/playback real de cliente permanecem
 pendentes de homologacao pelo responsavel, sem alegar sucesso de midia.
+
+## C156 — PIN web independente e recuperacao por PUK local — 2026-10-17
+
+Pedido posterior substitui o reuso do PIN parental C155 por cadastro separado
+em Configuracoes -> PIN web. Especificacao/allowlist anterior ao codigo em
+[C11_SEPARATE_WEB_PIN_RECOVERY.md](C11_SEPARATE_WEB_PIN_RECOVERY.md).
+PIN web novo deve ser diferente do parental; criacao/recuperacao local exige
+PUK valido e nao concede grant parental/adulto. PUK e seus verificadores nao
+saem do aparelho. Servidor recebe somente chave publica ECDSA de recuperacao
+e desafios efemeros; chave privada fica cifrada localmente sob PUK/AES-GCM
+e nunca e persistida/transmitida em claro. Isso nao e verificador remoto do
+PUK nem permite atacar o PUK com dados do servidor. Troca legitima do PUK
+reencapsula localmente a chave, sem mudar prova publica ou enviar segredo.
+Gestor pode criar PIN inicial; depois de cadastrado, recuperacao/redefinicao
+exige prova vinculada ao PUK no aparelho, sem reset administrativo legado.
+PINs C155 sem recovery exigem PIN web atual para vincular recuperacao; nao
+prometer recuperacao retroativa sem essa preparacao. Bloqueio3h preservado.
+Nenhuma mudanca em fonte/vault/catalogo/busca/player/identidade/licenca/ativacao.

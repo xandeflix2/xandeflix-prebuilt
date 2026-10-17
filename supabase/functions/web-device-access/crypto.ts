@@ -24,3 +24,11 @@ export function equalVerifier(left: string, right: string): boolean {
   for (let i = 0; i < Math.max(left.length, right.length); i++) diff |= (left.charCodeAt(i) || 0) ^ (right.charCodeAt(i) || 0);
   return diff === 0;
 }
+export async function verifyRecovery(publicKey: string, challenge: string, pin: string, signature: string): Promise<boolean> {
+  try {
+    if (!/^[0-9a-f]{182}$/.test(publicKey) || !/^[0-9a-f]{128}$/.test(signature) || !/^\d{6}$/.test(pin) || challenge.length > 1024) return false;
+    const bytes = (v: string) => Uint8Array.from(v.match(/../g)!, b => parseInt(b, 16));
+    const key = await crypto.subtle.importKey('spki', bytes(publicKey), { name: 'ECDSA', namedCurve: 'P-256' }, false, ['verify']);
+    return crypto.subtle.verify({ name: 'ECDSA', hash: 'SHA-256' }, key, bytes(signature), encoder.encode(`${challenge}:${await sha256(pin)}`));
+  } catch { return false; }
+}

@@ -3104,3 +3104,42 @@ Fixture sintetico removido; nenhum cliente/fonte real modificado. Fonte e
 playback real nao homologados pelo agente; nenhum APK ou instalacao nova.
 Fechamento documental nao modifica bundles. CURRENT_GATE=NONE;
 NEXT_GATE_STARTED=NAO. Contrato/evidencia C155 consolidados.
+
+## C156 — PIN web independente e APK autorizados; especificacao — 2026-10-17
+
+Usuario autorizou cadastro em Configuracoes separado do parental, recuperacao
+com PUK e APK instalavel. Preflight clone/main/origin canonicos HEAD8d5744e,
+arvore inicialmente limpa; AGENTS/Architecture/Execution/Source/Lock/C126/C155
+lidos, baseline1217 e copias privadas tmp/c156-web-pin. Lock antes PASS26+27+
+9+6. Projeto Supabase canonico ACTIVE_HEALTHY confirmado, outra conta intocada.
+Spec/allowlist C11_SEPARATE_WEB_PIN_RECOVERY.md anterior ao codigo. PUK fica
+local; envelope privado cifrado sob PUK e chave publica/desafios no servidor,
+sem permitir reset por token web/gestor. Sem nova ativacao/source/proxy.
+Git/publicacao existentes autorizados, APK code31; nenhuma instalacao/reset
+autorizada neste pedido. Implementacao/testes/deploy/APK ainda pendentes.
+Leitura de glob posicional Windows e arquivo parental.types inexistente
+corrigida por inventario e leitura real; nenhum arquivo funcional alterado.
+CURRENT_GATE=NONE; CURRENT_LOCAL_CYCLE=C156; NEXT_GATE_STARTED=NAO.
+
+## C156 — PIN web/PUK implementados e APK1.0.31 validado — 2026-10-17
+
+Janela propria Configuracoes -> PIN web; PUK valida localmente, novo PIN
+diferente do parental. Atalho de reuso retirado, nenhum upload de PUK/hash.
+Recuperacao ECDSA usa chave privada cifrada sob PUK somente no aparelho,
+chave publica/desafio privados no servidor. Rewrap transacional ao trocar
+PUK, rollback em erro, nao abre grants parentais/adultos. Gestor so cria PIN
+inicial; PIN existente exige PUK/recovery ja preparado, sem bypass legado.
+Migration aplicada e Edge v2 ACTIVE no projeto canonico. SQL rollback e
+HTTPS real21 checks PASS, sexto erro paralelo3h nao removido por assinatura
+correta/hora falsa; sessao web anterior revogada e nativo preservado. Fixture
+sintetico sem fonte/conteudo removido; nenhum cliente real alterado.
+Lock26+27+9+6, parental16, C15511, C15610, C9runtime10, deliveryA-F e builds
+site/Android PASS. Harness antigo ENROLL atualizado apos sucessao formal,
+negativas preservadas e ampliadas. Timer de teste/falso alias Windows/log
+aberto corrigidos nos helpers sem relaxar verificacoes. Chrome isolado UI
+real com API sintetica PASS, sem alegar teste fisico.
+APK 1.0.31/code31,11393851bytes,SHA256a7012e334e87ec2eac56715b7ae89fef523e9548cd4a9db01f8b7f83b3b8deee; mesma
+assinatura/package C149,205 testes nativos/35 suites,1412 recursos iguais.
+Arquivo tmp/c156-web-pin/Xandeflix-v1.0.31-C156.apk. Instalacao nao executada. Git/frontend pendentes deste
+registro, autorizados para concluir. Evidencia/contrato C156 detalham.
+CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO.

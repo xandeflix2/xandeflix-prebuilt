@@ -11,7 +11,6 @@ import { useDevicePresentation } from '../hooks/useDevicePresentation.ts';
 import { isTelevisionPresentation } from '../device-presentation.ts';
 import { parentalEntry } from '../parental-dpad-navigation.ts';
 import { SearchPage } from './SearchPage.tsx';
-import { WebPinEnrollment } from '../../web-production/WebPinEnrollment.tsx';
 import './SettingsPage.css';
 import './ParentalControlPage.css';
 
@@ -76,7 +75,7 @@ export function ParentalControlPage({ readModel, onOpenAdult }: { readModel: Cat
   return <main ref={pageRef} className="settings-page parental-page" onSubmitCapture={e => {
     if (television && document.activeElement instanceof HTMLInputElement) { e.preventDefault(); e.stopPropagation(); }
   }}><h1>Controle parental</h1>
-    <p>PUK e preferências ficam somente neste aparelho. O PIN só é cadastrado no acesso web quando você escolhe essa opção e confirma o PIN atual.</p>
+    <p>PIN parental, PUK e preferências ficam somente neste aparelho. Para entrar pelo navegador, crie outro PIN na opção PIN web das Configurações.</p>
     {television && <p className="parental-remote-help">↑ ↓ Campos · ← → Classificação · OK Selecionar / editar · Voltar Tela anterior</p>}
     {message && <p role="alert">{message}</p>}
     {state.status === 'loading' ? <p role="status">Lendo proteção local…</p> : state.status === 'error' ? <p role="alert">Não foi possível ler a proteção local. O acesso restrito está bloqueado. Nenhuma chave será recriada automaticamente.</p>
@@ -111,7 +110,6 @@ export function ParentalControlPage({ readModel, onOpenAdult }: { readModel: Cat
           </form> : <><form onSubmit={e => { e.preventDefault(); void run(async () => { await parentalControl.updatePolicy({ maxAge, allowAdult }); setMessage('Preferências salvas neste aparelho.'); }); }}><h2>Classificações permitidas</h2>{policyFields}<button className="focusable-item btn-primary" type="submit">Salvar preferências</button></form>
             <div className="parental-actions"><button className="focusable-item btn-secondary" type="button" disabled={!readModel} onClick={() => setMode('search')}>Buscar e restringir conteúdo ({parentalControl.rules().length}/256)</button>
               <button className="focusable-item btn-secondary" type="button" onClick={() => { clearSecrets(); setMode('pin'); }}>Alterar PIN</button><button className="focusable-item btn-secondary" type="button" onClick={() => { clearSecrets(); setMode('puk'); }}>Alterar PUK</button></div>
-            <WebPinEnrollment />
             {state.policy.allowAdult && state.policy.maxAge === 18 && <section><h2>Área 18+</h2><p>Use o acesso 18+ no menu para informar o PIN e abrir a grade protegida.</p>{onOpenAdult && <button type="button" className="focusable-item btn-secondary" onClick={onOpenAdult}>Abrir área 18+</button>}</section>}
             <div className="parental-actions"><button className="focusable-item btn-secondary" type="button" onClick={() => { parentalControl.lock(); clearSecrets(); setMessage('Conteúdo restrito bloqueado.'); }}>Bloquear conteúdo restrito agora</button></div>
           </>}

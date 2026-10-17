@@ -171,10 +171,15 @@ await test('MANAGER_PIN_REQUIRES_REAL_USER_AND_SCOPED_AUTHORIZATION', async () =
   assert.match(write.args.p_verifier, /^[0-9a-f]{64}$/); assert(!Object.values(write.args).includes(pin));
 });
 await test('DELEGATED_TOKEN_CANNOT_ENROLL_OR_RESET_PARENTAL_PIN', async () => {
-  const result = await edgeCase({ operation: 'ENROLL_PIN', deviceId: did, deviceAuthToken: token, pin });
-  assert.equal(result.status, 403); assert(!result.calls.some(call => call.name === 'rpc_web_enroll_pin'));
+  for (const operation of ['ENROLL_PIN','DEVICE_STATE','DEVICE_REGISTER','DEVICE_CHALLENGE','DEVICE_RECOVER']) {
+    const result = await edgeCase({ operation, deviceId: did, deviceAuthToken: token, pin });
+    assert.equal(result.status, 403); assert(!result.calls.some(call => /rpc_web_(?:enroll_pin|pin_)/.test(call.name)));
+  }
   const native = await edgeCase({ operation: 'ENROLL_PIN', deviceId: did, deviceAuthToken: 'synthetic-native-credential', pin });
-  assert.equal(native.status, 200);
-  assert(native.calls.find(call => call.name === 'rpc_web_enroll_pin').args.p_verified);
+  assert.equal(native.status, 403); assert(!native.calls.some(call => call.name === 'rpc_web_enroll_pin'));
+  const state = await edgeCase({ operation: 'DEVICE_STATE', deviceId: did, deviceAuthToken: 'synthetic-native-credential' });
+  assert.equal(state.status, 200);
+  assert.equal(state.calls.find(call => call.name === 'rpc_web_pin_device_state').args.p_native_token_hash, createHash('sha256').update('synthetic-native-credential').digest('hex'));
+  assert.doesNotMatch(JSON.stringify(state.result), /verifier|salt|native_token_hash/);
 });
 console.log(`C155_EXISTING_DEVICE_WEB_LOGIN=${tests}/${tests}_PASS`);

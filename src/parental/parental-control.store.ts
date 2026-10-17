@@ -48,6 +48,7 @@ export class ParentalControlStore {
   private readonly crypto: () => Crypto;
   private readonly now: () => number;
   private readonly clock: () => Promise<ParentalClock>;
+  private readonly preparePukChange?: (current: string, next: string) => Promise<() => Promise<void>>;
   private blockTimer?: ReturnType<typeof setTimeout>;
   private record?: RecordV1;
   private loaded?: Promise<void>;
@@ -60,8 +61,9 @@ export class ParentalControlStore {
   private expiry?: ReturnType<typeof setTimeout>;
   private lockEpoch = 0;
   private snapshot: ParentalSnapshot = { status: 'loading', policy: { maxAge: 18, allowAdult: false }, admin: false, adultSession: false, busy: false, revision: 0, contentRevision: 0, lockRevision: 0, grantRevision: 0, prompt: null };
-  constructor(options: { storage: ParentalStorage; crypto?: () => Crypto; now?: () => number; clock?: () => Promise<ParentalClock> }) {
+  constructor(options: { storage: ParentalStorage; crypto?: () => Crypto; now?: () => number; clock?: () => Promise<ParentalClock>; preparePukChange?: (current: string, next: string) => Promise<() => Promise<void>> }) {
     this.storage = options.storage; this.crypto = options.crypto || (() => globalThis.crypto); this.now = options.now || Date.now;
+    this.preparePukChange = options.preparePukChange;
     this.clock = options.clock || (options.now ? async () => ({ clockId: 'fixture', elapsedMs: this.now() })
       : async () => (await import('./parental-storage.ts')).readParentalClock());
   }
@@ -170,7 +172,17 @@ export class ParentalControlStore {
   }
   async changePuk(current: string, next: string): Promise<boolean> {
     return this.run(async () => { this.requireAdmin(); if (!validateParentalPuk(next)) throw new Error('PARENTAL_INVALID_SECRET'); if (!await this.check(current, 'puk')) return false;
-      await this.save({ ...this.record!, puk: await this.verifier(next) }); return true; });
+      const puk = await this.verifier(next), rollback = await this.preparePukChange?.(current, next);
+      try { await this.save({ ...this.record!, puk }); } catch (error) { await rollback?.(); throw error; }
+      return true; });
+  }
+  async authorizeWebPin(puk: string, newPin: string): Promise<boolean> {
+    return this.run(async () => {
+      if (!validateParentalPin(newPin)) throw new Error('PARENTAL_INVALID_SECRET');
+      if (!await this.check(puk, 'puk')) return false;
+      if (equal((await this.verifier(newPin, this.record!.pin.salt)).hash, this.record!.pin.hash)) throw new Error('WEB_PIN_MUST_DIFFER');
+      return true;
+    });
   }
   async unlockAdult(pin: string): Promise<boolean> {
     return this.run(async () => { const epoch = this.lockEpoch; if (!this.record?.policy.allowAdult) throw new Error('PARENTAL_ADULT_DISABLED'); if (this.record.policy.maxAge < 18) throw new Error('PARENTAL_ADULT_AGE_LIMIT'); if (!await this.check(pin, 'pin') || epoch !== this.lockEpoch) return false;
@@ -265,7 +277,7 @@ export class ParentalControlStore {
   cancelPrompt() { const current = this.prompt; this.prompt = undefined; this.snapshot.prompt = null; if (current) { current.finish(false); this.emit(); } }
 }
 
-export const parentalControl = new ParentalControlStore({ storage: {
+export const parentalControl = new ParentalControlStore({ preparePukChange: async (current, next) => (await import('../web-production/web-pin-recovery.storage.ts')).prepareRecoveryPukChange(current, next), storage: {
   read: async () => (await import('./parental-storage.ts')).parentalStorage.read(),
   write: async value => (await import('./parental-storage.ts')).parentalStorage.write(value),
 } });

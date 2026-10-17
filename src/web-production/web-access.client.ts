@@ -19,7 +19,7 @@ async function post(path: string, body: Record<string, unknown>, authorization?:
     return result as Record<string, unknown>;
   } catch { throw new Error(WEB_ACCESS_ERROR); } finally { clearTimeout(timer); }
 }
-export function webAccessRequest(operation: 'LOGIN' | 'SET_PIN' | 'ENROLL_PIN', fields: Record<string, unknown>, authorization?: string) {
+export function webAccessRequest(operation: 'LOGIN' | 'SET_PIN' | 'ENROLL_PIN' | 'DEVICE_STATE' | 'DEVICE_REGISTER' | 'DEVICE_CHALLENGE' | 'DEVICE_RECOVER', fields: Record<string, unknown>, authorization?: string) {
   return post('/functions/v1/web-device-access', { ...fields, operation }, authorization);
 }
 export function webSessionRequest(operation: 'rpc_web_session_context' | 'rpc_web_logout', token: string, keepalive = false) {

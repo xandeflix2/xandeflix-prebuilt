@@ -1,5 +1,5 @@
 import { createClient } from 'npm:@supabase/supabase-js@2.116.0';
-import { equalVerifier, pinVerifier, protect, randomHex, sha256 } from './crypto.ts';
+import { equalVerifier, pinVerifier, protect, randomHex, sha256, verifyRecovery } from './crypto.ts';
 
 const origins = new Set(['https://xandeflix.vercel.app', 'https://xandeflix-prebuilt-nm3x.vercel.app', 'https://localhost', 'http://localhost:3000', 'http://localhost:4173']);
 const denial = { success: false, code: 'ACCESS_DENIED', message: 'Não foi possível autorizar o acesso. Confira os dados ou tente mais tarde.' };
@@ -52,6 +52,38 @@ export async function handleWebDeviceAccess(request: Request): Promise<Response>
       if (result.error || result.data !== true) return respond(denial, 429);
     }
     const operation = text(body.operation, 32), pin = text(body.pin, 6);
+    if (operation.startsWith('DEVICE_')) {
+      const deviceId = text(body.deviceId), nativeToken = text(body.deviceAuthToken, 256);
+      if (!deviceId || !nativeToken || nativeToken.startsWith('xw1_')) return respond(denial, 403);
+      const proof = { p_device_id: deviceId, p_native_token_hash: await sha256(nativeToken) };
+      const state = await service.rpc('rpc_web_pin_device_state', proof);
+      if (state.error || state.data?.success !== true) return respond(denial, 403);
+      if (operation === 'DEVICE_STATE') return respond({ success: true, configured: state.data.configured, publicKey: state.data.publicKey }, 200);
+      if (operation === 'DEVICE_CHALLENGE') {
+        const result = await service.rpc('rpc_web_pin_begin_recovery', proof);
+        if (result.error || result.data?.success !== true) return respond(denial, 403);
+        return respond({ success: true, challengeId: result.data.challengeId, challenge: result.data.challenge }, 200);
+      }
+      if (!/^\d{6}$/.test(pin)) return respond(denial, 403);
+      const salt = randomHex(16), verifier = await pinVerifier(pin, salt, serverSecret);
+      let result;
+      if (operation === 'DEVICE_REGISTER') {
+        const publicKey = text(body.publicKey, 182), currentPin = text(body.currentPin, 6);
+        if (!/^[0-9a-f]{182}$/.test(publicKey)) return respond(denial, 403);
+        try { await crypto.subtle.importKey('spki', Uint8Array.from(publicKey.match(/../g)!, b => parseInt(b, 16)), { name: 'ECDSA', namedCurve: 'P-256' }, false, ['verify']); }
+        catch { return respond(denial, 403); }
+        const verified = !state.data.configured || (/^\d{6}$/.test(currentPin) && equalVerifier(await pinVerifier(currentPin, state.data.salt, serverSecret), state.data.verifier));
+        result = await service.rpc('rpc_web_pin_register', { ...proof, p_expected_version: state.data.version, p_previous_verified: verified, p_public_key: publicKey, p_salt: salt, p_verifier: verifier });
+      } else if (operation === 'DEVICE_RECOVER') {
+        const challengeId = text(body.challengeId, 36);
+        if (!/^[0-9a-f-]{36}$/.test(challengeId)) return respond(denial, 403);
+        const challenge = await service.rpc('rpc_web_pin_recovery_proof', { ...proof, p_challenge_id: challengeId });
+        if (challenge.error || challenge.data?.success !== true) return respond(denial, 403);
+        const verified = await verifyRecovery(challenge.data.publicKey, challenge.data.challenge, pin, text(body.signature, 128));
+        result = await service.rpc('rpc_web_pin_finish_recovery', { ...proof, p_challenge_id: challengeId, p_verified: verified, p_salt: salt, p_verifier: verifier });
+      } else return respond(denial, 403);
+      return result.error || result.data?.success !== true ? respond(denial, 403) : respond({ success: true }, 200);
+    }
     if (!/^\d{6}$/.test(pin)) return respond(denial, 403);
     if (operation === 'LOGIN') {
       const code = text(body.displayCode, 12).trim().toUpperCase(), accessKey = text(body.accessKey, 6);
@@ -83,20 +115,6 @@ export async function handleWebDeviceAccess(request: Request): Promise<Response>
       if (scope.error || scope.data !== true) return respond(denial, 403);
       const salt = randomHex(16), verifier = await pinVerifier(pin, salt, serverSecret);
       const result = await manager.rpc('rpc_manager_set_web_pin', { p_device_id: deviceId, p_salt: salt, p_verifier: verifier });
-      return result.error || result.data?.success !== true ? respond(denial, 403) : respond({ success: true }, 200);
-    }
-    if (operation === 'ENROLL_PIN') {
-      const deviceToken = text(body.deviceAuthToken, 256);
-      if (!deviceToken || deviceToken.startsWith('xw1_')) return respond(denial, 403);
-      const tokenHash = await sha256(deviceToken);
-      const state = await service.rpc('rpc_web_enrollment_state', { p_device_id: deviceId, p_native_token_hash: tokenHash });
-      if (state.error || state.data?.success !== true) return respond(denial, 403);
-      const verified = !state.data.version || equalVerifier(await pinVerifier(pin, state.data.salt, serverSecret), state.data.verifier);
-      const salt = randomHex(16), verifier = await pinVerifier(pin, salt, serverSecret);
-      const result = await service.rpc('rpc_web_enroll_pin', {
-        p_device_id: deviceId, p_native_token_hash: tokenHash, p_expected_version: state.data.version,
-        p_salt: salt, p_verifier: verifier, p_verified: verified,
-      });
       return result.error || result.data?.success !== true ? respond(denial, 403) : respond({ success: true }, 200);
     }
     return respond(denial, 403);

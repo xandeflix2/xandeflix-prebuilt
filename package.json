@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "site:build": "npm run c11:new-device:lock && tsc && vite build --config vite.manager.config.ts && vite build --config vite.app.config.ts && node scripts/build-public-site.mjs && node scripts/test-c151-manager-production.mjs && node scripts/test-c154-public-site.mjs && node scripts/test-c155-existing-device-web-login.mjs",
+    "site:build": "npm run c11:new-device:lock && tsc && vite build --config vite.manager.config.ts && vite build --config vite.app.config.ts && node scripts/build-public-site.mjs && node scripts/test-c151-manager-production.mjs && node scripts/test-c154-public-site.mjs && node scripts/test-c155-existing-device-web-login.mjs && node scripts/test-c156-web-pin-recovery.mjs",
     "manager:build": "npm run c11:new-device:lock && tsc && vite build --config vite.manager.config.ts",
     "web:build": "npm run c11:new-device:lock && tsc && vite build --mode web",
     "web:serve": "node scripts/serve-web-local.mjs",

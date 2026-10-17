@@ -8,7 +8,7 @@ export function requireWebLogin(): Promise<void> {
   if (!root) return Promise.reject(new Error('WEB_ROOT_REQUIRED'));
   root.innerHTML = `<main class="web-login"><form class="web-login-card" aria-labelledby="web-login-title" autocomplete="off">
     <div class="web-login-brand">XANDE<span>FLIX</span></div><h1 id="web-login-title">Acessar minha conta</h1>
-    <p>Use os dados de um aparelho já ativado. O PIN de acesso deve estar cadastrado pelo responsável ou gestor.</p>
+    <p>Use os dados de um aparelho já ativado e seu PIN web. Para criar ou recuperar esse PIN, abra Configurações → PIN web no aparelho e tenha o PUK em mãos.</p>
     <label>Código do dispositivo<input name="displayCode" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="12" placeholder="XF-XXXX-XXXX" required pattern="XF-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}"></label>
     <label>Chave de acesso<input name="accessKey" type="password" autocomplete="off" inputmode="numeric" maxlength="6" required pattern="[0-9]{6}"></label>
     <label>PIN de acesso<input name="pin" type="password" autocomplete="off" inputmode="numeric" maxlength="6" required pattern="[0-9]{6}"></label>
