@@ -103,7 +103,7 @@ await test('PUBLIC_CONFIG_IS_INSTALLED_BEFORE_REAL_ENTRY_BOOTSTRAPS', () => {
 await test('VERCEL_ROUTES_BUILD_AND_ARTIFACT_BOUNDARY', () => {
   const config = JSON.parse(fs.readFileSync('vercel.json', 'utf8'));
   assert.equal(config.buildCommand, 'npm run manager:build');
-  assert.equal(config.outputDirectory, 'tmp/c151-manager-production/site'); assert.equal(config.public, false);
+  assert.equal(config.outputDirectory, 'tmp/c151-manager-production/site'); assert.equal(Object.hasOwn(config, 'public'), false);
   assert.deepEqual(config.rewrites.map(rule => rule.source), ['/', '/admin', '/master', '/manager', '/manager-reset-password']);
   assert.ok(config.rewrites.every(rule => rule.destination === '/manager.html'));
   assert.ok(!config.rewrites.some(rule => rule.source.includes('*')));

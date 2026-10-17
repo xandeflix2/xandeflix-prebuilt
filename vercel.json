@@ -4,7 +4,6 @@
   "installCommand": "npm ci",
   "buildCommand": "npm run manager:build",
   "outputDirectory": "tmp/c151-manager-production/site",
-  "public": false,
   "rewrites": [
     { "source": "/", "destination": "/manager.html" },
     { "source": "/admin", "destination": "/manager.html" },

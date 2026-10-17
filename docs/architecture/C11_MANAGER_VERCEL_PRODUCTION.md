@@ -91,3 +91,31 @@ conta proibida. Memorias/evidencia registram SHA, testes e resultado reais.
 Um segundo commit exclusivamente de evidencia/memorias pode registrar o
 primeiro push confirmado. Conferir novamente remoto e arvore limpa, sem
 amend/force ou mudanca funcional nesse fechamento.
+
+## C152 - compatibilidade do deploy Vercel - 2026-10-17
+
+Usuario apresentou erro real do import/deploy: additional property public,
+Please remove it. Latest regression wins: builds locais C151 nao validaram
+essa fronteira remota. Schema oficial atual tambem nao declara public.
+Correcao autorizada como continuacao da publicacao/commit/push ja solicitados.
+
+Preflight clone/main/origin esperado, HEAD010a2189e5c753a31ebcaaf8dadda1da98c1220e,
+arvore limpa, baseline1193 e copias anteriores em tmp/c152-vercel-public-fix.
+Contratos/lock conhecidos preservados, nenhum novo Gate. CURRENT_GATE=NONE;
+NEXT_GATE_STARTED=NAO; commit/push corretivos autorizados, sem PR/force/backend.
+
+Antes do patch: retirar somente public:false do vercel.json e substituir no
+teste C151 a expectativa desse campo pela ausencia da propriedade. Manter
+todos os outros campos/rotas/headers/build/Auth/variaveis intactos. Nao alterar
+runtime, pacote Android, catalogo/busca, Supabase ou permissoes de contas.
+Validar JSON pelo schema oficial, negativo com public injetado, suite C151
+e lock antes/depois. Como nao muda bundle/script/entry, preservar builds C151
+verificados por hashes, sem recompilar APK ou apps por esta remocao JSON.
+
+Allowlist: vercel.json (somente uma linha),
+scripts/test-c151-manager-production.mjs (somente uma expectativa),
+este contrato, docs/evidence/C11_MANAGER_VERCEL_PRODUCTION.md e3 memorias
+append-only; helpers/logs/schema privados tmp/c152-vercel-public-fix.
+Auditar baseline/segredos/stage nominal, enviar origin/main e conferir SHA
+remoto; fechamento documental separado permitido. Nenhuma operacao na conta
+Vercel xandeflix4. Deploy correto ainda depende da conta do usuario.

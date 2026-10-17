@@ -2896,3 +2896,25 @@ a configuracao dedicada Vercel e os patches C133-C150. Este fechamento e
 exclusivamente documental, sem nova mudanca funcional. Publicacao Vercel
 ainda nao iniciada: nova conta/conexao correta necessarias; nenhum uso ou
 mutacao de xandeflix4, Supabase ou dispositivos. NEXT_GATE_STARTED=NAO.
+
+
+## C152 - correcao da propriedade public rejeitada pela Vercel - 2026-10-17
+
+Erro real da imagem: additional property public, Please remove it. Retirada
+apenas essa linha do vercel.json e atualizada uma expectativa C151 para
+impedir seu retorno. Schema oficial https://openapi.vercel.sh/vercel.json
+HTTP200 nao declara public; validacao das regras por AJV passou e negativo
+com public:false reproduz additionalProperties. Somente declaracao de
+metaschema draft04 omitida no compilador AJV8, sem remover regras de dados.
+C1517 casos e locks26+27+9 antes/depois PASS. Baseline1193/1186 preservados,
+7 arquivos allowlisted, sem novas dependencias/runtime/build de bundle.
+Builds/artefatos C151 e APK149 preservados; sem alterar Supabase/Android/
+catalogo/busca/player/contas. Git corretivo autorizado pela publicacao ativa;
+resultado do push sera registrado no fechamento. Sem deploy na conta proibida.
+
+Ocorrencias operacionais: copia de backups com nomes iguais architecture/
+evidence foi recusada por COPYFILE_EXCL, preservando ambos originais; resolvido
+com nomes baseados no caminho completo antes de editar. Python jsonschema
+nao instalado; usado AJV existente, sem instalar pacote. Sem segredo em logs.
+Atual validacao corrige somente o bloqueio do schema: deploy/login remoto
+ainda precisam ser conferidos na nova conta Vercel. NEXT_GATE_STARTED=NAO.
