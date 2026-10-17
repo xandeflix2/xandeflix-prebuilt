@@ -83,3 +83,13 @@ EPG ou seguranca. Reexecutar suites afetadas e conferir os hashes de todos os
 arquivos de produto com a baseline anterior. Registrar falhas/solucoes nas
 memorias/evidencia. Esses cinco scripts ja integram os220 caminhos autorizados;
 hashes revisados devem ter registro privado separado da baseline imutavel.
+
+
+## C132 - commit e push confirmados - 2026-10-16
+
+Commit241b2b6608039157e8eb7ea3d952ade87c55f6b3 enviado a origin/main com push normal e confirmado
+independentemente por ls-remote. Divergencia0/0 e workspace limpo apos envio.
+222caminhos/blobs do commit iguais ao manifesto auditado, zero achados de
+segredos e APK C131 preservado.43verificacoes e201testes Android PASS.
+Este apendice, evidencia e memorias formam fechamento documental separado;
+nenhum arquivo funcional adicional. SHA final deve ser confirmado no remoto.

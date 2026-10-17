@@ -49,3 +49,24 @@ APKs/.env/tmp/builds/caches/chaves/dumps/catalogos reais excluidos do Git.
 Sem backend/Supabase/updater, instalacao/reset/release ou novo Gate.
 Publicacao nao substitui QA fisica pendente de launcher/anti-piscada nem
 homologa desempenho ou reproducao fora das evidencias anteriores.
+
+
+## C132 - commit e push confirmados - 2026-10-16
+
+Commit de codigo/testes/docs:
+[241b2b6608039157e8eb7ea3d952ade87c55f6b3](https://github.com/xandeflix2/xandeflix-prebuilt/commit/241b2b6608039157e8eb7ea3d952ade87c55f6b3).
+
+Push normal HEAD:main concluido; consulta independente git ls-remote retornou
+exatamente241b2b6608039157e8eb7ea3d952ade87c55f6b3, divergencia0/0, index/workspace limpos antes deste
+fechamento.222caminhos/blobs conferidos contra manifesto auditado apos commit;
+zero achados de segredos, todos os arquivos de produto/APK preservados neste
+ciclo.43verificacoes PASS e201testes Android em34suites, zero falhas/erros.
+
+Cinco ajustes limitados a fixtures, com assercoes preservadas, documentados
+antes do patch. Sem relaxamento do lock, nova funcionalidade ou alteracao no
+APK. Memorias append-only. Sem force/amend/rebase/bypass/PR, operacao de
+backend/Supabase/updater, instalacao/reset/release ou proximo Gate.
+
+Segundo commit autorizado somente para estes registros documentais; conferir
+novamente SHA remoto e workspace limpo apos seu envio e informar no resultado
+final. Artefato APK1.0.21 permanece local/ignorado e com SHA256 original.

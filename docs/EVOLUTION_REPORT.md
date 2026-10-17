@@ -2605,3 +2605,18 @@ para parental/favoritos/generos, com assercoes preservadas e reexecucao PASS.
 Nenhum arquivo de produto/APK alterado. Stage nominal, auditoria de segredos
 sanitizada e push normal somente main; confirmacao remota pendente deste
 registro inicial. Sem novo Gate, backend, instalacao/reset ou release.
+
+
+## C132 - commit e push confirmados - 2026-10-16
+
+Commit de consolidacao C107–C131 241b2b6608039157e8eb7ea3d952ade87c55f6b3,222arquivos auditados,
+enviado por push normal para main de xandeflix2/xandeflix-prebuilt. Confirmado
+independentemente por ls-remote, remoto/local iguais e divergencia0/0;
+workspace limpo antes deste fechamento.43verificacoes e201testes Android PASS.
+Zero achados de segredos; somente cinco fixtures revisadas, assercoes
+preservadas, produto/APK intocados. Memorias append-only, artefatos privados
+excluidos. Fechamento final apenas documental, com nova verificacao do SHA
+remoto depois do segundo envio. Sem force/amend/rebase/PR, backend/Supabase,
+updater, instalacao/reset/release ou novo Gate. CURRENT_GATE=NONE;
+CURRENT_LOCAL_CYCLE=C132_GIT_PUBLICATION_VERIFIED; NEXT_GATE_STARTED=NAO.
+GIT_COMMIT_AUTHORIZED=SIM; GIT_PUSH_AUTHORIZED=SIM; GIT_PR_AUTHORIZED=NAO.
