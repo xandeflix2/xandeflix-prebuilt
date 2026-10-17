@@ -76,6 +76,29 @@ LOCAL_CATALOG_SYNC_TO_BACKEND=NAO
 
 ## 2. Dados permitidos no Control Plane
 
+### C155 — credencial de autenticação web do cliente existente — 2026-10-17
+
+Emenda limitada autorizada pelo usuário e especificada em
+[C11_EXISTING_DEVICE_WEB_LOGIN.md](C11_EXISTING_DEVICE_WEB_LOGIN.md).
+Permitir somente em schema privado de autenticação: verificador protegido do
+PIN, salt/parâmetros criptográficos, contadores/prazo de bloqueio e provas
+protegidas de sessões web efêmeras com validade/revogação, vinculados ao
+dispositivo/licença existentes. Sem leitura direta por anon/authenticated,
+listagem, reveal, logs ou telemetria desses verificadores/provas.
+
+PIN plaintext somente transitório em RAM durante entrada/validação por HTTPS,
+nunca persistido ou retornado. PUK/verificador PUK, registro/políticas parentais
+e dados de conteúdo permanecem locais. ADMIN responsável/MASTER pode cadastrar
+a credencial web apenas com autorização server-side no seu escopo e auditoria
+sanitizada. A credencial não é sourceId, segredo de fonte ou novo binding.
+
+Sessão web exige os três dados válidos e autorização comercial vigente, sem
+novo usuário/dispositivo/licença/ativação nem rotação do token nativo. Ela não
+dispensa autorização de resolver/vault/C9 ou cria direito sobre outra fonte.
+Não amplia dados permitidos nos cofres, não muda catálogo/busca/EPG locais,
+playback direto, cifragem local ou as proibições de proxy e relay. Login não
+transmite fonte, stream ou conteúdo ao servidor de autenticação.
+
 ### C90 — distribuição pública de atualização Android, 2026-10-12
 
 Pedido explícito e spec [C11_APP_UPDATE_MIRRORS](C11_APP_UPDATE_MIRRORS.md)

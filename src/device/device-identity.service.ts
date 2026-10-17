@@ -13,6 +13,7 @@
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
 import type { DeviceIdentity, DeviceType, InstallationIdentity, StoredActivationState } from './device.types.ts';
 import { getDevicePresentation } from '../ui/device-presentation.ts';
+import { delegatedActivation, delegatedIdentity, delegatedInstallation, isPublicConsumerWeb, publicWebSession } from '../web-production/session-context.ts';
 
 const IDENTITY_FILE = 'device_identity.json';
 const ACTIVATION_FILE = 'device_activation.json';
@@ -332,6 +333,7 @@ export class DeviceIdentityService {
    * Gera um código de exibição legível no formato XF-XXXX-XXXX.
    */
   static generateDisplayCode(): string {
+    if (isPublicConsumerWeb()) throw new Error('WEB_DEVICE_IDENTITY_READ_ONLY');
     const bytes = new Uint8Array(8);
     if (typeof globalThis.crypto?.getRandomValues === 'function') {
       globalThis.crypto.getRandomValues(bytes);
@@ -384,6 +386,7 @@ export class DeviceIdentityService {
   }
 
   public static async persistIdentityToFilesystem(identity: DeviceIdentity): Promise<void> {
+    if (isPublicConsumerWeb()) throw new Error('WEB_DEVICE_IDENTITY_READ_ONLY');
     try {
       await Filesystem.writeFile({
         path: IDENTITY_FILE,
@@ -403,6 +406,7 @@ export class DeviceIdentityService {
    * - NO_HARDWARE_FINGERPRINT: Baseada estritamente em UUID v4 gerado localmente.
    */
   static async getOrCreateInstallationIdentity(): Promise<InstallationIdentity> {
+    if (isPublicConsumerWeb()) return delegatedInstallation();
     if (this.cachedInstallation) {
       return this.cachedInstallation;
     }
@@ -430,6 +434,7 @@ export class DeviceIdentityService {
   }
 
   public static async persistInstallationToFilesystem(identity: InstallationIdentity): Promise<void> {
+    if (isPublicConsumerWeb()) throw new Error('WEB_DEVICE_IDENTITY_READ_ONLY');
     try {
       await Filesystem.writeFile({
         path: INSTALLATION_FILE,
@@ -444,6 +449,10 @@ export class DeviceIdentityService {
    * Salva o estado de ativação no storage privado.
    */
   static async saveActivationState(state: StoredActivationState): Promise<void> {
+    if (isPublicConsumerWeb()) {
+      if (state.deviceId !== delegatedActivation().deviceId || state.deviceAuthToken !== publicWebSession().sessionToken || state.status !== 'AUTHORIZED') throw new Error('WEB_SESSION_REQUIRED');
+      return;
+    }
     this.cachedActivation = state;
     const jsonStr = JSON.stringify(state, null, 2);
 
@@ -468,6 +477,10 @@ export class DeviceIdentityService {
    * fluxo para o preflight. O token nunca é retornado nem registrado.
    */
   static async saveActivationStateVerified(state: StoredActivationState): Promise<boolean> {
+    if (isPublicConsumerWeb()) {
+      await this.saveActivationState(state);
+      return true;
+    }
     const jsonStr = JSON.stringify(state, null, 2);
 
     try {
@@ -516,6 +529,7 @@ export class DeviceIdentityService {
    * Carrega o estado de ativação previamente persistido.
    */
   static async loadActivationState(): Promise<StoredActivationState | null> {
+    if (isPublicConsumerWeb()) return delegatedActivation();
     if (this.cachedActivation) {
       return this.cachedActivation;
     }
@@ -554,6 +568,7 @@ export class DeviceIdentityService {
    * Remove o estado de ativação do dispositivo.
    */
   static async clearActivationState(): Promise<void> {
+    if (isPublicConsumerWeb()) { window.dispatchEvent(new Event('xandeflix:web-signout')); return; }
     this.cachedActivation = null;
 
     try {
@@ -579,6 +594,10 @@ export class DeviceIdentityService {
    * 3. O servidor armazena apenas o hash SHA-256; o token bruto NUNCA é retornado ou exposto desnecessariamente.
    */
   static getOrCreateDeviceAuthToken(): Promise<{ rawDeviceToken: string; deviceTokenHash: string }> {
+    if (isPublicConsumerWeb()) {
+      const token = publicWebSession().sessionToken;
+      return Promise.resolve({ rawDeviceToken: token, deviceTokenHash: computeSha256Pure(token) });
+    }
     if (this.deviceTokenPromise) return this.deviceTokenPromise;
     const promise = this.createDeviceAuthToken();
     this.deviceTokenPromise = promise;
@@ -626,6 +645,7 @@ export class DeviceIdentityService {
    * deviceAuthToken permanece como credencial interna do runtime.
    */
   static getOrCreateDeviceActivationKey(): Promise<{ rawActivationKey: string; activationKeyHash: string }> {
+    if (isPublicConsumerWeb()) return Promise.reject(new Error('WEB_DEVICE_KEY_READ_ONLY'));
     if (this.activationKeyPromise) {
       return this.activationKeyPromise;
     }
@@ -667,6 +687,7 @@ export class DeviceIdentityService {
 
   /** Remove a consumed capability so a later activation request gets a new key. */
   static async rotateDeviceActivationKey(): Promise<void> {
+    if (isPublicConsumerWeb()) throw new Error('WEB_DEVICE_KEY_READ_ONLY');
     this.activationKeyPromise = null;
     localCandidates.delete(DEVICE_ACTIVATION_KEY_FILE);
     nativeVerifiedValues.delete(DEVICE_ACTIVATION_KEY_FILE);
@@ -707,6 +728,7 @@ export const isValidDisplayCode = (code: string): boolean => {
 };
 
 export async function getOrCreateDeviceIdentity(): Promise<DeviceIdentity> {
+  if (isPublicConsumerWeb()) return delegatedIdentity();
   if (initIdentityPromise) {
     return initIdentityPromise;
   }

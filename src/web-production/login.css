@@ -1,0 +1,10 @@
+.web-login{position:fixed;inset:0;overflow-y:auto;display:grid;place-items:center;padding:24px;background:radial-gradient(ellipse at top,#31101c,#080c14 65%);color:#f8fafc;font-family:system-ui,sans-serif;box-sizing:border-box}
+.web-login-card{width:min(100%,420px);padding:32px;border:1px solid #ffffff20;border-radius:18px;background:#101521;box-sizing:border-box;box-shadow:0 20px 70px #0008}
+.web-login-brand{color:#ff1744;font-size:30px;font-weight:900;letter-spacing:-1px}.web-login-brand span{color:#fff}
+.web-login-card h1{font-size:26px;margin:24px 0 10px}.web-login-card p{color:#b9c2d3;line-height:1.5;font-size:14px}
+.web-login-card label{display:grid;gap:8px;margin-top:20px;font-size:14px;font-weight:600}
+.web-login-card input{width:100%;box-sizing:border-box;background:#090d16;border:1px solid #475569;color:#fff;padding:13px;border-radius:8px;font:inherit}
+.web-login-card input:focus-visible,.web-login-card button:focus-visible,.web-account-signout:focus-visible{outline:2px solid #ff1744;outline-offset:3px}
+.web-login-card button{width:100%;border:0;border-radius:8px;padding:14px;background:#e50914;color:#fff;font-weight:700;font-size:16px;cursor:pointer}.web-login-card button:disabled{opacity:.6;cursor:wait}
+.web-login-message{min-height:42px;margin:16px 0}.web-account-signout{position:fixed;left:14px;bottom:12px;z-index:5000;border:1px solid #ffffff30;border-radius:6px;background:#101521dd;color:#cbd5e1;padding:5px 8px;font:12px system-ui,sans-serif;cursor:pointer}
+@media(max-width:500px){.web-login{padding:16px}.web-login-card{padding:24px}}

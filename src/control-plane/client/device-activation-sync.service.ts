@@ -5,11 +5,13 @@ import { getControlPlaneClient } from './control-plane-client.ts';
 import { InstallationRegistryService } from './installation-registry.service.ts';
 import { activationDeadline } from './activation-timeout.ts';
 import type { LicenseMode, StoredActivationState } from '../../device/device.types.ts';
+import { isPublicConsumerWeb } from '../../web-production/session-context.ts';
 
 let requestPromise: Promise<boolean> | null = null;
 let syncPromise: Promise<StoredActivationState | null> | null = null;
 
 export function ensurePendingDeviceActivationRequest(): Promise<boolean> {
+  if (isPublicConsumerWeb()) return Promise.resolve(false);
   if (requestPromise) return requestPromise;
   const promise = ensurePendingRequest();
   requestPromise = promise;
@@ -83,6 +85,7 @@ async function ensurePendingRequest(): Promise<boolean> {
 }
 
 export function syncPendingDeviceActivation(): Promise<StoredActivationState | null> {
+  if (isPublicConsumerWeb()) return DeviceIdentityService.loadActivationState();
   if (syncPromise) return syncPromise;
   const promise = syncPendingActivation();
   syncPromise = promise;

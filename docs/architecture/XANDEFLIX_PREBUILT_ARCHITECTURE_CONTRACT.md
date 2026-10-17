@@ -95,3 +95,24 @@ sem depender de diretorios preexistentes. Mudancas devem preservar esse fluxo
 sob [C11_NEW_DEVICE_ACTIVATION_AND_CATALOG_LOCK_V1](C11_NEW_DEVICE_ACTIVATION_LOCK.md).
 Playback permanece independente, device-to-source e sujeito a autorizacao;
 falha de reproducao nao autoriza recriar identidade/chave nem contornar licenca.
+
+## 7. Emenda limitada C155 — acesso web com dispositivo existente
+
+Em 2026-10-17, o usuario autorizou a emenda especificada em
+[C11_EXISTING_DEVICE_WEB_LOGIN.md](C11_EXISTING_DEVICE_WEB_LOGIN.md).
+Exclusivamente no consumidor web publico /app, acesso exige codigo do
+dispositivo, chave permanente e PIN cadastrado, com validacao real no servidor.
+Nao gerar identidade/chave, usuario, licenca ou ativacao para o navegador:
+usar sessao delegada, efemera e revogavel do dispositivo/licenca existentes,
+sem copiar, rotacionar ou substituir o token original do aparelho.
+
+Permitir somente verificador protegido de PIN em autenticacao privada do
+Control Plane; PIN plaintext, PUK, registro parental e dados de conteudo nao
+sao persistidos remotamente por essa excecao. Gestor autorizado pode cadastrar
+a credencial web dentro de seu escopo; nao ganha reset/reveal de PIN/PUK local.
+Licenca, revogacao, limites C9, source delivery protegido, catalogo/busca locais
+e playback direto permanecem obrigatorios. Nao autoriza proxy ou relay.
+
+A secao6 e o lock continuam integrais para instalacoes nativas Android/TV/Fire
+Stick. A excecao web nao relaxa testes ou autoriza alterar APKs. Documentacao
+nao comprova implementacao, implantacao ou reproducao em producao.

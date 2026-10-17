@@ -14,6 +14,7 @@ import type { DeviceSourceResolverClient } from '../../security/device-self-serv
 import { getSupabaseRuntimeConfig } from './runtime-config.ts';
 
 let clientInstance: SupabaseClient | undefined;
+declare const __XANDEFLIX_WEB_PUBLIC__: boolean;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
@@ -53,11 +54,13 @@ export function getSupabaseBrowserClient(): SupabaseClient | undefined {
   }
 
   try {
+    const publicConsumer = typeof __XANDEFLIX_WEB_PUBLIC__ !== 'undefined' && __XANDEFLIX_WEB_PUBLIC__;
     clientInstance = createClient(config.url, config.key, {
       auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-        detectSessionInUrl: true,
+        persistSession: !publicConsumer,
+        autoRefreshToken: !publicConsumer,
+        detectSessionInUrl: !publicConsumer,
+        ...(publicConsumer ? { storageKey: 'xandeflix.consumer.auth' } : {}),
       },
     });
     return clientInstance;

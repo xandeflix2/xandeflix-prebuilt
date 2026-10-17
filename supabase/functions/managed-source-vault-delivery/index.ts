@@ -248,7 +248,7 @@ async function deliver(request: Request): Promise<Response> {
     SELECT device_id, status
     FROM public.devices
     WHERE device_id = ${deviceId}
-      AND device_token_hash = ${tokenHash}
+      AND (device_token_hash = ${tokenHash} OR private.c155_web_session_id(device_id, ${deviceAuthToken}) IS NOT NULL)
     LIMIT 1
   `;
   const device = deviceRows[0] as RecordValue | undefined;

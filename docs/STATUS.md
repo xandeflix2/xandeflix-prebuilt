@@ -2685,3 +2685,72 @@ projeto novo apos liberacao. Alterar nome do projeto sozinho nao comprova
 reatribuicao do dominio. Este fechamento altera somente evidencia/memorias.
 Publicacao /app concluida; troca de dominio ainda nao concluida.
 CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO.
+
+
+## C155 - verificacao do login web existente, implementacao pendente - 2026-10-17
+
+Usuario exige codigo/chave/PIN de dispositivo existente, sem nova identidade,
+usuario ou ativacao web; relato de falha apos ativar prevalece sobre C154, que
+certificou somente entry/tela de ativacao. Preflight clone/main/origin limpos,
+HEAD8d0db6a, baseline1202; spec/evidencia C11_EXISTING_DEVICE_WEB_LOGIN.md.
+Codigo atual usa primeira instalacao. PIN/verificador parental e local e token
+interno nao e chave permanente. Nao clonar identidade/token nem inventar
+autorizacao local. Sessao web precisa validacao real dos tres dados no servidor.
+
+Usuario autorizou mesmo PIN apenas se contratos permitirem. C126:18-21 e31-32
+proibe rede/Supabase/gestor para PIN e sincronizacao de verificadores. Emenda
+limitada concreta foi perguntada; ainda pendente. C126 permanece intacto.
+Conexao Supabase do agente lista somente projeto alheio; nenhuma query privada,
+migration ou deploy tentado. Usuario pediu orientacao de reconexao e recebeu
+passos Plugins/Instalados e conta/organizacao do projeto cujbmyhitgomlgwfkaat,
+sem pedir senhas ou chaves. Dependencias de plugin nao resolvidas por schema/
+referencia, sem reinstalar ou modificar permissoes. Leituras presumidas e globs
+Windows falhos corrigidos com inventario/filtros rg; MIME markdown do changelog
+contornado com GET publico em RAM. Lock26+27+9+6 PASS antes do codigo futuro.
+Somente documentacao de preparacao; sem patch funcional, novo build/deploy/Git,
+backend, reset ou mutacao de identidades/Android. Falha Catalogo ainda sem
+codigo de transporte/validacao para atribuir causa. CURRENT_GATE=NONE;
+NEXT_GATE_STARTED=NAO.
+
+## C155 — emenda limitada de autenticacao web autorizada — 2026-10-17
+
+Usuario autorizou expressamente a emenda apos conferir AGENTS/Architecture.
+Reconciliados C126, Architecture, Source Boundary e Activation Lock para
+codigo/chave/PIN de cliente existente, verificador privado protegido, gestor
+com escopo e sessao delegada sem nova identidade/ativacao ou rotacao do token
+nativo. PUK/registro parental/conteudo locais; licenca/C9 e midia direta
+preservados. Mesmo PIN requer cadastramento autenticado, nao upload automatico
+do verificador local. Sexto PIN errado bloqueia3h por autoridade do servidor.
+Allowlist documental registrada antes; snapshots9, baseline1202 preservada.
+Usuario informou reconexao, mas list_projects ainda nao mostra projeto alvo e
+get_project(cujbmyhitgomlgwfkaat) recusa permissao. Implantacao depende desse
+acesso; aprovacao da emenda resolvida. Patch documental inicialmente recusado
+por contexto sem acentos, corrigido por leitura UTF8, sem aplicacao parcial.
+Sem alteracao funcional, migration/deploy/Git, APK ou instalacao. Login web
+ainda nao implementado/publicado. CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO.
+
+Auditoria documental C155 PASS:7 rastreados+2 novos na allowlist;1195/1202 hashes
+preservados,9 snapshots,15 links e3 memorias append-only. Lock pos-emenda
+26+27+9+6 PASS; diff --check PASS. Runtime/Android/backend/testes intactos;
+emenda concluida localmente, login real ainda depende do acesso administrativo.
+A seguir, registro append-only C155 funcional — 2026-10-17.
+
+
+## C155 — login web implementado; backend validado; frontend pronto — 2026-10-17
+
+Conexao canonica cujbmyhitgomlgwfkaat resolvida com link_id da organizacao
+Xandeflix Prebuilt. Emenda autorizada implementada: /app exige codigo/chave/PIN
+antes do App; sem nova identidade/ativacao, sessao delegada em RAM e storage
+isolado. Painel Dispositivos permite cadastrar PIN web; PIN local nao enviado
+automaticamente, PUK preservado. Backend3 migrations e2 funcoes implantados.
+SQL rollback e HTTPS sintetico reais PASS, sexto erro paralelo bloqueia3h
+com hora do servidor, revogacao/PIN/chave/logout/C9 preservam token nativo.
+Fixture sem fonte/conteudo removido integralmente, nenhum cliente real editado.
+Lock26+27+9+6, parental16, C9 runtime10 e deliveryA-F PASS; site:build completo
+com C1517/C1548/C15511 PASS. Chrome isolado login/storage/IDB reais PASS.
+Auditoria1202:1184 hashes preservados,18 alterados+15 novos permitidos,
+memorias append-only, APK C149 intacto, sem segredos privados nos artefatos.
+Wrapper C9 antigo limitado por scriptC8 ausente no baseline; nao relaxado.
+Codigo/frontend local e backend concluidos; commit/push/Vercel seguintes
+ja autorizados. Playback de fonte real nao homologado. Sem APK/instalacao.
+CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO. Contrato/evidencia C155 detalham.

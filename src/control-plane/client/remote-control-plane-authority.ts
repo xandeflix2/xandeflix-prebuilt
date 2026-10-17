@@ -18,6 +18,7 @@ import type {
 } from '../device-reactivation.types.ts';
 import { ControlPlaneCrypto } from '../crypto/control-plane-crypto.ts';
 import type { ControlPlaneEngine } from '../engine/control-plane-engine.ts';
+declare const __XANDEFLIX_WEB_PUBLIC__: boolean;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
@@ -58,7 +59,8 @@ export class SupabaseRemoteControlPlaneAuthority implements RemoteControlPlaneAu
   async resolveAuthorizedDeviceSource(
     req: SourceResolutionRequest
   ): Promise<RemoteSourceAuthorizationMetadata> {
-    const deviceTokenHash = await ControlPlaneCrypto.sha256(req.deviceAuthToken);
+    const deviceTokenHash = typeof __XANDEFLIX_WEB_PUBLIC__ !== 'undefined' && __XANDEFLIX_WEB_PUBLIC__
+      ? req.deviceAuthToken : await ControlPlaneCrypto.sha256(req.deviceAuthToken);
     const { data, error } = await this.rpcClient.rpc('rpc_resolve_authorized_source_metadata', {
       p_device_id: req.deviceId,
       p_device_token_hash: deviceTokenHash,

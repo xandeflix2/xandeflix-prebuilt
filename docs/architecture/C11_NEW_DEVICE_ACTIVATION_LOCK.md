@@ -160,3 +160,23 @@ prévia C11_LIVE_FULLSCREEN_GESTURES.md. Permite somente evento de gesto nativo
 sanitizado e reutilização do fullscreen do preview autorizado existente; não
 altera ativação/autoridade/C9/source. Lock/prebuild e preservação in-place dos
 dois alvos continuam obrigatórios; nenhuma rotação/reset/Git ou próximo Gate.
+
+## Exceção limitada C155 — consumidor web público — 2026-10-17
+
+Pedido explícito posterior: entrar no /app com código do dispositivo, chave
+permanente e PIN do cliente existente, sem ativar novo usuário/dispositivo.
+Emenda autorizada e limites em
+[C11_EXISTING_DEVICE_WEB_LOGIN.md](C11_EXISTING_DEVICE_WEB_LOGIN.md).
+
+Somente esse entry web público deve usar uma sessão delegada validada no
+servidor, sem gerar/copiar identidade ou chave de ativação, criar instalação
+de ativação ou substituir o token original do aparelho. Sessão não é nova
+identidade, licença ou autorização comercial. Sem login real, não importar o
+boot de primeira instalação. Android/TV/Fire Stick e demais instalações
+nativas continuam sujeitos a todas as invariantes acima, sem alteração.
+
+O lock e seu prebuild permanecem obrigatórios e integrais; não modificar
+asserções/negativos para aceitar a exceção. Implementação web exige testes
+adicionais de três fatores, não geração e preservação dos aparelhos existentes,
+além de revogação/licença/C9. Nenhuma implementação, deploy ou APK é realizado
+pela emenda documental. NEXT_GATE_STARTED=NAO.

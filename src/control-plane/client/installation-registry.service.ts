@@ -20,6 +20,7 @@ import type {
 } from '../control-plane.types.ts';
 
 export const CANONICAL_PACKAGE_NAME = 'com.xandeflix.prebuilt';
+declare const __XANDEFLIX_WEB_PUBLIC__: boolean;
 
 export class InstallationRegistryService {
   private static lastReportedAtMs = 0;
@@ -31,6 +32,7 @@ export class InstallationRegistryService {
    * Garantia: Nunca lança exceção em caso de erro.
    */
   static reportInstallationBestEffort(): Promise<AppInstallationReportResponse | null> {
+    if (typeof __XANDEFLIX_WEB_PUBLIC__ !== 'undefined' && __XANDEFLIX_WEB_PUBLIC__) return Promise.resolve(null);
     if (this.reportPromise) return this.reportPromise;
     const promise = this.reportInstallation();
     this.reportPromise = promise;

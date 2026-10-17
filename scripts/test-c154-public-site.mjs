@@ -30,6 +30,7 @@ async function bootstrap(options = {}) {
   // Observe the real asynchronous import without loading App or a source.
   const imports = {
     '../manager/public-config.ts': config, '../web/validation.ts': validation,
+    './login.ts': { requireWebLogin: async () => {} },
   };
   const run = vm.runInContext(`(function(require,exports,module,__dirname){${transpile('src/web-production/main.ts')}\n})`, context);
   run((name) => {

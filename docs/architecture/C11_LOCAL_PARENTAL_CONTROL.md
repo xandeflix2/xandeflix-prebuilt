@@ -19,6 +19,8 @@ CURRENT_GATE=NONE; CURRENT_LOCAL_CYCLE=C126. Não autoriza Git/backend/install/r
   licença, chave de ativação e source. Sem rede/Supabase/gestor/telemetria de PIN,
   PUK, preferências, classificações ou associações conteúdo-usuário. Catálogo,
   índices e fontes canônicos não são reescritos. Acesso comercial/C9 mantidos.
+  Exceção posterior e estritamente limitada: o verificador de autenticação web
+  C155 descrito ao final; as demais proibições continuam obrigatórias.
 - PIN seis dígitos com confirmação. PUK gerado aleatoriamente128bits como
   sugestão, editável pelo responsável (16–64 caracteres), confirmação e aviso
   para guardar fora do aparelho. Armazenar somente verificadores PBKDF2-HMAC-
@@ -28,8 +30,9 @@ CURRENT_GATE=NONE; CURRENT_LOCAL_CYCLE=C126. Não autoriza Git/backend/install/r
   confirmado, preservando preferências, sem abrir conteúdo automaticamente.
 - Android: registro próprio cifrado AES-GCM com chave Android Keystore e prefs
   separadas/excluídas de backup/transferência; não reutilizar cofre de source.
-  Web/TV sem bridge: verificadores em armazenamento local da origem; sem
-  sincronização. Não prometer resistência a root/ADB, app modificado, ferramentas
+  Web/TV sem bridge: verificadores parentais em armazenamento local da origem;
+  sem sincronização do registro parental. A credencial web C155 é separada,
+  conforme emenda abaixo. Não prometer resistência a root/ADB, app modificado, ferramentas
   do navegador ou remoção de dados do SO. Não oferecer botão limpar/reset sem
   segredo. Registro corrompido/I/O/crypto indisponíveis falham fechado, nunca
   são tratados como primeira configuração. Escrita deve ser verificada.
@@ -126,3 +129,41 @@ permissao de exibir capa/titulo quando a sessao adulta termina, a protecao e
 reativada, uma regra muda ou o storage entra em erro. Invalidar o escopo local
 dos IDs aprovados antes do proximo efeito assincrono; testar a busca aberta
 durante o relock, alem de Home e preview. Nenhuma alteracao do indice/source.
+
+## Emenda limitada C155 — mesmo PIN para autenticação web — 2026-10-17
+
+Autorização explícita do usuário: prosseguir com a emenda limitada para acesso
+web com os dados do cliente existente. Escopo, provisionamento e critérios em
+[C11_EXISTING_DEVICE_WEB_LOGIN.md](C11_EXISTING_DEVICE_WEB_LOGIN.md).
+
+Substitui exclusivamente a proibição de uma credencial remota derivada do PIN
+para autenticação web. Permite verificador protegido em schema privado do
+Control Plane, separado do registro parental e dos cofres de fonte. PIN não é
+persistido em texto nem aparece em respostas, listagens, logs ou telemetria.
+Verificador remoto usa salt próprio, KDF forte e proteção adicional exclusiva
+do servidor; não exportar nem reutilizar verificador/salt do aparelho.
+
+O mesmo valor de seis dígitos pode ser cadastrado após validação local do PIN
+atual no aparelho autenticado. PINs existentes não ficam automaticamente
+disponíveis ao servidor; o cadastramento exige fluxo autenticado. Gestor ADMIN
+responsável ou MASTER pode criar/alterar a credencial de entrada web no seu
+escopo, com autorização no servidor e auditoria sanitizada. Nunca revelar PIN
+salvo nem redefinir silenciosamente o PIN parental do aparelho. Alterar PIN
+web revoga suas sessões; compartilhar o novo valor com o parental exige
+confirmação no fluxo local já protegido, sem contornar PIN/PUK existentes.
+
+PUK e seu verificador, políticas, classificações, restrições, preferências,
+histórico e associações de conteúdo continuam exclusivamente locais. Não há
+sincronização do registro parental nem recuperação remota do PUK. O PIN não
+cria binding de fonte, identidade, licença ou direito de reprodução. C9,
+autorização comercial, filtros e grants parentais existentes permanecem.
+
+Login web exige código/chave permanentes e PIN cadastrados, validados no
+servidor. Sexto PIN incorreto bloqueia por três horas com contador atômico e
+relógio do servidor; sem bypass por reload, concorrência ou relógio local.
+Sessão delegada não cria novo usuário/dispositivo/ativação nem substitui o
+token original do aparelho. Catálogo/busca locais e playback direto mantidos.
+
+Esta emenda é normativa e documental: não implanta banco, endpoints, login ou
+atualização dos aparelhos. Demais regras C126 e emendas posteriores, inclusive
+controle de tentativas local, permanecem. NEXT_GATE_STARTED=NAO.

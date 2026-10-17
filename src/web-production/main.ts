@@ -1,5 +1,6 @@
 import { resolveManagerPublicConfig } from '../manager/public-config.ts';
 import { requireSecureWebContext } from '../web/validation.ts';
+import { requireWebLogin } from './login.ts';
 
 declare const __XANDEFLIX_APP_PUBLIC_CONFIG__: { url: string; publishableKey: string };
 
@@ -14,7 +15,8 @@ async function startPublicApplication(): Promise<void> {
       __XANDEFLIX_RUNTIME_CONFIG__?: { supabase: { url: string; publishableKey: string } };
     };
     runtime.__XANDEFLIX_RUNTIME_CONFIG__ = { supabase: { url: config.url, publishableKey: config.key } };
-    // App modules may initialize services on import; install config first.
+    // Never import native first-installation services before server authentication.
+    await requireWebLogin();
     await import('../main.tsx');
   } catch {
     const root = document.getElementById('root');

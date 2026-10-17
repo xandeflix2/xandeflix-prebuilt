@@ -17,6 +17,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './ManagerPanelPage.css';
 import { managerSections, type ManagerSection } from './manager-access.ts';
 import { ManagerDeviceDeletion } from './ManagerDeviceDeletion.tsx';
+import { ManagerWebPin } from './ManagerWebPin.tsx';
 import { ManagerUsersView } from './ManagerUsersView.tsx';
 import { ManagerMultiDeviceContact } from './ManagerMultiDeviceContact.tsx';
 import { ManagerPlaybackErrors } from './ManagerPlaybackErrors.tsx';
@@ -2259,6 +2260,7 @@ export const ManagerPanelPage: React.FC<ManagerPanelPageProps> = ({ onBack }) =>
                             </span>
                           </div>
 
+                          {d.status === 'AUTHORIZED' && <ManagerWebPin deviceId={d.deviceId} />}
                           <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
                             Licença:{' '}
                             <code style={{ color: '#a78bfa', backgroundColor: '#0c111e', padding: '0.15rem 0.35rem', borderRadius: '3px' }}>
