@@ -58,11 +58,20 @@ const shell={getAttribute:key=>attributes.get(key)??null,hasAttribute:key=>attri
 stage()({root:{current:{closest:selector=>selector==='.app-shell'?shell:{},classList:{add:c=>classes.add(c),remove:c=>classes.delete(c)},querySelector:()=>({focus:()=>heroFocused++})}},snapshot:'fire',onPreparing:v=>preparing.push(v)});
 const cleanups=flush();assert.deepEqual(preparing,[true]);assert.ok(classes.has('home-page--startup-check'));
 assert.equal(attributes.has('data-startup-isolated'),true);assert.equal(attributes.has('inert'),true);
-updateStage(pendingSample);finishStage();assert.deepEqual(preparing,[true,false]);assert.equal(heroFocused,1);assert.equal(classes.size,0);
+updateStage(pendingSample);
+for(const key of ['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Tab','Enter',' ','Escape','BrowserBack','Backspace','Unidentified']){
+  let prevented=0,stopped=0;
+  listeners.get('keydown')({key,keyCode:key==='Unidentified'?23:0,preventDefault(){prevented++;},stopImmediatePropagation(){stopped++;}});
+  assert.equal(prevented,1,`consume ${key}`);assert.equal(stopped,1,`isolate ${key}`);
+  assert.deepEqual(preparing,[true],`${key} must never release pending preparation`);
+  assert.equal(cancelled,0);assert.equal(heroFocused,0);assert.equal(attributes.has('inert'),true);
+}
+finishStage();assert.deepEqual(preparing,[true,false]);assert.equal(heroFocused,1);assert.equal(classes.size,0);
 assert.equal(listeners.size,0,'D-pad must be released immediately on entering, before React cleanup');
 assert.equal(attributes.size,0,'Shell isolation must be restored on entering');
 cleanups.forEach(fn=>fn());assert.equal(listeners.size,0);assert.ok(cancelled>=1);
 console.log('PASS_REAL_COMPONENT_PHONE_SKIP_FIRE_PREPARE_FINISH_FOCUS_DPAD_RELEASE_LISTENER_CLEANUP');
+console.log('PASS_PENDING_PREPARATION_NAVIGATION_OK_SPACE_BACK_CANNOT_ENTER_EARLY');
 
 let fireClass=false,observers=0;
 globalThis.MutationObserver=class {constructor(){observers++;}observe(){}disconnect(){}};

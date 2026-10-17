@@ -18,6 +18,7 @@ import { useCategoryPreviews } from '../hooks/useCategoryPreviews.ts';
 import type { HomeCollectionId } from './HomeCollectionPage.tsx';
 import { useSeriesHighlights } from '../hooks/useSeriesHighlights.ts';
 import { prioritizeSeries } from '../../catalog/series-content-updates.ts';
+import { isAdultClassification } from '../../playback/content-adult-policy.ts';
 
 export interface CatalogBrowsePageProps {
   readModel: CatalogReadModel;
@@ -33,7 +34,8 @@ export function CatalogBrowsePage({ kind, readModel, onSelectItem, categoryId, o
   const heroPlayback = useHeroPlayback(readModel);
   const title = movie ? 'Filmes' : 'Séries';
   const snapshot = readModel.catalog.metadata.snapshotId;
-  const categories = useMemo(() => readModel.getCategoriesForKind(movie ? 'movie' : 'series'), [readModel, movie]);
+  const categories = useMemo(() => readModel.getCategoriesForKind(movie ? 'movie' : 'series')
+    .filter(category => !isAdultClassification(category.name)), [readModel, movie]);
   const category = categories.find(row => row.id === categoryId);
   const collection = categoryId !== undefined;
   const latestSourceFirst = movie && Boolean(category && isReleaseCategory(category.name));

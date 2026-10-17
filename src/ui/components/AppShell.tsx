@@ -15,6 +15,7 @@ import { useDevicePresentation } from '../hooks/useDevicePresentation.ts';
 import { useParentalControl } from '../hooks/useParentalControl.ts';
 import { parentalControl } from '../../parental/parental-control.store.ts';
 import { ParentalPinDialog } from './ParentalPinDialog.tsx';
+import { StartupLoadingScreen } from './StartupLoadingScreen.tsx';
 
 interface AppShellProps {
   currentView: AppView;
@@ -59,6 +60,7 @@ export const AppShell: React.FC<AppShellProps> = ({
       && !(navigator as Navigator & { userAgentData?: { mobile?: boolean } }).userAgentData?.mobile));
   const detailPage = currentView === 'movie-detail' || currentView === 'series-detail';
   const remoteBackOnly = television && (currentView === 'movies' || currentView === 'series' || detailPage);
+  if (parental.status === 'loading') return <StartupLoadingScreen stage="reading"/>;
   return (
     <div className={`app-shell${television ? ' app-shell--television' : ''}${androidTv ? ' app-shell--android-tv' : ''}${squareLive ? ' app-shell--square-display' : ''}${fireStick ? ' app-shell--fire-stick' : ''}${tablet ? ' app-shell--tablet' : ''}${tabletPortrait ? ' app-shell--tablet-portrait' : ''}${squareLivePage ? ' app-shell--live-square' : ''}${currentView === 'live' && stackedLive ? ' app-shell--live-stacked' : ''}${sideNavigation ? ' app-shell--side-nav' : ''}${sideNavigation && currentView === 'live' ? ' app-shell--live-view' : ''}${currentView === 'live' ? ' app-shell--live-page' : ''}${currentView === 'home' ? ' app-shell--home-page' : ''}${currentView === 'movies' || currentView === 'series' || currentView === 'search' || currentView === 'activation' || currentView === 'settings' || detailPage ? ' app-shell--phone-header-back' : ''}${detailPage ? ' app-shell--phone-detail-page' : ''}`}>
       <Header
@@ -87,8 +89,7 @@ export const AppShell: React.FC<AppShellProps> = ({
             {tablet && detailPage && <CastButton iconOnly />}
           </div>
         )}
-        {parental.status === 'loading' ? <p role="status">Lendo preferências deste aparelho…</p>
-          : parental.status === 'error' && currentView !== 'settings' && currentView !== 'parental-control'
+        {parental.status === 'error' && currentView !== 'settings' && currentView !== 'parental-control'
             ? <div role="alert"><p>A proteção local está indisponível. O acesso ao catálogo permanece bloqueado.</p><button className="focusable-item btn-secondary" type="button" onClick={() => onNavigate('settings')}>Abrir configurações</button></div> : children}
       </div>
       <ParentalPinDialog/>

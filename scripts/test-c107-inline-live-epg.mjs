@@ -10,7 +10,7 @@ const channel={id:'synthetic',name:'Synthetic channel',groupId:'group',streamRef
 await test('WIDE_GUIDE_EMBEDDED_OPEN_MOBILE_FOOTER_AND_SQUARE_UNCHANGED',()=>{
  for(const[isMobile,squareLive]of [[false,false],[true,false],[false,true],[true,true]]){
   const module={exports:{}},code=ts.transpileModule('module.exports=('+expression+');',{compilerOptions:{jsx:ts.JsxEmit.React,module:ts.ModuleKind.CommonJS}}).outputText;
-  const LiveEpgPanel=()=>null;new Function('React','module','isMobile','squareLive','selectedChannel','isEpgOpen','setIsEpgOpen','liveCatalog','LiveEpgPanel','favoriteButton',code)(React,module,isMobile,squareLive,channel,false,()=>{}, {groups:[]},LiveEpgPanel,React.createElement('button',{type:'button','aria-label':'Favoritar canal'},'★'));
+  const LiveEpgPanel=()=>null;new Function('React','module','isMobile','squareLive','selectedChannel','isEpgOpen','setIsEpgOpen','liveCatalog','LiveEpgPanel','favoriteButton','guideChannel','browsingGuide',code)(React,module,isMobile,squareLive,channel,false,()=>{}, {groups:[]},LiveEpgPanel,React.createElement('button',{type:'button','aria-label':'Favoritar canal'},'★'),channel,false);
   const find=n=>!n||typeof n!=='object'?undefined:n.type===LiveEpgPanel?n:Array.isArray(n)?n.map(find).find(Boolean):find(n.props?.children),panel=find(module.exports);assert.ok(panel);
   if(!isMobile&&!squareLive){assert.equal(panel.props.embedded,true);assert.equal(panel.props.inline,true);assert.equal(panel.props.open,true);}
   else{assert.equal(panel.props.embedded,undefined);assert.equal(panel.props.inline,squareLive);assert.equal(panel.props.open,squareLive);}

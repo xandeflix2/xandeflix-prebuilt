@@ -15,6 +15,9 @@ export function ParentalPinDialog() {
     window.addEventListener('xandeflix:parental-back', back);
     return () => { window.removeEventListener('xandeflix:parental-back', back); element.close(); if (origin?.isConnected) origin.focus({ preventScroll: true }); };
   }, [state.prompt?.id]);
+  useEffect(() => {
+    if (state.prompt && !state.busy && error) dialog.current?.querySelector<HTMLInputElement>('input')?.focus();
+  }, [state.prompt?.id, state.busy, error]);
   if (!state.prompt) return null;
   const id = state.prompt.id;
   return <dialog ref={dialog} data-detail-modal className="parental-dialog" aria-labelledby="parental-pin-title"

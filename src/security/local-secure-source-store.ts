@@ -1,4 +1,5 @@
 import { Capacitor, registerPlugin } from '@capacitor/core';
+import { webValidationBuild } from '../web/validation.ts';
 
 export type LocalSourceProtocol = 'M3U' | 'XTREAM';
 
@@ -102,6 +103,7 @@ export interface NativeLocalSecureSourceStorePlugin {
 
 export const NativeLocalSecureSourceStore = registerPlugin<NativeLocalSecureSourceStorePlugin>(
   LOCAL_SECURE_SOURCE_STORE_PLUGIN,
+  webValidationBuild && !Capacitor.isNativePlatform() ? { web: () => import('../web/web-source-store.ts').then(m => new m.WebSourceStore()) } : {},
 );
 
 const SOURCE_ID_PATTERN = /^(src|csrc)_[a-z0-9]+$/;

@@ -15,9 +15,11 @@ interface Props {
   total: number;
   seed?: LiveChannelPage;
   selectedId?: string;
-  request: { offset: number; nonce: number; focus: boolean };
+  request: { offset: number; nonce: number; focus: boolean; index?: number };
   loadPage: (offset: number, signal: AbortSignal) => Promise<LiveChannelPage>;
   onSelect: (channel: LiveChannel) => void;
+  onInspect?: (channel: LiveChannel) => void;
+  focusBlocked?: boolean;
   onFavorite?: (channel:LiveChannel)=>void;
   isFavorite?: (channel:LiveChannel)=>boolean;
   favoriteReady?: boolean;
@@ -27,7 +29,7 @@ interface Props {
 }
 
 /** Continuous scroll over local pages; only the visible rows and three pages live in RAM. */
-export function ContinuousLiveChannelList({ total, seed, selectedId, request, loadPage, onSelect, onWindowPage, onFavorite, isFavorite, favoriteReady=false, pressScope, onFocusFavorite }: Props) {
+export function ContinuousLiveChannelList({ total, seed, selectedId, request, loadPage, onSelect, onInspect, focusBlocked = false, onWindowPage, onFavorite, isFavorite, favoriteReady=false, pressScope, onFocusFavorite }: Props) {
   const list = useRef<HTMLDivElement>(null);
   const pages = useRef(new Map<number, LiveChannelPage>());
   const controller = useRef<AbortController | null>(null);
@@ -78,7 +80,7 @@ export function ContinuousLiveChannelList({ total, seed, selectedId, request, lo
     const element = list.current;
     if (!element || appliedRequest.current === request.nonce) return;
     const position = seed?.offset === request.offset ? seed.channels.findIndex(channel => channel.id === selectedId) : -1;
-    const index = request.offset + Math.max(0, position);
+    const index = request.index ?? request.offset + Math.max(0, position);
     if (index > 0 && count === 0) return;
     appliedRequest.current = request.nonce;
     if (request.focus) pendingFocus.current = index;
@@ -122,8 +124,8 @@ export function ContinuousLiveChannelList({ total, seed, selectedId, request, lo
     if (page) onWindowPage?.(page);
     const index = pendingFocus.current;
     const target = index !== null ? list.current?.querySelector<HTMLElement>(`[data-live-index="${index}"]`) : null;
-    if (target) { pendingFocus.current = null; target.focus({ preventScroll: true }); }
-  }, [revision, range.start, scrollTop, onWindowPage, request.nonce]);
+    if (target && !focusBlocked) { pendingFocus.current = null; target.focus({ preventScroll: true }); }
+  }, [revision, range.start, scrollTop, onWindowPage, request.nonce, focusBlocked]);
 
   const moveFocus = useCallback((index: number) => {
     const element = list.current;
@@ -152,6 +154,8 @@ export function ContinuousLiveChannelList({ total, seed, selectedId, request, lo
         {channel ? <button type="button" data-live-channel={channel.id} data-live-index={index}
           className={`focusable-item live-continuous-channel${channel.id === selectedId ? ' active-channel' : ''}`}
           aria-label={`${channel.name}${favorite?' — Favorito':''}`}
+          onFocus={() => onInspect?.(channel)}
+          onPointerEnter={event => { if (event.pointerType === 'mouse') onInspect?.(channel); }}
           onClick={() => press.current?.click(channel)}
           onPointerDown={event=>{if(onFavorite&&favoriteReady&&event.isPrimary&&event.button===0)press.current?.pointerDown(channel,event.pointerId,event.clientX,event.clientY);}}
           onPointerMove={event=>press.current?.pointerMove(event.pointerId,event.clientX,event.clientY)}

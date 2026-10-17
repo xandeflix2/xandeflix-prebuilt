@@ -54,6 +54,7 @@ import { ActivationHandoff } from '../components/ActivationHandoff.tsx';
 
 interface ActivationPageProps {
   onBack: () => void;
+  showBackButton?: boolean;
   onOpenSettings?: () => void;
   onOpenSourceSetup?: () => void;
   onCatalogImported?: () => Promise<void> | void;
@@ -61,10 +62,18 @@ interface ActivationPageProps {
 
 export const ActivationPage: React.FC<ActivationPageProps> = ({
   onBack,
+  showBackButton = true,
   onOpenSettings,
   onOpenSourceSetup,
   onCatalogImported,
 }) => {
+  const pageRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const page = pageRef.current;
+    if (page?.closest('.app-shell--television') && !page.contains(document.activeElement)) {
+      page.querySelector<HTMLElement>('.focusable-item:not([disabled])')?.focus({ preventScroll: true });
+    }
+  }, []);
   const [deviceId, setDeviceId] = useState('');
   const [displayCode, setDisplayCode] = useState('XF-....-....');
   const [deviceType, setDeviceType] = useState<DeviceType>('TV');
@@ -696,6 +705,7 @@ export const ActivationPage: React.FC<ActivationPageProps> = ({
 
   return (
     <div
+      ref={pageRef}
       className="activation-page activation-page--simple"
       style={{
         minHeight: '100vh',
@@ -735,7 +745,7 @@ export const ActivationPage: React.FC<ActivationPageProps> = ({
               Xandeflix Ativação
             </h1>
           </div>
-          <button
+          {showBackButton && <button
             type="button"
             className="focusable-item"
             onClick={onBack}
@@ -749,7 +759,7 @@ export const ActivationPage: React.FC<ActivationPageProps> = ({
             }}
           >
             ← Voltar
-          </button>
+          </button>}
         </div>
 
         {/* Card de Identidade do Dispositivo */}
@@ -869,7 +879,7 @@ export const ActivationPage: React.FC<ActivationPageProps> = ({
           </button>
           {isSupportOpen && <div id="activation-support-details">
             <p>Consulte e copie o diagnóstico para enviar ao gestor em caso de erro.</p>
-            <pre className="activation-page__diagnostic">{diagnosticText}</pre>
+            <pre className="activation-page__diagnostic focusable-item" tabIndex={0} role="region" aria-label="Diagnóstico de ativação. Use cima e baixo para rolar.">{diagnosticText}</pre>
             <button type="button" className="focusable-item activation-page__secondary" onClick={() => {
               void copyActivationText(diagnosticText)
                 .then(() => setDiagnosticCopyFeedback('Diagnóstico copiado. Envie ao gestor para análise.'))

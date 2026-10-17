@@ -6,6 +6,7 @@ import { isFireTvPresentation } from '../device-presentation.ts';
 import { Hero } from './Hero.tsx';
 import { useHeroArtwork } from '../hooks/useHeroArtwork.ts';
 import { HeroPreparing } from './CategoryHero.tsx';
+import { isWebValidation } from '../../web/validation.ts';
 
 interface HomeHeroProps {
   options: HomeHeroOption[];
@@ -29,6 +30,8 @@ export function heroSwipeDirection(dx: number, dy: number, elapsed: number, widt
 export const HomeHero: React.FC<HomeHeroProps> = ({ options: incoming, onSelect, onPlay, playbackBusy, playbackMessage, nextBatch, displayed, contentKind, headingLevel = 1 }) => {
   const phone = useHeroLayout();
   const fireStick = typeof navigator !== 'undefined' && isFireTvPresentation(navigator.userAgent);
+  const webValidation = isWebValidation();
+  const rotateWhileFocused = fireStick || webValidation;
   const candidates = useMemo(() => contentKind ? incoming.filter(option => option.item.kind === contentKind) : incoming, [incoming, contentKind]);
   const items = useMemo(()=>candidates.map(option=>option.item),[candidates]);
   const artwork = useHeroArtwork(items,phone?'vertical':'horizontal',20,10);
@@ -53,6 +56,8 @@ export const HomeHero: React.FC<HomeHeroProps> = ({ options: incoming, onSelect,
   const dotStart = Math.max(0, Math.min(index - 2, options.length - 5));
   const hasOptions = options.length > 0;
   const canRotate = options.length > 1;
+  const rotationState = !canRotate ? 'WAITING_IMAGES' : gesturing ? 'GESTURE' : ((interacting || hovered) && !rotateWhileFocused) ? 'INTERACTION'
+    : !visible ? 'OFFSCREEN' : hidden ? 'PAGE_HIDDEN' : reduced && !webValidation ? 'REDUCED_MOTION' : loading ? 'LOADING' : playbackBusy ? 'PLAYBACK_BUSY' : 'ACTIVE';
   useEffect(() => {
     const visibility = () => setHidden(document.hidden);
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)'), updateMotion = () => setReduced(motion.matches);
@@ -113,12 +118,17 @@ export const HomeHero: React.FC<HomeHeroProps> = ({ options: incoming, onSelect,
     else setCursor({ options, index: (index + options.length - 1) % options.length });
   };
   useEffect(() => {
-    if (!canRotate || gesturing || ((interacting || hovered) && !fireStick) || !visible || hidden || reduced || loading || playbackBusy) return;
-    const timer = setTimeout(() => { void advanceRef.current(); }, 10000);
-    return () => clearTimeout(timer);
-  }, [canRotate, item?.key, fireStick, gesturing, interacting, hovered, visible, hidden, reduced, loading, playbackBusy]);
+    if (!canRotate || gesturing || ((interacting || hovered) && !rotateWhileFocused) || !visible || hidden || (reduced && !webValidation) || loading || playbackBusy) return;
+    if (webValidation && root.current) root.current.dataset.webHeroTimer = 'ARMED';
+    const timer = setTimeout(() => {
+      if (webValidation && root.current) { root.current.dataset.webHeroTimer = 'FIRED'; root.current.dataset.webHeroTicks = String((Number(root.current.dataset.webHeroTicks) || 0) + 1); }
+      void advanceRef.current();
+    }, 10000);
+    return () => { clearTimeout(timer); if (webValidation && root.current) root.current.dataset.webHeroTimer = 'STOPPED'; };
+  }, [canRotate, item?.key, rotateWhileFocused, webValidation, gesturing, interacting, hovered, visible, hidden, reduced, loading, playbackBusy]);
   if (!item) return <div ref={root} className="home-hero-carousel"><HeroPreparing pending={artwork.pending} vertical={phone}/></div>;
   return <div ref={root} className="home-hero-carousel" aria-roledescription="carrossel" aria-label={contentKind === 'movie' ? 'Destaques de filmes' : contentKind === 'series' ? 'Destaques de séries' : 'Destaques de filmes e séries'}
+    data-web-hero-state={webValidation ? rotationState : undefined} data-web-hero-count={webValidation ? options.length : undefined} data-web-hero-position={webValidation ? index + 1 : undefined}
     onFocusCapture={() => setInteracting(true)} onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setInteracting(false); }}
     onPointerEnter={(event) => { if (event.pointerType === 'mouse') setHovered(true); }} onPointerLeave={(event) => { if (event.pointerType === 'mouse') setHovered(false); }}
     onPointerDown={startGesture} onPointerMove={moveGesture} onPointerUp={finishGesture} onPointerCancel={() => cancelGesture(true)}

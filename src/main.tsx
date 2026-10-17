@@ -2,9 +2,11 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { installWebViewBufferCompatibility } from './debug/webview-buffer-compatibility.ts';
 import { bootTelemetry } from './diagnostics/boot-telemetry.ts';
+import { mountWebRuntimeNotice } from './web/web-runtime.ts';
 
 installWebViewBufferCompatibility();
 bootTelemetry.mark('T1_WEBVIEW_READY');
+mountWebRuntimeNotice();
 
 import App from './App';
 import { AppUpdatePrompt } from './app-update/AppUpdatePrompt.tsx';

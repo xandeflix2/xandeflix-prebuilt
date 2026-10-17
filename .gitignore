@@ -20,6 +20,7 @@ local.properties
 
 
 # IDEs e Editores
+.vercel/
 .vscode/
 .idea/
 .settings/

@@ -2579,3 +2579,306 @@ remoto depois do segundo envio. Sem force/amend/rebase/PR, backend/Supabase,
 updater, instalacao/reset/release ou novo Gate. CURRENT_GATE=NONE;
 CURRENT_LOCAL_CYCLE=C132_GIT_PUBLICATION_VERIFIED; NEXT_GATE_STARTED=NAO.
 GIT_COMMIT_AUTHORIZED=SIM; GIT_PUSH_AUTHORIZED=SIM; GIT_PR_AUTHORIZED=NAO.
+
+
+## C133 - foco D-pad da janela PIN - 2026-10-16
+
+Regressao real: janela PIN parental sem fast path do editor, busca espacial
+rejeita botoes fora do angulo e foco nao sai do input. Reproduzido vazio e
+apos seis digitos. Corrigido somente roteamento da janela/edicao/fallback e
+foco de retry. C133oito perfis/seguranca/regressoes PASS. Controle negativo
+inicial pos-patch usava filtro Unix em Windows, carregando fontes atuais;
+corrigido filtro e confirmado erro anterior esperado Confirmar/observado PIN.
+Diagnostico inicialmente imprimia body inteiro no foco transitorio; limitado
+a tag/texto de botao. Apenas fixtures sinteticas em RAM; nenhum segredo real.
+Lock inicial/prebuild/build/sync/Gradle/APK1.0.22 PASS; avisos antigos
+Node/Vite/chunk/flatDir mantidos. Recursos nativos/assinatura preservados.
+Audit6/3/1102 e prefixos/Git PASS; sem install/reset/backend/Git. Homologacao
+fisica do controle/IME apos update manual ainda pendente. NEXT_GATE_STARTED=NAO.
+
+
+## C134 - preview parental e ativacao por controle - 2026-10-16
+
+C134 concluido localmente: preview Android oculto durante PIN sem trocar
+midia/ExoPlayer/buffer/C9 nem criar conexao; erro mantem oculto, cancelamento
+restaura e Back nao sai Live junto do modal. Ativacao por D-pad: entrada pelo
+Back/menu, ordem de acoes e diagnostico rolavel. Um unico Voltar na pagina
+interna; standalone conserva botao. Auth/source anteriores exatos por AST.
+Dois C134 e C133 com oito perfis cada,14 suites/203 testes Android34 suites
+PASS; lock antes/extensao/prebuild26+27+9, TS/Vite561/sync/Gradle PASS.
+APK1.0.23/code23 11450328bytes SHA256 625cae391a3260f290c99c17659488b66ffb9d52d9a61260ed22f5500b365301; mesma assinatura,
+1412recursos nativos/10DEX identicos, outros somente plugin e versao.
+Audit14/4/1097, memorias append-only e HEAD/main/origin/index preservados.
+QA fisica SurfaceView/IME pendente de update manual. Sem install/reset,
+backend/Git ou proximo Gate. CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO.
+
+Regressoes detectadas: SurfaceView acima do PIN, Escape duplo cancelava e
+saia Live, Back externo da ativacao procurava hero inexistente e Voltar
+duplicado. Corrigidos escopadamente. Fixtures antigas C112/C106 receberam
+estado/port parental faltantes, sem retirar assercoes; controle negativo
+anterior confirma cada bug. Verificador DEX herdado previa apenas versao;
+inspecao110+4classes confirma somente plugin/BuildConfig apos normalizacao
+de offsets/pool/annotations. Diagnostico sintetico completo testa overflow.
+Avisos antigos Node/Vite/chunk/flatDir permanecem. QA fisica ainda pendente.
+
+
+## C135 - area 18+, fonte ativa e cronometro parental - 2026-10-17
+
+Fonte e catalogo nas Configuracoes por ID/versao REAL promovida vs vinculada,
+com consulta/sync guardada. Area18+ separada por PIN e grade paginada; categorias
+adultas Live mantem somente nomes antes do PIN, sem expor canais/capas.
+Sexta falha de PIN bloqueia3h por cronometro monotono protegido, persistente;
+mudar data/hora ou reiniciar nao libera antecipadamente. Sem backend/identidade
+ou politica alterados. Spec/evidencia: docs/{architecture,evidence}/C11_ACTIVE_SOURCE_AND_ADULT_VISIBILITY.md.
+APK1.0.24/code24 em tmp/c135-active-source/Xandeflix-v1.0.24-C135.apk,
+11385598 bytes, SHA256 559cbe905898853765f9f4c3f8ac7373870c62885aa5607912a8a4a1da8514cd.
+MCP read-only negado: binding/conteudo real nao diagnosticados. UI fixture exports/previewId/seletores e C106ports/bootprofile corrigidos preservando asserts. Regressao real de reinicio de midia ao liberar categoria corrigida por dependencia snapshotId; leitor retry restaura cursor. Normalizador DEX corrigiu atribuicao de annotations. Falhas iniciais em logs privados; ultimos testes PASS. Reboot conserva restante; nao conta periodo desligado sem prova. Sem garantia de teste fisico/IME/SurfaceView; APK para validacao manual.
+
+
+## C136 - conferencia web local e LAN - 2026-10-17
+
+Modo web explicito com cofre cifrado IDB/player direto, sem fallback nativo.
+Catalogo web corrigido por arquivos virtuais locais, UA padrao normalizado
+somente no browser; source/bootstrap/catalog/search/Android exatos por hash.
+Usuario confirmou Home/fonte real, Live, reproducao e controles personalizados.
+Previa limpa, player FIT/contain inicial; largura desktop em Home/browse/detalhes,
+Hero compacto/rotacao10s, menu central sem barras, Space em busca e topo sem
+quantitativo. Ultimos refinamentos visuais aguardam QA manual.
+Spec/evidencia: docs/{architecture,evidence}/C11_BROWSER_LOCAL_VALIDATION.md;
+operacao docs/WEB_LOCAL.md.23suites locais PASS, lock/build web e padrao PASS;
+fixtures historicas corrigidas sem relaxar asserts. Cofre/crypto e arquivos WebFS
+reais com portas locais; decode/fonte real confirmado pelo usuario, sem CUA
+disponivel. HTTPS LAN3443 preparado; certificado publico precisa confianca no
+cliente, sem instalar raiz automaticamente. Nenhum backend/proxy/Internet.
+APK1.0.24 preservado SHA256559cbe905898853765f9f4c3f8ac7373870c62885aa5607912a8a4a1da8514cd.
+Auditoria15existentes+18novos/1113preservados, memorias append-only/Git inalterado.
+CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO; sem Git/install/reset/remote writes.
+
+Falhas iniciais: SPA HTML200 no fast path, UA proibido, fixtures T4/C105/SSR/C128 incompletas. Logs negativos privados preservados; ultimas execucoes PASS. Reproducao sujeita CORS/HTTPS/codecs; trilhas so quando expostas pelo browser/transporte. QA nativo/Cast/PiP e cliente LAN fisico nao certificado. npm advisories dev transitivos preexistentes, sem atualizar fora do escopo.
+
+
+Refino C136 autorizado: Hero web maior (100dvh-250px, min300px) para revelar aproximadamente metade da primeira fileira, imagem cover preenchendo mesmo cropada. Substitui altura compacta/contain apenas do Hero; player conserva contain/FIT. Somente CSS web; demais fronteiras e testes funcionais mantidos.
+
+Refino visual final C136: usuario pediu mais altura; Hero web ganhou mais40px, reserva passou a210px (100dvh-210px, min300px). Imagem cover; player FIT preservado.
+
+C136 - segundo incremento visual autorizado: mais40px exatos no Hero web, altura max(340px,100dvh-170px). Demais regras e video FIT preservados.
+
+C136 - contraste do Hero web: removido overlay escuro global e qualquer filter/opacity redutora da imagem. Gradiente radial local mantido atras dos metadados/botoes, como CSS nativo; player e demais dispositivos preservados.
+
+C136 - sinopse web ampliada14->18px/line-height1.5 em todos os hero-banner horizontais e detail-hero-wide. Somente CSS de conferencia web; fonte dos dispositivos nativos preservada.
+
+C136 - rotacao web: pedido explicito mantem troca10s mesmo reduced-motion, com transicao sem animacao; native preserva politica anterior. Usuario confirmou MUDOU apos Ctrl+F5/25s. Diagnostico HERO_ local de timer/estado/ticks, sem ID/URI. Previa Live web limitada50dvh/520px para mais EPG; video contain e fullscreen intactos. Hero5/SSR/C128 rerodados PASS.
+
+C136 - previa Live web: apos reducao inicial, usuario solicitou aumentar50px. Teto atual min(50dvh+50px,570px), enquadramento contain e fullscreen preservados.
+
+C136 - auditoria adicional da rotacao: callbacks reais atual/baseline em1024 combinacoes com web=false produzem timers identicos e nenhum marcador web. Hero5/C12811/SSR BrowseHero rerodados PASS. Fonte/bootstrap/catalog/search/Android e APK anteriores por hash preservados.
+
+## C137 - diagnostico real de troca de fonte web pendente - 2026-10-17
+
+Fonte ativa substituida apos teste de tres horas expirado, segundo usuario.
+CUA retornou apps=[]/browsers=[]; nenhuma leitura da aba real ou do binding
+remoto.51 casos sinteticos existentes PASS; nao comprovam sinal real.
+Solicitados ID/versao em uso/vinculada e mensagem de Atualizar catalogo no
+mesmo navegador. Nao presumir cache antigo, licenca expirada ou CORS sem essa
+evidencia. Nenhuma mudanca funcional especulativa/reset/escrita remota.
+Pesquisa inicial passou globs como paths no PowerShell e encontrou erros de
+path; corrigida para rg com diretorio real e filtros -g. Nao houve falha de
+teste neste ciclo. Causa real ainda nao identificada.
+
+## C137 - confirmacao do usuario e encerramento - 2026-10-17
+
+Em resposta ao procedimento Conferir fonte / Atualizar catalogo no mesmo
+navegador PC, usuario confirmou "DEU CERTO". Recuperacao do sinal confirmada
+pelo usuario apos atualizacao manual; nao foi observacao instrumentada do
+agente. Pendencia operacional anterior encerrada por esse relato. IDs/versoes
+e etapa exata da falha anterior nao foram enviados; nao atribuir causa-raiz
+conclusiva a cache, CORS ou licenca. Nenhuma alteracao funcional foi necessaria
+neste ciclo; demais dispositivos, ativacao e APK preservados. Os51 testes
+sinteticos anteriores permanecem evidencia separada. Preflight repetido:
+clone ativo/main/origin esperado, HEAD bd7e10c7c069df66328309105b6b210d04c7cf2d,
+proveniencia dirty conhecida; allowlist documental C137 mantida.
+CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO; sem Git/build/backend/install/reset.
+
+## C138 - verificacao visual limitada, sem regressao local - 2026-10-17
+
+Build web/padrao e typecheck/lock26+27+9 PASS; fonte8/8 PASS. CUA novamente sem
+apps/browsers: verificacao visual da pagina real e controle remoto fisico nao
+executadas. Nao usar automacao alternativa nem declarar esses testes feitos.
+Avisos existentes de chunk/externals permanecem, sem erro. Pesquisa inicial
+apontou diretorios CSS inexistentes; corrigida por leitura de src/index.css.
+Patch limitado aos resumos de Settings, demais fluxos preservados por hash.
+
+## C139 - build/install concluido, sem falhas - 2026-10-17
+
+Lock/build/sync/Gradle/205 testes/assinatura PASS; Fire install -r23->25 PASS.
+Dados protegidos comparados em RAM e preservados; APK anterior mantido.
+Dois paths tmp antigos na pesquisa foram corrigidos pelos nomes existentes.
+Avisos conhecidos de build mantidos. Verificacao fisica limitada a instalacao,
+versao/hash, preservacao e abertura/processo vivo10s; nao certificar playback,
+todos os controles ou funcionamento no tablet/celular sem testes nesses alvos.
+Nenhum bloqueio operacional de entrega identificado neste ciclo.
+
+## C140 - verificacao sintetica PASS, QA visual limitado - 2026-10-17
+
+Nenhuma falha de compilacao/teste: janela8/8, fonte8/8, lock26+27+9 e builds
+web/padrao PASS. CUA sem apps/browsers; nao executada UI real/controle fisico,
+sem automacao alternativa. Busca por nome antigo DevicePresentationDialog.tsx
+nao encontrou arquivo; seletor existente reutilizado por openDevicePresentation.
+Avisos conhecidos de chunk permanecem. Guardas de fonte/parental preservados;
+janelas de configuracao possuem marcador proprio para nao bloquear a propria
+atualizacao de catalogo. APK1.0.25 instalado anteriormente nao foi substituido.
+
+## C141 - APK de teste gerado sem falhas - 2026-10-17
+
+Lock/build/sync/Gradle/205 testes/assinatura/assets PASS. Avisos existentes de
+chunks e externals permaneceram, sem erro de compilacao ou verificacao.
+Nenhum dispositivo foi acessado/alterado; nao declarar instalacao, playback
+ou QA fisico neste ciclo. Artefato1.0.25 preservado;1.0.26 inclui janelas C140.
+Sem bloqueio operacional na entrega do APK.
+
+## C142 - verificacao dos cards horizontais - 2026-10-17
+
+Diferença reportada pelo usuario: min-height e alinhamento inicial permitiam
+cards com alturas diferentes ao quebrar titulo/resumo; Fire tinha tipografia
+fixa proporcionalmente maior. Bloco CSS isolado aplica linhas iguais e escala
+responsiva para tablet/TV paisagem, preservando phone/web/retrato e handlers.
+Lookups iniciais usaram caminhos inexistentes AppShell.tsx/UiShell.css e
+runtime/device-presentation.ts; localizados por rg --files em components e ui,
+sem escrita nesses caminhos nem efeito no patch. Nenhum erro de teste/build:
+lock, web/padrao, sync, Gradle,205 testes nativos e assinatura/empacotamento PASS.
+Avisos Vite preexistentes de Node externalizado/chunks grandes permanecem.
+CUA apps=[]/browsers=[] impede QA visual real nesta sessao. APK1.0.27 gerado
+para conferencia fisica, nao instalado; nenhum dispositivo/dado foi alterado.
+Auditoria de escopo/hashes PASS; nao houve bypass de teste/lock/backend/Git.
+
+## C143 - tela intermediaria de preferencias no startup - 2026-10-17
+
+Defeito visual reportado reproduzido antes da correcao em SSR sintetico: loading
+local de AppShell exibia header/texto sem startup. Corrigido por leitura
+antecipada no App e loading visual exclusivo; acesso fail-closed preservado.
+5 novos/16 regressivos parentais, lock, builds web/padrao, sync/Gradle,
+205 testes nativos e verificacao do APK1.0.28 PASS; nenhum teste relaxado.
+Avisos Vite preexistentes de Node/chunks/imports mistos permanecem, sem falhas.
+CUA apps=[]/browsers=[]; teste sintetico substitui startup por marcador e nao
+certifica renderizacao real/imagens. APK entregue para QA fisica, nao instalado.
+Sem leitura privada/reset/backend/Git. Evidencia C11_STARTUP_PREFERENCES_CONTINUITY.md.
+
+## C144 - fontes grandes na coluna canais e EPG Android TV - 2026-10-17
+
+Usuario confirmou tamanho bom das categorias mas canais/EPG grandes na Philips.
+Revisao identificou regras proprias de canais virtualizados/EPG que nao usam
+a referencia compacta das categorias. Corrigido somente font-size no perfil
+Android TV/live, excluindo Fire e web. Outros dispositivos e categorias intactos.
+Sem falhas de verificacao: AST/hashes/lock/builds/sync/Gradle/205 testes nativos
+e assinatura/empacotamento PASS. Avisos Vite preexistentes permanecem.
+CUA apps=[]/browsers=[]; sem alegar tamanhos computados ou renderizacao real
+medidos. APK1.0.29 gerado para conferencia fisica, nao instalado.
+Nenhum teste existente alterado, nenhuma fonte/dado/reset/backend/Git tocado.
+Evidencia C11_ANDROID_TV_LIVE_FONT_ALIGNMENT.md; proximo Gate nao iniciado.
+
+## C145 - ausencia de cor dinamica no navegador - 2026-10-17
+
+Reproduzido SecurityError capturado pela amostragem de imagem remota em fixture;
+sem paleta, CSS fica neutro. Correcao web via probe CORS isolado e sidebar
+transparente; imagem original/native/source/search preservados. Primeiro teste
+do hook nativo falhou porque img simulado nao possuia dataset; fixture alinhado
+ao DOM real, closest distinguindo Fire e verificacao de retencao adicionada.
+Nenhum assert antigo relaxado nem codigo produtivo mudado para acomodar erro.
+Suite final8/8 e regressao paleta PASS; lock/builds/isolamento PASS. Lookup
+opcional HeroArtwork.tsx ausente resolvido no Hero.tsx. Avisos Vite antigos
+permanecem. CUA apps=[]/browsers=[] limita verificacao a portas sinteticas,
+HTTP200 de modulos e CORS do exemplo publico; QA visual real pendente.
+Sem novo APK/dispositivos/credenciais/backend/Git. Evidencia C145 registrada.
+
+## C146 - Hero colorido mas fundo neutro/intermitente no web - 2026-10-17
+
+Regressao visual C145 reportada apos navegar Home/Filmes/Series. Diagnostico
+real NO_PALETTE/IMAGE_READY=SIM/PAGE_ACTIVE=NAO/cores NONE e header transparente
+isola falta de paleta, nao CSS opaco. Recuperacao web CORS com cache reload
+aplicada sem afirmar causa precisa no cache; neutralidade mantida se servidor
+negar CORS/rede/decodificacao. Reproducao anterior e7 testes novos PASS,
+3 diagnosticos+8 anteriores+paleta+locks/builds PASS. Campo failure detalha
+futuras falhas sem conteudo privado. Fixture inicial tinha assert de newline
+inicial indevido; trim corrigiu apenas fixture. Smoke node -e inicial teve
+escape PowerShell invalido antes de executar; substituido por .mjs privado,
+HTTP200/markers PASS. Avisos Vite preexistentes permanecem, sem falhas finais.
+CUA apps=[]/browsers=[]: QA visual ainda depende da conferencia solicitada na
+aba ativada. Nenhum dispositivo/storage/backend/Git tocado. Spec/evidencia
+C11_WEB_AMBIENT_REGRESSION_DIAGNOSIS.md; proximo Gate nao iniciado.
+
+## C147 - sidebar web retinha cor ao rolar - 2026-10-17
+
+C146 confirmado pelo usuario; novo relato/screenshots: menu retinha cor do
+topo enquanto categorias estavam neutras. Encontrado CSS do shell com
+background-attachment fixed e gradiente separado. Corrigido somente CSS web,
+herdando fundo da pagina por faixa nao interativa; leitura de cor preservada.
+Nenhum erro final de teste/build/auditoria.8 C145+7 C146+paleta e locks26+27+9
+PASS; build web31.83s/typecheck PASS. Avisos Vite anteriores (chunks grandes,
+modulos Node externalizados/import dinamico+estatico) persistem, sem novos
+modulos/dep ou alteracao funcional. CUA apps=[]/browsers=[] impede medir pixels;
+smoke HTTP200 e auditoria nao substituem confirmacao visual de rolagem.
+Spec/evidencia C11_WEB_SIDEBAR_SCROLL_BACKGROUND.md. Nenhum dispositivo/dado/
+backend/Git alterado; APK C144 intacto; proximo Gate nao iniciado.
+
+Confirmacao visual posterior C147: usuario respondeu "DEU CERTO" apos rolar
+alem do Hero e voltar ao topo na aba real. Relato homologa apenas o efeito
+visual solicitado; nao e medicao instrumentada pelo agente. Ciclo C147
+concluido; proximo pedido de guia Live tratado em escopo local separado.
+
+## C148 - guia presa ao canal ativo e ausencia de foco inicial - 2026-10-17
+
+Reproduzido antes: nenhum evento de inspecao e guia so do canal ativo. Corrigido
+com foco/hover/guia separada; usuario tambem pediu foco no ultimo canal, agora
+por ID/pagina local/indice exato, respeitando PIN/interacao/cancelamento.
+9 testes novos e47 regressivos PASS; locks/builds finais PASS. Primeiro teste
+novo de JSX emitido pelo TS falhou por exports ausente no fixture CommonJS;
+port adicionada, producao/asserts nao alterados. Primeira auditoria retirava
+newline legitima; removida so normalizacao do harness, assert exato preservado.
+Logs privados guardados. Lookup opcional de pasta c139-android-test-apk-fire
+inexistente resolvido pela spec canonical c139-android-test-apk; nenhum dado
+ou arquivo perdido. Avisos Vite anteriores persistem sem erro final. CUA vazio,
+HTTP200 nao mede pixels; usuario confirmou os2 fluxos na aba. Sem teste Android
+fisico/APK/install/reset/backend/Git neste ciclo. Spec/evidencia C148 registrada.
+
+## C149 - APK de teste e install Fire - 2026-10-17
+
+Nenhuma falha final de lock/sync/Gradle/205 testes/assinatura/package/assets/
+recursos/auditoria ou instalacao. Mesmo certificado instalado28/C144; Fire
+recebeu30 in-place e83 privados/75 catalogo/7 protegidos preservados antes de
+reabrir, identidade/chave/instalacao iguais apos boot10s. Somente hashes em RAM,
+sem segredos em logs. Avisos Gradle/Vite preexistentes nao exigiram patch.
+ADB nao estava no PATH; usado executavel SDK absoluto, sem instalar ferramentas.
+CUA vazio: processo/versao/hash conferidos, renderizacao/D-pad/EPG fisico ainda
+nao homologados pelo agente. APK1.0.30 entregue para teste tablet/celular/TV,
+sem instalar outros alvos/reset/backend/Git ou proximo Gate.
+Spec/evidencia C11_LIVE_GUIDE_TEST_APK_FIRE_INSTALL.md.
+
+
+## C150 - carga sem bypass manual - 2026-10-17
+
+Sem falha final de testes/lock/build/auditoria. Busca rg com glob de caminho
+invalido Windows123 repetida corretamente; helper baseline node -e perdeu
+aspas PowerShell e falhou sem executar, corrigido por here-string/stdin.
+Nenhuma escrita parcial. Avisos Vite Node externalizado/chunks grandes ja
+existentes preservados, sem patch fora de escopo.11 eventos nao liberam carga,
+28 renders/4 perfis/3 estados/foco, artwork/C143 e locks/builds PASS.
+CUA sem superficies; nenhum APK novo/install/teste fisico, APK149 intacto.
+Prazo defensivo de arte20s permanece, nao bloqueia por catalogo completo.
+Spec/evidencia C11_STARTUP_AUTOMATIC_ENTRY_ONLY.md; NEXT_GATE_STARTED=NAO.
+
+
+## C151 - build painel e conexao Vercel - 2026-10-17
+
+Primeiro artifact falhou verificacao de chave publica embutida (Vite define
+import.meta.env); corrigida injecao explicita de2 campos no runtime antes do
+SDK, novo teste de entry e segundo bundle PASS. Nunca publicado. Scanner
+sinalizou2 fixtures de URL negativas antigas; contexto/igualdade ao HEAD
+revisados sem imprimir valores, nenhum segredo real. Sem relaxar testes.
+API list_projects requer teamId raiz, caminho supabase client inferido
+inexistente e public/ ausente: corrigidos/registrados, sem efeito remoto.
+Avisos Vite/Git CRLF anteriores preservados; verificacao direta Git passou.
+Todas suites/locks/builds atuais PASS e APK149 preservado. Nao ha conta
+Vercel correta autenticada; usuario proibiu xandeflix4 e solicitou nova.
+CUA No browser is available. Sem deploy, novo Supabase, emails, roles/RLS ou
+operacao em contas reais. Git commit/push explicitamente autorizados em main,
+fechamento registrara resultado real. NEXT_GATE_STARTED=NAO.

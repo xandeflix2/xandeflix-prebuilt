@@ -86,6 +86,7 @@ public class NativeAndroidPlayerPlugin extends Plugin {
     private String currentPreviewId = null;
     private ExoPlayer previewPlayer = null;
     private PlayerView previewView = null;
+    private boolean previewObscured = false;
     private LivePlayerControls liveControls;
     private FrameLayout previewHost = null;
     private List<NativeStreamRequest> previewCandidateRequests = Collections.emptyList();
@@ -428,6 +429,31 @@ public class NativeAndroidPlayerPlugin extends Plugin {
             return;
         }
 
+        Boolean obscured = call.getBoolean("obscured");
+        if (obscured != null) {
+            if (requestedPreviewId == null || !requestedPreviewId.equals(currentPreviewId)
+                    || !"live".equals(currentPreviewKind) || rawUri != null
+                    || call.getObject("headers") != null || call.getBoolean("suspendPlayback") != null) {
+                rejectWithSanitizedError(call, ERROR_INVALID_REQUEST, "Ocultacao de preview invalida.");
+                return;
+            }
+            previewObscured = obscured;
+            if (obscured) {
+                exitPreviewFullscreenInternal();
+                if (liveControls != null) liveControls.dismissPanel();
+            }
+            if (previewView != null) {
+                int visibility = obscured ? View.INVISIBLE : View.VISIBLE;
+                previewView.setVisibility(visibility);
+                View surface = previewView.getVideoSurfaceView();
+                if (surface != null) surface.setVisibility(visibility);
+            }
+            JSObject result = new JSObject();
+            result.put("accepted", true); result.put("previewId", currentPreviewId);
+            call.resolve(result);
+            return;
+        }
+
         boolean suspendPlayback = Boolean.TRUE.equals(call.getBoolean("suspendPlayback"));
         if (suspendPlayback && (rawUri != null || !"live".equals(currentPreviewKind)
                 || requestedPreviewId == null || !requestedPreviewId.equals(currentPreviewId))) {
@@ -496,7 +522,7 @@ public class NativeAndroidPlayerPlugin extends Plugin {
     }
 
     public boolean dispatchLiveKey(android.view.KeyEvent event) {
-        return shouldDispatchLiveKey(isPreviewActive, previewFullscreen, previewInPip, event.getKeyCode())
+        return !previewObscured && shouldDispatchLiveKey(isPreviewActive, previewFullscreen, previewInPip, event.getKeyCode())
                 && liveControls != null && liveControls.dispatchKey(event);
     }
     static boolean shouldDispatchLiveKey(boolean active, boolean fullscreen, boolean inPip, int key) {
@@ -506,7 +532,7 @@ public class NativeAndroidPlayerPlugin extends Plugin {
     public void openLivePanel(PluginCall call) {
         android.app.Activity activity=getPluginActivity();
         if(activity!=null && android.os.Looper.myLooper()!=android.os.Looper.getMainLooper()) { activity.runOnUiThread(()->openLivePanel(call));return; }
-        if(!isPreviewActive || liveControls==null || currentPreviewId==null || !currentPreviewId.equals(call.getString("previewId")) || !liveControls.openRequestedPanel(call.getString("panel"))) {
+        if(previewObscured || !isPreviewActive || liveControls==null || currentPreviewId==null || !currentPreviewId.equals(call.getString("previewId")) || !liveControls.openRequestedPanel(call.getString("panel"))) {
             rejectWithSanitizedError(call,ERROR_INVALID_REQUEST,"Controles de TV ao vivo indisponíveis.");return;
         }
         JSObject result=new JSObject();result.put("accepted",true);call.resolve(result);
@@ -525,7 +551,7 @@ public class NativeAndroidPlayerPlugin extends Plugin {
             return;
         }
 
-        if (!isPreviewActive || previewView == null || previewHost == null || activity == null) {
+        if (previewObscured || !isPreviewActive || previewView == null || previewHost == null || activity == null) {
             rejectWithSanitizedError(call, ERROR_LIVE_PREVIEW_FULLSCREEN_FAILED,
                     "Fullscreen do preview nativo indisponível.");
             return;
@@ -940,6 +966,7 @@ public class NativeAndroidPlayerPlugin extends Plugin {
         previewInlineLayoutParams = null;
         previewFullscreen = false;
         previewInPip = false;
+        previewObscured = false;
         if (getBridge() != null && getBridge().getWebView() != null) {
             getBridge().getWebView().setVisibility(View.VISIBLE);
         }

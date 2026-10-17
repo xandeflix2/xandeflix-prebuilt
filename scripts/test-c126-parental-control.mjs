@@ -27,11 +27,13 @@ await test('LOCAL_RULES_AUTH_REQUIRED_ALLOWLIST_NO_SOURCE_FIELDS_LIMIT_AND_DEFEN
  await assert.rejects(s.setRule({key:'https://invalid',minAge:18,alwaysPin:false,adult:true}),/INVALID_RULE/);
  s.closeAdministration();await assert.rejects(s.removeRule(key),/PIN_REQUIRED/);assert.equal(await s.authenticate(pin),true);
 });
-await test('COOLDOWN_PERSISTS_RESTART_FIVE_WRONG_ATTEMPTS_PUK_DOES_NOT_BYPASS',async()=>{
+await test('COOLDOWN_PERSISTS_RESTART_SIXTH_WRONG_ATTEMPT_THREE_HOURS_PUK_DOES_NOT_BYPASS',async()=>{
  for(let n=0;n<5;n++)assert.equal(await s.authenticate('000001'),false);
+ await assert.rejects(s.authenticate('000001'),/COOLDOWN/);
  await assert.rejects(s.authenticate(pin),/COOLDOWN/);await assert.rejects(s.recoverPin(puk,nextPin),/COOLDOWN/);
  const restart=fixture(f.raw);await restart.store.load();await assert.rejects(restart.store.authenticate(pin),/COOLDOWN/);restart.store.lock();
- f.advance(60001);assert.equal(await s.authenticate(pin),true);assert.equal(JSON.parse(f.raw).failures,0);
+ f.advance(3*60*60*1000-1);await assert.rejects(s.authenticate(pin),/COOLDOWN/);
+ f.advance(2);assert.equal(await s.authenticate(pin),true);assert.equal(JSON.parse(f.raw).failures,0);
 });
 await test('PUK_RECOVERS_ONLY_PIN_PRESERVES_RULES_AND_POLICY_NEVER_AUTO_UNLOCKS',async()=>{
  const policy=s.getSnapshot().policy,rules=s.rules();assert.equal(await s.recoverPin('Wrong-PUK-Only-2026',nextPin),false);

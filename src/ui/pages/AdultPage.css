@@ -1,0 +1,6 @@
+.adult-page { max-width: 1500px; margin-inline: auto; }
+.adult-gate { max-width: 600px; padding: 1.25rem; background: #101624; border: 1px solid #ffffff25; border-radius: 12px; }
+.adult-gate p, .adult-actions p { color: #bcc5d3; line-height: 1.5; }
+.adult-gate button { display: block; margin-top: 1rem; min-height: 44px; }
+.adult-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+.app-shell--television .adult-page h1 { font-size: 1.6rem; margin-bottom: 1rem; }

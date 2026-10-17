@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 import android.util.Base64;
+import android.os.SystemClock;
+import android.provider.Settings;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
@@ -16,8 +18,17 @@ import javax.crypto.SecretKey;
 
 @CapacitorPlugin(name = "LocalParentalControl")
 public class LocalParentalControlPlugin extends Plugin {
+    private static final String PROCESS_CLOCK = "process:" + java.util.UUID.randomUUID();
     private static final String PREFS = "xandeflix_parental";
     private static final String ALIAS = "xandeflix_parental_v1";
+    static String clockId(int bootCount) { return bootCount >= 0 ? "boot:" + bootCount : PROCESS_CLOCK; }
+    @PluginMethod public void elapsedClock(PluginCall call) {
+        int bootCount = -1;
+        try { bootCount = Settings.Global.getInt(getContext().getContentResolver(), "boot_count", -1); }
+        catch (Exception ignored) { /* Unknown boot is conservatively process-scoped. */ }
+        JSObject result = new JSObject();
+        result.put("clockId", clockId(bootCount)); result.put("elapsedMs", SystemClock.elapsedRealtime()); call.resolve(result);
+    }
     private SharedPreferences prefs() { return getContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE); }
     private SecretKey key(boolean create) throws Exception {
         KeyStore store = KeyStore.getInstance("AndroidKeyStore"); store.load(null);

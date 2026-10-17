@@ -5,6 +5,7 @@ import { PackageBuilder } from '../src/provisioning/package-builder.ts';
 import { BootSyncCoordinator } from '../src/bootstrap/boot-sync-coordinator.ts';
 import { LiveCatalogService } from '../src/catalog/live/live-catalog.service.ts';
 import { createActivePointer } from '../src/bootstrap/active-snapshot.ts';
+import { CURRENT_CLASSIFICATION_PROFILE_VERSION } from '../src/source/source-classification-profile.ts';
 
 let totalTests = 0;
 let passedTests = 0;
@@ -158,7 +159,7 @@ async function buildPackageHelper(catalog, metadata = {}) {
   return builder.build(catalog, {
     packageFormatVersion: 2,
     liveCatalog,
-    metadata,
+    metadata: { classificationProfileVersion: CURRENT_CLASSIFICATION_PROFILE_VERSION, ...metadata },
   });
 }
 

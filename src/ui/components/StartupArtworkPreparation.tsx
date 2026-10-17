@@ -13,8 +13,6 @@ export function StartupArtworkPreparation({ root, onPreparing, posters }: {
   const [active, setActive] = useState(false);
   const [sample, setSample] = useState<StartupArtworkSample | null>(null);
   const anchor = useRef<HTMLSpanElement>(null);
-  const enter = useRef<HTMLButtonElement>(null);
-  const finish = useRef<() => void>(() => {});
   const ownsPresentation = useRef(false);
   const finished = useRef(false);
   useLayoutEffect(() => {
@@ -55,17 +53,15 @@ export function StartupArtworkPreparation({ root, onPreparing, posters }: {
     };
     const keydown = (event: KeyboardEvent) => {
       if (stopped) return;
-      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(event.key)) {
-        event.preventDefault(); event.stopImmediatePropagation(); enter.current?.focus({ preventScroll: true });
-      } else if (event.key === 'Escape' || event.key === 'BrowserBack') {
-        event.preventDefault(); event.stopImmediatePropagation(); done();
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter', ' ', 'Escape', 'BrowserBack', 'Backspace'].includes(event.key)
+        || event.keyCode === 23) {
+        event.preventDefault(); event.stopImmediatePropagation();
       }
     };
     // Reserve the first paint, letting a fast Home skip the animation at 250 ms.
     // Mounted artwork keeps its geometry and the existing bounded eager loading.
     element.classList.add('home-page--startup-check');
     onPreparing(true);
-    finish.current = done;
     document.addEventListener('keydown', keydown, true);
     cancel = prepareStartupArtwork({
       sample: () => sampleStartupArtwork(element),
@@ -89,12 +85,11 @@ export function StartupArtworkPreparation({ root, onPreparing, posters }: {
     };
   }, [root, onPreparing]);
   useLayoutEffect(() => {
-    if (active) enter.current?.focus({ preventScroll: true });
+    if (active) document.getElementById('startup-artwork-title')?.closest<HTMLElement>('[role="dialog"]')?.focus({ preventScroll: true });
   }, [active]);
   const percentage = sample && sample.total > 0 ? Math.min(sample.waitingRails ? 99 : 100,
     Math.round(100 * (sample.ready + sample.unavailable + Number(sample.heroSettled)) / (sample.total + 1))) : undefined;
   return <><span ref={anchor} hidden aria-hidden="true"/>{active && createPortal(<StartupLoadingScreen stage="artwork" modal
     className="startup-artwork-preparation modal-content" posters={posters} percentage={percentage}
-    titleId="startup-artwork-title" messageId="startup-artwork-message"
-    actions={<button ref={enter} type="button" className="btn-primary focusable-item" onClick={() => finish.current()}>Entrar agora</button>}/>, document.body)}</>;
+    titleId="startup-artwork-title" messageId="startup-artwork-message"/>, document.body)}</>;
 }

@@ -1,0 +1,12 @@
+import fs from'node:fs';import path from'node:path';import assert from'node:assert/strict';import http from'node:http';import{createWebServer,localAddress}from'./serve-web-local.mjs';
+const dir='tmp/c136-browser-web',root=path.resolve(dir+'/server-fixture');fs.mkdirSync(root+'/assets',{recursive:true});fs.writeFileSync(root+'/index.html','<!doctype html><title>Synthetic C136</title>');fs.writeFileSync(root+'/assets/app.js','/* synthetic */');fs.writeFileSync(root+'/.env','SYNTHETIC_SHOULD_NOT_BE_SERVED');
+const{server}=createWebServer({root});await new Promise(r=>server.listen(0,'127.0.0.1',r));const port=server.address().port;
+function request(url,options={}){return new Promise((resolve,reject)=>{const q=http.request({hostname:'127.0.0.1',port,path:url,...options},r=>{let data='';r.on('data',b=>data+=b);r.on('end',()=>resolve({status:r.statusCode,headers:r.headers,data}))});q.on('error',reject);q.end()})}
+let tests=0;async function test(name,run){await run();tests++;console.log('PASS '+name)}
+try{
+await test('STATIC_APP_AND_ASSETS_WITH_SAFE_HEADERS',async()=>{const r=await request('/');assert.equal(r.status,200);assert.ok(r.data.includes('Synthetic C136'));assert.equal(r.headers['x-content-type-options'],'nosniff');assert.equal(r.headers['referrer-policy'],'no-referrer');assert.equal((await request('/assets/app.js')).status,200)});
+await test('NO_ADMIN_API_DIRECTORY_ENV_TRAVERSAL_OR_ARBITRARY_PROXY',async()=>{for(const p of['/api/control-plane/state','/api/control-plane/sync','/.env','/%2e%2e/.env','/assets/..%5c..%5c.env','/../index.html','/assets/','/src/main.tsx','/proxy?url=https://fixture.invalid'])assert.notEqual((await request(p)).status,200,p)});
+await test('HOST_METHOD_AND_HEAD_ENFORCED',async()=>{assert.equal((await request('/',{headers:{host:'evil.invalid'}})).status,403);assert.equal((await request('/',{method:'POST'})).status,405);const r=await request('/',{method:'HEAD'});assert.equal(r.status,200);assert.equal(r.data,'')});
+await test('LAN_REQUIRES_TLS_AND_REJECTS_NONLOCAL_CLIENT_CLASS',async()=>{assert.throws(()=>createWebServer({root,host:'0.0.0.0'}),/HTTPS/);assert.equal(localAddress('8.8.8.8'),false);assert.equal(localAddress('192.168.3.1'),true);assert.equal(localAddress('::ffff:10.0.0.1'),true)});
+fs.writeFileSync(dir+'/server-tests.json',JSON.stringify({result:'PASS',tests,realHttp:true,syntheticOnly:true},null,2));
+}finally{await new Promise(r=>server.close(r))}

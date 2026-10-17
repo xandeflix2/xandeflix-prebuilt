@@ -55,7 +55,7 @@ export function StartupLoadingScreen({ stage = 'checking', percentage, posters, 
   const measured = typeof percentage === 'number' && Number.isFinite(percentage) ? Math.min(100, Math.max(0, percentage)) : undefined;
   const step = stageIndex[stage];
   return <section className={`startup-loading-screen${mobile ? ' startup-loading-screen--mobile' : ''}${paused || hidden ? ' startup-loading-screen--paused' : ''} ${className}`} role={modal ? 'dialog' : undefined}
-    aria-modal={modal || undefined} aria-labelledby={titleId} aria-describedby={messageId}>
+    aria-modal={modal || undefined} aria-labelledby={titleId} aria-describedby={messageId} tabIndex={modal ? -1 : undefined}>
     <StartupBackdrop key={mobile ? 'portrait' : 'horizontal'} mobile={mobile} posters={covers} paused={paused || hidden}/>
     <div className="startup-loading-layout">
       {!mobile && <div className="startup-preview" aria-label={trending ? 'Tendências do cinema no TMDB' : 'Amostra de filmes do seu catálogo'}>

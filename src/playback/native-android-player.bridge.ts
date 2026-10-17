@@ -16,6 +16,7 @@
 import { registerPlugin, Capacitor, type PluginListenerHandle } from '@capacitor/core';
 import { validatePlaybackUri } from './playback-redaction.ts';
 import { isCastFailureCode, castFailureNotice, type CastFailureCode } from './cast-failure.ts';
+import { webValidationBuild, isWebValidation } from '../web/validation.ts';
 
 export type NativePlaybackKind = 'movie' | 'series' | 'live' | 'vod';
 
@@ -69,6 +70,8 @@ export interface NativeLiveContext {
 
 export interface NativePreviewUpdateRequest {
   previewId?: string;
+  /** Temporarily hide the live native surface behind a WebView parental dialog. */
+  obscured?: boolean;
   /** Stop the authorized media before C9 handoff, retaining the view/mode. */
   suspendPlayback?: boolean;
   uri?: string;
@@ -134,7 +137,8 @@ export interface NativeAndroidPlayerPlugin {
   addListener(eventName: 'androidBackButton', listenerFunc: (event: NativeAndroidBackButtonEvent) => void): Promise<PluginListenerHandle>;
 }
 
-export const NativeAndroidPlayer = registerPlugin<NativeAndroidPlayerPlugin>('NativeAndroidPlayer');
+export const NativeAndroidPlayer = registerPlugin<NativeAndroidPlayerPlugin>('NativeAndroidPlayer',
+  webValidationBuild && !Capacitor.isNativePlatform() ? { web: () => import('../web/web-player.ts').then(m => new m.WebPlayer()) } : {});
 
 export type NativeAndroidPlayerErrorCode =
   | CastFailureCode
@@ -464,12 +468,12 @@ export async function addNativePreviewTapListener(
 }
 
 export async function addNativePlayerProgressListener(listener:(event:NativePlayerProgressEvent)=>void):Promise<PluginListenerHandle> {
-  if(!Capacitor.isNativePlatform() || !Capacitor.isPluginAvailable('NativeAndroidPlayer'))throw new Error('NATIVE_UNAVAILABLE');
+  if((!Capacitor.isNativePlatform() && !isWebValidation()) || !Capacitor.isPluginAvailable('NativeAndroidPlayer'))throw new Error('NATIVE_UNAVAILABLE');
   return NativeAndroidPlayer.addListener('progress',listener);
 }
 
 export async function readNativeWatchProgress(): Promise<NativePlayerProgressEvent[]> {
-  if (!Capacitor.isNativePlatform() || !Capacitor.isPluginAvailable('NativeAndroidPlayer')) return [];
+  if ((!Capacitor.isNativePlatform() && !isWebValidation()) || !Capacitor.isPluginAvailable('NativeAndroidPlayer')) return [];
   try {
     const result = await NativeAndroidPlayer.getWatchProgress();
     return Array.isArray(result.events) ? result.events.slice(0, 4) : [];

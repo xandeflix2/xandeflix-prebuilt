@@ -10,6 +10,7 @@
 .activation-page__support-toggle { display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: 48px; padding: .85rem 1rem; color: #cbd5e1; background: #101624; border: 1px solid #273244; border-radius: 6px; cursor: pointer; text-align: left; font-weight: 600; gap: 1rem; }
 #activation-support-details { padding-top: .75rem; }
 .activation-page__diagnostic { margin: .75rem 0; padding: 1rem; background: #151d30; color: #cbd5e1; font-size: .8rem; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; border-radius: 6px; }
+.activation-page__diagnostic { max-height: min(40vh, 18rem); overflow: auto; }
 .activation-page--simple button { min-height: 44px; }
 /* Existing TV compact rules use !important; keep the new support/contact targets usable. */
 #root .activation-page--simple .activation-page__support-toggle { height: auto !important; min-height: 48px !important; }

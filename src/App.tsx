@@ -24,6 +24,7 @@ import {
   createInitialRoute,
   navigateTo,
   navigateBack,
+  isAdultLocation,
 } from './ui/navigation/route-state.ts';
 import type { CatalogItemViewModel } from './catalog/catalog-view-model.ts';
 import { AppShell } from './ui/components/AppShell.tsx';
@@ -52,6 +53,8 @@ import { LocalSourceProvisioningPage } from './ui/pages/LocalSourceProvisioningP
 import { ActivationPage } from './ui/pages/ActivationPage.tsx';
 import { SettingsPage } from './ui/pages/SettingsPage.tsx';
 import { ParentalControlPage } from './ui/pages/ParentalControlPage.tsx';
+import { AdultPage } from './ui/pages/AdultPage.tsx';
+import { parentalControl } from './parental/parental-control.store.ts';
 import { ParentalDetailGate } from './ui/components/ParentalDetailGate.tsx';
 import { PublicDeviceActivationPage } from './ui/pages/PublicDeviceActivationPage.tsx';
 import { ManagerPanelPage } from './debug/manager/ManagerPanelPage.tsx';
@@ -75,6 +78,7 @@ import { ensurePendingDeviceActivationRequest, syncPendingDeviceActivation } fro
 import { installViewportMetricsDiagnostic } from './ui/layout/viewport-metrics.ts';
 
 declare const __XANDEFLIX_DEBUG_BUILD__: boolean;
+import { isWebValidation } from './web/validation.ts';
 
 if (typeof __XANDEFLIX_DEBUG_BUILD__ !== 'undefined' && __XANDEFLIX_DEBUG_BUILD__) {
   import('./debug/debug-import.ts').then(({ initDebugImport }) => {
@@ -99,6 +103,8 @@ export default function App(): React.JSX.Element {
     summary,
     refresh,
   } = useActiveCatalog();
+
+  useEffect(() => { void parentalControl.load(); }, []);
 
   const [bootSyncState, setBootSyncState] = useState<BootSyncState>(() => getBootSyncCoordinator().getState());
   const [bootSyncProgress, setBootSyncProgress] = useState<BootSyncProgress | undefined>(() =>
@@ -153,6 +159,8 @@ export default function App(): React.JSX.Element {
     const intent = ++navigationIntentRef.current;
     const commit = () => {
       if (navigationIntentRef.current !== intent) return;
+      if ((isAdultLocation(previous.current) || previous.current.view === 'live' || previous.current.view === 'parental-control')
+          && !isAdultLocation(next.current)) parentalControl.lock();
       setRouteState(current => current === previous ? next : current);
     };
     const prepare = previous.current.view === 'live' && next.current.view !== 'live'
@@ -161,7 +169,7 @@ export default function App(): React.JSX.Element {
     else commit();
   }, []);
 
-  const handleNavigate = useCallback((view: AppView, itemId?: string) => {
+  const handleNavigate = useCallback((view: AppView, itemId?: string, adultArea = false) => {
     const current=routeStateRef.current.current,snapshot=catalogSnapshotRef.current;
     catalogReturn.remember(current,snapshot);
     catalogReturn.clearRequest();
@@ -170,12 +178,14 @@ export default function App(): React.JSX.Element {
       catalogReturn.requestHome(snapshot);
       if(current.view==='home'&&!current.itemId){catalogReturn.apply(current,snapshot);return;}
     }
-    commitRoute((prev) => navigateTo(prev, view, itemId));
+    commitRoute((prev) => navigateTo(prev, view, itemId, adultArea));
   }, [commitRoute, catalogReturn]);
 
   const handleBack = useCallback(() => {
     if (!window.dispatchEvent(new Event('xandeflix:parental-back', { cancelable: true }))) return;
     if (!window.dispatchEvent(new Event('xandeflix:playback-error-back', { cancelable: true }))) return;
+    const settingsWindow = document.querySelector<HTMLDialogElement>('dialog[data-settings-modal][open]');
+    if (settingsWindow) { settingsWindow.close(); return; }
     const dialog = document.querySelector<HTMLDialogElement>('dialog[data-detail-modal][open]');
     if (dialog) { dialog.close(); return; }
     catalogReturn.requestBack(navigateBack(routeStateRef.current).current,catalogSnapshotRef.current);
@@ -186,9 +196,9 @@ export default function App(): React.JSX.Element {
     (item: CatalogItemViewModel) => {
       if (getBootSyncCoordinator().getState() === 'PROMOTING') return;
       if (item.kind === 'movie') {
-        handleNavigate('movie-detail', item.id);
+        handleNavigate('movie-detail', item.id, isAdultLocation(routeStateRef.current.current));
       } else {
-        handleNavigate('series-detail', item.id);
+        handleNavigate('series-detail', item.id, isAdultLocation(routeStateRef.current.current));
       }
     },
     [handleNavigate]
@@ -259,7 +269,7 @@ export default function App(): React.JSX.Element {
   // A NativePlayerActivity comunica fim, Back e erro de mídia sem transportar
   // URL ou credenciais. O mesmo evento fecha o lease C9 no runtime web.
   useEffect(() => {
-    if (!Capacitor.isNativePlatform()) return;
+    if (!Capacitor.isNativePlatform() && !isWebValidation()) return;
 
     let disposed = false;
     let listenerHandle: { remove: () => Promise<void> } | null = null;
@@ -288,7 +298,7 @@ export default function App(): React.JSX.Element {
   }, []);
 
   useEffect(() => {
-    if (!Capacitor.isNativePlatform()) return;
+    if (!Capacitor.isNativePlatform() && !isWebValidation()) return;
     let disposed = false;
     let handle: { remove: () => Promise<void> } | undefined;
     void NativeAndroidPlayer.addListener('episodeNavigation', event => {
@@ -426,6 +436,7 @@ export default function App(): React.JSX.Element {
         'series',
         'live',
         'search',
+        'adult',
         'activation',
         'activate-device',
         'debug-source-setup',
@@ -469,8 +480,8 @@ export default function App(): React.JSX.Element {
 
   if (routeState.current.view === 'settings' || routeState.current.view === 'parental-control') {
     return <AppShell currentView={routeState.current.view} onNavigate={handleNavigate} onBack={handleBack} canGoBack={canGoBack}>
-      {routeState.current.view === 'parental-control' ? <ParentalControlPage readModel={readModel} onBack={handleBack}/>
-        : <SettingsPage onOpenActivation={() => handleNavigate('activation')} onOpenParental={() => handleNavigate('parental-control')}/>}
+      {routeState.current.view === 'parental-control' ? <ParentalControlPage readModel={readModel} onBack={handleBack} onOpenAdult={() => handleNavigate('adult')}/>
+        : <SettingsPage onOpenActivation={() => handleNavigate('activation')} onOpenParental={() => handleNavigate('parental-control')} onOpenAdult={() => handleNavigate('adult')}/>}
     </AppShell>;
   }
 
@@ -574,6 +585,9 @@ export default function App(): React.JSX.Element {
         return <SeriesPage readModel={readModel} onSelectItem={handleSelectItem} categoryId={itemId}
           onSelectCategory={id => handleNavigate('series', id)} onSelectCollection={id => handleNavigate('home', id)} />;
 
+      case 'adult':
+        return readModel ? <AdultPage readModel={readModel} onSelectItem={handleSelectItem} onOpenParental={() => handleNavigate('parental-control')}/> : <EmptyState/>;
+
       case 'live':
         return <LiveTvPage initialChannelId={itemId} onBack={handleBack} onHome={() => handleNavigate('home')} onOpenSourceSetup={() => handleNavigate('debug-source-setup')} registerBeforeLeave={registerBeforeLiveLeave} />;
 
@@ -596,6 +610,7 @@ export default function App(): React.JSX.Element {
         return (
           <ActivationPage
             onBack={handleBack}
+            showBackButton={!canGoBack}
             onOpenSettings={() => handleNavigate('settings')}
             onOpenSourceSetup={() => handleNavigate('debug-source-setup')}
             onCatalogImported={handleCatalogImported}

@@ -2620,3 +2620,371 @@ remoto depois do segundo envio. Sem force/amend/rebase/PR, backend/Supabase,
 updater, instalacao/reset/release ou novo Gate. CURRENT_GATE=NONE;
 CURRENT_LOCAL_CYCLE=C132_GIT_PUBLICATION_VERIFIED; NEXT_GATE_STARTED=NAO.
 GIT_COMMIT_AUTHORIZED=SIM; GIT_PUSH_AUTHORIZED=SIM; GIT_PR_AUTHORIZED=NAO.
+
+
+## C133 - foco D-pad da janela PIN - 2026-10-16
+
+Correcao isolada do modal PIN na entrada Live: fallback espacial deixava foco
+no campo largo porque botoes abaixo ficam desalinhados do eixo. Fast path
+reutiliza ordem parental ja existente, fallback contido e retry apos PIN errado.
+Protecoes e persistencia intactas. Oito perfis browser reais e controle
+negativo com codigo anterior, regressoes parentais/D-pad, lock/build/sync/
+Gradle/assinatura/packaging PASS. APK1.0.22 77b54d229a7dc6cc31068d47cb556fbb4993b4abea666f29caa85c735c9061c9 separado do C131.
+1412recursos nativos/11DEX iguais; outro DEX so versao. Audit6/3/1102, memorias
+append-only e HEAD/main/origin intactos. QA fisica do IME/controle pendente;
+sem nova operacao Git, backend/install/reset ou proximo Gate.
+
+
+## C134 - preview parental e ativacao por controle - 2026-10-16
+
+C134 concluido localmente: preview Android oculto durante PIN sem trocar
+midia/ExoPlayer/buffer/C9 nem criar conexao; erro mantem oculto, cancelamento
+restaura e Back nao sai Live junto do modal. Ativacao por D-pad: entrada pelo
+Back/menu, ordem de acoes e diagnostico rolavel. Um unico Voltar na pagina
+interna; standalone conserva botao. Auth/source anteriores exatos por AST.
+Dois C134 e C133 com oito perfis cada,14 suites/203 testes Android34 suites
+PASS; lock antes/extensao/prebuild26+27+9, TS/Vite561/sync/Gradle PASS.
+APK1.0.23/code23 11450328bytes SHA256 625cae391a3260f290c99c17659488b66ffb9d52d9a61260ed22f5500b365301; mesma assinatura,
+1412recursos nativos/10DEX identicos, outros somente plugin e versao.
+Audit14/4/1097, memorias append-only e HEAD/main/origin/index preservados.
+QA fisica SurfaceView/IME pendente de update manual. Sem install/reset,
+backend/Git ou proximo Gate. CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO.
+
+Spec/evidencia em C11_PARENTAL_NATIVE_PREVIEW_OVERLAY.md. C133 e APK anterior
+conservados; autoridade/regras/KDF/storage/source permanecem intactos.
+
+
+## C135 - area 18+, fonte ativa e cronometro parental - 2026-10-17
+
+Fonte e catalogo nas Configuracoes por ID/versao REAL promovida vs vinculada,
+com consulta/sync guardada. Area18+ separada por PIN e grade paginada; categorias
+adultas Live mantem somente nomes antes do PIN, sem expor canais/capas.
+Sexta falha de PIN bloqueia3h por cronometro monotono protegido, persistente;
+mudar data/hora ou reiniciar nao libera antecipadamente. Sem backend/identidade
+ou politica alterados. Spec/evidencia: docs/{architecture,evidence}/C11_ACTIVE_SOURCE_AND_ADULT_VISIBILITY.md.
+APK1.0.24/code24 em tmp/c135-active-source/Xandeflix-v1.0.24-C135.apk,
+11385598 bytes, SHA256 559cbe905898853765f9f4c3f8ac7373870c62885aa5607912a8a4a1da8514cd.
+C135fonte8/clock12/leitor3/UI8 PASS; C12616/C12811/C1298/C1338/C1348+8 e Live/refresh19/boot15 preservados. Assinatura/1412recursos e APK1.0.23 por hash preservados; delta nativo somente clock e versao. Auditoria baseline1115:26existentes+13novos allowlisted,1089preservados, memorias append-only e Git inalterado.
+
+
+## C136 - conferencia web local e LAN - 2026-10-17
+
+Modo web explicito com cofre cifrado IDB/player direto, sem fallback nativo.
+Catalogo web corrigido por arquivos virtuais locais, UA padrao normalizado
+somente no browser; source/bootstrap/catalog/search/Android exatos por hash.
+Usuario confirmou Home/fonte real, Live, reproducao e controles personalizados.
+Previa limpa, player FIT/contain inicial; largura desktop em Home/browse/detalhes,
+Hero compacto/rotacao10s, menu central sem barras, Space em busca e topo sem
+quantitativo. Ultimos refinamentos visuais aguardam QA manual.
+Spec/evidencia: docs/{architecture,evidence}/C11_BROWSER_LOCAL_VALIDATION.md;
+operacao docs/WEB_LOCAL.md.23suites locais PASS, lock/build web e padrao PASS;
+fixtures historicas corrigidas sem relaxar asserts. Cofre/crypto e arquivos WebFS
+reais com portas locais; decode/fonte real confirmado pelo usuario, sem CUA
+disponivel. HTTPS LAN3443 preparado; certificado publico precisa confianca no
+cliente, sem instalar raiz automaticamente. Nenhum backend/proxy/Internet.
+APK1.0.24 preservado SHA256559cbe905898853765f9f4c3f8ac7373870c62885aa5607912a8a4a1da8514cd.
+Auditoria15existentes+18novos/1113preservados, memorias append-only/Git inalterado.
+CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO; sem Git/install/reset/remote writes.
+
+
+Refino C136 autorizado: Hero web maior (100dvh-250px, min300px) para revelar aproximadamente metade da primeira fileira, imagem cover preenchendo mesmo cropada. Substitui altura compacta/contain apenas do Hero; player conserva contain/FIT. Somente CSS web; demais fronteiras e testes funcionais mantidos.
+
+Refino visual final C136: usuario pediu mais altura; Hero web ganhou mais40px, reserva passou a210px (100dvh-210px, min300px). Imagem cover; player FIT preservado.
+
+C136 - segundo incremento visual autorizado: mais40px exatos no Hero web, altura max(340px,100dvh-170px). Demais regras e video FIT preservados.
+
+C136 - contraste do Hero web: removido overlay escuro global e qualquer filter/opacity redutora da imagem. Gradiente radial local mantido atras dos metadados/botoes, como CSS nativo; player e demais dispositivos preservados.
+
+C136 - sinopse web ampliada14->18px/line-height1.5 em todos os hero-banner horizontais e detail-hero-wide. Somente CSS de conferencia web; fonte dos dispositivos nativos preservada.
+
+C136 - rotacao web: pedido explicito mantem troca10s mesmo reduced-motion, com transicao sem animacao; native preserva politica anterior. Usuario confirmou MUDOU apos Ctrl+F5/25s. Diagnostico HERO_ local de timer/estado/ticks, sem ID/URI. Previa Live web limitada50dvh/520px para mais EPG; video contain e fullscreen intactos. Hero5/SSR/C128 rerodados PASS.
+
+C136 - previa Live web: apos reducao inicial, usuario solicitou aumentar50px. Teto atual min(50dvh+50px,570px), enquadramento contain e fullscreen preservados.
+
+C136 - auditoria adicional da rotacao: callbacks reais atual/baseline em1024 combinacoes com web=false produzem timers identicos e nenhum marcador web. Hero5/C12811/SSR BrowseHero rerodados PASS. Fonte/bootstrap/catalog/search/Android e APK anteriores por hash preservados.
+
+## C137 - diagnostico de troca de fonte web - 2026-10-17
+
+Usuario relata fonte de teste expirada e substituida no PC sem retorno do sinal.
+Preflight/auditoria C136 PASS; baseline C137 privada. Spec/evidencia em
+ docs/{architecture,evidence}/C11_WEB_SOURCE_REPLACEMENT_RECOVERY.md.
+Inspecao read-only: sincronizacao manual existente ignora cooldown, boot
+reconcilia sourceId/versao; refresh de conteudo automatico15min com adiamento
+por playback/UI.51 testes existentes sinteticos PASS (boot15, fonte8,
+cofre web9, refresh19), sem alterar testes. CUA sem superficies; solicitados
+ID/versao local/vinculada e resultado da atualizacao manual. Causa real e
+recuperacao do sinal ainda nao confirmadas; diagnostico depende desses dados.
+Nenhum codigo funcional/build/APK/backend/identidade/storage real alterado.
+CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO; sem commit/push/PR/install/reset.
+
+## C137 - confirmacao do usuario e encerramento - 2026-10-17
+
+Em resposta ao procedimento Conferir fonte / Atualizar catalogo no mesmo
+navegador PC, usuario confirmou "DEU CERTO". Recuperacao do sinal confirmada
+pelo usuario apos atualizacao manual; nao foi observacao instrumentada do
+agente. Pendencia operacional anterior encerrada por esse relato. IDs/versoes
+e etapa exata da falha anterior nao foram enviados; nao atribuir causa-raiz
+conclusiva a cache, CORS ou licenca. Nenhuma alteracao funcional foi necessaria
+neste ciclo; demais dispositivos, ativacao e APK preservados. Os51 testes
+sinteticos anteriores permanecem evidencia separada. Preflight repetido:
+clone ativo/main/origin esperado, HEAD bd7e10c7c069df66328309105b6b210d04c7cf2d,
+proveniencia dirty conhecida; allowlist documental C137 mantida.
+CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO; sem Git/build/backend/install/reset.
+
+## C138 - configuracoes resumidas com expansao - 2026-10-17
+
+Pedido do usuario implementado somente em SettingsPage.tsx/CSS: cinco opcoes
+com titulo/descricao curta, inicialmente recolhidas, detalhes por acionamento
+do resumo. details/summary com focusable-item/foco visivel, toque/mouse e
+DPAD_CENTER/Enter/Space do hook existente; campo aberto ocupa largura da grade.
+Filhos/handlers/estado de operacoes continuam montados; nenhum novo Voltar.
+Spec/evidencia docs/{architecture,evidence}/C11_SETTINGS_SUMMARY_DISCLOSURE.md.
+Lock antes/depois PASS (26+27+9); build web e padrao com typecheck PASS;
+regressao fonte8/8 PASS. Servidor3000 entrega TSX/CSS novos HTTP200. Auditoria
+AST confirma corpo original semantico apos remover wrappers, CSS limitado ao
+resumo/alinhamento e todos os demais arquivos funcionais por hash preservados.
+APK1.0.24 preservado; memorias append-only/HEAD/main inalterados. CUA vazio,
+conferencia visual real/controle fisico pendentes. Nenhum backend/Git/APK
+novo/install/reset; CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO.
+
+## C139 - APK1.0.25 e Fire Stick atualizado - 2026-10-17
+
+Pedido explicito de APK tablet/celular e install Fire atendido. Somente versao
+Gradle24->25/1.0.25; runtime atual e Settings C138 preservados. Spec/evidencia
+ docs/{architecture,evidence}/C11_ANDROID_TEST_APK_FIRE_INSTALL.md.
+Lock inicial/prebuild26+27+9, typecheck/Vite/cap sync/Gradle PASS;205 testes
+nativos35 suites sem falhas. APK11387196 bytes, SHA256
+05b0c4b0e58df1b393a49747856c3da4fcb8d2261e23af2213ecd4f171fb6581,
+mesma assinatura do instalado/C135;8 assets dist,1412 recursos iguais, standalone
+HTTPS sem server.url/implementacoes web exclusivas. Caminho distribuivel:
+tmp/c139-android-test-apk/Xandeflix-v1.0.25-C139.apk.
+Fire AFTSS recebeu install -r23->25, hash instalado igual;83 arquivos privados,
+75 de catalogo/7 essenciais e firstInstallTime preservados antes de abrir.
+App abriu, vivo10s; identidade/chave/instalacao tambem preservadas apos boot.
+Hashes privados somente RAM, sem plaintext de conta em logs. APK disponivel
+para instalar manualmente no tablet/celular; nao instalados pelo agente.
+Sem teste novo de playback, reset, uninstall, backend administrativo ou Git.
+CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO.
+
+## C140 - janelas dedicadas nas configuracoes - 2026-10-17
+
+Usuario substituiu expansao por janela dedicada: cards compactos agora abrem
+dialog com titulo/Fechar/detalhes e rolagem interna. Filhos/operacoes mantidos;
+fechar nao expande grade nem recria estado. D-pad/Tab/foco/cleanup locais,
+Enter existente e Back fecha janela antes de rota; destinos fecham janela
+antes do callback atual. settings-modal separado de detail-modal preserva
+atualizacao de fonte com todos os guardas existentes.
+Spec/evidencia docs/{architecture,evidence}/C11_SETTINGS_DEDICATED_WINDOWS.md.
+Janela8/8 +fonte8/8 PASS; lock26+27+9 e typecheck/build web/padrao PASS.
+Dev3000 entrega novos dialogs/CSS200, sem accordion. Auditoria3 arquivos UI/App
++3 memorias alterados e4 novos allowlisted/1146 baseline preservados; App muda
+apenas branch de fechamento, filhos/callbacks mantidos. Codigo fonte/catalogo/
+busca/playback/parental/Android e APK C1391.0.25 preservados por hash. Memorias
+append-only/HEAD/main/index intactos. CUA vazio: visual/controle fisico pendentes.
+Sem novo APK/install/reset/backend/Git. CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO.
+
+## C141 - APK1.0.26 para teste nos demais dispositivos - 2026-10-17
+
+Pedido do usuario atendido com pacote que inclui janelas dedicadas C140.
+Somente constantes Gradle25->26/1.0.26 alteradas; todo codigo funcional C140
+preservado. Spec/evidencia docs/{architecture,evidence}/C11_DEDICATED_SETTINGS_TEST_APK.md.
+Lock inicial/prebuild26+27+9, typecheck/Vite/cap sync/Gradle PASS;205 testes
+nativos35 suites sem falhas/erros/skips. APK11388227 bytes, SHA256
+ffe6939d73ed6d8163938e78f9f56feb6e9854429d56e20bdcb436cb4412664c,
+mesma assinatura do C139;8 assets dist conferidos,1412 recursos identicos,
+HTTPS standalone sem server.url ou chunks do player/cofre de conferencia web.
+Janelas dedicadas presentes no bundle. Distribuivel:
+tmp/c141-android-test-apk/Xandeflix-v1.0.26-C141.apk.
+Auditoria baseline1156/1152 preservados, apenas Gradle e3 memorias alterados,
+2 documentos novos allowlisted, memorias append-only e HEAD/main/index intactos.
+APK C139 preservado por hash. Nao instalado nem acessados dados dos aparelhos;
+teste fisico permanece a cargo da validacao nos alvos. Sem Git/backend/reset.
+CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO.
+
+## C142 - dimensoes iguais dos cards tablet/TV - 2026-10-17
+
+Pedido atual autoriza correcao dos cards horizontais que cresciam isoladamente
+conforme quebra de texto. Spec previa e emenda de entrega em
+docs/architecture/C11_SETTINGS_LANDSCAPE_CARD_SIZE.md. CSS acrescentado ao fim
+de SettingsPage.css, sem editar regras anteriores: quatro colunas iguais,
+linhas1fr e botao100%, min-height108-128px, titulo15-18/resumo11-13px e
+padding12-18px. Texto completo com crescimento compartilhado, foco preservado.
+Telefone/web/retrato excluidos. Nenhum handler/TSX/source/search/native alterado.
+Versao Gradle26->27 permite pacote de teste novo sem substituir o C141.
+Lock inicial/prebuilds/antes de sync PASS; builds web e padrao/typecheck PASS,
+cap sync/Gradle PASS e205 testes nativos em35 suites aprovados. Assinatura,
+package, HTTPS standalone,8 assets exatos,1412 recursos identicos e novo CSS
+no APK conferidos. SHA25682af677cbaad3602bb49765ca8637a832d2422890325016b9b343f7893f0c012.
+Auditoria baseline1158/1153 preservados, memorias append-only, HEAD/main/index
+intactos, APK C141 preservado. Evidencia em docs/evidence/C11_SETTINGS_LANDSCAPE_CARD_SIZE.md.
+Novo pacote privado1.0.27 em tmp/c142-settings-landscape-size, nao instalado.
+CUA sem browser/app; sem alegar renderizacao ou controle fisico homologados.
+Sem backend, reset, Git ou proximo Gate.
+
+## C143 - startup visual exclusivo enquanto preferencias carregam - 2026-10-17
+
+Usuario reportou transicao startup -> shell sem capas com texto de preferencias
+-> startup com imagens. Teste anterior ao patch reproduziu esse estado com
+store local pendente. Leitura agora inicia em effect de App, junto ao boot,
+e AppShell retorna o loading visual existente antes do menu durante loading.
+Nao aguarda/serializa boot e nao exibe conteudo sem preferencias; erro e
+recuperacao por configuracoes mantidos. Sem alterar store/regras/credenciais/
+fonte/catalogo/busca/player/CSS ou timers de imagens. Revisao React realizada.
+Spec previa C11_STARTUP_PREFERENCES_CONTINUITY.md.5 testes novos com store/hook
+reais e SSR sintetico,16 regressivos e lock26+27+9 PASS; builds web/padrao,
+sync/Gradle e205 testes nativos/35 suites PASS. APK1.0.28, assinatura igual,
+8 assets/1412 recursos conferidos; SHA25657ffcbf8b94a4a6c0f58b18a55517e5bff53d2df6cc005d415a7bd7577d7d6c6.
+Auditoria inversa preserva todo App/AppShell fora desses dois patches pequenos;
+Gradle somente2 constantes.1160/1154 baseline preservados,6 existentes e3 novos
+allowlisted, memorias append-only, APK C142/HEAD/main/index intactos.
+Novo APK recuperavel em tmp/c143-startup-preferences/Xandeflix-v1.0.28-C143.apk, nao instalado. CUA sem superficies,
+sem alegar teste fisico ou imagens efetivamente renderizadas pelo agente.
+Nenhum backend/reset/Git ou proximo Gate.
+
+## C144 - alinhamento tipografico Live no Android TV - 2026-10-17
+
+Pedido do usuario: igualar canais e guia ao tamanho correto das categorias na
+TV Philips Google Android TV, mantendo demais dispositivos. Spec previa
+C11_ANDROID_TV_LIVE_FONT_ALIGNMENT.md. Um bloco CSS novo em LiveTvPage.css,
+somente font-size var(--tv-font-xs,0.85rem)!important, limitado a classe Android
+TV/live e excluindo Fire Stick/web. Categorias permanecem referencia intacta;
+nome/formato/cabecalho/filtro/status/resumo do canal e textos de programacao
+padronizados. Nenhum TSX/JS/Java/EPG/source/search/player/parental alterado,
+sem nova altura de linha ou mudanca de virtualizacao/D-pad. Gradle28->29 apenas.
+AST/isolamento/hashes, lock26+27+9, builds web/padrao/typecheck, sync/Gradle e
+205 testes nativos35 suites PASS. APK1.0.29, 11388899 bytes, SHA256
+168768ca3ca670296301793fec8d8d778db2b04ed453b1e17bfb999966f92c9f; mesma assinatura,8 assets/1412 recursos
+verificados. Pacote preserva startupC143 e cards/janelasC140/C142. Auditoria
+1163/1158 preservados,5 existentes/2 novos allowlisted, memorias append-only,
+HEAD/main/index e APK C143 intactos. Novo pacote privado em tmp/c144-android-tv-live-fonts/Xandeflix-v1.0.29-C144.apk.
+CUA vazio impede QA visual real; pacote entregue para teste no aparelho,
+sem instalacao/reset/acesso privado/backend/Git ou proximo Gate.
+
+## C145 - fundo dinamico e sidebar transparente web - 2026-10-17
+
+Pedido usuario aplicado com CSS web isolado e fallback de cores lazy no
+useImmersiveArtwork, guardado por flag web e plataforma. Extracao atual pode
+falhar por canvas cross-origin; teste anterior ao patch reproduziu ausencia
+de paleta. Imagem auxiliar anonymous/no-referrer da mesma URI reutiliza paleta
+24px/cache48 existente, sem mexer na imagem/fila exibida. Limites2 em voo/5s,
+falhas48/60s, abort e imagem atual; sem persistencia/proxy. Header transparente
+e gradiente do shell usam navigation-ambient atual, preservando foco/layout.
+Spec/evidencia C11_WEB_AMBIENT_TRANSPARENT_SIDEBAR.md.8 testes novos cobrem
+helper/hook web/native, cor nova/stale/abort, limites/timeout/cleanup. Regressao
+paleta PASS; lock26+27+9, tsc/Vite web e padrao PASS. Helper ausente no padrao.
+Smoke localhost3000 CSS/hook/helper200; exemplo publico TMDB CORS HEAD200.
+Auditoria1165/1160 preservados, somente additions web no hook/CSS e3 memorias,
+4 novos allowlisted; demais runtime e Android/APK C144 intactos. CUA sem
+surfaces: nao homologados pixels da aba. Sem backend/Git/install/reset/APK novo.
+
+## C146 - diagnostico e recuperacao do ambient web - 2026-10-17
+
+Screenshot/relato posterior anula resultado visual presumido de C145. Campos
+AMBIENT_ sanitizados adicionados; usuario demonstrou NO_PALETTE com img pronto,
+nenhuma cor inline, shell gradiente neutro/header transparente. Primeiro
+boundary e amostragem; nao prova falha de cache especifica. Spec emendada
+antes da correcao: helper web faz uma segunda tentativa da mesma URI via
+fetch CORS/omit/reload/no-referrer; Blob image ate5MiB e img auxiliar, recursos
+liberados, cache RAM48 e falhas48/60s, max2/timeout5s por etapa. Sem alterar
+img/crossOrigin original ou fila/catalogo/native. Resultado tardio rejeitado
+apos navegacao/troca. Campo failure enum sem URL/excecao/credencial.
+Reproducao anterior PASS;7 testes recuperacao,3 privacidade/diagnostico,
+8 C145 intactos e paleta PASS. Lock26+27+9, tsc/Vite web21.66s e padrao17.66s
+PASS. Helper apenas web; hook/CSS/Android/APK C144 preservados. HTTP200/markers
+na origem3000 e auditoria de escopo/memorias/Git PASS. Sem browser conectado
+para pixels reais; retorno visual solicitado ao usuario ainda pendente.
+Sem APK/instalacao/reset/Supabase/commit/push/PR. NEXT_GATE_STARTED=NAO.
+
+## C147 - gradiente compartilhado entre pagina e menu web - 2026-10-17
+
+Usuario homologou recuperacao visual C146 por relato e mostrou divergencia
+na rolagem. Gradiente lateral independente100dvh/fixed permanecia colorido
+quando pagina ja chegava ao bg-dark. Substituido somente bloco final ambient
+web por shell neutro e faixa ::before absoluta da pagina imersiva, background
+inherit/pointer-events none, sem novo stacking context. Fundo segue mesmas
+coordenadas/cores/altura da pagina; header continua transparente/fixo, botoes
+e foco exatos. Nao alterados hook/algoritmo/cache C146/fila/rotacao/capas,
+source/catalogo/search/player/parental/Android. Spec anterior e evidencia
+C11_WEB_SIDEBAR_SCROLL_BACKGROUND.md.8+7 testes existentes/paleta PASS,
+lock26+27+9 e web build/typecheck PASS31.83s. Auditoria hashes1173/1169, AST
+CSS guardado web/side-nav,3 memorias append,2 docs novos; HEAD/main/index/APK
+C144 intactos. HTTP200 CSS novo nao certifica pixels; CUA vazio e conferencia
+visual da rolagem solicitada. Sem novo APK/install/reset/backend/Git/next Gate.
+
+Confirmacao visual posterior C147: usuario respondeu "DEU CERTO" apos rolar
+alem do Hero e voltar ao topo na aba real. Relato homologa apenas o efeito
+visual solicitado; nao e medicao instrumentada pelo agente. Ciclo C147
+concluido; proximo pedido de guia Live tratado em escopo local separado.
+
+## C148 - consulta EPG independente e foco no ultimo canal - 2026-10-17
+
+Inspecao local de canal por foco/hover separada de selectedChannel. Estado
+bounded1 com escopo/politica parental e fallback ativo; guia DOM com titulo do
+canal consultado e primeira requisicao adiada250ms quando browsing. Timer e
+pedido cancelados, respostas antigas descartadas; consulta ativa/refresh60s e
+clock15s exatos. Foco inicial em paralelo ao player usa API local ID existente,
+uma pagina48 e indice visivel, preservando list loader/virtualizacao. Pedido
+pendente conserva-se durante PIN, sem roubar foco; abort/replay/interacao e
+mudanca de grupo/filtro respeitados. Nao muda escolha do ultimo canal ou fonte.
+56 casos PASS; locks26+27+9 e builds web24.05s/padrao21.98s PASS. Auditoria
+recompoe blocos antigos exceto additions autorizadas, C107 somente bindings,
+4 UI/fixture/3 memorias e3 novos allowlisted; baseline1175/1167 preservados,
+APK C144/HEAD/main/index intactos. Checklist React sem refactor/dependencias.
+Usuario confirmou foco e programacao na aba real; Android fisico nao testado.
+Source/EPG service/search/catalog/Java/parental store intocados. Novo pedido
+explicito de gerar APK e instalar no Fire sera tratado separadamente, sem
+antecipar Gate. Evidencia C11_LIVE_BROWSE_GUIDE.md. Sem backend/Git/reset.
+
+## C149 - empacotamento e update Fire com C148 - 2026-10-17
+
+Usuario confirmou foco/guia no browser e solicitou APK/instalacao Fire. Spec
+previa C11_LIVE_GUIDE_TEST_APK_FIRE_INSTALL.md. ADB identificou unico AFTSS/USB
+G071CQ070344374G, instalado28. Gradle29->30/1.0.29->1.0.30 apenas. Dist padrao
+final C148 reaproveitado sem alteracao funcional; sync/lock26+27+9/Gradle43s e
+205 testes nativos35 suites PASS. APK1.0.30, 11389596 bytes,
+SHA256 44b885186d48d1c96773f7b00fd554a95c95039430a920217aa2a1ae752cce54;8 assets/1412 recursos conferidos,
+HTTPS, assinatura igual ao C144 e instalado. Guia por foco/foco inicial incluidos.
+Install -r30, same firstInstallTime/hash.83 privados/75 catalogo/7 protegidos
+comparados em RAM e preservados; apos abrir, processo ativo10s e identidade/
+chave/instalacao identicos. Sem persistir hashes de conta ou escolher midia/PIN.
+Auditoria1178/1174, somente Gradle/3 memorias e2 docs novos, runtime/HEAD/main/
+index/APK C144 intactos. Arquivo tmp/c149-live-guide-test-apk/Xandeflix-v1.0.30-C149.apk para tablet/celular;
+nao instalados nesses aparelhos. QA visual Fire nao alegada sem CUA.
+Sem reset/backend/Git/novo Gate; evidencia C149 registrada.
+
+
+## C150 - carregamento sem entrada manual - 2026-10-17
+
+Removido Entrar agora do componente compartilhado; Voltar/OK/Espaco/setas
+nao liberam o preparo antecipadamente. Dialogo focavel, conclusao/foco/cleanup
+automaticos e recuperacao de erro preservados. Motor automatico/prazo defensivo
+20s intactos; nenhuma mudanca em App/source/catalog/search/player/Android.
+Spec/evidencia C11_STARTUP_AUTOMATIC_ENTRY_ONLY.md. Suite artwork com11 eventos
+PASS, C1435 casos PASS,28 renders/4 perfis+3 estados de recuperacao/foco PASS.
+Locks26+27+9 e builds web29.15s/padrao23.79s/typecheck PASS;
+HTTP200 dos2 modulos e ambos bundles sem botao. Auditoria1180/1174 preservados,
+2 TSX/teste/3 memorias e2 docs novos; reversao exata/asserts antigos preservados,
+HEAD/main/index/APK149 intactos. CUA vazio, sem teste fisico. Sem novo APK ou
+instalacao;1.0.30 anterior nao contem este patch. CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO.
+
+
+## C151 - painel de producao preparado e Git autorizado - 2026-10-17
+
+Entrada dedicada ADMIN/MASTER, sem App/boot/ativacao/catalogo/player; reutiliza
+Auth/RPCs/recuperacao e escopos existentes, sem editar servicos nem backend.
+Vite/config propria com2 variaveis publicas Supabase do projeto canonico;
+config privada/ausente/projeto errado falham fechados. vercel.json define
+build/rotas/headers, .vercelignore protege privados e preserva XML do lock.
+Spec/evidencia C11_MANAGER_VERCEL_PRODUCTION.md e guia docs/VERCEL_MANAGER.md.
+C1517/C70escopo8/recuperacao15/guia9/PIN12 e startup/web player/store/catalog
+PASS. Locks26+27+9, builds/typecheck painel9.85s/padrao24.98s/web26.00s PASS.
+Bundle6assets com chave publica efetiva, sem TMDB/debug/consumer entry/player
+chunks/sourcemaps. Baseline1182/1177 preservados: somente script package e
+ignore/3 memorias alterados,11 novos C151; runtime/native/APK149 intactos.
+Usuario autorizou commit/push cumulativo C133-C151 em origin/main; remoto
+antes igual HEAD bd7e10c7c069df66328309105b6b210d04c7cf2d. Scan sem segredos
+reais;2 fixtures negativas antigas revisadas. Envio ainda nao executado nesta
+entrada; fechamento posterior registra SHA real. Conta Vercel xandeflix4
+explicitamente proibida, nenhuma mutacao. Nova conta/conexao dependem do usuario,
+CUA sem browser, sem deploy/login real/alteracao Supabase/APK/install.
+CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO.

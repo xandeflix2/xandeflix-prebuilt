@@ -141,6 +141,7 @@
   background: transparent; overflow: hidden;
 }
 #root .live-epg-section .live-epg-embedded :is(.live-epg-inline-heading, .live-epg-channel-name) { display: none; }
+#root .live-epg-section .live-epg-embedded.live-epg-browsing .live-epg-channel-name { display: block; }
 #root .live-epg-section .live-epg-embedded .live-epg-content {
   flex: 1; min-height: 0; padding: 0 12px 12px;
   overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y;
@@ -166,3 +167,24 @@
 .active-group .live-favorite-count {color:#38bdf8;background:#0f172a;}
 .live-channel-favorite-mark {width:18px;height:18px;flex-shrink:0;fill:#facc15;}
 .live-continuous-channel {user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;}
+
+/* Android/Google TV: match channel and guide text to the category labels. */
+html:not([data-web-validation="true"]) #root .app-shell--android-tv.app-shell--live-page:not(.app-shell--fire-stick) :is(
+  .live-channel-column > div:first-child span,
+  .live-channel-column input,
+  .live-continuous-name,
+  .live-continuous-format,
+  .live-page-range,
+  .live-page-button,
+  .live-window-status,
+  .live-window-status p,
+  .live-window-status button,
+  .live-channel-details > div,
+  .live-channel-live-badge,
+  .live-epg-header h3,
+  .live-epg-header span,
+  .live-epg-inline-heading,
+  .live-epg-content :is(h3, p, strong, time, span, button)
+) {
+  font-size: var(--tv-font-xs, 0.85rem) !important;
+}

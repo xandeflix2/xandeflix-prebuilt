@@ -6,7 +6,7 @@ const CLOCK_KEY = '__xandeflix_source_refresh_clock_v1__';
 
 export function canRefreshCatalog(input: { visible: boolean; online: boolean; view: string; playbackState: string; modalOpen: boolean }): boolean {
   return input.visible && input.online && !input.modalOpen &&
-    !['live', 'movie-detail', 'series-detail', 'manager-panel', 'portal'].includes(input.view) &&
+    !['live', 'adult', 'movie-detail', 'series-detail', 'manager-panel', 'portal'].includes(input.view) &&
     !['RESOLVING', 'READY_TO_START', 'OPENING_NATIVE_PLAYER', 'BUFFERING', 'PLAYING', 'PAUSED'].includes(input.playbackState);
 }
 

@@ -37,11 +37,11 @@ export function parentalLiveNeedsPin(channel: LiveChannel, catalog: LiveCatalog)
 }
 export function parentalErrorMessage(error: unknown): string {
   const code = error instanceof Error ? error.message : '';
-  if (code === 'PARENTAL_COOLDOWN') return 'Muitas tentativas. Aguarde alguns minutos antes de tentar novamente.';
+  if (code === 'PARENTAL_COOLDOWN') return 'Limite de tentativas atingido. O acesso ao PIN fica bloqueado por 3 horas após a sexta tentativa incorreta.';
   if (code === 'PARENTAL_ADULT_AGE_LIMIT') return 'Para liberar conteúdo adulto, ajuste primeiro a classificação máxima para 18 anos.';
   if (code === 'PARENTAL_ADULT_DISABLED' || code === 'PARENTAL_SETUP_REQUIRED') return 'Conteúdo adulto bloqueado. Configure e desbloqueie o controle parental em Configurações.';
   if (code === 'PARENTAL_PIN_REQUIRED') return 'Informe o PIN para acessar o controle parental.';
   if (code === 'PARENTAL_RULE_LIMIT') return 'O limite de 256 regras foi atingido. Remova uma regra antes de criar outra.';
-  if (code === 'PARENTAL_CRYPTO_UNAVAILABLE' || code === 'PARENTAL_STORAGE_UNAVAILABLE') return 'A proteção local está indisponível. O acesso restrito permanece bloqueado.';
+  if (code === 'PARENTAL_CRYPTO_UNAVAILABLE' || code === 'PARENTAL_STORAGE_UNAVAILABLE' || code === 'PARENTAL_CLOCK_UNAVAILABLE') return 'A proteção local está indisponível. O acesso restrito permanece bloqueado.';
   return 'Não foi possível concluir. Confira os dados e tente novamente.';
 }

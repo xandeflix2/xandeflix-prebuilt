@@ -20,6 +20,7 @@ export type AppView =
   | 'activation'
   | 'settings'
   | 'parental-control'
+  | 'adult'
   | 'activate-device'
   | 'manager-panel'
   | 'portal';
@@ -27,11 +28,16 @@ export type AppView =
 export interface RouteLocation {
   view: AppView;
   itemId?: string;
+  adultArea?: boolean;
 }
 
 export interface NavigationState {
   current: RouteLocation;
   history: RouteLocation[];
+}
+
+export function isAdultLocation(route: RouteLocation): boolean {
+  return route.view === 'adult' || route.adultArea === true && (route.view === 'movie-detail' || route.view === 'series-detail');
 }
 
 export function createInitialRoute(): NavigationState {
@@ -47,6 +53,7 @@ export function createInitialRoute(): NavigationState {
     'activate-device',
     'settings',
     'parental-control',
+    'adult',
       'debug-source-setup',
       'manager-panel',
       'portal',
@@ -74,15 +81,16 @@ export function createInitialRoute(): NavigationState {
 export function navigateTo(
   state: NavigationState,
   view: AppView,
-  itemId?: string
+  itemId?: string,
+  adultArea = false
 ): NavigationState {
   // Se for a mesma rota, não duplica histórico
-  if (state.current.view === view && state.current.itemId === itemId) {
+  if (state.current.view === view && state.current.itemId === itemId && Boolean(state.current.adultArea) === adultArea) {
     return state;
   }
 
   return {
-    current: { view, itemId },
+    current: { view, itemId, ...(adultArea ? { adultArea: true } : {}) },
     history: [...state.history, state.current],
   };
 }

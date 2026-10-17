@@ -62,8 +62,9 @@ function controlPlaneApiPlugin(): Plugin {
 }
 
 export default defineConfig(({ mode }) => ({
-  plugins: [react(), controlPlaneApiPlugin()],
+  plugins: [react(), ...(mode === 'web' ? [] : [controlPlaneApiPlugin()])],
   define: {
+    __XANDEFLIX_WEB_VALIDATION__: JSON.stringify(mode === 'web' || mode === 'development'),
     __XANDEFLIX_DEBUG_BUILD__: JSON.stringify(
       process.env.VITE_DEBUG_BUILD ? process.env.VITE_DEBUG_BUILD.trim() === 'true' : mode === 'development'
     ),
@@ -79,7 +80,7 @@ export default defineConfig(({ mode }) => ({
     entries: ['index.html'],
   },
   build: {
-    outDir: 'dist',
+    outDir: mode === 'web' ? 'tmp/c136-browser-web/site' : 'dist',
     sourcemap: false,
   },
 }));

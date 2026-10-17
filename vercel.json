@@ -1,0 +1,23 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "vite",
+  "installCommand": "npm ci",
+  "buildCommand": "npm run manager:build",
+  "outputDirectory": "tmp/c151-manager-production/site",
+  "public": false,
+  "rewrites": [
+    { "source": "/", "destination": "/manager.html" },
+    { "source": "/admin", "destination": "/manager.html" },
+    { "source": "/master", "destination": "/manager.html" },
+    { "source": "/manager", "destination": "/manager.html" },
+    { "source": "/manager-reset-password", "destination": "/manager.html" }
+  ],
+  "headers": [
+    { "source": "/(.*)", "headers": [
+      { "key": "X-Content-Type-Options", "value": "nosniff" },
+      { "key": "X-Frame-Options", "value": "DENY" },
+      { "key": "Referrer-Policy", "value": "no-referrer" },
+      { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
+    ] }
+  ]
+}

@@ -14,6 +14,8 @@
  * - Auditoria de duplicação de rawUri
  */
 
+import { installUnconfiguredParentalFixture } from './lib/parental-fixture-bindings.mjs';
+installUnconfiguredParentalFixture();
 import assert from 'node:assert';
 import { DirectStreamResolver } from '../src/playback/direct-stream-resolver.ts';
 import { PlaybackService } from '../src/playback/playback.service.ts';
@@ -54,6 +56,7 @@ async function runAsyncTest(name, fn) {
 
 function createMinimalCatalog(overrides = {}) {
   return {
+    metadata: { schemaVersion: 1, snapshotId: 'synthetic-t4', catalogVersion: '1', generatedAt: '2026-10-17', counts: {} },
     version: '1.0.0',
     generatedAt: '2026-09-10T00:00:00.000Z',
     sourceNamespace: 'test',

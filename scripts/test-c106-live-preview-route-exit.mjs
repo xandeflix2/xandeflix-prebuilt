@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 import ts from 'typescript';
+import { isAdultLocation } from '../src/ui/navigation/route-state.ts';
 const read = file => fs.readFileSync(new URL('../' + file, import.meta.url), 'utf8');
 const source = read('src/ui/pages/LiveTvPage.tsx');
 const app = read('src/App.tsx');
@@ -28,6 +29,7 @@ function fixture({ acquireGate, startGate, castGate, stopGate, denied = false, s
   desiredPreviewChannel: { current: {} }, liveOperation: { current: { abort: () => events.push('abort') } },
   getPreviewBounds: () => ({ left: 0, top: 0, width: 200, height: 100 }), mapPreviewErrorCode: () => 'fixture',
   previewRetryNonce: 0, liveCatalog: {}, liveContextRef: { current: {} }, resumeFullscreen: { current: false }, switchingChannel: { current: false },
+  authorizeParentalLive: async () => true, parentalErrorMessage: () => 'Synthetic parental failure',
   bootTelemetry: { mark() {} }, lastLiveChannel: { remember() {} }, setIsPreviewFullscreen() {}, setControlsReady() {}, setStreamError: e => errors.push(e),
   addNativePreviewPlayingListener: async () => ({ remove: async () => {} }),
   getAuthorizedPlaybackSessionGuard: () => ({
@@ -45,6 +47,7 @@ function fixture({ acquireGate, startGate, castGate, stopGate, denied = false, s
  compile(effectSource, ports);
  let state = { current: { view: 'live' }, history: [{ view: 'home' }] };
  const routePorts = { useCallback: fn => fn, routeStateRef: { current: state }, beforeLiveLeaveRef: { current: prepareToLeave }, navigationIntentRef: { current: 0 },
+  isAdultLocation, parentalControl: { lock: () => events.push('parental-lock') },
   setRouteState: update => { state = update(state); routePorts.routeStateRef.current = state; events.push('route:' + state.current.view); } };
  const { commitRoute } = compile(commitSource + '\nmodule.exports={commitRoute};', routePorts);
  const navigate = view => commitRoute(previous => ({ ...previous, current: { view } }));
@@ -55,6 +58,7 @@ await test('NATIVE_STOP_COMPLETES_BEFORE_HOME_AND_CAST_RELEASE', async () => {
  f.navigate('home'); await tick(); assert.equal(f.state().current.view, 'live'); assert.ok(f.events.includes('stop')); assert.ok(!f.events.includes('cast-stop'));
  gate.resolve(); await tick(); assert.equal(f.state().current.view, 'home');
  assert.ok(f.events.indexOf('hidden') < f.events.indexOf('cast-stop')); assert.ok(f.events.indexOf('release') < f.events.indexOf('route:home'));
+ assert.ok(f.events.indexOf('release') < f.events.indexOf('parental-lock')); assert.ok(f.events.indexOf('parental-lock') < f.events.indexOf('route:home'));
 });
 await test('LATE_START_IS_CANCELLED_AND_REMOVED_BEFORE_ROUTE_PAINT', async () => {
  const gate = deferred(), f = fixture({ startGate: gate }); await tick(); assert.ok(f.events.includes('start'));
@@ -92,7 +96,7 @@ await test('STOP_FAILURE_RETAINS_PAGE_ID_AND_C9_UNTIL_SUCCESSFUL_RETRY', async (
  f.retryStop(); f.navigate('home'); await tick(); assert.equal(f.state().current.view, 'home'); assert.equal(f.events.filter(e => e === 'release').length, 1);
 });
 await test('BACK_HOME_AND_SHELL_USE_BARRIER_AND_NATIVE_HIDE_PRECEDES_TEARDOWN', () => {
- assert.match(app, /commitRoute\(\(prev\) => navigateBack\(prev\)\)/); assert.match(app, /commitRoute\(\(prev\) => navigateTo\(prev, view, itemId\)\)/);
+ assert.match(app, /commitRoute\(\(prev\) => navigateBack\(prev\)\)/); assert.match(app, /commitRoute\(\(prev\) => navigateTo\(prev, view, itemId, adultArea\)\)/);
  assert.ok(app.includes('registerBeforeLeave={registerBeforeLiveLeave}'));
  const native = read('android/app/src/main/java/com/xandeflix/prebuilt/player/NativeAndroidPlayerPlugin.java');
  const stop = native.slice(native.indexOf('public void stopPreview('), native.indexOf('private void resolvePreviewStart'));

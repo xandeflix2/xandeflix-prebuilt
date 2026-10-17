@@ -53,6 +53,8 @@ function load(relative) {
     if(name.endsWith('home-hero.service.ts'))return heroService;
     if(name.endsWith('useSeriesHighlights.ts'))return {useSeriesHighlights:()=>recent};
     if(name.endsWith('useHeroLayout.ts'))return {useHeroLayout:()=>false};
+    if(name.endsWith('device-presentation.ts'))return {isFireTvPresentation:()=>false};
+    if(name.endsWith('web/validation.ts'))return {isWebValidation:()=>false};
     if(name.endsWith('useHeroPlayback.ts'))return {useHeroPlayback:()=>({onPlay(){},playbackBusy:false,playbackMessage:null})};
     if(name.endsWith('usePhoneLayout.ts'))return {usePhoneLayout:()=>false};
     if(name.endsWith('useHeroArtwork.ts'))return {useHeroArtwork:items=>({eligible:items.map(item=>({item,uri:'synthetic'})),revision:0,pending:false})};

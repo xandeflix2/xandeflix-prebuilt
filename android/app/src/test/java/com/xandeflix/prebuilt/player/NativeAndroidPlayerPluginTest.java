@@ -280,6 +280,65 @@ public class NativeAndroidPlayerPluginTest {
     }
 
     @Test
+    public void parentalObscuringRetainsPlayerMediaAndSessionUntilRestored() throws Exception {
+        NativeAndroidPlayerPlugin owner = new NativeAndroidPlayerPlugin();
+        TestPluginCall start = new TestPluginCall();
+        start.put("uri", "https://fixture.test/live/channel1.ts"); start.put("kind", "live");
+        owner.startPreview(start);
+        String id = owner.getCurrentPreviewId();
+        java.lang.reflect.Field media = NativeAndroidPlayerPlugin.class.getDeclaredField("previewPlayer");
+        java.lang.reflect.Field candidates = NativeAndroidPlayerPlugin.class.getDeclaredField("previewCandidateRequests");
+        java.lang.reflect.Field hidden = NativeAndroidPlayerPlugin.class.getDeclaredField("previewObscured");
+        for (java.lang.reflect.Field f : new java.lang.reflect.Field[]{media, candidates, hidden}) f.setAccessible(true);
+        Object requests = candidates.get(owner);
+        java.util.List<String> operations = new java.util.ArrayList<>();
+        Object player = java.lang.reflect.Proxy.newProxyInstance(getClass().getClassLoader(),
+                new Class<?>[]{androidx.media3.exoplayer.ExoPlayer.class}, (p,m,a) -> { operations.add(m.getName()); return null; });
+        media.set(owner, player);
+        for (boolean obscured : new boolean[]{true, false, true}) {
+            TestPluginCall change = new TestPluginCall(); change.put("previewId", id); change.put("obscured", obscured);
+            owner.updatePreview(change);
+            assertTrue(change.resolved); assertFalse(change.rejected);
+            assertEquals(obscured, hidden.getBoolean(owner));
+            assertSame(player, media.get(owner)); assertSame(requests, candidates.get(owner));
+            assertEquals(id, owner.getCurrentPreviewId()); assertTrue(owner.isPreviewActive());
+            assertTrue("Visibility must not perform any ExoPlayer operation", operations.isEmpty());
+        }
+        TestPluginCall geometry = new TestPluginCall(); geometry.put("previewId", id);
+        geometry.put("left", 1.0); geometry.put("top", 1.0); geometry.put("width", 400.0); geometry.put("height", 225.0);
+        owner.updatePreview(geometry); assertTrue(geometry.resolved); assertTrue(hidden.getBoolean(owner));
+        assertTrue(operations.isEmpty());
+        media.set(owner, null);
+        TestPluginCall stop = new TestPluginCall(); stop.put("previewId", id); owner.stopPreview(stop);
+        assertTrue(stop.resolved); assertFalse(hidden.getBoolean(owner)); assertFalse(owner.isPreviewActive());
+    }
+
+    @Test
+    public void parentalObscuringRejectsStaleMissingMixedVodAndInactiveRequests() throws Exception {
+        TestPluginCall start = new TestPluginCall(); start.put("uri", "https://fixture.test/live/channel1.ts"); start.put("kind", "live");
+        plugin.startPreview(start);
+        java.lang.reflect.Field hidden = NativeAndroidPlayerPlugin.class.getDeclaredField("previewObscured"); hidden.setAccessible(true);
+        for (String id : new String[]{null, "stale-preview"}) {
+            TestPluginCall stale = new TestPluginCall(); stale.put("previewId", id); stale.put("obscured", true);
+            plugin.updatePreview(stale); assertTrue(stale.rejected); assertFalse(hidden.getBoolean(plugin));
+        }
+        for (String field : new String[]{"uri", "headers", "suspendPlayback"}) {
+            TestPluginCall mixed = new TestPluginCall(); mixed.put("previewId", plugin.getCurrentPreviewId()); mixed.put("obscured", true);
+            mixed.put(field, field.equals("uri") ? "https://fixture.test/live/channel2.ts"
+                    : field.equals("headers") ? new TestJSObject().putHeader("User-Agent", "Synthetic") : true);
+            plugin.updatePreview(mixed); assertTrue(mixed.rejected); assertFalse(hidden.getBoolean(plugin));
+        }
+        plugin.stopPreview(new TestPluginCall());
+        TestPluginCall inactive = new TestPluginCall(); inactive.put("previewId", "old"); inactive.put("obscured", true);
+        plugin.updatePreview(inactive); assertTrue(inactive.rejected);
+        TestPluginCall vod = new TestPluginCall(); vod.put("uri", "https://fixture.test/vod/movie.mp4"); vod.put("kind", "vod");
+        plugin.startPreview(vod); assertTrue(vod.resolved);
+        TestPluginCall change = new TestPluginCall(); change.put("previewId", plugin.getCurrentPreviewId()); change.put("obscured", true);
+        plugin.updatePreview(change); assertTrue(change.rejected); assertFalse(hidden.getBoolean(plugin));
+        plugin.stopPreview(new TestPluginCall());
+    }
+
+    @Test
     public void testPreviewStopContract() {
         TestPluginCall startCall = new TestPluginCall();
         startCall.put("uri", "http://server.iptv:8080/live/user/pass/1.ts");

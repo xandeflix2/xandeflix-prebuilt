@@ -1,11 +1,37 @@
 .settings-page { width: min(1080px, 100%); margin: 0 auto; padding: clamp(18px, 3vw, 40px); }
-.settings-sections { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 24px; }
+.settings-sections { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 24px; align-items: start; }
 .settings-section { background: #101624; border: 1px solid #ffffff25; border-radius: 14px; padding: clamp(20px, 3vw, 32px); }
 .settings-section h2 { font-size: clamp(20px, 2vw, 26px); margin: 0 0 16px; }
 .settings-section p { color: #bcc5d3; font-size: 16px; line-height: 1.5; margin: 12px 0; }
 .settings-section strong { color: #fff; }
 .settings-section button { margin-top: 12px; min-height: 46px; }
 .settings-credits { margin-top: 24px; color: #94a3b8; font-size: 12px; line-height: 1.5; }
+.settings-source { min-width: 0; overflow-wrap: anywhere; }
+.settings-source button { display: block; width: 100%; }
+.settings-option { min-width: 0; background: #101624; border: 1px solid #ffffff25; border-radius: 14px; overflow-wrap: anywhere; }
+.settings-option-summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; width: 100%; min-height: 112px; padding: 20px; border: 0; border-radius: 14px; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.settings-option-copy { display: grid; gap: 8px; min-width: 0; }
+.settings-option-title { color: #fff; font-size: 20px; font-weight: 700; line-height: 1.3; }
+.settings-option-description { color: #bcc5d3; font-size: 14px; line-height: 1.45; }
+.settings-option-chevron { flex: 0 0 auto; color: #bcc5d3; font-size: 30px; line-height: 1; }
+#root .settings-option-summary:focus { outline: 2px solid #ff5261 !important; outline-offset: -2px; box-shadow: 0 0 0 2px #ff526126; }
+.settings-window { width: min(760px, calc(100vw - 32px)); max-height: calc(100dvh - 48px); padding: 0; margin: auto; border: 1px solid #ffffff35; border-radius: 16px; background: #101624; color: #fff; box-shadow: 0 24px 80px #0009; }
+.settings-window[open] { display: flex; flex-direction: column; }
+.settings-window::backdrop { background: #000b; }
+.settings-window-header { display: flex; flex: 0 0 auto; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 20px; border-bottom: 1px solid #ffffff20; }
+.settings-window-header h2 { margin: 0; font-size: clamp(20px, 2vw, 24px); line-height: 1.3; }
+.settings-window-close { flex: 0 0 auto; min-height: 44px; padding: 8px 16px; }
+.settings-window-body { min-height: 0; overflow: auto; overscroll-behavior: contain; }
+.settings-window-body > .settings-section { border: 0; background: transparent; border-radius: 0; }
+.settings-window-body > .settings-section > h2 { display: none; }
+#root .settings-window .focusable-item:focus { outline: 2px solid #ff5261 !important; outline-offset: -2px; }
+@media (max-width: 599px) {
+  .settings-sections { gap: 12px; }
+  .settings-option-summary { min-height: 96px; padding: 16px; }
+  .settings-option-title { font-size: 18px; }
+}
+.header-adult-button { display: none; }
+@media (max-width: 599px) { .header-adult-button { display: inline-flex; align-items: center; justify-content: center; color: #cbd5e1; background: #ffffff12; border: 1px solid #ffffff20; border-radius: 10px; min-width: 38px; min-height: 40px; } }
 
 #root :is(.app-shell--fire-stick, .app-shell--tablet) .settings-sections {
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -21,4 +47,25 @@
 #root :is(.app-shell--fire-stick, .app-shell--tablet) .settings-section button {
   max-width: 100%;
   white-space: normal;
+}
+
+/* Match every landscape card, including the final row, without clipping text. */
+@media (orientation: landscape) {
+  html:not([data-web-validation="true"]):not([data-device-presentation="phone"]) #root :is(.app-shell--tablet, .app-shell--television) .settings-sections {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-auto-rows: 1fr;
+    align-items: stretch;
+    gap: 16px;
+  }
+  html:not([data-web-validation="true"]):not([data-device-presentation="phone"]) #root :is(.app-shell--tablet, .app-shell--television) .settings-option-summary {
+    height: 100%;
+    min-height: clamp(108px, 10vw, 128px);
+    padding: clamp(12px, 1.4vw, 18px);
+    gap: 12px;
+    white-space: normal;
+  }
+  html:not([data-web-validation="true"]):not([data-device-presentation="phone"]) #root :is(.app-shell--tablet, .app-shell--television) .settings-option-copy { gap: 6px; }
+  html:not([data-web-validation="true"]):not([data-device-presentation="phone"]) #root :is(.app-shell--tablet, .app-shell--television) .settings-option-title { font-size: clamp(15px, 1.55vw, 18px); }
+  html:not([data-web-validation="true"]):not([data-device-presentation="phone"]) #root :is(.app-shell--tablet, .app-shell--television) .settings-option-description { font-size: clamp(11px, 1.15vw, 13px); }
+  html:not([data-web-validation="true"]):not([data-device-presentation="phone"]) #root :is(.app-shell--tablet, .app-shell--television) .settings-option-chevron { font-size: 24px; }
 }

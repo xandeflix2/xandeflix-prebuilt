@@ -73,7 +73,14 @@ function pageHeroTarget(current: HTMLElement): HTMLElement | null {
   return pageHeroControls(current.closest('main') || document)[0] || null;
 }
 
+function activationControls(page: Element): HTMLElement[] {
+  return Array.from(page.querySelectorAll('.focusable-item')).filter((control): control is HTMLElement =>
+    isFocusable(control) && !control.closest('[hidden], [aria-hidden="true"]') && control.getClientRects().length > 0);
+}
+
 function findNextDpadTarget(current: HTMLElement, key: Direction, previousContent: HTMLElement | null, grids: WeakMap<Element, GridNavigation>): HTMLElement | null {
+  const parentalDialog = current.closest('.parental-dialog[open]');
+  if (parentalDialog) return parentalDpadTarget(parentalDialog, current, key, null, null);
   const sideShell = current.closest('.app-shell--side-nav');
   const sideMenu = sideShell && !current.closest('.modal-content, .player-overlay')
     ? sideShell.querySelector<HTMLElement>('.header-nav .nav-link.active') || sideShell.querySelector<HTMLElement>('.header-nav .focusable-item')
@@ -83,12 +90,29 @@ function findNextDpadTarget(current: HTMLElement, key: Direction, previousConten
   const parentalPage = !current.closest('.modal-content, .player-overlay')
     ? current.closest('.parental-page') : null;
   if (parentalPage && !current.closest('.catalog-grid')) return parentalDpadTarget(parentalPage, current, key, pageBack || null, sideMenu);
+  const activationPage = !current.closest('.modal-content, .player-overlay, .catalog-grid') ? current.closest('.activation-page, .adult-page') : null;
+  if (activationPage) {
+    if (key === 'ArrowLeft') return sideMenu || pageBack || current;
+    if (key === 'ArrowRight') return current;
+    if (current.classList.contains('activation-page__diagnostic')) {
+      const remaining = key === 'ArrowDown' ? current.scrollHeight - current.clientHeight - current.scrollTop : current.scrollTop;
+      if (remaining > 1) {
+        current.scrollTop += (key === 'ArrowDown' ? 1 : -1) * Math.max(40, current.clientHeight * .7);
+        return current;
+      }
+    }
+    const controls = activationControls(activationPage), index = controls.indexOf(current);
+    return controls[index + (key === 'ArrowDown' ? 1 : -1)]
+      || (key === 'ArrowUp' ? pageBack || sideMenu : null) || current;
+  }
   if (pageBack && key === 'ArrowUp' && current.closest('.filter-bar, .hero-actions, .detail-hero-wide .detail-actions')) return pageBack;
   if (sideMenu && current.closest('.page-back-row')) {
     if (key === 'ArrowDown') {
       const content = sideShell?.querySelector('.app-content');
       const parental = content?.querySelector('.parental-page');
       if (parental) return parentalEntry(parental) || current;
+      const activation = content?.querySelector('.activation-page, .adult-page');
+      if (activation) return activationControls(activation)[0] || current;
       return (content ? pageHeroControls(content)[0] : null) || current;
     }
     if (key === 'ArrowLeft') return focusableSibling(current, false) || sideMenu;
@@ -199,6 +223,8 @@ function findNextDpadTarget(current: HTMLElement, key: Direction, previousConten
         ? previousContent : parentalEntry(parental) || pageBack || current;
       if (previousContent?.isConnected && isFocusable(previousContent) && content?.contains(previousContent)
         && previousContent.getClientRects().length > 0) return previousContent;
+      const activation = content?.querySelector('.activation-page, .adult-page');
+      if (activation) return activationControls(activation)[0] || pageBack || current;
       return content?.querySelector<HTMLElement>('[data-dpad-region="live-categories"] .active-group.focusable-item:not([disabled])')
         || content?.querySelector<HTMLElement>('[data-dpad-region="live-categories"] .focusable-item:not([disabled])')
         || (content ? pageHeroControls(content)[0] : null)
@@ -447,9 +473,9 @@ export function useDpadNavigation(options: UseDpadNavigationOptions = {}): void 
       if (key === 'Enter' || (event as any).keyCode === 23 || key === ' ') {
         const active = document.activeElement as HTMLElement;
         // Preserve the trusted native activation/IME and spaces in a PUK.
-        // The parental page separately rejects implicit submission from inputs.
+        // The parental editor separately rejects implicit submission from inputs.
         if (active instanceof HTMLInputElement && active.type !== 'checkbox'
-          && active.closest('.parental-page')) return;
+          && active.closest('.parental-page, .parental-dialog')) return;
         if (active && active.classList.contains('focusable-item')) {
           active.click();
           event.preventDefault();
@@ -463,7 +489,7 @@ export function useDpadNavigation(options: UseDpadNavigationOptions = {}): void 
       }
 
       const focused = document.activeElement as HTMLElement | null;
-      if ((key === 'ArrowLeft' || key === 'ArrowRight') && focused?.closest('.app-shell--side-nav')
+      if ((key === 'ArrowLeft' || key === 'ArrowRight') && focused?.closest('.app-shell--side-nav, .parental-dialog')
         && (focused instanceof HTMLInputElement || focused instanceof HTMLTextAreaElement || focused.isContentEditable)) {
         return;
       }
@@ -481,7 +507,9 @@ export function useDpadNavigation(options: UseDpadNavigationOptions = {}): void 
       let current = isFocusable(active) ? active : null;
 
       if (!current) {
+        const parentalDialog = document.querySelector('.parental-dialog[open]');
         const fallback =
+          (parentalDialog ? parentalEntry(parentalDialog) : null) ||
           document.querySelector<HTMLElement>('.header-nav .nav-link.active') ||
           document.querySelector<HTMLElement>('.media-rail-track .focusable-item:not([disabled])') ||
           document.querySelector<HTMLElement>('.focusable-item:not([disabled])');

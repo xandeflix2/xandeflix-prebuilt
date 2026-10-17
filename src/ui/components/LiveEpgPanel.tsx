@@ -8,9 +8,10 @@ interface LiveEpgPanelProps {
   onToggle: () => void;
   inline?: boolean;
   embedded?: boolean;
+  browsing?: boolean;
 }
 
-function EpgSchedule({ channel }: { channel: LiveChannel }) {
+function EpgSchedule({ channel, browsing = false }: { channel: LiveChannel; browsing?: boolean }) {
   const [result, setResult] = useState<LiveEpgResult | null>(null);
   const [now, setNow] = useState(Date.now);
   const [retry, setRetry] = useState(0);
@@ -23,17 +24,18 @@ function EpgSchedule({ channel }: { channel: LiveChannel }) {
       if (!disposed && !request.signal.aborted) { setNow(Date.now()); setResult(next); }
     };
     setResult(null);
-    void refresh();
+    const pending = browsing ? setTimeout(() => { void refresh(); }, 250) : undefined;
+    if (!browsing) void refresh();
     const timer = setInterval(() => { void refresh(); }, 60000);
     const clock = setInterval(() => setNow(Date.now()), 15000);
-    return () => { disposed = true; controller?.abort(); clearInterval(timer); clearInterval(clock); };
-  }, [channel, retry]);
+    return () => { disposed = true; controller?.abort(); if (pending !== undefined) clearTimeout(pending); clearInterval(timer); clearInterval(clock); };
+  }, [channel, retry, browsing]);
   const programs = result?.status === 'ready' ? result.programs.filter(p => p.end > now) : [];
   const current = programs.find(p => p.start <= now && now < p.end);
   const format = (date: number) => new Date(date).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
   const date = (time: number) => new Date(time).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
   return <>
-    <h3 className="live-epg-channel-name">{channel.name}</h3>
+    <h3 className="live-epg-channel-name">{browsing ? 'Programação: ' : ''}{channel.name}</h3>
     {!result ? <p className="live-epg-message" role="status"><span className="live-epg-spinner" aria-hidden="true"/>Carregando programação…</p>
       : result.status === 'error' ? <div className="live-epg-message" role="status"><p>Não foi possível carregar a programação.</p><button type="button" className="focusable-item live-epg-retry" onClick={() => setRetry(v => v + 1)}>Tentar novamente</button></div>
       : !programs.length ? <p className="live-epg-message" role="status">{result.status === 'unavailable' && result.reason === 'unauthorized' ? 'Acesso à programação indisponível. Verifique a autorização da fonte.' : 'Programação indisponível para este canal. A fonte não forneceu uma grade compatível.'}</p>
@@ -53,7 +55,7 @@ function EpgSchedule({ channel }: { channel: LiveChannel }) {
   </>;
 }
 
-export function LiveEpgPanel({ channel, open, onToggle, inline = false, embedded = false }: LiveEpgPanelProps) {
+export function LiveEpgPanel({ channel, open, onToggle, inline = false, embedded = false, browsing = false }: LiveEpgPanelProps) {
   const panel = useRef<HTMLElement>(null), toggle = useRef<HTMLButtonElement>(null), wasOpen = useRef(false);
   const [top, setTop] = useState(0);
   useLayoutEffect(() => {
@@ -85,7 +87,7 @@ export function LiveEpgPanel({ channel, open, onToggle, inline = false, embedded
     if (wasOpen.current && !open && !inline) toggle.current?.focus({ preventScroll: true });
     wasOpen.current = open;
   }, [open, inline]);
-  return <section ref={panel} className={`live-mobile-epg${inline ? ' live-epg-inline' : ''}${open ? ' live-mobile-epg--open' : ''}${embedded ? ' live-epg-embedded focusable-item' : ''}`} tabIndex={embedded ? 0 : undefined} style={inline ? undefined : { top }} aria-label="Guia de programação do canal"
+  return <section ref={panel} className={`live-mobile-epg${inline ? ' live-epg-inline' : ''}${open ? ' live-mobile-epg--open' : ''}${embedded ? ' live-epg-embedded focusable-item' : ''}${browsing ? ' live-epg-browsing' : ''}`} tabIndex={embedded ? 0 : undefined} style={inline ? undefined : { top }} aria-label="Guia de programação do canal"
     onKeyDown={embedded ? event => {
       if(event.target!==event.currentTarget||!['ArrowDown','ArrowUp'].includes(event.key))return;
       const content=panel.current?.querySelector<HTMLElement>('.live-epg-content');if(!content)return;
@@ -98,7 +100,7 @@ export function LiveEpgPanel({ channel, open, onToggle, inline = false, embedded
       <svg className="live-epg-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg>
     </button>}
     <div id="live-mobile-epg-content" className="live-epg-content" role="region" aria-label={`Programação de ${channel.name}`} aria-hidden={!open}>
-      {open && <EpgSchedule key={channel.id} channel={channel}/>}
+      {open && <EpgSchedule key={channel.id} channel={channel} browsing={browsing}/>}
     </div>
   </section>;
 }

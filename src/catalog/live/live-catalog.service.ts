@@ -253,11 +253,11 @@ export class LiveCatalogService {
   }
 
   /** Carrega o first-fold Live do snapshot atualmente ativo. */
-  static async loadLiveCatalog(parentalEditor = false): Promise<LiveCatalog | null> {
+  static async loadLiveCatalog(parentalEditor = false, includeLockedGroups = false): Promise<LiveCatalog | null> {
     if (parentalEditor && !parentalControl.getSnapshot().admin) throw new Error('PARENTAL_PIN_REQUIRED');
     const pointer = await this.readActivePointer();
     if (!pointer?.snapshotId) return null;
-    if (this.cachedCatalog?.snapshotId === pointer.snapshotId) return parentalEditor ? this.cachedCatalog : parentalLiveCatalog(this.cachedCatalog);
+    if (this.cachedCatalog?.snapshotId === pointer.snapshotId) return parentalEditor ? this.cachedCatalog : parentalLiveCatalog(this.cachedCatalog, includeLockedGroups);
 
     try {
       const file = await Filesystem.readFile({
@@ -268,7 +268,7 @@ export class LiveCatalogService {
       if (typeof file.data !== 'string' || !file.data) return null;
       const parsed = this.ensureChannelsByGroup(JSON.parse(file.data) as LiveCatalog);
       this.cachedCatalog = parsed;
-      return parentalEditor ? parsed : parentalLiveCatalog(parsed);
+      return parentalEditor ? parsed : parentalLiveCatalog(parsed, includeLockedGroups);
     } catch {
       return null;
     }

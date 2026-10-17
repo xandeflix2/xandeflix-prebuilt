@@ -1,4 +1,10 @@
 import assert from 'node:assert/strict';
+import { parentalFixtureBindings, installUnconfiguredParentalFixture } from './lib/parental-fixture-bindings.mjs';
+import { parentalControl } from '../src/parental/parental-control.store.ts';
+import { CatalogReadModel } from '../src/catalog/catalog-read-model.ts';
+import * as catalogSelectors from '../src/catalog/catalog-selectors.ts';
+installUnconfiguredParentalFixture();
+await parentalControl.load();
 import { readFileSync } from 'node:fs';
 import ts from 'typescript';
 import { resolveSegmentRelativePath } from '../src/bootstrap/storage/segment-path-resolver.ts';
@@ -11,7 +17,7 @@ const source = name => readFileSync(new URL('../' + name, import.meta.url), 'utf
 function load(name, require) {
   const module = { exports: {} };
   const code = ts.transpileModule(source(name), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.React } }).outputText;
-  new Function('require', 'module', 'exports', code)(require, module, module.exports);
+  new Function('require', 'module', 'exports', code)(name => parentalFixtureBindings(name) || require(name), module, module.exports);
   return module.exports;
 }
 let tests = 0;
@@ -113,7 +119,8 @@ function flatten(node) {
 const MediaCard = () => null, Artwork = () => null;
 const renderSearch = (runtime, readModel, callbacks) => {
   const component = load('src/ui/components/SearchResults.tsx', name => name === 'react' ? { default: runtime.react, ...runtime.react }
-    : name.includes('catalog-selectors') ? { movieToViewModel: () => { throw Error('unexpected hydrated movie'); }, seriesToViewModel: () => { throw Error('unexpected hydrated series'); } }
+    : name.includes('catalog-selectors') ? catalogSelectors
+    : name.includes('live-catalog.service') ? liveModule
     : name.includes('MediaCard') ? { MediaCard } : { Artwork });
   return { ...component, tree: component.SearchResults({ results: searched, readModel, ...callbacks }) };
 };
@@ -121,19 +128,26 @@ await test('LOCAL_COMPLETE_INDEX_LIVE_CARD_HAS_DISTINCT_HANDLER_AND_NO_SERIES_HY
   assert.deepEqual(new Set(searched.map(row => row.kind)), new Set(['movie', 'series', 'live']));
   assert.ok(searched.some(row => row.id === target.id && row.kind === 'live'));
   const runtime = hooks(), resolutions = [], selected = [];
-  const readModel = { moviesById: new Map(), seriesById: new Map(),
-    resolveMovieById: async id => { resolutions.push(['movie', id]); },
-    resolveSeriesById: async id => { resolutions.push(['series', id]); } };
-  const { tree } = renderSearch(runtime, readModel, { onSelectItem: item => selected.push(item.kind), onSelectLive: id => selected.push(id) });
+  const readModel = new CatalogReadModel(rootCatalog);
+  const resolveMovie = readModel.resolveMovieById.bind(readModel), resolveSeries = readModel.resolveSeriesById.bind(readModel);
+  readModel.resolveMovieById = async id => { resolutions.push(['movie', id]); return resolveMovie(id); };
+  readModel.resolveSeriesById = async id => { resolutions.push(['series', id]); return resolveSeries(id); };
+  const callbacks = { onSelectItem: item => selected.push(item.kind), onSelectLive: id => selected.push(id) };
+  const initial = renderSearch(runtime, readModel, callbacks);
+  assert.ok(!flatten(initial.tree).some(node => node.props?.['aria-label']?.includes('Canal ao vivo')), 'live artwork stays hidden until local parental verification');
+  const cleanup = runtime.effects[0].run(); for(let i=0;i<10;i++) await tick();
+  runtime.begin(); const { tree } = renderSearch(runtime, readModel, callbacks);
   const liveCard = flatten(tree).find(node => node.type === 'button' && node.props['aria-label']?.includes('Canal ao vivo'));
   assert.ok(liveCard); assert.equal(liveCard.props.disabled, false); liveCard.props.onClick();
   assert.deepEqual(selected, [target.id]);
   assert.ok(flatten(liveCard).some(node => node.type === Artwork && node.props.identity === undefined && node.props.prepare === false));
   for (const card of flatten(tree).filter(node => node.type === MediaCard)) card.props.onClick(card.props.item);
   assert.deepEqual(new Set(selected.slice(1)), new Set(['movie', 'series']));
-  const cleanup = runtime.effects[0].run(); await tick(); cleanup();
+  cleanup();
   assert.equal(resolutions.length, 2); assert.ok(resolutions.every(([, id]) => id !== target.id));
-  const unavailable = renderSearch(hooks(), readModel, { onSelectItem() {} }).tree;
+  const unavailableRuntime = hooks(); renderSearch(unavailableRuntime, readModel, { onSelectItem() {} });
+  const unavailableCleanup = unavailableRuntime.effects[0].run(); for(let i=0;i<10;i++) await tick();
+  unavailableRuntime.begin(); const unavailable = renderSearch(unavailableRuntime, readModel, { onSelectItem() {} }).tree; unavailableCleanup();
   assert.equal(flatten(unavailable).find(node => node.type === 'button').props.disabled, true);
 });
 await test('SEARCH_PAGE_PASSES_LIVE_CALLBACK_WITHOUT_CHANGING_MOVIE_SERIES_CALLBACK', () => {

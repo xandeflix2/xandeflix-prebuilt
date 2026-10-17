@@ -74,8 +74,8 @@ export function parentalLiveAge(channel: LiveChannel, catalog: LiveCatalog): num
   return ages.length ? Math.max(...ages) : undefined;
 }
 /** Raw snapshot is never modified; only an ephemeral visible projection is returned. */
-export function parentalLiveCatalog(catalog: LiveCatalog): LiveCatalog {
-  const groups = catalog.groups.filter(g => canShowParentalGroup(g.name)), ids = new Set(groups.map(g => g.id));
+export function parentalLiveCatalog(catalog: LiveCatalog, includeLockedGroups = false): LiveCatalog {
+  const groups = catalog.groups.filter(g => includeLockedGroups || canShowParentalGroup(g.name)), ids = new Set(groups.map(g => g.id));
   const allowed = (c: LiveChannel) => ids.has(c.groupId) && canShowParentalLive(c, catalog);
   return { ...catalog, groups, channels: catalog.channels.filter(allowed),
     channelsByGroup: Object.fromEntries(groups.map(g => [g.id, (catalog.channelsByGroup[g.id] || []).filter(allowed)])) };

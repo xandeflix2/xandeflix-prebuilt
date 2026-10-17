@@ -28,7 +28,7 @@ public class C112KeyDispatchHarness {
  ${method(controls,'private void adjustVolume(')}
  ${method(controls,'boolean dispatchKey(')}
  }
- static class NativeAndroidPlayerPlugin{boolean isPreviewActive=true,previewFullscreen,previewInPip;LivePlayerControls liveControls=new LivePlayerControls();
+ static class NativeAndroidPlayerPlugin{boolean isPreviewActive=true,previewFullscreen,previewInPip,previewObscured;LivePlayerControls liveControls=new LivePlayerControls();
  ${method(plugin,'public boolean dispatchLiveKey(')}
  ${method(plugin,'static boolean shouldDispatchLiveKey(')}
  }
@@ -52,6 +52,7 @@ public class C112KeyDispatchHarness {
   c.disposing=true;a.dispatchKeyEvent(key(KeyEvent.KEYCODE_CHANNEL_UP,KeyEvent.ACTION_DOWN,0));check(c.events.size()==3,"DISPOSED_NO_EMISSION");c.disposing=false;
   c.dialog=new Object();check(!a.dispatchKeyEvent(key(KeyEvent.KEYCODE_CHANNEL_UP,KeyEvent.ACTION_DOWN,0)),"DIALOG_KEEPS_KEYS");check(c.events.size()==3,"DIALOG_NO_CHANNEL_CHANGE");c.dialog=null;
   a.plugin.previewInPip=true;check(!a.dispatchKeyEvent(key(KeyEvent.KEYCODE_CHANNEL_UP,KeyEvent.ACTION_DOWN,0)),"PIP_EXCLUDED");a.plugin.previewInPip=false;
+  a.plugin.previewObscured=true;check(!a.dispatchKeyEvent(key(KeyEvent.KEYCODE_CHANNEL_UP,KeyEvent.ACTION_DOWN,0)),"PARENTAL_MODAL_KEEPS_NATIVE_CHANNEL_KEYS");check(c.events.size()==3,"PARENTAL_MODAL_NO_CHANNEL_CHANGE");a.plugin.previewObscured=false;
   a.plugin.isPreviewActive=false;check(!a.dispatchKeyEvent(key(KeyEvent.KEYCODE_CHANNEL_UP,KeyEvent.ACTION_DOWN,0)),"INACTIVE_EXCLUDED");a.plugin.isPreviewActive=true;
   a.plugin.previewFullscreen=false;c.view.visible=false;c.view.focused=false;
   check(!a.dispatchKeyEvent(key(KeyEvent.KEYCODE_DPAD_UP,KeyEvent.ACTION_DOWN,0)),"INLINE_DPAD_NOT_STOLEN");check(c.view.shown==0,"INLINE_FOCUS_UNCHANGED");

@@ -21,7 +21,7 @@ function AgeField({ label, value, onChange, television }: { label: string; value
   </div></div> : <label>{label}<select className="focusable-item" value={value} onChange={e => onChange(Number(e.target.value))}>{ages}</select></label>;
 }
 type Selection = { key: string; title: string; poster?: string };
-export function ParentalControlPage({ readModel }: { readModel: CatalogReadModel | null; onBack: () => void }) {
+export function ParentalControlPage({ readModel, onOpenAdult }: { readModel: CatalogReadModel | null; onBack: () => void; onOpenAdult?: () => void }) {
   const state = useParentalControl();
   const choice = useDevicePresentation();
   const television = isTelevisionPresentation(navigator.userAgent, choice);
@@ -110,7 +110,7 @@ export function ParentalControlPage({ readModel }: { readModel: CatalogReadModel
           </form> : <><form onSubmit={e => { e.preventDefault(); void run(async () => { await parentalControl.updatePolicy({ maxAge, allowAdult }); setMessage('Preferências salvas neste aparelho.'); }); }}><h2>Classificações permitidas</h2>{policyFields}<button className="focusable-item btn-primary" type="submit">Salvar preferências</button></form>
             <div className="parental-actions"><button className="focusable-item btn-secondary" type="button" disabled={!readModel} onClick={() => setMode('search')}>Buscar e restringir conteúdo ({parentalControl.rules().length}/256)</button>
               <button className="focusable-item btn-secondary" type="button" onClick={() => { clearSecrets(); setMode('pin'); }}>Alterar PIN</button><button className="focusable-item btn-secondary" type="button" onClick={() => { clearSecrets(); setMode('puk'); }}>Alterar PUK</button></div>
-            {state.policy.allowAdult && state.policy.maxAge === 18 && <form onSubmit={e => { e.preventDefault(); void run(async () => { const ok = await parentalControl.unlockAdult(pin); setPin(''); setMessage(ok ? 'Navegação adulta liberada por até 15 minutos. Cada título continua protegido pelo PIN.' : 'PIN incorreto.'); }); }}><h2>Navegação de conteúdo adulto</h2><label>PIN para liberar sessão<input className="focusable-item" type="password" inputMode="numeric" maxLength={6} autoComplete="off" value={pin} onChange={e => setPin(e.target.value.replace(/\D/g, ''))}/></label><button type="submit" className="focusable-item btn-secondary" disabled={!validateParentalPin(pin)}>Liberar por 15 minutos</button></form>}
+            {state.policy.allowAdult && state.policy.maxAge === 18 && <section><h2>Área 18+</h2><p>Use o acesso 18+ no menu para informar o PIN e abrir a grade protegida.</p>{onOpenAdult && <button type="button" className="focusable-item btn-secondary" onClick={onOpenAdult}>Abrir área 18+</button>}</section>}
             <div className="parental-actions"><button className="focusable-item btn-secondary" type="button" onClick={() => { parentalControl.lock(); clearSecrets(); setMessage('Conteúdo restrito bloqueado.'); }}>Bloquear conteúdo restrito agora</button></div>
           </>}
       </fieldset>}
