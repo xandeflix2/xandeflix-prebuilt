@@ -50,6 +50,10 @@ export function parseMoviePresentation(raw: unknown, tmdbId: number): MoviePrese
 }
 
 interface Options { credential:()=>string; fetchImpl?:typeof fetch; now?:()=>number; timeoutMs?:number; kind?:'movie'|'series' }
+const ageListeners = new Set<() => void>();
+export function subscribePresentationAges(listener: () => void): () => void {
+  ageListeners.add(listener); return () => { ageListeners.delete(listener); };
+}
 /** Optional public metadata; no source/catalog writes and no video bytes. */
 export class SeriesPresentationService {
   private cache=new Map<number,{expires:number;value:SeriesPresentation}>();
@@ -57,6 +61,10 @@ export class SeriesPresentationService {
   private queue:Array<()=>void>=[]; private active=0; private pausedUntil=0;
   private options:Options;
   constructor(options:Options) {this.options=options;}
+  peek(tmdbId:number):SeriesPresentation|null {
+    const cached=this.cache.get(tmdbId);
+    return cached && cached.expires>(this.options.now?.()??Date.now()) ? cached.value : null;
+  }
   resolve(tmdbId:number):Promise<SeriesPresentation|null> {
     const now=this.options.now?.()??Date.now();
     if(!Number.isSafeInteger(tmdbId)||tmdbId<=0||!this.options.credential().trim()||now<this.pausedUntil)return Promise.resolve(null);
@@ -72,7 +80,9 @@ export class SeriesPresentationService {
         let value:SeriesPresentation|null=null;
         try {
           value=await this.request(tmdbId);
-          if(value){this.cache.delete(tmdbId);this.cache.set(tmdbId,{expires:(this.options.now?.()??Date.now())+6*60*60*1000,value});while(this.cache.size>64)this.cache.delete(this.cache.keys().next().value!);}
+          if(value){this.cache.delete(tmdbId);this.cache.set(tmdbId,{expires:(this.options.now?.()??Date.now())+6*60*60*1000,value});while(this.cache.size>64)this.cache.delete(this.cache.keys().next().value!);
+            if(value.ageRating)for(const listener of ageListeners){try{listener();}catch{/* Optional presentation observer. */}}
+          }
         } catch {/* Optional enrichment failure. */}
         finally {this.pending.delete(tmdbId);this.active--;this.drain();}
         finish(value);

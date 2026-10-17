@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180" viewBox="0 0 320 180">
+  <path d="M0 0h320v180H0z" fill="#080C14"/>
+  <path d="M142 42 178 82M178 42 142 82" fill="none" stroke="#E50914" stroke-width="12" stroke-linecap="round"/>
+  <text x="160" y="140" text-anchor="middle" fill="#E50914" font-family="Arial, sans-serif" font-size="32" font-weight="800" letter-spacing="1">XANDEFLIX</text>
+</svg>

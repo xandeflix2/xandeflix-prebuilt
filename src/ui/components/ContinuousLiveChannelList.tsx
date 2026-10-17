@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { LiveChannel } from '../../catalog/live/live-tv.types.ts';
 import type { LiveChannelPage } from '../../catalog/live/live-catalog.service.ts';
+import { LiveChannelPress, isLiveConfirmKey } from '../live-channel-press.ts';
 
 export const LIVE_ROW_HEIGHT = 64;
 const PAGE_SIZE = 48;
@@ -17,11 +18,16 @@ interface Props {
   request: { offset: number; nonce: number; focus: boolean };
   loadPage: (offset: number, signal: AbortSignal) => Promise<LiveChannelPage>;
   onSelect: (channel: LiveChannel) => void;
+  onFavorite?: (channel:LiveChannel)=>void;
+  isFavorite?: (channel:LiveChannel)=>boolean;
+  favoriteReady?: boolean;
+  pressScope?: string;
+  onFocusFavorite?: (channel:LiveChannel)=>void;
   onWindowPage?: (page: LiveChannelPage) => void;
 }
 
 /** Continuous scroll over local pages; only the visible rows and three pages live in RAM. */
-export function ContinuousLiveChannelList({ total, seed, selectedId, request, loadPage, onSelect, onWindowPage }: Props) {
+export function ContinuousLiveChannelList({ total, seed, selectedId, request, loadPage, onSelect, onWindowPage, onFavorite, isFavorite, favoriteReady=false, pressScope, onFocusFavorite }: Props) {
   const list = useRef<HTMLDivElement>(null);
   const pages = useRef(new Map<number, LiveChannelPage>());
   const controller = useRef<AbortController | null>(null);
@@ -38,6 +44,16 @@ export function ContinuousLiveChannelList({ total, seed, selectedId, request, lo
   const range = useMemo(() => liveVisibleWindow(scrollTop, height, count), [scrollTop, height, count]);
   const desired = useRef(range); desired.current = range;
   const loader = useRef(loadPage); loader.current = loadPage;
+  const actions=useRef({onSelect,onFavorite});actions.current={onSelect,onFavorite};
+  const press=useRef<LiveChannelPress>();
+  if(!press.current)press.current=new LiveChannelPress(channel=>actions.current.onSelect(channel),channel=>actions.current.onFavorite?.(channel));
+  useEffect(()=>{press.current?.cancel();},[pressScope,favoriteReady]);
+  useEffect(()=>{
+    const cancel=()=>press.current?.cancel();
+    const hidden=()=>{if(document.visibilityState==='hidden')cancel();};
+    window.addEventListener('blur',cancel);document.addEventListener('visibilitychange',hidden);
+    return()=>{cancel();window.removeEventListener('blur',cancel);document.removeEventListener('visibilitychange',hidden);};
+  },[]);
 
   useEffect(() => {
     const active = new AbortController(); controller.current = active;
@@ -107,7 +123,7 @@ export function ContinuousLiveChannelList({ total, seed, selectedId, request, lo
     const index = pendingFocus.current;
     const target = index !== null ? list.current?.querySelector<HTMLElement>(`[data-live-index="${index}"]`) : null;
     if (target) { pendingFocus.current = null; target.focus({ preventScroll: true }); }
-  }, [revision, range.start, scrollTop, onWindowPage]);
+  }, [revision, range.start, scrollTop, onWindowPage, request.nonce]);
 
   const moveFocus = useCallback((index: number) => {
     const element = list.current;
@@ -120,21 +136,35 @@ export function ContinuousLiveChannelList({ total, seed, selectedId, request, lo
   }, []);
   const rows = Array.from({ length: Math.max(0, range.end - range.start) }, (_, i) => {
     const index = range.start + i, offset = Math.floor(index / PAGE_SIZE) * PAGE_SIZE;
-    return { index, channel: pages.current.get(offset)?.channels[index - offset] };
+    const channel=pages.current.get(offset)?.channels[index-offset];
+    return { index, channel, favorite:!!channel&&!!isFavorite?.(channel) };
   });
   return <div ref={list} className="live-channel-list live-channel-list--continuous" aria-label="Canais da categoria" aria-busy={loading}
-    onScroll={event => { setScrollTop(event.currentTarget.scrollTop); }}>
+    onScroll={event => { press.current?.cancel();setScrollTop(event.currentTarget.scrollTop); }}>
     {error && <div className="live-window-status" role="alert">Não foi possível carregar os canais.
       <button type="button" className="focusable-item" onClick={() => { setError(false); setRetry(value => value + 1); }}>Tentar novamente</button>
     </div>}
     {!error && loading && <div className="live-window-status" role="status">Carregando canais…</div>}
     {!error && !loading && count === 0 && <div className="live-window-empty">Nenhum canal encontrado.</div>}
     <div className="live-channel-window" role="list" style={{ height: count * LIVE_ROW_HEIGHT }}>
-      {rows.map(({ index, channel }) => <div key={index} role="listitem" aria-posinset={index + 1} aria-setsize={count}
+      {rows.map(({ index, channel, favorite }) => <div key={index} role="listitem" aria-posinset={index + 1} aria-setsize={count}
         className="live-channel-window-row" style={{ top: index * LIVE_ROW_HEIGHT, height: LIVE_ROW_HEIGHT }}>
         {channel ? <button type="button" data-live-channel={channel.id} data-live-index={index}
           className={`focusable-item live-continuous-channel${channel.id === selectedId ? ' active-channel' : ''}`}
-          onClick={() => onSelect(channel)} onKeyDown={event => {
+          aria-label={`${channel.name}${favorite?' — Favorito':''}`}
+          onClick={() => press.current?.click(channel)}
+          onPointerDown={event=>{if(onFavorite&&favoriteReady&&event.isPrimary&&event.button===0)press.current?.pointerDown(channel,event.pointerId,event.clientX,event.clientY);}}
+          onPointerMove={event=>press.current?.pointerMove(event.pointerId,event.clientX,event.clientY)}
+          onPointerUp={event=>press.current?.pointerUp(event.pointerId)}
+          onPointerCancel={()=>press.current?.cancel(channel.id)}
+          onLostPointerCapture={()=>press.current?.cancel(channel.id)}
+          onBlur={()=>press.current?.cancel(channel.id)}
+          onContextMenu={event=>{if(onFavorite&&favoriteReady)event.preventDefault();}}
+          onKeyUp={event=>{if(onFavorite&&favoriteReady&&isLiveConfirmKey(event)){event.preventDefault();event.stopPropagation();press.current?.keyUp(channel.id);}}}
+          onKeyDown={event => {
+            if(onFavorite&&favoriteReady&&isLiveConfirmKey(event)){event.preventDefault();event.stopPropagation();press.current?.keyDown(channel,event.repeat);return;}
+            press.current?.cancel(channel.id);
+            if(event.key==='ArrowRight'&&favoriteReady&&onFocusFavorite){event.preventDefault();event.stopPropagation();onFocusFavorite(channel);return;}
             const direction = event.key === 'ArrowDown' ? 1 : event.key === 'ArrowUp' ? -1 : 0;
             const next = index + direction;
             if (direction && next >= 0 && next < count) { event.preventDefault(); event.stopPropagation(); moveFocus(next); }
@@ -144,6 +174,7 @@ export function ContinuousLiveChannelList({ total, seed, selectedId, request, lo
           <span className="live-continuous-info"><span className="live-continuous-name">{channel.name}</span>
             <span className="live-continuous-format">{channel.num ? `Canal #${channel.num}` : channel.streamRef?.containerExtension?.toUpperCase() || 'LIVE'}</span></span>
           {channel.id === selectedId && <span aria-hidden="true">▶</span>}
+          {favorite&&<svg className="live-channel-favorite-mark" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.8 5.7 6.3.9-4.6 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9Z"/></svg>}
         </button> : <div className="live-channel-placeholder" aria-hidden="true"/>}
       </div>)}
     </div>

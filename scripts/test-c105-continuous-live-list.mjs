@@ -1,9 +1,11 @@
+import {parentalFixtureBindings} from './lib/parental-fixture-bindings.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import ts from 'typescript';
 import { resolveSegmentRelativePath } from '../src/bootstrap/storage/segment-path-resolver.ts';
+import { LIVE_FAVORITES_GROUP_ID, favoriteChannelPage } from '../src/playback/live-favorite-category.ts';
 const source=name=>fs.readFileSync(new URL('../'+name,import.meta.url),'utf8');
-const load=(name,require)=>{const module={exports:{}};const code=ts.transpileModule(source(name),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX}}).outputText;new Function('require','module','exports',code)(require,module,module.exports);return module.exports;};
+const load=(name,require)=>{const module={exports:{}};const code=ts.transpileModule(source(name),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX}}).outputText;new Function('require','module','exports',code)((name => parentalFixtureBindings(name) ?? (require)(name)),module,module.exports);return module.exports;};
 const row=(index,groupId='a')=>({id:`${groupId}:${index}`,name:index===104?'Canal procurado distante':`Canal ${index}`,groupId,streamRef:{sourceItemId:String(index),containerExtension:'ts'}});
 const rows=[...Array.from({length:105},(_,i)=>row(i)),...Array.from({length:63},(_,i)=>row(i,'b'))];
 const segments=['live_1.json','live_2.json','live_3.json'];
@@ -45,7 +47,7 @@ await test('LATE_INITIAL_SEED_NEVER_SCROLLS_USER_BACK_AND_EXPLICIT_NAVIGATION_IS
  const js=ts.transpileModule(snippet+'\nmodule.exports=requestGroupPage;',{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
  const module={exports:{}},navigation=[],loaded=[];const state={groupId:'old',offset:0,nonce:2,focus:false};
  const port={loadChannelPageForGroup:async(id,offset)=>({channels:[row(offset,id)],offset,totalAvailable:105,nextOffset:offset+1}),loadLiveCatalog:async()=>catalog};
- new Function('module','exports','liveCatalog','groupRequest','browseGroupRef','LiveCatalogService','setIsGroupPageLoading','setGroupPage','setChannelScrollRequest','setLiveMessage','LIVE_GROUP_PAGE_SIZE',js)(module,module.exports,catalog,{current:null},{current:'a'},port,()=>{},page=>loaded.push(page),fn=>navigation.push(fn(state)),()=>{},48);
+ new Function('module','exports','liveCatalog','groupRequest','browseGroupRef','LiveCatalogService','setIsGroupPageLoading','setGroupPage','setChannelScrollRequest','setLiveMessage','LIVE_GROUP_PAGE_SIZE','LIVE_FAVORITES_GROUP_ID','favoriteChannelPage','favoriteChannelsRef',js)(module,module.exports,catalog,{current:null},{current:'a'},port,()=>{},page=>loaded.push(page),fn=>navigation.push(fn(state)),()=>{},48,LIVE_FAVORITES_GROUP_ID,favoriteChannelPage,{current:[]});
  await module.exports('a',0);assert.equal(loaded.length,1);assert.equal(navigation.length,0);
  await module.exports('a',48,false,true);assert.equal(navigation[0].offset,48);assert.equal(navigation[0].groupId,'a');
  await module.exports('a',0,false,true);assert.equal(navigation[1].offset,0);assert.equal(navigation[1].groupId,'a');

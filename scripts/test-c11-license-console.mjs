@@ -30,11 +30,11 @@ await test('REAL_AUTHORITY_METADATA_COMMANDS_AND_AUTH_FAIL_CLOSED',async()=>{
 });
 const {AdminLicensesView}=compile('src/debug/manager/AdminLicensesView.tsx',{'react':React,'./ManagerLicenseEditor.tsx':{ManagerLicenseEditor:()=>null},'./license-device-summary.ts':compile('src/debug/manager/license-device-summary.ts')});
 await test('TABLE_COLUMNS_ACCESSIBLE_ICON_ACTIONS_AND_MASTER_ONLY_DELETE',()=>{
- const props={licenses:[license],authority:{},onUpdated:async()=>{},onInspectLicense:async()=>null,onUpdateLimits:async()=>true,onSuspendLicense:async()=>true,onRevokeLicense:async()=>true};
+ const props={licenses:[license],authority:{deleteDevicePermanently:async()=>{}},onUpdated:async()=>{},onInspectLicense:async()=>null,onUpdateLimits:async()=>true,onSuspendLicense:async()=>true,onRevokeLicense:async()=>true};
  const master=renderToStaticMarkup(React.createElement(AdminLicensesView,{...props,isMaster:true}));
- assert(!master.includes('ID da Licença'));for(const value of ['Código do dispositivo','Plataforma / Tipo','Visto pela última vez','XF-AB12-CD34','ANDROID / TV','aria-label="Editar licença"','aria-label="Excluir cliente'])assert(master.includes(value));
+ assert(!master.includes('ID da Licença'));for(const value of ['Código do dispositivo','Plataforma / Tipo','Visto pela última vez','XF-AB12-CD34','ANDROID / TV','aria-label="Editar licença"','aria-label="Excluir dispositivo XF-AB12-CD34"'])assert(master.includes(value));
  const actions=master.match(/<button[^>]*>[\s\S]*?<\/button>/g);assert.equal(actions.length,5);assert(!master.includes('aria-label="Ajustar limites"'));for(const action of actions){assert(action.includes('aria-label=')&&action.includes('title='));assert(!/>[^<]*(Limites|Renovar|Suspender|Revogar)[^<]*</.test(action));}
- assert(!renderToStaticMarkup(React.createElement(AdminLicensesView,{...props,isMaster:false})).includes('aria-label="Excluir cliente'));
+ const admin=renderToStaticMarkup(React.createElement(AdminLicensesView,{...props,isMaster:false}));assert(!admin.includes('aria-label="Excluir cliente'));assert(!admin.includes('aria-label="Excluir dispositivo'));
 });
 let handler;const rpcCalls=[];let mode='MANAGED',authenticated=true,denied=false;
 const syntheticKey=new Uint8Array(32).fill(7);

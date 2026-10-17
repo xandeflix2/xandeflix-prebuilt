@@ -1,8 +1,11 @@
+import {parentalFixtureBindings} from './lib/parental-fixture-bindings.mjs';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import ts from 'typescript';
 import React from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
+import {isFireTvPresentation,isTelevisionPresentation} from '../src/ui/device-presentation.ts';
+import {meaningfulDetailGenres} from '../src/ui/detail-genres.ts';
 
 const read=path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
 const flush=()=>new Promise(resolve=>setTimeout(resolve,0));
@@ -20,7 +23,7 @@ function harness(path,bindings={}) {
   },useRef:initial=>{const index=cursor++;return refs[index]||= {current:initial};},useEffect:effect,useLayoutEffect:effect,useCallback:value=>value};
   const require=name=>name==='react'?{default:hooks,...hooks}:bindings[name]||(()=>{throw Error('Missing controlled port: '+name);})();
   const module={exports:{}};
-  new Function('require','module','exports',ts.transpileModule(read(path),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.React}}).outputText)(require,module,module.exports);
+  new Function('require','module','exports',ts.transpileModule(read(path),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.React}}).outputText)((name => parentalFixtureBindings(name) ?? (require)(name)),module,module.exports);
   return {exports:module.exports,render(name,props){cursor=0;return module.exports[name](props);},effects(){while(pending.length)pending.shift()();},cleanup(){for(const effect of effects.values())effect.cleanup?.();effects.clear();},get updates(){return updates;}};
 }
 const stub=tag=>props=>React.createElement(tag,{'data-kind':props.kind,'data-icon-only':props.iconOnly===true?'yes':undefined});
@@ -50,6 +53,7 @@ console.log('PASS_REAL_SERIES_TABS_DEFAULT_EPISODES_RELATED_ONLY_KEYBOARD_RETRY'
 // Personal actions belong beside the trailer in the real non-phone hero.
 const canonicalSeries={id:'series-one',title:'Public series'};
 const detailPage=harness('src/ui/pages/SeriesDetailPage.tsx',{
+  '../detail-genres.ts':{meaningfulDetailGenres},
   '../../catalog/catalog-selectors.ts':{getSeriesDetail:()=>({id:'series-one',title:'Public series',externalIds:{tmdbId:'1399'},genreLabels:[],seasons:[],overview:'Synopsis'})},
   '../components/Artwork.tsx':{Artwork:stub('artwork')},
   '../hooks/useArtworkMetadata.ts':{useArtworkMetadata:()=>undefined},
@@ -60,6 +64,7 @@ const detailPage=harness('src/ui/pages/SeriesDetailPage.tsx',{
   '../components/SeriesPersonalActions.tsx':{SeriesPersonalActions:stub('personal')},
   '../../playback/watch-history.ts':{watchFingerprint:(kind,row)=>{assert.equal(kind,'series');assert.equal(row,canonicalSeries);return '0123456789abcdef';},watchHistory:{list:()=>[],savedPosition:()=>0,subscribe:()=>()=>{},syncNativeProgress:async()=>{}}},
   '../components/PhoneSeriesDetail.tsx':{PhoneSeriesDetail:stub('phone')},
+  '../components/WatchProviders.tsx':{WatchProviders:stub('providers')},
   '../hooks/usePhoneLayout.ts':{usePhoneLayout:()=>false},
   '../hooks/useDetailInitialFocus.ts':{useDetailInitialFocus:()=>{}},
   '../../playback/playback.service.ts':{defaultPlaybackService:{}},
@@ -75,11 +80,13 @@ console.log('PASS_REAL_SERIES_HERO_TRAILER_PERSONAL_SIBLINGS_CANONICAL_IDENTITY_
 
 const canonicalMovie={id:'movie-one',title:'Public movie'};
 const moviePage=harness('src/ui/pages/MovieDetailPage.tsx',{
+  '../detail-genres.ts':{meaningfulDetailGenres},
   '../../catalog/catalog-selectors.ts':{getMovieDetail:()=>({id:'movie-one',title:'Public movie',externalIds:{tmdbId:'75802'},genreLabels:[],categoryLabels:[],overview:'Synopsis'})},
   '../components/Artwork.tsx':{Artwork:stub('artwork')},'../hooks/useArtworkMetadata.ts':{useArtworkMetadata:()=>undefined},
   '../../artwork/tmdb-metadata.service.ts':{tmdbPosterPath:()=>undefined},'../hooks/useImmersiveArtwork.ts':{useImmersiveArtwork:()=>({current:null})},
   '../components/DetailTrailer.tsx':{DetailTrailer:stub('trailer')},'../components/SeriesPersonalActions.tsx':{SeriesPersonalActions:stub('personal')},
   '../components/RelatedTitles.tsx':{RelatedTitles:stub('related')},'../components/PhoneMovieDetail.tsx':{PhoneMovieDetail:stub('phone')},
+  '../components/WatchProviders.tsx':{WatchProviders:stub('providers')},
   '../hooks/usePhoneLayout.ts':{usePhoneLayout:()=>false},'../hooks/useDetailInitialFocus.ts':{useDetailInitialFocus:()=>{}},
   '../../playback/playback.service.ts':{defaultPlaybackService:{}},
   '../../playback/watch-history.ts':{watchFingerprint:(kind,row)=>{assert.equal(kind,'movie');assert.equal(row,canonicalMovie);return 'abcdef0123456789';}},
@@ -97,6 +104,8 @@ let landscape=true,portrait=false;
 const shell=harness('src/ui/components/AppShell.tsx',{
   './Header.tsx':{Header:stub('header')},'../hooks/useLandscapeNavigation.ts':{useLandscapeNavigation:()=>landscape},
   '../hooks/useLivePresentation.ts':{useLivePresentation:()=>({tabletPortrait:portrait,stackedLive:false})},'./CastButton.tsx':{CastButton:stub('cast')},
+  '../hooks/useDevicePresentation.ts':{useDevicePresentation:()=>null},
+  '../device-presentation.ts':{isFireTvPresentation,isTelevisionPresentation},
 });
 for(const [ua,mobile,touch,isPortrait,cast] of [
   ['Android SM-X610',false,5,false,true],['Android SM-X610',false,5,true,true],
@@ -137,7 +146,7 @@ const seriesModal=harness('src/ui/components/DetailTrailer.tsx',{
 tree=seriesModal.render('TrailerDialog',{...dialogProps,identity:{kind:'series',title:'Series'}});tree.ref.current=dialogNode;seriesModal.effects();await flush();assert.equal(selectedKind,'Series');seriesModal.cleanup();
 console.log('PASS_REAL_MODAL_CURRENT_KIND_CLOSE_FOCUS_RESTORE_NO_LATE_RESULT');
 
-// Native geometry must ignore the Fire side header, and controls are session-bound.
+// Native geometry must ignore the Fire side header, without an extra control bar.
 const calls={open:[],close:[],control:[],removed:0};let listener;
 globalThis.window={innerWidth:960,innerHeight:540,addEventListener(){},removeEventListener(){}};
 globalThis.document={hidden:false,activeElement:originalFocus,querySelector:()=>({getBoundingClientRect:()=>({bottom:540,top:0})}),addEventListener(){},removeEventListener(){}};
@@ -155,19 +164,22 @@ tree=trailer.render('SeriesTrailer',trailerProps);
 nodes(tree).find(node=>node.props.className==='series-trailer-frame').ref.current={getBoundingClientRect:()=>({left:40,top:60,width:640,height:360,bottom:420})};
 trailer.effects();await flush();assert.equal(calls.open.length,1);assert.equal(calls.open[0].visible,true);assert.equal(calls.open[0].presentation,'modal');
 const sessionId=calls.open[0].sessionId;listener({sessionId,state:'ready'});listener({sessionId,state:'playing'});
-tree=trailer.render('SeriesTrailer',trailerProps);buttons(tree).find(button=>button.props.children==='▶ Reproduzir').props.onClick();buttons(tree).find(button=>button.props.children==='Ⅱ Pausar').props.onClick();
-assert.deepEqual(calls.control,[{sessionId,command:'play'},{sessionId,command:'pause'}]);
+tree=trailer.render('SeriesTrailer',trailerProps);assert.equal(buttons(tree).length,0);
+assert.ok(!nodes(tree).some(node=>node.props.className==='detail-trailer-controls'));
+assert.deepEqual(calls.control,[]);
 assert.ok(!renderToStaticMarkup(tree).includes('Não foi possível reproduzir'));trailer.cleanup();await flush();assert.equal(calls.removed,1);assert.ok(calls.close.some(value=>value.sessionId===sessionId));
 for(const key of Object.keys(saved)){if(saved[key])Object.defineProperty(globalThis,key,saved[key]);else delete globalThis[key];}
-console.log('PASS_REAL_NATIVE_MODAL_FIRE_BOUNDS_PLAY_PAUSE_PLAYING_EVENT_SESSION_CLEANUP');
+console.log('PASS_REAL_NATIVE_MODAL_FIRE_BOUNDS_NO_EXTRA_CONTROLS_PLAYING_EVENT_SESSION_CLEANUP');
 
 // Back must close detail dialogs before route mutation; unrelated routing stays intact.
-const app=read('src/App.tsx'),start=app.indexOf('  const handleBack = useCallback(() => {'),end=app.indexOf('  }, []);',start);
+const app=read('src/App.tsx'),start=app.indexOf('  const handleBack = useCallback(() => {'),end=app.indexOf('\n  },',start);
+assert.ok(start>=0&&end>start);
 const body=app.slice(start+'  const handleBack = useCallback(() => {'.length,end);
-let routes=0,closes=0,currentDialog={close(){closes++;}};
-const back=new Function('document','setRouteState','navigateBack','window','Event',ts.transpileModule(body,{compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText);
-back({querySelector:()=>currentDialog},()=>routes++,value=>value,{dispatchEvent:()=>true},Event);assert.equal(closes,1);assert.equal(routes,0);
-currentDialog=null;back({querySelector:()=>currentDialog},()=>routes++,value=>value,{dispatchEvent:()=>true},Event);assert.equal(routes,1);
+let routes=0,closes=0,returns=0,currentDialog={close(){closes++;}};
+const runBack=new Function('document','commitRoute','navigateBack','window','Event','catalogReturn','routeStateRef','catalogSnapshotRef',ts.transpileModule(body,{compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText);
+const back=()=>runBack({querySelector:()=>currentDialog},()=>routes++,value=>value,{dispatchEvent:()=>true},Event,{requestBack(){returns++;}},{current:{current:{view:'home'}}},{current:'fixture-generation'});
+back();assert.equal(closes,1);assert.equal(routes,0);assert.equal(returns,0);
+currentDialog=null;back();assert.equal(routes,1);assert.equal(returns,1);
 const series=read('src/ui/pages/SeriesDetailPage.tsx'),movie=read('src/ui/pages/MovieDetailPage.tsx'),plugin=read('android/app/src/main/java/com/xandeflix/prebuilt/trailer/PublicTrailerPlugin.java');
 for(const page of [series,movie]){assert.ok(page.includes('DetailTrailer'));assert.ok(page.includes('detail-hero-wide'));assert.ok(!page.includes('<CastButton'));}
 assert.ok(series.includes('<SeriesDetailSections'));assert.ok(plugin.includes('PublicTrailerPolicy.presentation('));assert.ok(plugin.includes('PublicTrailerPolicy.controlScript('));assert.ok(plugin.includes('!nonce.equals(session) || !visible'));

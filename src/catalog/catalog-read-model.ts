@@ -10,6 +10,7 @@
  * - NO SEARCH INDEX: Não cria nem persiste índices textuais invertidos (G7).
  */
 
+import { canShowParentalGroup } from '../parental/parental-content.ts';
 import type {
   PrebuiltCatalog,
   Category,
@@ -298,7 +299,7 @@ export class CatalogReadModel {
   }
 
   getCategoriesForKind(kind: TypedCategoryKind): Category[] {
-    return this.categoriesByKind.get(kind) || [];
+    return (this.categoriesByKind.get(kind) || []).filter(category => canShowParentalGroup(category.name));
   }
 
   getTrustedCategoriesForKind(kind: TypedCategoryKind): Category[] {

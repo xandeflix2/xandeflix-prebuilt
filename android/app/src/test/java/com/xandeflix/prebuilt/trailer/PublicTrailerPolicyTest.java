@@ -19,7 +19,7 @@ public class PublicTrailerPolicyTest {
     @Test public void officialEmbedIdentityAndNoPrivilegedBridge() {
         String html=PublicTrailerPolicy.html("abc_DEF-123");
         assertTrue(html.contains("https://com.xandeflix.prebuilt"));assertTrue(html.contains("https://www.youtube.com/iframe_api"));
-        assertTrue(html.contains("controls:1"));assertFalse(html.contains("Authorization"));assertFalse(html.contains("Capacitor"));
+        assertTrue(html.contains("controls:0"));assertFalse(html.contains("controls:1"));assertFalse(html.contains("Authorization"));assertFalse(html.contains("Capacitor"));
         assertFalse(html.contains("directStreamUrl"));
     }
     @Test public void modalExplicitlySupportsTabletAndTVWithoutOpeningInline() {

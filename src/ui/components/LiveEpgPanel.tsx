@@ -7,6 +7,7 @@ interface LiveEpgPanelProps {
   open: boolean;
   onToggle: () => void;
   inline?: boolean;
+  embedded?: boolean;
 }
 
 function EpgSchedule({ channel }: { channel: LiveChannel }) {
@@ -52,7 +53,7 @@ function EpgSchedule({ channel }: { channel: LiveChannel }) {
   </>;
 }
 
-export function LiveEpgPanel({ channel, open, onToggle, inline = false }: LiveEpgPanelProps) {
+export function LiveEpgPanel({ channel, open, onToggle, inline = false, embedded = false }: LiveEpgPanelProps) {
   const panel = useRef<HTMLElement>(null), toggle = useRef<HTMLButtonElement>(null), wasOpen = useRef(false);
   const [top, setTop] = useState(0);
   useLayoutEffect(() => {
@@ -84,7 +85,13 @@ export function LiveEpgPanel({ channel, open, onToggle, inline = false }: LiveEp
     if (wasOpen.current && !open && !inline) toggle.current?.focus({ preventScroll: true });
     wasOpen.current = open;
   }, [open, inline]);
-  return <section ref={panel} className={`live-mobile-epg${inline ? ' live-epg-inline' : ''}${open ? ' live-mobile-epg--open' : ''}`} style={inline ? undefined : { top }} aria-label="Guia de programação do canal">
+  return <section ref={panel} className={`live-mobile-epg${inline ? ' live-epg-inline' : ''}${open ? ' live-mobile-epg--open' : ''}${embedded ? ' live-epg-embedded focusable-item' : ''}`} tabIndex={embedded ? 0 : undefined} style={inline ? undefined : { top }} aria-label="Guia de programação do canal"
+    onKeyDown={embedded ? event => {
+      if(event.target!==event.currentTarget||!['ArrowDown','ArrowUp'].includes(event.key))return;
+      const content=panel.current?.querySelector<HTMLElement>('.live-epg-content');if(!content)return;
+      const down=event.key==='ArrowDown';if((down&&content.scrollTop+content.clientHeight>=content.scrollHeight-1)||(!down&&content.scrollTop<=0))return;
+      event.preventDefault();event.stopPropagation();content.scrollBy({top:down?64:-64,behavior:'auto'});
+    } : undefined}>
     {inline ? <h2 className="live-epg-inline-heading">Guia de Programação (EPG)</h2> : <button ref={toggle} type="button" className="focusable-item live-epg-toggle" aria-expanded={open} aria-controls="live-mobile-epg-content" onClick={onToggle}>
       <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M8 3v4m8-4v4M4 10h16m-12 4h3m-3 3h7"/></svg>
       <span>Guia de Programação (EPG)</span>

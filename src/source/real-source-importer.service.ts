@@ -32,6 +32,7 @@ import {
 import { iterateUtf8Lines } from './m3u-line-stream.ts';
 import { parseM3uEpisodeIdentity, parseM3uExtInfLine } from './m3u-extinf-parser.ts';
 import { bootTelemetry } from '../diagnostics/boot-telemetry.ts';
+import { isStartupPreviewObserved, offerStartupPoster, resetStartupCatalogPreview } from '../artwork/startup-catalog-preview.ts';
 import { yieldToEventLoop } from '../diagnostics/boot-telemetry.ts';
 import { createSha256Stream } from '../security/artifact-hash.ts';
 import { DIRECTORY_ROOTS_MODE, deriveDirectoryRuntimeConfig, fetchDirectoryJson, buildDirectoryStreamUrl } from './source-directory-api.ts';
@@ -261,6 +262,7 @@ export class RealSourceImporterService {
     config: SourceRuntimeConfig,
     options?: RealSourceImportOptions,
   ): Promise<RealImportResult> {
+    resetStartupCatalogPreview();
     const t0 = performance.now();
     const directoryConfig = options?.directoryRoots ? deriveDirectoryRuntimeConfig(config) : undefined;
     if (options?.directoryRoots && !directoryConfig) throw new Error('DIRECTORY_SOURCE_UNSUPPORTED');
@@ -395,6 +397,7 @@ export class RealSourceImporterService {
 
     const firstFoldSeries: Series[] = [];
 
+    const movieCategoryNames = new Map(categories.map(category => [category.id, category.name]));
     let countM = 0;
     for (const m of vodStreams) {
       countM++;
@@ -434,6 +437,7 @@ export class RealSourceImporterService {
           (movieObj as any).posterUri = String(m.stream_icon);
           (movieObj as any).cover = String(m.stream_icon);
         }
+        if (isStartupPreviewObserved()) offerStartupPoster({ id: movieId, title, posterUri: m.stream_icon ? String(m.stream_icon) : undefined, category: movieCategoryNames.get(catId) });
         writer.addMovie(movieObj, stream);
         if (writer.shouldFlush()) await writer.flushBatch(countM);
       }
@@ -588,6 +592,7 @@ export class RealSourceImporterService {
     config: SourceRuntimeConfig,
     options?: RealSourceImportOptions,
   ): Promise<RealImportResult> {
+    resetStartupCatalogPreview();
     const t0 = performance.now();
     bootTelemetry.mark('IMPORT_FETCH_STARTED');
 
@@ -931,6 +936,7 @@ export class RealSourceImporterService {
           (movie as any).cover = safeLogo;
         }
 
+        if (isStartupPreviewObserved()) offerStartupPoster({ id: movieId, title: displayTitle, posterUri: safeLogo || undefined, category: cat.name });
         writer.addMovie(movie, stream, artwork);
       } else if (classification.canonicalKind === 'unresolved') {
         rawUnresolvedCount++;

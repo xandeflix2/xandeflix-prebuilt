@@ -1,5 +1,32 @@
 # C11 — Controles do player de TV ao vivo (C73)
 
+## Emenda C113 — remover Áudio/legendas somente no Live — 2026-10-15
+
+Pedido explícito do usuário: retirar opção Áudio e legendas do menu do player
+fullscreen de canais ao vivo. Esta emenda supersede somente a exigência
+histórica dessa opção no Live. Remover botão live_tracks do layout Live e
+seu listener/diálogo/imports exclusivos, sem espaço ou foco residual.
+O mesmo layout Live é compartilhado com preview; não criar outra variante.
+Filmes/séries mantêm player_tracks e seleção de áudio/legendas. Não desativar
+faixas do vídeo, áudio de reprodução ou silenciar PiP; apenas remover acesso
+ao seletor no menu Live. CH+/− C112, guia/favoritos/resize/Back, player/C9,
+buffer, source, catalog e todos os refinamentos anteriores preservados.
+
+Preflight: clone independente C11-main, main, origin canônico, HEAD
+0f68f169f7728fae17c8311832b7643629e97a02; dirty conhecidos C107–C112, baseline
+em tmp/c113-live-remove-tracks/baseline.json. AGENTS/Architecture/Execution/
+Source Boundary/Activation Lock lidos. CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO.
+Allowlist incremental: este documento; layout xandeflix_live_controls.xml;
+LivePlayerControls.java somente remoções descritas; script existente
+test-c11-live-player-controls.mjs para requerer ausência no Live e presença
+VOD, sem relaxar demais critérios; docs/evidence/C11_LIVE_REMOVE_TRACKS.md;
+docs/{STATUS,EVOLUTION_REPORT,ERRORS_AND_BLOCKERS}.md; saídas ignoradas usuais
+Gradle/APK/helpers tmp/c113-live-remove-tracks. Sem outras alterações funcionais.
+Validar navegação C73/C112, JUnit nativo e compilação; lock antes/depois/build,
+mesma assinatura/package, assets C111/C112 idênticos; APK C113 local para teste.
+Não instalar automaticamente, publicar updater, Git/backend/reset ou novo Gate.
+QA física não afirmada sem execução. SPEC_BEFORE_CODE=SIM.
+
 Pedido direto de 2026-10-11: canais/categorias/guia/favoritos no player inline
 e fullscreen, por toque e D-pad. CURRENT_GATE=NONE; ciclo local autorizado;
 NEXT_GATE_STARTED=NAO; Git/backend/env/instalacao em aparelhos nao autorizados.

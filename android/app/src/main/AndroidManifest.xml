@@ -14,7 +14,7 @@
         android:fullBackupContent="@xml/backup_rules"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:icon="@mipmap/ic_launcher"
-        android:banner="@mipmap/ic_launcher"
+        android:banner="@drawable/xandeflix_tv_banner"
         android:label="@string/app_name"
         android:networkSecurityConfig="@xml/network_security_config"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -27,6 +27,8 @@
         <activity
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode|navigation"
             android:name=".MainActivity"
+            android:icon="@mipmap/ic_launcher"
+            android:banner="@drawable/xandeflix_tv_banner"
             android:supportsPictureInPicture="true"
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.NoActionBarLaunch"

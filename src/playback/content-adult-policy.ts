@@ -11,12 +11,14 @@ export function isAdultClassification(value: string | undefined): boolean {
 }
 
 export function isAdultCatalogItem(item: Movie | Series, model: CatalogReadModel): boolean {
-  return item.categoryIds?.some(id => isAdultClassification(model.categoryById.get(id)?.name)) === true
+  const raw = item as unknown as Record<string, unknown>, metadata = raw.metadata && typeof raw.metadata === 'object' ? raw.metadata as Record<string, unknown> : {};
+  const flags = [raw.adult, raw.is_adult, metadata.adult, metadata.is_adult];
+  return flags.some(value => value === true || value === 1 || value === '1') || item.categoryIds?.some(id => isAdultClassification(model.categoryById.get(id)?.name)) === true
     || item.genreIds?.some(id => isAdultClassification(model.genreById.get(id)?.name)) === true;
 }
 
 export function isAdultLiveChannel(channel: LiveChannel, catalog: LiveCatalog): boolean {
-  return channel.metadata?.adult === true || channel.metadata?.isAdult === true
+  return [channel.metadata?.adult, channel.metadata?.isAdult, channel.metadata?.is_adult].some(value => value === true || value === 1 || value === '1')
     || isAdultClassification(channel.groupName)
     || isAdultClassification(catalog.groups.find(group => group.id === channel.groupId)?.name)
     || isAdultClassification(channel.name);

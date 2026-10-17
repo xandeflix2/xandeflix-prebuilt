@@ -12,6 +12,7 @@
 import type { Category, Movie, Series } from '../contracts/catalog.ts';
 import { normalizeArtworkUri } from '../artwork/artwork-uri.ts';
 import { CatalogReadModel } from './catalog-read-model.ts';
+import { parentalCatalogMetadata } from '../parental/parental-content.ts';
 import {
   type CatalogItemViewModel,
   type MovieDetailViewModel,
@@ -43,6 +44,7 @@ function sourceArtwork(readModel: CatalogReadModel, item: Movie | Series, kind: 
 
 export function movieToViewModel(readModel: CatalogReadModel, movie: Movie): CatalogItemViewModel {
   return {
+    parental: parentalCatalogMetadata(movie, readModel, 'movie'),
     id: movie.id,
     externalIds: movie.externalIds?.tmdbId ? { tmdbId: movie.externalIds.tmdbId } : undefined,
     kind: 'movie',
@@ -60,6 +62,7 @@ export function movieToViewModel(readModel: CatalogReadModel, movie: Movie): Cat
 
 export function seriesToViewModel(readModel: CatalogReadModel, series: Series): CatalogItemViewModel {
   return {
+    parental: parentalCatalogMetadata(series, readModel, 'series'),
     id: series.id,
     externalIds: series.externalIds?.tmdbId ? { tmdbId: series.externalIds.tmdbId } : undefined,
     kind: 'series',

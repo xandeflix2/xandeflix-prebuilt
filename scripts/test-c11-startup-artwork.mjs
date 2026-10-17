@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import React from 'react';
 import ts from 'typescript';
+import { parentalFixtureBindings } from './lib/parental-fixture-bindings.mjs';
 import { sampleStartupArtwork, prepareStartupArtwork, STARTUP_ARTWORK_LIMIT, STARTUP_ARTWORK_WAIT_MS } from '../src/artwork/startup-artwork-preparation.ts';
 globalThis.innerHeight=540;globalThis.innerWidth=960;
 let layoutReads=0;
@@ -28,41 +29,46 @@ const dispose=prepareStartupArtwork(options),late=job;dispose();time=50000;late(
 console.log('PASS_STARTUP40_BOUNDED_LAYOUT_READS_REAL_READY_DISTINCT_FALLBACK_STABILITY_TIMEOUT_CANCEL');
 
 const passive={...React,useRef:v=>({current:v}),useState:v=>[typeof v==='function'?v():v,()=>{}],useEffect:()=>{},useLayoutEffect:()=>{},useMemo:f=>f()};
-function load(file,imports){const module={exports:{}};const code=ts.transpileModule(readFileSync(new URL('../'+file,import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.React,target:ts.ScriptTarget.ES2022}}).outputText;new Function('require','module','exports',code)(name=>{for(const [key,value]of Object.entries(imports))if(name.includes(key))return value;throw Error('Uncontrolled dependency '+name);},module,module.exports);return module.exports;}
+function load(file,imports){const module={exports:{}};const code=ts.transpileModule(readFileSync(new URL('../'+file,import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.React,target:ts.ScriptTarget.ES2022}}).outputText;new Function('require','module','exports',code)(name=>{const parental=parentalFixtureBindings(name);if(parental)return parental;for(const [key,value]of Object.entries(imports))if(name.includes(key))return value;throw Error('Uncontrolled dependency '+name);},module,module.exports);return module.exports;}
 function elements(tree){const result=[];function walk(n){if(!React.isValidElement(n))return;result.push(n);React.Children.forEach(n.props.children,walk);}walk(tree);return result;}
 const Card=()=>null,Artwork=()=>null;
 const {MediaRail}=load('src/ui/components/MediaRail.tsx',{react:{default:passive,...passive},'category-presentation':{createPresentationSeed:()=>1,orderCategoryItems:x=>x,isReleaseCategory:()=>false},MediaCard:{MediaCard:Card},useRailArtworkPreparation:{useRailArtworkPreparation:()=>({root:{current:null},prepare:false})}});
-const items=Array.from({length:20},(_,id)=>({id:String(id),title:'Synthetic',kind:'movie',posterUri:'https://synthetic.invalid/poster.jpg',genreLabels:[]}));
+const items=Array.from({length:20},(_,id)=>({id:String(id),title:'Synthetic',kind:'movie',posterUri:'https://synthetic.invalid/poster.jpg',categoryLabels:[],genreLabels:[]}));
 const props={id:'startup',title:'Synthetic',items,preserveOrder:true,onItemClick(){},startupArtworkCount:999};
 const rail=elements(MediaRail.type(props)),cards=rail.filter(n=>n.type===Card);
 assert.equal(cards.filter(n=>n.props.startupArtwork).length,8);
 assert.equal(elements(MediaRail.type({...props,startupArtworkCount:0})).filter(n=>n.type===Card&&n.props.startupArtwork).length,0);
-const {MediaCard}=load('src/ui/components/MediaCard.tsx',{react:{default:passive,...passive},Artwork:{Artwork},NewContentProvider:{useContentBadge:()=>undefined},'artwork-uri':{displayArtworkUri:x=>x},'image-load-queue':{loadImage:()=>Promise.resolve({ok:true})}});
+const {MediaCard}=load('src/ui/components/MediaCard.tsx',{react:{default:passive,...passive},Artwork:{Artwork},NewContentProvider:{useContentBadge:()=>undefined},useCardGenres:{useCardGenres:item=>({ref:{current:null},genres:item.genreLabels})},'artwork-uri':{displayArtworkUri:x=>x},'image-load-queue':{loadImage:()=>Promise.resolve({ok:true})}});
 const node=MediaCard.type({item:items[0],onClick(){},startupArtwork:true});
 assert.equal(node.props['data-startup-artwork'],true);assert.equal(elements(node).find(n=>n.type===Artwork).props.startup,true);
 console.log('PASS_REAL_RAIL8_LIMIT_AND_CARD_TO_ARTWORK_PROP_AND_NORMAL_DEFAULT');
 
+// C108 amends only presentation timing/one-document behavior; engine bounds above stay intact.
 const effects=[],listeners=new Map();
-const hookReact={...passive,useEffect:fn=>effects.push(fn),useLayoutEffect:fn=>effects.push(fn)};
-let preparing=[],cancelled=0,finishStage;
+const hookReact={...passive,useLayoutEffect:fn=>effects.push(fn)};
+let preparing=[],cancelled=0,finishStage,updateStage;
+const pendingSample={...sample,ready:sample.ready-1};
 globalThis.document={addEventListener:(type,fn)=>listeners.set(type,fn),removeEventListener:(type,fn)=>{if(listeners.get(type)===fn)listeners.delete(type);}};
-const {StartupArtworkPreparation}=load('src/ui/components/StartupArtworkPreparation.tsx',{react:{default:hookReact,...hookReact},'startup-artwork-preparation':{sampleStartupArtwork:()=>sample,prepareStartupArtwork:opts=>{finishStage=opts.finish;return()=>cancelled++;}}});
-StartupArtworkPreparation({root:{current:{closest:()=>null}},snapshot:'phone',onPreparing:v=>preparing.push(v)});
-effects.splice(0).forEach(fn=>fn());assert.deepEqual(preparing,[]);assert.equal(listeners.size,0);
-let heroFocused=0;
-StartupArtworkPreparation({root:{current:{closest:()=>({}),querySelector:()=>({focus:()=>heroFocused++})}},snapshot:'fire',onPreparing:v=>preparing.push(v)});
-const cleanups=effects.splice(0).map(fn=>fn()).filter(fn=>typeof fn==='function');
-assert.deepEqual(preparing,[true]);finishStage();assert.deepEqual(preparing,[true,false]);assert.equal(heroFocused,1);
-let intercepted=0;listeners.get('keydown')({key:'ArrowDown',preventDefault:()=>intercepted++,stopImmediatePropagation:()=>intercepted++});
-assert.equal(intercepted,0,'startup handler must release D-pad immediately after entering');
+function stage(){return load('src/ui/components/StartupArtworkPreparation.tsx',{'react-dom':{createPortal:()=>null},StartupLoadingScreen:{StartupLoadingScreen:()=>null},react:{default:hookReact,...hookReact},'startup-artwork-preparation':{sampleStartupArtwork:()=>pendingSample,isStartupArtworkSettled:s=>s.ready+s.unavailable===s.total,prepareStartupArtwork:opts=>{finishStage=opts.finish;updateStage=opts.update;return()=>cancelled++;}}}).StartupArtworkPreparation;}
+const flush=()=>effects.splice(0).map(fn=>fn()).filter(fn=>typeof fn==='function');
+stage()({root:{current:{closest:()=>null}},snapshot:'phone',onPreparing:v=>preparing.push(v)});
+flush();assert.deepEqual(preparing,[]);assert.equal(listeners.size,0);
+let heroFocused=0;const classes=new Set(),attributes=new Map();
+const shell={getAttribute:key=>attributes.get(key)??null,hasAttribute:key=>attributes.has(key),setAttribute:(key,value)=>attributes.set(key,value),removeAttribute:key=>attributes.delete(key)};
+stage()({root:{current:{closest:selector=>selector==='.app-shell'?shell:{},classList:{add:c=>classes.add(c),remove:c=>classes.delete(c)},querySelector:()=>({focus:()=>heroFocused++})}},snapshot:'fire',onPreparing:v=>preparing.push(v)});
+const cleanups=flush();assert.deepEqual(preparing,[true]);assert.ok(classes.has('home-page--startup-check'));
+assert.equal(attributes.has('data-startup-isolated'),true);assert.equal(attributes.has('inert'),true);
+updateStage(pendingSample);finishStage();assert.deepEqual(preparing,[true,false]);assert.equal(heroFocused,1);assert.equal(classes.size,0);
+assert.equal(listeners.size,0,'D-pad must be released immediately on entering, before React cleanup');
+assert.equal(attributes.size,0,'Shell isolation must be restored on entering');
 cleanups.forEach(fn=>fn());assert.equal(listeners.size,0);assert.ok(cancelled>=1);
-console.log('PASS_REAL_COMPONENT_PHONE_SKIP_FIRE_START_FINISH_FOCUS_DPAD_RELEASE_LISTENER_CLEANUP');
+console.log('PASS_REAL_COMPONENT_PHONE_SKIP_FIRE_PREPARE_FINISH_FOCUS_DPAD_RELEASE_LISTENER_CLEANUP');
 
-let fireClass=false,notify,observerStopped=0;
-globalThis.MutationObserver=class {constructor(fn){notify=fn;}observe(_el,options){assert.deepEqual(options,{attributes:true,attributeFilter:['class']});}disconnect(){observerStopped++;}};
-preparing=[];
-StartupArtworkPreparation({root:{current:{closest:selector=>selector==='.app-shell'?{}:fireClass?{}:null,querySelector:()=>({focus(){}})}},snapshot:'async-profile',onPreparing:v=>preparing.push(v)});
-const asyncCleanup=effects.splice(0).map(fn=>fn()).filter(fn=>typeof fn==='function');
-assert.deepEqual(preparing,[]);fireClass=true;notify();assert.deepEqual(preparing,[true]);notify();assert.deepEqual(preparing,[true]);
-finishStage();asyncCleanup.forEach(fn=>fn());assert.ok(observerStopped>=2);
-console.log('PASS_REAL_ASYNC_FIRE_PROFILE_STARTS_ONCE_CLASS_ONLY_OBSERVER_CLEANUP');
+let fireClass=false,observers=0;
+globalThis.MutationObserver=class {constructor(){observers++;}observe(){}disconnect(){}};
+preparing=[];const LateStage=stage();
+const lateRoot={current:{closest:()=>fireClass?{}:null,querySelector:()=>({focus(){}})}},onPreparing=v=>preparing.push(v);
+LateStage({root:lateRoot,snapshot:'async-profile',onPreparing});flush().forEach(fn=>fn());
+fireClass=true;LateStage({root:lateRoot,snapshot:'different-snapshot',onPreparing});flush().forEach(fn=>fn());
+assert.deepEqual(preparing,[]);assert.equal(observers,0);
+console.log('PASS_C108_LATE_PROFILE_AND_SNAPSHOT_NEVER_COVER_A_PRESENTED_HOME');

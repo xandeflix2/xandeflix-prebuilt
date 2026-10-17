@@ -1399,7 +1399,6 @@ TS/build/lock22+27+9, JS7, regressao Cast/awake/series/continuidade/device/nav e
 Artefato tmp/c73-live-player-controls/xandeflix-player-tv-ao-vivo.apk, 12.379.300 bytes, SHA256 E82CA3324DA7467112F37366E6F682B92D73899D552001555F92881337EC969F. Sem instalacao/distribuicao/backend/env/Git.
 NEXT_GATE_STARTED=NAO.
 
-
 ### C74 — Ativacao assistida e Codigo ID automatico (2026-10-11)
 
 Concluido Codigo ID automatico nos campos do gestor/portal; Share mobile/tablet na primeira ativacao; solicitacao TV com nome/plataforma/routing opcional. Icones diferentes: sino para erros e tela com + para ativacao. Clique na solicitacao abre aba Ativacao validada/preenchida; gestor informa fonte e confirma ATIVAR. Manual preservado.
@@ -1744,3 +1743,460 @@ Home90s, playback VOD e retenção C102 permanecem pendentes.
 [Comprovante](evidence/C11_C100_C106_GIT_PUBLICATION.md).
 CURRENT_GATE=NONE; CURRENT_LOCAL_CYCLE=C106_GIT_PUBLICATION_VERIFIED;
 NEXT_GATE_STARTED=NAO; GIT_COMMIT_AUTHORIZED=SIM; GIT_PUSH_AUTHORIZED=SIM.
+
+## C107 — refinamentos de UI e APK externo — 2026-10-14
+
+Hero Fire sem faixas laterais/overlay global; contraste radial discreto também
+tablet/TV/quase quadrado. Botões maiores Fire/tablet, selos padronizados e
+selos9px/ano10px Fire. Categoria da série sem Séries | em todos os perfis,
+logo quando disponível, fundo transparente e alternativa em texto. Detalhes
+mostram só logos únicos; dados BR opcionais TMDB/JustWatch, créditos Settings.
+Menu lateral acompanha ambiente, Fire sem contorno/ícones menores. Cor ambiente
+termina no entorno do hero. TV sem Voltar/título/contagem acima do hero;
+erros, remote Back, foco e títulos das faixas mantidos.
+
+Home explícita foca hero; Back restaura categoria/card. Destaques renovam lote
+de20 por tipo ao abrir/clicar Home via páginas locais distribuídas, sem trocar
+lote no Back ou durante foco na faixa. Preparação duplicada removida, erros
+mantidos. Configurações Fire/tablet quatro colunas/linhas automáticas. Guia
+Live aberto abaixo do nome do canal em layouts maiores; celular no rodapé e
+dobrável quase quadrado preservados. Nenhuma alteração de C9/native/source.
+
+54 grupos novos, regressões dirigidas, lock26+27+9/build/assets/assinatura PASS.
+APK1.0.19-C107 recuperável para transferência externa; relatório registra digest,
+instalações-r USB autorizadas e verificações físicas sem exportar mídia/dados.
+Home90s/playback VOD/retenção C102 não reavaliados. Sem commit/push/publicação,
+backend/reset ou próximo Gate.
+[Evidência C107](evidence/C11_FIRE_HERO_FILL_AND_LOCAL_CONTRAST.md).
+CURRENT_GATE=NONE; CURRENT_LOCAL_CYCLE=C107_UI_DELIVERY;
+NEXT_GATE_STARTED=NAO; GIT_COMMIT_AUTHORIZED=NAO; GIT_PUSH_AUTHORIZED=NAO.
+
+Revisão final: categorias/logos no hero também em filmes; variantes Prime
+agrupadas em uma marca; tablet/quase quadrado sem título/contagem acima do
+hero e com Voltar touch.24 casos de layout PASS; QA físico três USB e Grimm
+com uma Prime + uma Globoplay confirmado. APK final11.441.550 bytes/SHA
+eb40b6e8e5cef992fc248bc776ac4092f0b65b7e1622589928ea1ade1fb43eb8,
+instalado-r nos três mantendo dados. Grimm episódios: fonte retornou HTTP404,
+problema aberto e separado de UI, sem modificar source/reader/autorização.
+
+Revisão do Voltar: causa absolute no side-nav confirmada no tablet conectado;
+mesma sobreposição em dobrável TABLET horizontal reproduzida em navegador.
+Classe de apresentação browse reserva row acima do hero, apenas tablet/quase
+quadrado não-TV.60 cenários após correção sem interseção; dobrável PHONE usa
+Back no Header e já não sobrepunha. Tablet físico com gap8,67px e retorno Home
+confirmados. APK11.441.560 bytes/SHA
+7251f2ef50457e62bac04c49a6112ffd510dcdccc9a5b3a2dacbb96944c9151a.
+22 regressões dirigidas e lock/build PASS. Sem Z Fold físico conectado;
+validação dobrável é responsiva. Sem novo Gate/Git/reset/backend.
+Atualizado-r nos três USB com digest7251f2ef:tablet978/celular2471/Fire67
+arquivos privados preservados. Conferência física tablet/celular sem interseção
+e Voltar->Home; Fire segue sem Back visual nos dois destinos.
+
+Refinamento posterior C107: faixa do Voltar transparente com camada da mesma
+cor do topo; logos de plataforma sem flash de nome (espera/erro/ausência ficam
+ocultos); Ver todos12px/36px apenas Fire/Android TV. Selos FILME/SÉRIE sobre as
+capas das listas removidos, tipo acessível e ações/pôster preservados. Top10/
+ranking permanece futuro.28 testes dirigidos,60 geometrias,28 comparações de
+botão/foco,12 raster de paleta e4 smoke de card PASS, lock/build mantidos.
+APK final11.441.595 bytes/SHA
+f769d1fca75dfbeaafe63d919e4a9d0a6dfa139ef3fc70701a13b8c53a33c60b.
+Mesmo package/assinatura/version19 de teste, sem publicar updater/Git/novo Gate.
+Final f769d1fc instalado-r no tablet/Fire com978/67 privados preservados.
+UI confirmou faixa/paleta no tablet, zero texto antes da logo, zero selos
+Filme/Série nos cards e Ver todos12px/36px somente Fire. Após falha de alcance
+Wi-Fi, usuário escolheu atualizar celular manualmente com APK gerado; celular
+não recebeu esse APK remotamente e não exige novas tentativas neste ciclo.
+
+
+## C108 ? anima??o antes da Home e investiga??o na It?lia ? 2026-10-14
+
+Apresenta??o Fire decidida antes do paint: reserva de hero/faixas durante preparo,
+pula anima??o se pronto inicialmente ou na primeira amostra250ms. Caso lento,
+modal precede Home; nenhuma reentrada por perfil/snapshot/retorno. Limites40/8,
+20s, estabilidade500ms, Enter/Back/foco/reduced-motion preservados. Registros
+em architecture/evidence/C11_STARTUP_PRESENTATION_ORDER.md.
+Typecheck, preparo4 grupos, React real13 cen?rios (incluindo20s real), retorno
+C10711 grupos, lock26+27+9, build/sync/Gradle/assets7/assinatura PASS. Baseline
+C107 e999 arquivos fora da allowlist incremental preservados.
+APK tmp/c108-startup-order/Xandeflix-v1.0.19-C108.apk,11.441.629 bytes,
+SHA256 f1d562d1e6939e41a21fc3aec43ec0838edad5c04e44e93a13c1cb18de0f5582.
+Fire desconectou e voltou USB/offline antes de qualquer instala??o; usu?rio
+optou por instalar manualmente. Nenhuma instala??o/reset neste ciclo; QA f?sica
+Fire n?o certificada. Tablet n?o atualizado por este ajuste; celular manual.
+It?lia: todos conte?dos falham, diagn?stico/modelo/XF/bundle ainda pendentes.
+Nenhuma regra de pa?s encontrada no caminho de playback revisado; causa n?o
+confirmada/corrigida e acesso da fonte na It?lia n?o validado. Diagn?stico8 e
+playback direto12 grupos sint?ticos PASS, sem mudan?a de player/fonte/backend.
+Evid?ncia C11_INTERNATIONAL_PLAYBACK_INVESTIGATION.md. CURRENT_GATE=NONE;
+CURRENT_LOCAL_CYCLE=C108_APK_MANUAL_DELIVERY; NEXT_GATE_STARTED=NAO; sem Git.
+
+## C109 — exclusão individual no painel gestor — 2026-10-15
+
+Lixeira da tabela abria exclusão inteira do cliente e dependia de customerId;
+legado sem cliente ficava sem ação. Nova exclusão individual por linha, inclusive
+legado/secundário, exige código XF digitado e usa RPC MASTER existente. Cliente
+inteiro permanece separado, com preview/snapshot/proteções contra identidade
+administrativa ou compartilhada. Erros conhecidos de preview têm mensagem
+específica; nenhuma proteção removida. Guard principal/duplicata/cancelamento,
+ack verdadeiro/refresh falho/callback tardio e foco testados. React14 cenários,
+C78/4,C68/8,C80/6,C83, lock26+27+9, TypeScript/Vite PASS. Módulos novos servidos
+em localhost:3000. Nenhuma exclusão real/schema/grant/backend/Git/APK/install.
+Conector negou get_project/SELECT; causa remota exata de XF-4PNM-CD8C permanece
+sem confirmação, não confundir com causa de UI confirmada do legado.
+Spec/evidência C11_MANAGER_DEVICE_DELETE_SCOPE. APK C108 e consolidado anterior
+preservados; investigação Itália segue pendente do diagnóstico de reprodução.
+CURRENT_GATE=NONE; CURRENT_LOCAL_CYCLE=C109_MANAGER_UI_VERIFIED;
+NEXT_GATE_STARTED=NAO; REAL_BACKEND_DELETE_VALIDATED=NAO.
+
+## C110 — escolha de modelo em duas etapas — 2026-10-15
+
+Mantidos três grupos; Celular abre comum/dobrável, Tablet conclui, TV abre
+Fire/Android TV ou Google TV/Box Android/Samsung Tizen/LG webOS. Configurações
+mostra modelo e reabre o fluxo para corrigir escolha; cancelamento não grava.
+Preferência v1 compatível, identidade/catálogo intocados; subtipo atualiza UI
+mesmo entre dois TV sem remount. Fire explícito usa perfil consolidado e legado
+mantém UA; dobrável acompanha proporção da tela aberta/fechada.11 grupos React/
+browser PASS, regressões de apresentação/hero/metadata/logos/orientação/quadrado
+PASS, typecheck/build e lock26+27+9 antes/depois PASS. Asserção obsoleta do
+levantamento corrigida com verificação da composição real do hook.
+Spec/evidência C11_DEVICE_PRESENTATION_SUBTYPES. Sem backend/Git/APK/install
+ou homologação física/nativa nova. CURRENT_GATE=NONE;
+CURRENT_LOCAL_CYCLE=C110_DEVICE_PRESENTATION_SUBTYPES_VERIFIED;
+NEXT_GATE_STARTED=NAO.
+
+## C111 — carregamento exclusivo e APK entregue — 2026-10-15
+
+Tela própria antes do shell/menu na primeira sincronização. Tablet/TV têm
+mosaico real limitado à esquerda/progresso à direita e fundo horizontal do
+hero; celular usa apenas capa vertical com fade, sem alterar orientação.
+Ver ativação/Portal ocultos na carga normal, recuperação em erro/offline
+preservada. Catálogo local pronto libera Home enquanto sync continua.
+Preparo Fire C108 mantém skip/deadline/Back/foco/limites, shell restaurado.
+Spec/evidência C11_EXCLUSIVE_STARTUP_LOADING. C111/9, C108/13, preparo/4,
+importação/83, C110/11, elegibilidade, TypeScript/Vite/lock26+27+9, sync/Gradle,
+assinatura e7 assets PASS. APK C111/1.0.19:11.445.445 bytes, SHA256
+7de8aa2202abdd5c63a7db3b25a1d52ba5cc114d2c96f89bc3bec41c8190a0b6.
+Celular SM-S926B atualizado via Wi-Fi,45 privados/UID/data de instalação
+preservados; Home/hero/capas conferidos. Tablet sem alcance, usuário optou
+instalação manual; não instalado remotamente. Sem reset/Git/backend/updater.
+Avaliação somente leitura do preload Live: viável protótipo limitado a um
+candidato extra condicionado à fonte/cota/rede/RAM; categoria/todos não
+indicados; troca instantânea não certificada. Nada alterado no player/C9.
+CURRENT_GATE=NONE; CURRENT_LOCAL_CYCLE=C111_DELIVERED_AND_LIVE_PRELOAD_REVIEWED;
+NEXT_GATE_STARTED=NAO.
+
+## C112 — Canal +/− físico — 2026-10-15
+
+Adicionado mapeamento CH+→próximo/CH−→anterior em Android Live inline/fullscreen.
+Uma ação por pressão; busy/dialog/PiP/inativo, D-pad/Back e guards C9 preservados.
+Ordem/limites da categoria mantidos. Usuário confirmou somente uma conexão na
+fonte; nenhum pré-buffer dos vizinhos ou stream extra implementado.
+Harness Java real PASS, C73/7, C106/8, JUnit26/5 classes e lock26+27+9 PASS.
+Gradle/APK/assinatura/7 assets PASS. APK C112/1.0.19 local11.445.445 bytes,
+SHA25686214de1988b6b4885058127cb989530ce07bfc8a4e0336a0d277ec4761ea19f.
+C111/patches anteriores preservados; sem instalação/Git/backend/updater.
+QA do controle físico e tempo de troca não certificados. Spec/evidência
+C11_REMOTE_CHANNEL_KEYS_AND_NEIGHBOR_BUFFER. CURRENT_GATE=NONE;
+CURRENT_LOCAL_CYCLE=C112_CHANNEL_KEYS_VERIFIED_SINGLE_CONNECTION;
+NEXT_GATE_STARTED=NAO.
+
+## C113 — menu Live sem áudio/legendas — 2026-10-15
+
+Removidos botão, listener e diálogo do seletor somente no player Live.
+Filmes/séries mantêm controles VOD byte a byte, som/faixas e mute PiP intactos.
+CH+/− C112 preservado. C73/7, harness C112, JUnit37/6 classes, lock26+27+9 e
+Gradle/assets7/assinatura PASS. AAPT confirma Live sem seletor/VOD com seletor.
+APK C113/1.0.19 local11.445.445 bytes, SHA256
+14b1058303daa57f68e7af45492c07194d16f2adc4fc0723b000c222e2eb8870.
+C112 anterior preservado; sem instalação/Git/backend/updater. Spec em emenda
+C113 de C11_LIVE_PLAYER_CONTROLS, evidência C11_LIVE_REMOVE_TRACKS.
+CURRENT_GATE=NONE; CURRENT_LOCAL_CYCLE=C113_LIVE_TRACK_SELECTOR_REMOVED;
+NEXT_GATE_STARTED=NAO; PHYSICAL_QA=NOT_EXECUTED.
+
+## C114 — setas Live e retorno de foco — 2026-10-15
+
+Fullscreen Android/Fire com controles ocultos: esquerda/anterior, direita/
+próximo, cima/baixo volume do app ±5%; central abre menu, setas navegam com
+menu visível. TV inicia com menu oculto, sem autoShow no buffering. Back
+restaura foco ao canal ativo atual, inclusive fora da janela/mudado em fullscreen,
+sem reiniciar player/C9. Filtro visível preservado; guards descartam foco tardio.
+Fonte continua com somente um stream; inline/PiP/VOD/CH+/− preservados.
+C114 browser10, harness Java, C105/6, C106/8, C73/7, JUnit37/6 classes,
+TypeScript/Vite/lock26+27+9, sync/Gradle/assinatura/7 assets PASS.
+APK local C114/1.0.19:11.445.995 bytes, SHA256
+5472333cd575042e56bfebc3b376d64da6fc4885ec338c7edd4298e1e2d61325.
+C113 preservado; sem instalação/Git/backend/updater. Volume é do aplicativo,
+sem IR da TV; controle físico e suporte nativo Tizen/webOS não certificados.
+Spec/evidência C11_LIVE_DPAD_SHORTCUTS_AND_FOCUS_RETURN.
+CURRENT_GATE=NONE; CURRENT_LOCAL_CYCLE=C114_LIVE_DPAD_AND_FOCUS_VERIFIED;
+NEXT_GATE_STARTED=NAO; PHYSICAL_QA=NOT_EXECUTED.
+
+## C115 — tendências na tela inicial — 2026-10-15
+
+Visual de carregamento recebe até seis tendências aleatórias diretamente do
+TMDB, sem aguardar a fonte, uma página/20 candidatos. Celular vertical;
+tablet/TV/quadrado com mosaico e backdrop horizontal direto. Cache público
+6h/stale máximo7d, cancelamento/timeout/cooldown, fila existente; nenhuma
+condição nova para liberar a Home. Labels não prometem disponibilidade.
+C115/7, C111/9 (directory7), C108/13, fila/cache5, TypeScript/Vite,
+lock26+27+9, sync/Gradle/assinatura/assets7 PASS. Consulta real TMDB HTTP200,
+uma requisição/seis selecionados. APK1.0.19-C115 local11.447.969 bytes,
+SHA256ed0f16466e2e1097fcd8d6816a93c211aca46044e2647454a48e4c1c875d69f9.
+C114/patches anteriores preservados. Sem instalação/Git/backend/updater/reset.
+Spec/evidência C11_STARTUP_TMDB_TRENDS. CURRENT_GATE=NONE;
+CURRENT_LOCAL_CYCLE=C115_STARTUP_TMDB_TRENDS_VERIFIED; NEXT_GATE_STARTED=NAO;
+PHYSICAL_QA=NOT_EXECUTED.
+
+## C116 — cabeçalho mobile transparente — 2026-10-15
+
+CSS mobile deixa Header/borda transparentes e estende cor ambiente do hero
+por trás, faixa superior limitada e fallback escuro. Geometria/menus/ações
+preservados; tablet/TV/quadrado/lateral inalterados. Inspeção browser real de
+Header/CSS320–600px, paleta/fallback/scroll/callbacks e exclusões PASS.
+Build/lock26+27+9/sync/Gradle/7 assets/assinatura PASS. APK local1.0.19-C116,
+11.447.971 bytes, SHA256
+6d5cd897beb5b6166e0ebbf257129e19450c9b9f95cdda2a175b78410d9a0738.
+C115/patches anteriores preservados; sem instalação/Git/backend/updater/reset.
+Spec/evidência C11_MOBILE_HEADER_TRANSPARENCY. CURRENT_GATE=NONE;
+CURRENT_LOCAL_CYCLE=C116_MOBILE_HEADER_TRANSPARENT; NEXT_GATE_STARTED=NAO;
+PHYSICAL_QA=NOT_EXECUTED.
+
+## C117 — heading Filmes/Séries no celular — 2026-10-15
+
+Ocultos título da página/total e espaço acima do hero em Filmes/Séries
+mobile até600px. Marca e ações do Header, transparência C116, hero e menu
+inferior mantidos. Categoria ausente preserva aviso; outros perfis intactos.
+Inspeção browser320–600px/ambas páginas/ações/geometria/exclusões PASS;
+build/lock26+27+9/sync/Gradle/7 assets/assinatura PASS. APK1.0.19-C117 local,
+11.447.969 bytes, SHA256
+f13d0004e1b98bfdac7dbf9fb1804bf249bc71adb6953b2a7286750aed0256e6.
+C116/patches anteriores preservados; sem instalação/Git/backend/updater/reset.
+Spec/evidência C11_MOBILE_BROWSE_HEADER. CURRENT_GATE=NONE;
+CURRENT_LOCAL_CYCLE=C117_MOBILE_BROWSE_HEADER_HIDDEN; NEXT_GATE_STARTED=NAO;
+PHYSICAL_QA=NOT_EXECUTED.
+
+## C118 — toque do hero no dobrável — 2026-10-15
+
+Reproduzido bloqueio13/25 pontos por camada passiva de textos de largura
+inteira. Classe condicional PHONE/TABLET e pointer-events delimitados deixam
+toque atingir imagem; ações/dots mantêm eventos próprios. Layout/gestos/timer/
+TV/Fire preservados. C118 browser4/160 pontos em7 formatos/páginas e C106/8,
+TypeScript/build/lock26+27+9/sync/Gradle/7 assets/assinatura PASS.
+APK1.0.19-C118 local11.447.990 bytes, SHA256
+ee872966d23438ca3bedcf34e02b4f48e3e97f60e8f0812de1fc31a4bebb6175.
+C117/patches anteriores preservados; sem instalação/Git/backend/updater/reset.
+Spec/evidência C11_SQUARE_HERO_HIT_AREA. CURRENT_GATE=NONE;
+CURRENT_LOCAL_CYCLE=C118_SQUARE_HERO_HIT_AREA_FIXED; NEXT_GATE_STARTED=NAO;
+PHYSICAL_QA=NOT_EXECUTED.
+
+## C119 — trailer sem barra externa e imagem horizontal — 2026-10-15
+
+Removidos link Abrir trailer no YouTube e botões abaixo do vídeo (inclusive
+modal, conforme correção do usuário). controls0 oficial web/native; sem
+trailer/erro apresenta Artwork horizontal TMDB disponível, sem mensagem ou
+overlay; ausência de imagem usa fundo neutro. Sessão/bounds/cleanup/foco e C9
+preservados. C119 browser5, modal7, phone movie3/series2, Java5, TypeScript/
+build/lock26+27+9/sync/Gradle/7 assets/assinatura PASS. APK1.0.19-C119 local,
+11.447.598 bytes, SHA256
+38a7267c8beca344fdad95d4c0f7603e150ca8662fafea651e659daffd2d1608.
+Verificação adicional read-only: refresh de fonte habilitado no código15min
+após sucesso, foreground/online com adiamentos; suites19+3+9 PASS. Última
+consulta dos aparelhos/publicação da fonte não verificadas, rotina intacta.
+C118 preservado; sem instalação/Git/backend/updater/reset. Spec/evidência
+C11_TRAILER_ARTWORK_AND_MINIMAL_CONTROLS. CURRENT_GATE=NONE;
+CURRENT_LOCAL_CYCLE=C119_TRAILER_PRESENTATION; NEXT_GATE_STARTED=NAO;
+PHYSICAL_QA=NOT_EXECUTED.
+
+## C120 — menu mobile em cápsula fixa/flutuante — 2026-10-15
+
+CSS mobile até600px: barra64px arredondada, fundo escuro translúcido/blur,
+margens16/12px mais safe-area, ícones24px e nomes, item ativo discreto/foco
+visível. Quatro atalhos/callbacks/Header mantidos. Reserva90px inclusive Live;
+tablet/TV/dobrável aberto e Live quadrado preservados. Inspeção browser5
+grupos/10 cenários de largura/safe-area/toque/foco/scroll/exclusões PASS.
+TypeScript/build/lock26+27+9/sync/Gradle/7 assets/assinatura PASS.
+APK1.0.19-C120 local11.447.597 bytes, SHA256
+9de88e5047fb934f8b448f927956310cf34e36115da4ecd2ed1338ccaadcffda.
+C119 preservado; sem instalação/Git/backend/updater/reset. Spec/evidência
+C11_MOBILE_FLOATING_NAVIGATION. CURRENT_GATE=NONE;
+CURRENT_LOCAL_CYCLE=C120_MOBILE_FLOATING_NAVIGATION; NEXT_GATE_STARTED=NAO;
+PHYSICAL_QA=NOT_EXECUTED.
+
+## C121 — gênero real nos detalhes e logos inline mobile — 2026-10-15
+
+Geral não bloqueia enriquecimento TMDB; gênero real local preservado, sem
+categoria/plataforma no lugar do gênero. Lógica dos detalhes cobre oito
+modelos. Logos na linha ano/idade/duração somente phone, faixa rolável; tablet/
+TV mantêm abaixo do poster conforme resposta do usuário. Episódios/ações/menu
+intactos. C1219, browser3 (16+14 casos), regressões7+3+2+10+5, TypeScript/build/
+lock26+27+9/sync/Gradle/7 assets/assinatura PASS. APK1.0.19-C121 local,
+11.447.784 bytes, SHA256
+7b77e6fd8609ad5ea05aeb57b5ccd51343b6b1a4fb488bd7a50658c9f59533f4.
+C120 preservado; sem instalação/Git/backend/updater/reset. Spec/evidência
+C11_DETAIL_GENRES_AND_INLINE_PROVIDERS. CURRENT_GATE=NONE;
+CURRENT_LOCAL_CYCLE=C121_DETAIL_GENRES_INLINE_PROVIDERS; NEXT_GATE_STARTED=NAO;
+PHYSICAL_QA=NOT_EXECUTED.
+
+## C122 — marca do ícone Android — 2026-10-15
+
+Escolha do usuário aplicada: X vermelho/fundo escuro nos ícones padrão,
+redondo, adaptável e monocromático; banner TV horizontal com XANDEFLIX.
+Manifest só banner alterado.16 PNGs e4 XMLs compilados conferidos;9 arquivos
+web idênticos ao C121,7 dist/certificado/configuração PASS. Lock26+27+9 e
+Gradle PASS. APK1.0.19-C122 local12.708.979 bytes, SHA256
+b78c02f6d95104477dd3708301f2145b00ffabc5e31ff110a4ee64f3f6af677d.
+C121/gêneros/logos e C120/menu preservados; sem instalação/Git/backend/reset.
+Spec/evidência C11_ANDROID_LAUNCHER_BRANDING. CURRENT_GATE=NONE;
+CURRENT_LOCAL_CYCLE=C122_ANDROID_LAUNCHER_BRANDING; NEXT_GATE_STARTED=NAO;
+PHYSICAL_QA=NOT_EXECUTED.
+
+## C123 — favoritos na Home e Live — 2026-10-15
+
+Uma faixa/coleção Favoritos reúne filmes+séries; botões/store v1 e ratings
+mantidos, hints locais sanitizados e resolução bounded no catálogo atual.
+Live inclui Favoritos primeira categoria/seletor quadrado, toggle web/nativo,
+filtro/rolagem contínua, isolamento por fonte e foco fullscreen. Nenhuma nova
+conexão de vídeo. Ghost row após remover último corrigido com versão da lista.
+C12311/browser3 em8 perfis, regressões, TypeScript/build/lock26+27+9/sync/Gradle/
+7 assets/assinatura PASS;12 DEX/1410 recursos nativos iguais ao C122.
+APK1.0.19-C123 local12.708.979 bytes, SHA256
+1af324b08edb372508730de6f989a0c3fab4b992e868b391cf1d37883e81e491.
+Spec/evidência C11_UNIFIED_FAVORITES; C122 e demais patches preservados.
+Sem instalação/Git/backend/reset; favoritos locais, QA física pendente.
+CURRENT_GATE=NONE; CURRENT_LOCAL_CYCLE=C123_UNIFIED_FAVORITES;
+NEXT_GATE_STARTED=NAO; PHYSICAL_QA=NOT_EXECUTED.
+
+## C124 — estrela/contador e hold Live — 2026-10-15
+
+Estrela única junto ao Ao vivo abaixo do preview, sem botão textual; D-pad
+Direita/Esquerda alcança/retorna. Hold Enter/touch2000ms alterna favorito da
+linha, sem selecionar/reiniciar player; curto/segundo curto/fullscreen intactos.
+Marca à direita e contador por fonte, inclusive seletor quadrado. Cancelamento
+não reseta janela C123. C12410/browser4 em9 layouts/8 modelos e regressões
+11+6+10+7, TypeScript/build/lock26+27+9/sync/Gradle/assinatura/7 assets PASS.
+APK1.0.19-C124 local12.708.979 bytes, SHA256
+269ec8c2c78c4a5402fe69b1e9535c2da4d823fb4855056fcabefb6a72056255.
+12 DEX/1410 recursos iguais ao C123; spec/evidência C11_LIVE_FAVORITE_GESTURES.
+Sem instalação/Git/backend/reset. CURRENT_GATE=NONE;
+CURRENT_LOCAL_CYCLE=C124_LIVE_FAVORITE_GESTURES; NEXT_GATE_STARTED=NAO;
+PHYSICAL_QA=NOT_EXECUTED.
+
+
+## C125 - generos de cards/hero e semelhantes - 2026-10-16
+
+Geral removido da apresentacao; metadata TMDB/cache para cards visiveis e hero
+compartilhado, generos mobile/TV visiveis. Semelhantes somente do catalogo local
+com genero real em comum, complemento publico bounded60 e scan local guarded.
+C1259/browser18casos/8modelos e regressoes C121/C123/C124/hero/details PASS.
+Typecheck/build/lock26+27+9/sync/Gradle e APK C125 verificados.
+APK tmp/c125-content-genres/Xandeflix-v1.0.19-C125.apk 12708979 bytes; SHA256
+bb51c62bb3c38a62b8b097a2f325acb72f8ac22ca05b78839de07f65ce378532.
+Mesmo package/certificado/nativo C124. Sem Git/backend/install/reset.
+Spec/evidence: C11_CONTENT_GENRES_AND_RELATED_TITLES.md.
+CURRENT_GATE=NONE; CURRENT_LOCAL_CYCLE=C125_CONTENT_GENRES;
+NEXT_GATE_STARTED=NAO; PHYSICAL_QA=NOT_EXECUTED.
+
+
+## C126 - controle parental local e busca por capa - 2026-10-16
+
+Quarta opção em Configurações: PIN6/PUK editável, recuperação pelo PUK atual,
+limite L-18, sem classificação exige PIN e adulto oculto até opt-in/sessão.
+Busca local com capa define regra por filme/série/canal (até256), sem upload.
+Android Keystore/AES-GCM; verificadores PBKDF2/600000 e cooldown persistente.
+C12616, browser10relatórios/8perfis, Java2 e regressões PASS; lock26+27+9,
+build/sync/Gradle/assinatura/8 assets PASS. APK C126 12709074 bytes,
+SHA256 d9b68fdceb62d59ada399c6c42b7854f64560c77ad1c4b22d984df21c2e41158.
+Spec/evidence C11_LOCAL_PARENTAL_CONTROL. Auditoria38existentes/16novos,
+1035hashes e memórias anteriores preservados. Sem Git/backend/install/reset.
+CURRENT_GATE=NONE; CURRENT_LOCAL_CYCLE=C126_LOCAL_PARENTAL_CONTROL;
+NEXT_GATE_STARTED=NAO; PHYSICAL_QA=NOT_EXECUTED.
+
+
+## C127 - fonte e playback no navegador - 2026-10-16
+
+Investigacao read-only: cofre sem plugin web rejeita get/put/has com
+UNSUPPORTED_SECURE_STORE; entrega MANAGED autorizada simulada falha com
+SECURE_STORE_WRITE_FAILED. Player/preview web indisponiveis por contrato.
+Suite cofre5 e reproducao com classes reais PASS; zero rede remota/segredos.
+Modulos Vite localhost3000 confirmam guards; aba real nao acessivel via CUA.
+UI/ativacao/painel web nao equivalem a ingestao/playback desktop. Limitacao
+anterior a C126, nao controle parental. Evidence C11_BROWSER_SOURCE_SUPPORT_DIAGNOSIS.
+Sem patch/build/APK/backend/Git/reset. CURRENT_GATE=NONE;
+CURRENT_LOCAL_CYCLE=C127_BROWSER_SOURCE_DIAGNOSIS; NEXT_GATE_STARTED=NAO.
+
+
+## C128 - exibicao por faixa parental - 2026-10-16
+
+Limite inclusivo aplicado a cards/hero/busca/favoritos/semelhantes/Live.
+Acima oculto/nega acesso direto; desconhecido visível com PIN. Adulto exige
+teto18, opt-in e sessão PIN. Metadata pública tardia atualiza filtro sem
+reiniciar Live ou desmontar detalhe de outro título. Overlay RAM512 local,
+consulta apenas visível/hero atual; catálogo e registro PIN/PUK preservados.
+C12811/C12616/browser10relatórios em8perfis e regressões PASS;
+lock26+27+9/typecheck/build/sync/Gradle/APK PASS. APK C128 12709074 bytes,
+SHA256 9f2751fc650091def45ea335f3035205f322b87de64e82b82831ed00806d868e. Mesmo certificado,12DEX/1412recursos iguais ao C126.
+Spec/evidence C11_PARENTAL_AGE_VISIBILITY. Audit17/4/1073hashes preservados.
+Sem Git/backend/instalação/reset. CURRENT_GATE=NONE;
+CURRENT_LOCAL_CYCLE=C128_PARENTAL_AGE_VISIBILITY; NEXT_GATE_STARTED=NAO;
+PHYSICAL_QA=NOT_EXECUTED.
+
+
+## C129 - controle parental na TV e D-pad - 2026-10-16
+
+Pedido de D-pad/proporção Fire/TV e Voltar duplicado concluído em patch local.
+Entrada pelo shell/menu, percurso de formulário, classificação por opções e
+rolagem/foco restaurados; TV compacta, dimensões touch preservadas. Critérios
+C128 e PIN/PUK/storage/C9/ativação/source intactos. Spec/evidence
+C11_PARENTAL_TV_NAVIGATION. C129 oito perfis/C12616/C12811/regressões PASS;
+typecheck/lock26+27+9/build561/sync/Gradle/APK PASS. APK C129 12709074bytes,
+SHA256 e560a91fb82d7c0177cf99e84cb572689844b96b1fbdaf6d48511557ce179195; mesma assinatura,12DEX/1412recursos iguais ao C128,
+oito assets verificados. Auditoria8existentes/4novos/1086preservados,
+memórias append-only, HEAD/main/origin/APK anterior preservados.
+Sem Git/backend/instalação/reset. CURRENT_GATE=NONE;
+CURRENT_LOCAL_CYCLE=C129_PARENTAL_TV_NAVIGATION; NEXT_GATE_STARTED=NAO;
+PHYSICAL_QA=NOT_EXECUTED; FIRE_VIRTUAL_KEYBOARD_QA=PENDING.
+
+
+## C130 - icone Fire e piscada do hero - 2026-10-16
+
+Icone azul reportado; ADB confirmou APK C126 instalado. C130 adiciona bitmap
+TV e icon/banner explicitos na MainActivity, phone adaptive/PNGs preservados.
+Piscada do hero reproduzida fisicamente: opacity0 nas trocas e paleta apagada,
+shell estavel. Corrigidos fade do carousel Fire e reset entre imagens; foco e
+timer10s mantidos. C1307/negativos2/C1077/C1068/D-pad15/C1184/HomeHero12/C12811
+PASS; browserFire261frames/cincotrocas opacity1, AndroidTV fade preservado.
+Lock/build561/sync/Gradle/APK PASS. APK1.0.20/code20 11198257bytes,
+SHA256 871b86c5aa12d3dc1cb74d2a922c606be17ac5afa6f9d62d3f6e5eca269c8438. Oito assets,11DEX iguais,15PNGs/quatroXML mobile
+preservados, dois PNG TV e manifest compilado corretos, assinatura igual.
+Audit8/5/1090, memorias append-only, HEAD/main/origin/C129 preservados.
+Sem Git/backend/install/reset. CURRENT_GATE=NONE;
+CURRENT_LOCAL_CYCLE=C130_FIRE_LAUNCHER_AND_RENDER_STABILITY;
+NEXT_GATE_STARTED=NAO; NEW_APK_PHYSICAL_QA=PENDING_MANUAL_UPDATE.
+
+
+## C131 - logo metalica enviada pelo usuario - 2026-10-16
+
+Logo X metalico/play do anexo aplicada somente aos icones instalados e banner
+Fire; menu interno preserva X vermelho simples, conforme escopo. Original por
+hash,18PNGs e quatro adaptive XML conferidos, previews sem corte. Code21/name
+1.0.21, assinatura igual, dez arquivos web identicos C130; C130 anti-piscada,
+C129 D-pad e todos os patches anteriores preservados. Lock26+27+9 PASS antes,
+depois e final; primeiro Gradle falhou por cache incremental, :app:clean e
+assembleDebug PASS. APK 11378734bytes, SHA256 dc71af63531da4709497f069dd5de33cccb11251c86e009f46daab5a25b9b06c.
+Audit27/3/1076, memorias append-only e Git preservados. Sem instalacao/reset,
+backend/Git. CURRENT_GATE=NONE; CURRENT_LOCAL_CYCLE=C131_USER_SUPPLIED_LOGO;
+NEXT_GATE_STARTED=NAO; PHYSICAL_LAUNCHER_QA=PENDING_MANUAL_UPDATE.
+
+
+## C132 - publicacao Git 1.0.21 preparada - 2026-10-16
+
+Usuario autorizou commit e push da atual versao. Main/origin canonicamente
+verificados, HEAD inicial 0f68f169f7728fae17c8311832b7643629e97a02, remoto0/0/index vazio.
+220 candidatos C107–C131 mais spec/evidencia222.43 verificacoes PASS e Android
+201testes/34suites XML sem falhas/erros. Cinco harnesses antigos
+ajustados apenas em dependencias de fixtures, mantendo assercoes; produto e
+APK1.0.21 preservados por hash. Auditoria/staging/commit/push em andamento;
+nao afirmar envio antes da verificacao independente do SHA remoto.
+GIT_COMMIT_AUTHORIZED=SIM; GIT_PUSH_AUTHORIZED=SIM; GIT_PR_AUTHORIZED=NAO;
+CURRENT_GATE=NONE; CURRENT_LOCAL_CYCLE=C132_GIT_PUBLICATION;
+NEXT_GATE_STARTED=NAO. APK/env/tmp/segredos excluidos; sem backend/install/reset.

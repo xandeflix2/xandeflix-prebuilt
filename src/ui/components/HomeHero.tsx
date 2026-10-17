@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import type { CatalogItemViewModel } from '../../catalog/catalog-view-model.ts';
 import type { HomeHeroOption } from '../../catalog/home-hero.service.ts';
 import { useHeroLayout } from '../hooks/useHeroLayout.ts';
+import { isFireTvPresentation } from '../device-presentation.ts';
 import { Hero } from './Hero.tsx';
 import { useHeroArtwork } from '../hooks/useHeroArtwork.ts';
 import { HeroPreparing } from './CategoryHero.tsx';
@@ -27,7 +28,7 @@ export function heroSwipeDirection(dx: number, dy: number, elapsed: number, widt
 
 export const HomeHero: React.FC<HomeHeroProps> = ({ options: incoming, onSelect, onPlay, playbackBusy, playbackMessage, nextBatch, displayed, contentKind, headingLevel = 1 }) => {
   const phone = useHeroLayout();
-  const fireStick = typeof navigator !== 'undefined' && /\bAFT\w*/i.test(navigator.userAgent);
+  const fireStick = typeof navigator !== 'undefined' && isFireTvPresentation(navigator.userAgent);
   const candidates = useMemo(() => contentKind ? incoming.filter(option => option.item.kind === contentKind) : incoming, [incoming, contentKind]);
   const items = useMemo(()=>candidates.map(option=>option.item),[candidates]);
   const artwork = useHeroArtwork(items,phone?'vertical':'horizontal',20,10);
@@ -39,7 +40,7 @@ export const HomeHero: React.FC<HomeHeroProps> = ({ options: incoming, onSelect,
       if(bucket[option.item.kind]>=5)return false;
       bucket[option.item.kind]++;return true;
     }).slice(0,20);
-  },[candidates,artwork.revision,phone]);
+  },[candidates,artwork.revision,artwork.eligibilityKey,phone]);
   const [cursor, setCursor] = useState({ options, index: 0 });
   const index = cursor.options === options ? Math.min(cursor.index, Math.max(0, options.length - 1))
     : Math.max(0,options.findIndex(option=>option.key===cursor.options[cursor.index]?.key));
@@ -65,10 +66,10 @@ export const HomeHero: React.FC<HomeHeroProps> = ({ options: incoming, onSelect,
   }, [hasOptions]);
   useEffect(() => { if (item && visible && !hidden) displayed(item); }, [item, displayed, visible, hidden]);
   useEffect(() => {
-    if (!item || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (!item || fireStick || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const animation = root.current?.animate?.([{ opacity: 0 }, { opacity: 1 }], { duration: 400, easing: 'ease-out' });
     return () => animation?.cancel();
-  }, [item?.key, reduced]);
+  }, [item?.key, reduced, fireStick]);
   const advance = async () => {
     if (pending.current || options.length < 2) return;
     if (index + 1 < options.length) { setCursor({ options, index: index + 1 }); return; }

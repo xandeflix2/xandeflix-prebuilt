@@ -76,7 +76,7 @@ export const Header: React.FC<HeaderProps> = ({
           <span className="brand-logo">XANDEFLIX</span>
           <span className="brand-sub">PREBUILT</span>
         </div>
-        {(currentView === 'movies' || currentView === 'series' || currentView === 'search' || currentView === 'activation' || currentView === 'settings' || currentView === 'movie-detail' || currentView === 'series-detail') && (
+        {(currentView === 'movies' || currentView === 'series' || currentView === 'search' || currentView === 'activation' || currentView === 'settings' || currentView === 'parental-control' || currentView === 'movie-detail' || currentView === 'series-detail') && (
           <button
             type="button"
             className="focusable-item header-home-button"

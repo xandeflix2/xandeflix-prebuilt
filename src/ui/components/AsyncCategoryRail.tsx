@@ -19,6 +19,8 @@ import type { Movie, Series } from '../../contracts/catalog.ts';
 import { MediaRail } from './MediaRail.tsx';
 import { observeArtwork } from '../../artwork/artwork-visibility.ts';
 import { isReleaseCategory } from '../../catalog/category-presentation.ts';
+import { useParentalControl } from '../hooks/useParentalControl.ts';
+import { canShowParentalGroup } from '../../parental/parental-content.ts';
 import type { CategoryPreviewIndex } from '../../catalog/category-preview-index.ts';
 
 export interface RailLoadQueue {
@@ -194,6 +196,8 @@ export const AsyncCategoryRail = React.memo<AsyncCategoryRailProps>(function Asy
   }, [browseService, categoryId, hasSufficientInitial, initialItems, kind, maxItems, queue, readModel, loadWhenVisible, nearViewport, onscreen, previewIndex, startupArtworkCount, latestSourceFirst]);
 
   // Se já finalizou a busca e não há itens, não ocupa espaço na Home
+  useParentalControl();
+  if (!canShowParentalGroup(title)) return null;
   if (loaded && items.length === 0) {
     return null;
   }

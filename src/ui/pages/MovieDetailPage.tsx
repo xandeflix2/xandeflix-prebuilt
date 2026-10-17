@@ -23,7 +23,9 @@ import { watchFingerprint } from '../../playback/watch-history.ts';
 import type { CatalogItemViewModel } from '../../catalog/catalog-view-model.ts';
 import { defaultPlaybackService } from '../../playback/playback.service.ts';
 import { PhoneMovieDetail } from '../components/PhoneMovieDetail.tsx';
+import { WatchProviders } from '../components/WatchProviders.tsx';
 import { usePhoneLayout } from '../hooks/usePhoneLayout.ts';
+import { meaningfulDetailGenres } from '../detail-genres.ts';
 
 interface MovieDetailPageProps {
   movieId: string;
@@ -39,14 +41,15 @@ export const MovieDetailPage: React.FC<MovieDetailPageProps> = ({ movieId, readM
   const sourceDetail = getMovieDetail(readModel, movieId);
   const identity = sourceDetail ? { kind: 'movie' as const, title: sourceDetail.title,
     year: sourceDetail.yearFormatted, tmdbId: sourceDetail.externalIds?.tmdbId, posterPath: tmdbPosterPath(sourceDetail.posterUri), sourcePosterUri: sourceDetail.posterUri } : undefined;
+  const sourceGenres = meaningfulDetailGenres(sourceDetail?.genreLabels || []);
   const metadata = useArtworkMetadata(identity, Boolean(sourceDetail && (!sourceDetail.overview || !sourceDetail.yearFormatted
-    || !sourceDetail.originalTitle || !sourceDetail.durationFormatted || !sourceDetail.genreLabels.length)), 'high');
+    || !sourceDetail.originalTitle || !sourceDetail.durationFormatted || !sourceGenres.length)), 'high');
   const detail = sourceDetail && { ...sourceDetail,
     originalTitle: sourceDetail.originalTitle || metadata?.originalTitle,
     yearFormatted: sourceDetail.yearFormatted || (metadata?.year ? String(metadata.year) : undefined),
     durationFormatted: sourceDetail.durationFormatted || metadata?.durationFormatted,
     overview: sourceDetail.overview || metadata?.overview,
-    genreLabels: sourceDetail.genreLabels.length ? sourceDetail.genreLabels : metadata?.genres || [],
+    genreLabels: sourceGenres.length ? sourceGenres : meaningfulDetailGenres(metadata?.genres || []),
   };
   const [detailLoading, setDetailLoading] = useState(!detail);
   const [detailFailed, setDetailFailed] = useState(false);
@@ -77,7 +80,7 @@ export const MovieDetailPage: React.FC<MovieDetailPageProps> = ({ movieId, readM
   const handlePlayMovie = useCallback(async () => {
     setIsResolving(true);
     setStatusKind('info');
-    setStatusMessage('Preparando reprodução...');
+    setStatusMessage(null);
 
     try {
       const result = await defaultPlaybackService.playMovie(movieId, readModel);
@@ -156,6 +159,7 @@ export const MovieDetailPage: React.FC<MovieDetailPageProps> = ({ movieId, readM
               immersiveArtwork="poster"
               className="detail-poster-img"
             />
+            <WatchProviders identity={identity}/>
           </div>
 
           <div className="detail-info-col">
@@ -211,7 +215,7 @@ export const MovieDetailPage: React.FC<MovieDetailPageProps> = ({ movieId, readM
               </div>
 
               {identity && <DetailTrailer key={movieId} title={detail.title} identity={identity} backdrop={detail.backdropUri} poster={detail.posterUri}/>}
-              {readModel.moviesById.has(movieId) && <SeriesPersonalActions key={movieId} kind="movie"
+              {readModel.moviesById.has(movieId) && <SeriesPersonalActions key={movieId} kind="movie" itemId={movieId}
                 fingerprint={watchFingerprint('movie', readModel.moviesById.get(movieId)!)} title={detail.title}
                 tmdbId={Number.isSafeInteger(Number(detail.externalIds?.tmdbId)) && Number(detail.externalIds?.tmdbId) > 0 ? Number(detail.externalIds?.tmdbId) : undefined}/>}
             </div>

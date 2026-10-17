@@ -1993,3 +1993,574 @@ sem efeito no código; próximas mensagens UTF-8 sem BOM, histórico sem amend.
 Proveniência/artefato/privados mantidos, registro final apenas documental.
 Home90s/playback VOD/retenção C102 seguem pendentes; envio Git não os resolve.
 [Comprovante](evidence/C11_C100_C106_GIT_PUBLICATION.md).
+
+## 2026-10-14 — C107_UI_REFINEMENTS_AND_RECOVERABLE_APK
+
+Primeiro fundo elíptico escuro rejeitado pelo usuário; substituído por nuvem
+radial única.52/.38/.18→0, sem certificar contraste5,9 do candidato rejeitado.
+QA revelou background preso à caixa de scroll: attachment local e limite com
+scrollTop corrigiram halo; raster13 contextos termina rgb(8,12,20) sem seam.
+Disponibilidade inicialmente exibida por modo duplicava logos entre grupos;
+usuário pediu só logos, dedupe por ID/URI/nome e créditos fora da capa. Selo
+de categoria inicialmente azul foi revisto para transparente explicitamente.
+
+TypeScript apontou imports React usados apenas implicitamente no harness e
+wrapper openLivePanel sem chamada após remover botão; tipos React explícitos
+e remoção somente do wrapper/import mortos corrigiram build. Sync de artefato
+anterior não constituiu entrega: build completo/sync/Gradle e comparação de
+sete assets byte a byte repetidos. Nenhum lock/teste canônico relaxado.
+
+Helpers tiveram falhas de quoting/BOM/patch context e consulta DOM durante
+transição; corrigidos sem alterar dados. CDP Promise was collected em espera
+RAF foi substituído por sondagem síncrona entre eventos normais. Escapes de
+regex em string do probe causaram falso prefixo; probe corrigido, normalizador
+de produção/testes de prefixo já correto. Foco D-pad exigiu aguardar prontidão.
+Offset horizontal exato não se mantém quando seed existente reordena cards;
+QA exige mesma linha/card inteiro visível, e offset exato com ordem estável
+continua passando. Não foi congelada ordenação ou ampliada biblioteca em RAM.
+
+54 grupos novos, regressões touch/autoplay/Live16 e lock26+27+9 PASS; artefato
+final/instalações/QA sanitizados em evidence/C11_FIRE_HERO_FILL_AND_LOCAL_CONTRAST.md.
+Home90s, reprodução VOD e retenção C102 permanecem pendentes; UI/metadados não
+os certificam. Sem Git/backend/reset/publicação/novo Gate.
+
+Revisão posterior: ID/URI/nome iguais não cobriam Amazon Prime Video, variante
+with Ads e Amazon Video com logos/IDs distintos. Dedupe de apresentação agora
+agrupa aliases explícitos, prefere serviço base e conserva marcas diferentes;
+fixture três Prime + Globoplay => duas logos e QA Grimm no Fire confirmados.
+Cabeçalho Filmes/Séries estava oculto apenas TV; ampliado tablet/quase quadrado,
+sem remover Voltar touch. Selo de categoria/dir público estendido a filmes.
+
+Grimm sem episódios foi reproduzido no Fire: DIRECTORY_JSON_FETCH_FAILED;
+transporte nativo recebeu HTTP_STATUS_ERROR/4XX, GET diagnóstico autorizado
+confirmou HTTP404 sem dados de episódios. Sem mudança de source/reader/C9,
+sem fabricar episódios TMDB ou usar cache stale. Falha da fonte permanece
+aberta; patch visual não a resolve. Diagnóstico apenas RAM/flags/contagens,
+wrappers restaurados e sem exportar URLs/corpo/credenciais/catálogo.
+Probe privado inicialmente exigiu selo em filme cuja categoria era ausente/
+Geral; expectativa corrigida para conferir presença contra dado local, sem
+relaxar teste funcional (filmes Netflix/Prime e categorias vazias testados).
+
+Auditoria privada de empacotamento inicialmente contou todos os arquivos public
+como se fossem apenas os sete de dist. Capacitor adiciona cordova.js e
+cordova_plugins.js vazios: ambos foram nominalmente conferidos com zero bytes,
+além dos sete assets exatos; nenhum arquivo desconhecido permitido. Ajuste
+somente do helper, sem alterar APK/runtime ou testes canônicos. Tentativa de
+listar ZIP por node inline falhou por quoting PowerShell; leitura .NET e
+helper em arquivo evitaram interpolação, sem dados sensíveis na saída.
+
+## 2026-10-14 — C107, Voltar sobre hero tablet/quase quadrado
+
+Usuário relata regressão após ocultar cabeçalhos: Voltar permanecia absolute
+no side-nav, usando a área antes ocupada por título/contagem. Tablet USB
+1365x775 confirmou interseção2486,91px² e botão terminando29,27px dentro do hero
+em Filmes/Séries. QA anterior conferia presença/hit/viewport, não interseção;
+não constitui evidência de ausência dessa sobreposição (latest regression wins).
+
+Matriz antes do patch, com políticas puras de layout e AppShell/Header reais,
+reproduziu oito sobreposições: tablet e dobrável configurado TABLET em paisagem,
+Filmes/Séries raiz/categoria. PHONE dobrável usa Back no Header e não reproduziu;
+tablet retrato/celular/TV não sobrepunham. Correção mínima: classe browse na row
+atual e posição no fluxo somente tablet/quase quadrado não-TV, reservando altura
+e8px antes do main.60 casos após o patch sem interseção/hit bloqueado, incluindo
+categorias ausentes, duas orientações dobráveis PHONE/TABLET, celular e TV.
+Sem Z Fold físico conectado; simulação responsiva não é teste desse hardware.
+
+## 2026-10-14 — C107, faixa Voltar/pending logo/Ver todos Android TV
+
+Faixa nova do Voltar estava sobre fundo padrão, pois o gradiente começava
+somente no main. Row permanece transparente e no fluxo, com camada não
+interativa atrás herdando a mesma --navigation-ambient do hero; raster com
+duas paletas confirma continuidade ao main e fundo escuro após hero, sem
+trocar hook/canvas ou ampliar coloração nas categorias.
+
+Usuário rejeita nome antes da logo: fallback textual anterior foi supersedido
+explicitamente. Selo agora não mostra texto durante espera/erro/ausência;
+imagem só visível depois de onLoad da URI atual, nome em alt/aria/title apenas.
+Ver todos menor solicitado somente Fire/Android TV:12px/36px/padding6x10,
+classe Android TV derivada da decisão TV existente + UA Android, sem mudar
+detector. Tablet/celular/Tizen/webOS conservam medidas anteriores.
+
+Fixture privado de foco inicialmente consultava sombra sem foco de documento
+headless; espera de transição sozinha não bastou. Focus emulation explícita
+no navegador resolveu sem alterar CSS/foco do produto. Fixture de quatro
+rotas também precisava stub CastButton para renderizar detalhe tablet; stub
+isolado adicionado, sem editar implementação Cast ou relaxar critérios.
+28 casos de Ver todos/foco e12 raster/paletas PASS; matriz60 sem interseção,
+regressões de plataforma10/metadados11/halo7 e lock/build PASS. Sync/Gradle/
+instalação dependem de término bem-sucedido; build não equivale a entrega.
+
+Novo pedido após build intermediário bdee7b99 exigiu remover selo de tipo das
+capas; tablet já havia recebido esse candidato-r preservando dados, demais
+alvos ainda não. Candidato preservado e novo build acumulado iniciado, sem
+apagar dados nem declarar intermediário final. Remoção de um div MediaCard,
+quatro checks sintéticos de ausência/poster/acessibilidade/ações PASS. Nenhum
+Top10/ranking novo iniciado. Próxima verificação física usa APK final nos três.
+
+Probe físico encontrou altura40.0000038px em vez de40px por precisão WebView;
+expectativa privada ajustada para tolerância geométrica0,01px, mantendo tamanho
+alvo e fonte exatos. Sem mudança de produto para aceitar erro do helper.
+Tablet final f769d1fc confirmado: faixa transparente/paleta igual ao topo,
+sem sobreposição, sem nome/alt visível antes da logo, zero selos de tipo.
+
+Usuário mudou celular para Wi-Fi. Pair ADB falhou com protocol fault, sondas
+TCP de pairing e conexão deram timeout. Host só apresentava Ethernet IPv4;
+celular não estava mais no ADB USB. Rede/IP/portas atuais solicitados ao usuário,
+sem fallback USB ou modo TCP5555. Não interpretar APK pronto como instalação
+do celular: manter entrega desse alvo pendente até conectividade/validação.
+Código transitório de pareamento não registrado neste documento/relatórios.
+Usuário respondeu depois para deixar celular para atualização pelo APK gerado.
+Isso encerra tentativas remotas por escolha dele: entregar arquivo manual e
+não marcar instalação do celular como feita. Tablet/Fire atualizados e QA
+final aprovados; sem novo bloqueio de código, sem fallback USB ou updater.
+## C108 — apresentação inicial e investigação internacional — 2026-10-14
+
+Animação Fire podia cobrir Home já exibida: efeito passivo incondicional,
+observação tardia do perfil e repetição por snapshot. Corrigida a decisão antes
+do paint, com reserva curta/omissão rápida e uma apresentação por documento.
+Regressões e build/APK verificados; detalhes em evidence/C11_STARTUP_PRESENTATION_ORDER.md.
+Fixture adicionada de deadline20s inicialmente não observou o final porque o
+registro limitado a600 frames acabava perto de10s; ampliar somente coleta para
+1800 frames, mantendo critérios e deadline. Reexecução final13 cenários PASS.
+
+Entrega física bloqueada pelo ADB: Fire desapareceu antes da verificação de
+modelo (nenhum install/force-stop executado); após reconexão aparece USB mas
+offline na depuração. Usuário escolheu instalar manualmente; instalação remota
+encerrada sem modificar o Fire. Tablet conectado, fora do alvo deste ajuste;
+celular manual por escolha do usuário. QA física de ordem permanece não validada.
+
+Itália: usuário confirma que todos os conteúdos falham. Sem modelo/XF/bundle
+ou diagnóstico da tentativa, causa não confirmada e não corrigida. Nenhuma
+regra de país encontrada no caminho de reprodução revisado; isso não valida
+liberação do provedor no exterior. Não atribuir o HTTP401 histórico a esse
+aparelho. evidence/C11_INTERNATIONAL_PLAYBACK_INVESTIGATION.md registra
+inspeção, testes sintéticos8+12 e dados pendentes. Sem alterar fonte/player,
+DNS/TLS/backend/licença/ativação. CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO.
+
+## C109 — exclusão no gestor e limites de verificação — 2026-10-15
+
+Confirmados lixeira por customerId (ausente no LEGACY MANAGED) e entrada antiga
+para cliente inteiro em vez de aparelho. Corrigida exclusão individual por
+código usando RPC MASTER existente, sem remover guardas de conta administrativa.
+Causa específica do erro de preview de XF-4PNM-CD8C ainda não confirmada: MCP
+get_project/SELECT negados, sem navegador conectado no CUA. Nenhuma alteração
+remota nem tentativa de contornar permissão. Usuário deve confirmar a exclusão
+no próprio painel; testes não removem dados reais.
+Falhas locais resolvidas: PowerShell5 OutputEncoding ASCII corrompeu acentos do
+bloco novo enviado por pipeline; reparado por apply_patch UTF-8 e validado no
+browser. Fixture esbuild precisou de outdir para CSS, corrigido sem alterar
+asserções/critério.14 cenários C109, regressões e build/lock PASS. Fonte/cofre,
+RLS, licenças, identidade e conta administrativa preservados. Evidência em
+C11_MANAGER_DEVICE_DELETE_SCOPE; investigação Itália continua separada.
+
+## Levantamento de apresentação por dispositivo — 2026-10-15
+
+Escopo solicitado: inventariar opções da primeira tela e adaptações existentes,
+sem alterar UI, ativação, identidade ou gerar APK. CURRENT_GATE=NONE;
+NEXT_GATE_STARTED=NAO. Leitura no clone C11 ativo, main,
+HEAD 0f68f169f7728fae17c8311832b7643629e97a02 e origin canônico confirmados.
+Testes existentes: square-live-layout 18/18 PASS e landscape-navigation
+18 casos, overrides e hook real PASS. Device-presentation passa os dois
+primeiros grupos (três escolhas persistidas/identidade e storage/subscrição),
+mas termina com AssertionError na asserção textual que exige
+`const phone = usePhoneLayout` em HomeHero.tsx. O código atual usa
+`const phone = useHeroLayout()`, cujo retorno considera usePhoneLayout,
+orientação e squareLive. Portanto, essa asserção está desatualizada; o script
+completo NÃO passou e sua verificação final ficou incompleta. Nenhum teste
+foi relaxado/alterado e nenhuma conclusão de regressão visual foi atribuída
+ao aparelho Google TV sem diagnóstico do dispositivo. Pendência registrada
+durante o levantamento; somente este registro documental foi acrescentado.
+
+## C110 — seleção em duas etapas e pendências do levantamento — 2026-10-15
+
+A asserção antiga em test-c11-device-presentation foi atualizada para exigir
+a composição real HomeHero→useHeroLayout→usePhoneLayout/orientação/square,
+sem remover critério de identificação. Script completo agora PASS. Fixture
+C106 precisou fornecer o novo import da apresentação real ao carrossel;
+TypeError de import ausente resolvido no loader, oito casos originais PASS.
+Suite antiga home-hero também tinha stubs ausentes para logos/WatchProviders
+adicionados em C107; completados sem remover asserções, suite completa PASS,
+com logos verificadas pela própria suíte C107/10 cenários.
+
+Primeira fixture C110 tentou validar retorno ao botão sem focar o trigger
+antes de chamar click() programático. Corrigida simulação para focus+click,
+como interação de teclado/mouse; critério de retorno mantido e PASS. Revisão
+visual em960x540 mostrou Voltar abaixo da área útil; compactados somente os
+cartões da subetapa em telas baixas. Regra global de densidade reduzia ações;
+override local garante44px, teste confirma retorno visível. Fixture esbuild
+recebe ambiente import.meta vazio, sem segredos nem rede externa.
+
+Verificação final: C110/11 grupos, regressões, typecheck/build e lock26+27+9
+PASS. Sem defeito funcional pendente observado neste fluxo; QA física não
+executada. Sem APK novo/install/backend/Git. C108 anterior preservado;
+diagnóstico Itália e exclusões reais permanecem tarefas independentes.
+
+Auditoria adicional: forçar core.autocrlf=false no diff de arquivos Windows
+produziu falsos avisos de whitespace por CRLF, sem modificar arquivos.
+Reexecução com a configuração normal do repositório: git diff --check PASS.
+
+## C111 — tela exclusiva e harness — 2026-10-15
+
+TypeScript detectou safeLogo nullable no observador opcional; normalizado
+para undefined sem alterar o objeto de filme. Novo backdrop tinha import
+React não utilizado; removido. Fixtures anteriores precisaram receber o
+componente compartilhado, portal e atributos de isolamento do shell.
+Esbuild passou a gerar outdir para CSS e import.meta.env vazio de fixture;
+normalização de caminho Windows impediu incluir autoridades reais no teste.
+Asserções C108/limites/foco/deadline não foram removidas nem reduzidas.
+
+No teste App, body.textContent incluía script inline e gerava falso achado
+do sentinel; consulta limitada ao root visível. CDP recebeu Boolean em
+expressões de espera para não serializar referências DOM. Teste da rotação
+falhou porque o Windows preferia reduzir movimento: estado real confirmou
+reduced=true, comportamento estático correto. Fixture agora escolhe
+no-preference para testar rotação e reduce explicitamente para a pausa.
+Código de produção continua respeitando preferência do usuário.
+
+Reexecução final C111/9, C108/13, preparo/4, importação/83, C110/11,
+elegibilidade do hero, build/lock26+27+9 PASS. Nenhum desses resultados
+certifica tempo de primeira carga física ou playback remoto.
+ADB não estava no PATH; usado SDK local, sem instalar dependências. Celular
+descoberto via mDNS e autorizado. Tablet com porta de pareamento anunciada,
+porém IP sem alcance TCP/ARP; novos dados solicitados, instalação pendente.
+
+Atualização final: novas tentativas do tablet mantiveram protocol fault e
+IP sem alcance; usuário escolheu instalar manualmente o APK C111, encerradas
+tentativas sem install/reset no tablet. Celular install-r por Wi-Fi PASS:
+45 privados/UID/firstInstallTime e hash do APK preservados/verificados,
+Home/hero/capas reais conferidos após abrir. Empacotamento/Gradle/assinatura,
+7 assets e lock final26+27+9 PASS. Nenhuma falha técnica de C111 pendente;
+primeira carga física continua não certificada, tablet manual não confirmado.
+
+## C112 — restrição de conexão e suporte CH+/− — 2026-10-15
+
+Inspeção encontrou ausência de mapeamento explícito CHANNEL_UP/DOWN apesar
+de existirem Anterior/Próximo na UI. Corrigido com guards/reuso de ações;
+harness real Java, C73/7, C106/8, JUnit26/5, lock/Gradle/APK PASS. Nenhum teste
+reduzido ou falha técnica pendente observada. Avisos flatDir/deprecated
+anteriores mantidos. QA com controle físico ainda não executada.
+
+Limite informado pelo usuário: uma conexão da fonte. Pré-buffer de canais
+vizinhos concorrente com canal ativo não é compatível com esse limite;
+funcionalidade não implementada, sem abrir streams adicionais ou alterar
+buffer/autorização. Não confundir teclas CH+/− implementadas com preload.
+APK C112 gerado e validado, sem instalação remota neste ciclo; C111 intacto.
+
+## C114 — foco Live e controle circular — 2026-10-15
+
+Relato: Back do fullscreen não devolvia foco ao canal ativo. Restaurado foco
+nativo/DOM com página local bounded e guardas contra resposta tardia; setas
+em fullscreen oculto acrescentam canal/volume do app, menu mantém navegação.
+Primeiro ensaio browser falhou por mock setNativeLiveControls com assinatura
+de objeto em vez de (previewId, context); corrigida somente fixture, critérios
+inalterados. Revisão preservou filtro quando canal ativo já está visível.
+C114/10 grupos, harness Java, C105/6, C106/8, C73/7, JUnit37/6 classes,
+TypeScript/build/lock26+27+9, APK/assinatura/7 assets PASS. Sem falha técnica
+pendente identificada; avisos Vite/flatDir prévios permanecem.
+APK C114 entregue para teste manual, sem instalação ou publicação. Controle
+físico/audibilidade não conferidos; volume do app não controla TV por IR.
+Nenhum stream de vizinho (fonte permite só uma conexão). Sem certificação
+de controle/modelo Samsung ou aplicativo nativo Tizen/webOS neste ciclo.
+
+## C115 — tendências iniciais TMDB — 2026-10-15
+
+Dependência visual da fonte removida por serviço público opcional separado;
+falha não bloqueia Home. Ensaios iniciais do novo harness: identificador fresh
+duplicado; Node strip-only não suporta parameter property TS (convertida para
+campo/construtor equivalente); CSS global ausente causava overflow da fixture;
+fade precisava definir preferência no-preference do ambiente, acrescentado
+também caso reduce. C111 tinha corrida de fixture: progresso emitido antes
+da assinatura após autorização; agora aguarda syncReady. Nenhum critério ou
+assertion relaxado, nenhuma mudança no App/coordenador para acomodar teste.
+C115/7, C111/9, C108/13, fila/cache5, TypeScript/build/lock26+27+9 e APK/assets/
+assinatura PASS. TMDB real HTTP200/seis selecionados, sem expor configuração.
+Avisos anteriores de Vite/Gradle persistem; nenhuma falha técnica pendente
+identificada. Primeira imagem ainda depende de internet/TMDB; rede/hardware
+reais não homologados. C114 preservado, sem install/reset/backend/Git/updater.
+
+## C116 — preenchimento do Header mobile — 2026-10-15
+
+Cor escura própria do Header ocultava continuidade do halo; transparência
+isolada ainda mostraria shell escuro. Corrigido somente CSS: Header/borda
+transparentes e faixa superior de ambiente já amostrado no shell. Geometria,
+callbacks, menu inferior e demais perfis preservados. Inspeção browser/build/
+lock/sync/Gradle/assinatura/assets PASS, sem novas falhas identificadas.
+APK C116 local, sem instalação/Git/backend/reset; hardware não homologado.
+
+## C117 — heading/count ainda presentes no celular — 2026-10-15
+
+Regra anterior ocultava heading somente em tablet/TV/quadrado. Acrescentada
+regra até600px para Filmes/Séries, exceto aviso de categoria ausente. Somente
+CSS, sem alterações em dados/navegação/JS. Inspeção ambas páginas320–600px,
+header/hero/ações/aviso/exclusões, build/lock/sync/Gradle/assets/assinatura PASS.
+Sem falhas novas; avisos anteriores permanecem. APK C117 local, sem instalação/
+publicação/Git/backend/reset. Conferência física no celular pendente.
+
+## C118 — toques bloqueados no hero quadrado — 2026-10-15
+
+Reproduzido com coordenadas:13/25 pontos cobertos por hero-content/title/
+overview/footer não acionavam detalhes, enquanto cantos livres funcionavam.
+Camada passiva de largura inteira corrigida por classe PHONE/TABLET e CSS
+que transmite eventos à imagem mantendo controles próprios, sem mudar layout.
+Primeiro ensaio de teclado da fixture CDP não enviava text CR no Enter;
+completado protocolo de teclado, mesma assertion passou, sem mudar produção.
+C1184 grupos/160 pontos/7 cenários e C1068 grupos PASS, TypeScript/build/lock/
+Gradle/assinatura/assets PASS. Avisos anteriores permanecem; sem falha técnica
+pendente. Z Fold físico não conferido. APK C118 local, C117 intacto, sem
+instalação/publicação/Git/backend/reset/novo Gate.
+
+## C119 — trailer e harnesses históricos — 2026-10-15
+
+Removidos link externo, mensagens sem trailer e barra play/pause abaixo do
+vídeo, explicitamente recusada pelo usuário. YouTube controls0 é parâmetro
+oficial; não implica remover todos os elementos próprios do provedor. Imagem
+horizontal disponível/fundo neutro substitui ausência/erro sem conteúdo falso.
+Testes históricos inicialmente falharam por WatchProviders ausente no binding
+(movie produzia elemento indefinido), perfil novo do shell e extrator Back
+antigo sem catalogReturn/commitRoute. Corrigidos somente os harnesses, sem
+mudar comportamento de produção. Expectativa dos botões alterada apenas por
+pedido explícito; isolamento/sessão/bounds/cleanup e demais asserts mantidos.
+Primeira fixture browser usava HTMLElement.click(), sem foco real; protocolo
+CDP de mouse e espera do cleanup corrigiram ensaio de retorno do foco.
+Nova execução C1195/browser, modal7, phone3+2 e Java5 PASS, TypeScript/build/
+lock26+27+9/sync/Gradle/assets/assinatura PASS. Avisos prévios Vite/flatDir
+mantidos; sem falha técnica pendente. YouTube físico/controle remoto não
+homologados. APK C119 local; sem instalação/Git/backend/reset/novo Gate.
+Ausência de novos Lançamentos não demonstra falha da atualização: mecanismo
+15min habilitado no código, suites19+3+9 PASS; fonte comercial e clock dos
+aparelhos não consultados nesta rodada, nenhum patch especulativo da rotina.
+
+## C120 — cápsula do menu mobile — 2026-10-15
+
+Primeira fixture media largura273px quando esperava288px: viewport desktop
+reservava15px para scrollbar clássica. Emulação mobile com scrollbar
+sobreposta corrigiu o ensaio sem alterar produção. Inspeção browser de dez
+cenários, toques/estado ativo, foco, rolagem/último item, Live e exclusões PASS.
+Patch apenas CSS: contorno/fundo/foco locais e reserva inferior; callbacks/
+demais perfis mantidos. Build/lock26+27+9/sync/Gradle/assets/assinatura PASS.
+Avisos anteriores Vite/flatDir permanecem; nenhuma falha técnica pendente.
+APK C120 local, C119 preservado; sem instalação/Git/backend/reset/novo Gate.
+Margens de sistema simuladas no browser; validação física no celular pendente.
+
+## C121 — Geral prevalecia sobre gêneros reais — 2026-10-15
+
+Identificado length>0 de ['Geral'] bloqueando fetch/fallback TMDB nos detalhes.
+Filtragem de apresentação e ausência sem categoria resolvem a fronteira, sem
+alterar catálogo ou serviços. Logos mobile movidas para linha de metadados;
+demais perfis abaixo do poster mantidos. Fixture esbuild inicialmente sem
+resolveDir para React e stub sem metadata ainda retornando classificação;
+ambos corrigidos no helper privado, sem fix de produção para satisfazê-los.
+C1219/browser3/regressões7+3+2+10+5 e build/lock26+27+9/sync/Gradle/assets/
+assinatura PASS. Nenhuma falha técnica pendente, avisos anteriores preservados.
+Oito modelos conferidos logicamente, hardware não homologado. APK C121 local
+preservado, sem instalação/Git/backend/reset/novo Gate.
+
+## C122 — branding nativo — 2026-10-15
+
+Ícone instalado ainda usava recursos genéricos Capacitor/Android e banner
+quadrado. Substituídos pela marca escolhida X vermelho/fundo escuro e banner
+TV. Renderizações/máscaras/safe-zone aprovadas, recursos compilados e16 PNGs
+idênticos aos fontes no APK. Dump inicial de resources excedeu buffer padrão
+do helper; nova leitura com maxBuffer explícito passou. Nenhuma alteração de
+produção para corrigir ferramenta. Gradle/lock26+27+9/assinatura/assets PASS;
+avisos prévios flatDir mantidos. Nenhuma falha técnica pendente. Verificação
+física de launcher/cache/máscara ainda não executada, sem instalação/Git/
+backend/reset/novo Gate. APK C122 e C121 anterior preservados.
+
+## C123 — favoritos e janela Live — 2026-10-15
+
+Filmes/séries já salvavam favorite, sem consumidor na Home; Live só expunha
+favoritos em painel nativo. Coleção mista e categoria virtual ligadas aos
+stores existentes. Teste browser revelou seed antigo na remoção do último:
+lista fantasma corrigida pelo versionamento de dados prontos. Loading inicial
+da coleção evita falso vazio enquanto consulta local está pendente. Testes
+específicos e rodada integral8 perfis/155 canais passaram após correção.
+Harnesses antigos sem portas atuais (hero/rotation/startup/retorno/suporte),
+modelo sem categoryLabels e props obsoletas BrowseHero foram alinhados sem
+relaxar invariantes de seleção/limites. Extrator de página recebeu bindings
+novos. Helper privado corrigiu ciclo de inicialização bridge, URL sintética
+ausente e escape de seletores. Alias fs colidiu no teste novo; corrigido e11
+grupos PASS. Nenhum patch de produção para contornar ferramenta.
+Revisão React, regressões, TypeScript/build/lock26+27+9/sync/Gradle/assinatura/
+assets PASS; avisos prévios preservados, nenhuma falha técnica pendente.
+APK C123 e anterior preservados, sem instalação/Git/backend/reset/novo Gate.
+Validação física de favoritos nos aparelhos permanece pendente.
+Auditoria privada desativou core.autocrlf no comando de diff e acusou CRLF
+nativo anterior como whitespace. Corrigido somente comando de leitura para
+respeitar configuração Git; arquivos anteriores não normalizados/regravados.
+
+## C124 — gestos Live e foco — 2026-10-15
+
+Node strip-only recusou constructor parameter properties no helper TS novo;
+declarações explícitas corrigiram compatibilidade sem alterar o gesto.
+Helper browser redeclarou stable; corrigido só no helper. Remount intermediário
+por scope na key perdia janela inicial do canal ativo; substituído por cancel
+do gesto em effect, preservando key/cache C123. Fixture também alinhada às
+classes reais stacked/portrait/square. Rodadas completas C12410/browser4
+e regressões11+6+10+7 PASS, sem relaxar assertions ou editar testes anteriores.
+Hold de inativo não seleciona vídeo; remoção final sem ghost, DPAD/touch,
+cancelamento/contador/marca/reload155 conferidos. TypeScript/build/lock26+27+9/
+sync/Gradle/assinatura/assets PASS, avisos prévios mantidos; nenhuma falha
+técnica pendente. APK C124 local; sem instalação/Git/backend/reset/novo Gate.
+Homologação física de Enter/OK e touch permanece pendente.
+
+C124 final audit: initial STATUS append was inserted at a repeated anchor.
+Moved only the C124 block to EOF; original STATUS bytes/hash restored exactly.
+First repair attempt failed its assertion before writing (stdin Unicode match);
+ASCII anchored repair and complete audit then PASS. No production impact.
+
+
+## C125 - falhas encontradas e corrigidas - 2026-10-16
+
+Typecheck inicial detectou fireStick unused apos unificar generos; removida
+apenas variavel/import obsoletos. Duas tentativas apply_patch falharam antes
+de escrever: delete/add no mesmo arquivo e contexto documental inexistente;
+reaplicadas como update com contexto correto. Harness home-hero nao tinha
+binding do filtro novo; adicionado. C107 ainda exigia Geral nao-Fire e o
+cenario vertical home-hero esperava genero TMDB sobre genero real local.
+Expectativas atualizadas apos emenda da spec, preservando demais asserts;
+novo teste exige mesma prioridade C121/source real nos oito modelos.
+Reexecucoes, demais regressoes, browser, typecheck/build/lock/Gradle PASS.
+Avisos de build preexistentes documentados, sem bloqueio novo. Sem QA fisica.
+
+
+## C126 - controle parental local e busca por capa - 2026-10-16
+
+Typecheck inicial apontou imports React default não usados nos componentes
+novos; removidos. apply_patch com primeira linha BOM/contexto incorreto
+falhou antes de gravar e foi reaplicado com âncora correta. Harnesses antigos
+não tinham bindings parentais nem alguns campos canônicos de fixtures;
+adicionados apenas os ports/campos, sem relaxar asserts. Wrapper automático
+C105 atingiu também um new Function cujo primeiro argumento era module;
+restaurado esse argumento, mantendo wrapper só de require. C107 renderiza
+AppShell diretamente e precisou do useEffect passivo no port React.
+Startup-artwork também precisou de categoryLabels e useCardGenres (C125)
+na fixture, além do binding parental. Regressões finais PASS.
+
+Helper browser inicial não fornecia exports nativos de watch-progress;
+ports sintéticos completados. Login Fire exigiu esperar commit do DOM,
+além do snapshot admin; corrigido o helper. Sem mudança de requisito.
+Na revisão final, busca Live mantinha capa adulta já aprovada após relock.
+Reproduzido no navegador e no teste do componente real antes do patch
+(1 botão em vez de0); escopo agora inclui status/contentRevision/lockRevision/
+adultSession. Teste exige ocultar antes do efeito assíncrono, também em
+mudança de regra/erro. C12616/browser10/8perfis e rebuild final PASS.
+
+Primeira execução isolada do teste Java ocorreu antes do lock pós-patch,
+um desvio de sequência. Depois executados lock e prebuild completos; Gradle
+revalidou unit test com mesmos inputs (UP-TO-DATE) e gerou os APKs somente
+após o lock. Último build/lock/sync/Gradle e pacote final PASS. Arquivo gerado
+capacitor.build.gradle rechecado: nenhum hash fora da allowlist foi alterado.
+Avisos Vite node:fs/path, dynamic/static/chunk grande e Gradle flatDir mantidos.
+Auditoria38/16/prefixos/HEAD/origin/diff-check PASS. QA física permanece pendente;
+simulações não provam Keystore real, KDF no Fire Stick ou fonte/rede reais.
+
+
+## C127 - fonte e playback no navegador - 2026-10-16
+
+Bloqueio funcional web confirmado por codigo/suite5/reproducao sintetica:
+UNSUPPORTED_SECURE_STORE -> SECURE_STORE_WRITE_FAILED no dispatcher MANAGED
+mesmo com autorizacao valida; PLAYER_ACTIVITY_UNAVAILABLE e PREVIEW_UNAVAILABLE.
+Limitacoes nativas preexistentes, nao corrigidas pela ativacao ou por escolher
+outro layout. Generic loading error nao explica a ausencia de suporte web.
+Aba do usuario indisponivel: CUA retornou browsers/tabs vazios; nenhum
+diagnostico tecnico daquela tentativa foi lido. Modulos Vite publicos
+confirmados por GET local, sem acessar token/chave/fonte reais.
+Leituras iniciais usaram alguns paths inexistentes e wildcard literal do
+rg no PowerShell; corrigidas por rg --files/paths exatos. Sem impacto runtime.
+Nao removidos guards ou invariantes para contornar o bloqueio. Futuro suporte
+web requer implementacao especifica; nenhum teste de fonte/CORS/codec real
+feito neste ciclo. Auditoria de hashes/prefixos/Git e diff-check PASS.
+
+
+## C128 - exibicao por faixa parental - 2026-10-16
+
+Revisão de integração identificou opções memoizadas do HomeHero e páginas
+guardadas da janela Live que poderiam sobreviver a mudança de política.
+Corrigidas por elegibilidade/escopo parental e leitura local sem seed antigo
+com proteção ativa. Metadata pública que chega por detalhes/trailer também
+precisava notificar o filtro; assinatura isolada no cache adicionada após
+emenda de allowlist. Novo teste prova revisão de UI sem revisão Live.
+Exceção adulta proposta inicialmente foi substituída antes da entrega por
+teto18 obrigatório, coerente com o pedido de somente conteúdos permitidos.
+Builds refeitos após os refinamentos; C12811/C12616/browser10/8perfis e
+regressões finais PASS. Teste antigo de acima-do-teto com prompt adaptado à
+nova spec; desconhecido real continua testado antes de C9/player.
+Sem falha nas suítes finais. Avisos Vite/Gradle preexistentes permanecem.
+PIN/PUK/cofre/ativação não migrados ou resetados. QA física/tempo de KDF,
+rede/TMDB/source reais e pacote Tizen/webOS não certificados pelas simulações.
+Auditoria17/4 e prefixos/HEAD/origin/native/APK anterior/diff-check PASS.
+
+
+## C129 - controle parental na TV e D-pad - 2026-10-16
+
+Regressão física reportada: editor parental sem D-pad e grande na TV, com Back
+duplicado. Cobertura anterior C126/C128 de diálogo PIN não comprovava navegação
+do editor. Identificados fast-path do Back restrito a hero, busca geométrica de
+formulário e Enter interceptado em input. Corrigidos em escopo parental; tamanho
+e espaçamentos reduzidos só para TV. Nova suíte real UI com teclas cobre todo
+percurso em cinco perfis TV, mais três touch. Ajustado foco pós-operação para
+esperar fim de busy. Falhas iniciais do harness (labels/seletores/ordem e timing)
+corrigidas; resultados finais C129 oito perfis, C12616/C12811, D-pad15/C11410/
+C1068/C9wiring10, lock e build PASS. Avisos Vite/Gradle anteriores permanecem.
+APK C129 assinado/teste local, nativo idêntico ao C128. Sem falhas finais,
+alterações remotas ou reset. Falta conferência física do D-pad e IME Fire/TV;
+viewport não homologa pacotes nativos Tizen/webOS. Auditoria8/4/prefixos/HEAD/
+origin/APK anterior PASS. NEXT_GATE_STARTED=NAO.
+
+
+## C130 - icone Fire e piscada do hero - 2026-10-16
+
+Regressao observada no Fire: carousel inteiro opacity0 em cada troca10s e halo
+limpo antes da nova imagem pronta, reproduzidos por CDP no C126 instalado.
+Corrigidos em escopo Fire; cleanup cobre erro/ref ausente/unmount. Metricas
+GPU/jank acumuladas e servicos Amazon reiniciados nao provam OOM/HDMI/crash app.
+Icone azul do relato nao coincide com assets vermelhos do APK: cache/launcher
+nao isolados conclusivamente; bitmapTV e atributos explicitos preparados.
+Tentativa UI de abrir listaApps selecionou navegador Amazon; captura preta
+descartada, app retomado e usuario avisado. Nenhum dado/conta alterado.
+Harness browser inicialmente exigia opacity<0,1 no controle nao-Fire, criterio
+dependente de timing/preferencia. Movimento fixado no harness; controle exige
+fade observavel e Fire exige sempre1/zeroanimacoes. Testes finais C1307,
+negativos2, browserFire261/AndroidTV275frames e regressões PASS. Candidato
+inicial substituido antes da entrega apos novo teste de ref ausente e rebuild.
+Avisos Vite/Gradle preexistentes. APK final1.0.20 validado e C129 preservado.
+Audit8/5/prefixos/Git PASS; sem instalacao/reset/backend/Git. Validacao fisica
+do APK corrigido, launcher e eventual piscada restante pendente apos update.
+NEXT_GATE_STARTED=NAO.
+
+
+## C131 - logo metalica enviada pelo usuario - 2026-10-16
+
+Primeiro assembleDebug falhou em :app:mergeDebugResources: erro interno do
+cache incremental no drawable-v24/ic_launcher_foreground.xml (In DataSet main,
+no data file for changedFile). Solucao recomendada pelo proprio Gradle:
+:app:clean assembleDebug, limitado a saidas geradas, concluido com sucesso.
+Nao foi necessario alterar codigo, dependencias ou testes de produto. O
+verificador privado de APK inicialmente esperava11DEX binarios iguais;
+clean alterou metadata de tres DEX adicionais. Disassembly completo -d -a -n
+dos tres e identico; quarto difere so em duas constantes BuildConfig. APK
+verificado por essas comparacoes estritas, nao por supressao da falha.
+Helper documental inicialmente leu log PowerShell UTF16 como UTF8; detectado
+o BOM para validar corretamente o marcador, sem nova compilacao ou patch.
+Lock final e
+verificacao do APK1.0.21 PASS; avisos flatDir anteriores mantidos. Imagens
+diferentes de Downloads nao usadas; original do anexo recuperado e preservado.
+Icone novo ainda nao observado em hardware; cache/tema do launcher nao podem
+ser certificados pelos assets. Menu interno deliberadamente permanece com
+X simples. Audit27/3/1076, memorias append-only e Git/C130 preservados.
+Sem instalacao/reset/backend/Git; NEXT_GATE_STARTED=NAO.
+
+
+## C132 - publicacao Git 1.0.21 preparada - 2026-10-16
+
+Primeira regressao consolidada: cinco harnesses faltavam dependencias recentes.
+C107retorno: useParentalControl inexistente e useMemo nao simulado; C107EPG:
+favoriteButton nao definido no JSX isolado; colecoes especiais: import parental
+nao declarado; episodios: useCardGenres nao declarado; C111startup: gate/pagina
+parental ausentes da allowlist de bundle. Emenda previa autorizou apenas
+bindings/fixtures; produto intocado e todas as assercoes preservadas.
+Cinco reexecucoes PASS, total43verificacoes; Android201testes/34suites
+sem falhas/erros. diff-check PASS; warnings LF/CRLF e flatDir preexistentes.
+Sem segredo em log; auditoria sanitizada e confirmacao Git ainda pendentes
+antes do staging/envio neste registro. Sem backend/install/reset ou novo Gate.

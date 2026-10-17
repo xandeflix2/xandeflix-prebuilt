@@ -1,4 +1,4 @@
-.live-action-message { color:#e0e3ea; font-size:14px; margin:8px 0 0; }
+.live-action-message { order:4; color:#e0e3ea; font-size:14px; margin:8px 0 0; }
 .live-tv-page--mobile .live-action-message { order:4; }
 .live-page-range { color: #cbd5e1; font-size: 0.85rem; margin: 0.3rem 0 0.6rem; }
 .live-page-button { width: 100%; padding: 0.65rem; margin-bottom: 0.5rem; background: #1e293b; color: #bfdbfe; border: 1px solid #334155; border-radius: 6px; font-weight: 600; }
@@ -133,3 +133,36 @@
 #root .app-shell.app-shell--live-square.app-shell--live-page .live-channel-list button { min-height: 44px; }
 #root .app-shell.app-shell--live-square.app-shell--live-page .live-epg-channel-name,
 #root .app-shell.app-shell--live-square.app-shell--live-page .live-epg-program { overflow-wrap: anywhere; }
+#root .live-epg-section .live-epg-embedded {
+  position: static; inset: auto; transform: none;
+  display: flex; flex-direction: column; order: 3;
+  flex: 1; min-height: 0; width: 100%;
+  border: 0; border-radius: 0; box-shadow: none;
+  background: transparent; overflow: hidden;
+}
+#root .live-epg-section .live-epg-embedded :is(.live-epg-inline-heading, .live-epg-channel-name) { display: none; }
+#root .live-epg-section .live-epg-embedded .live-epg-content {
+  flex: 1; min-height: 0; padding: 0 12px 12px;
+  overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y;
+}
+/* C123: favorites use the existing category/channel layout and focus navigation. */
+.live-favorites-category {
+  display:flex;align-items:center;justify-content:space-between;gap:.5rem;width:100%;padding:.65rem .85rem;margin-bottom:.25rem;
+  background:transparent;color:#cbd5e1;border:1px solid transparent;border-radius:6px;
+  cursor:pointer;text-align:left;font:inherit;font-size:.85rem;
+}
+.live-favorites-category.active-group {background:#1e293b;color:#38bdf8;border-color:#38bdf8;font-weight:700;}
+.live-favorite-toggle {
+  display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;width:44px;height:44px;padding:10px;margin:0;
+  border:1px solid transparent;border-radius:6px;background:transparent;color:#cbd5e1;cursor:pointer;
+}
+.live-favorite-toggle svg {width:22px;height:22px;display:block;}
+.live-favorite-toggle[aria-pressed="true"] {color:#facc15;}
+.live-favorite-toggle:disabled {opacity:.5;cursor:default;}
+.live-favorite-toggle:focus-visible,.live-favorites-category:focus-visible {outline:2px solid #fff;outline-offset:-2px;}
+.live-channel-status {display:flex;align-items:center;gap:.25rem;flex-shrink:0;margin-left:auto;}
+.live-channel-status .live-channel-live-badge {display:inline-flex;align-items:center;padding:.2rem .5rem;border-radius:4px;background:#dc2626;color:#fff;font-size:.65rem;font-weight:800;white-space:nowrap;}
+.live-favorite-count {flex-shrink:0;padding:.1rem .4rem;border-radius:4px;font-size:.7rem;color:#94a3b8;}
+.active-group .live-favorite-count {color:#38bdf8;background:#0f172a;}
+.live-channel-favorite-mark {width:18px;height:18px;flex-shrink:0;fill:#facc15;}
+.live-continuous-channel {user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;}

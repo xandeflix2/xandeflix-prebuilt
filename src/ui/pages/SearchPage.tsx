@@ -25,6 +25,7 @@ import { SearchResults } from '../components/SearchResults.tsx';
 import { SearchState } from '../components/SearchState.tsx';
 
 interface SearchPageProps {
+  parentalEditor?: boolean;
   readModel: CatalogReadModel;
   onSelectItem: (item: CatalogItemViewModel) => void;
   onSelectLive?: (channelId: string) => void;
@@ -36,6 +37,7 @@ export const SearchPage: React.FC<SearchPageProps> = ({
   onSelectItem,
   onSelectLive,
   searchServiceOverride,
+  parentalEditor = false,
 }) => {
   const searchService = useMemo(
     () => searchServiceOverride || getClientSearchService(),
@@ -163,6 +165,7 @@ export const SearchPage: React.FC<SearchPageProps> = ({
       >
         {showResults ? (
           <SearchResults
+            parentalEditor={parentalEditor}
             results={results}
             readModel={readModel}
             onSelectItem={onSelectItem}

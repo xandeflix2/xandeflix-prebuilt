@@ -105,7 +105,7 @@ export function CatalogBrowsePage({ kind, readModel, onSelectItem, categoryId, o
     ? `${browse.totalAvailable} ${browse.totalAvailable === 1 ? `${noun} disponível` : `${plural} disponíveis`} no catálogo local`
     : items.length ? `${items.length} ${plural} carregados` : 'Carregando categoria…';
 
-  return <main ref={root} tabIndex={-1} className={`page-container ${movie ? 'movies-page' : 'series-page'} ${collection ? 'category-collection-page' : 'category-rails-page'}`}
+  return <main ref={root} tabIndex={-1} className={`page-container ${movie ? 'movies-page' : 'series-page'} ${collection ? `category-collection-page${category ? '' : ' category-collection-page--missing'}` : 'category-rails-page'}`}
     data-browse-kind={kind} data-category-id={categoryId}>
     <div className="page-header"><h1 className="page-title">{heading}</h1><p className="page-subtitle">{collection && !category ? 'Esta categoria não está disponível no catálogo ativo.' : subtitle}</p></div>
     {!collection ? <BrowseHero key={`${snapshot}:${kind}`} readModel={readModel} storage={getClientBootstrapService().getStorage()}

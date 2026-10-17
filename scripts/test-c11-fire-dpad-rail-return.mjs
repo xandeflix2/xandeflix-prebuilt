@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 import ts from 'typescript';
+import { parentalControls, parentalDpadTarget, parentalEntry } from '../src/ui/parental-dpad-navigation.ts';
 
 // Execute the real hook against a DOM tree containing the production wrappers.
 // Fixtures carry no catalog data and do not replace the navigation algorithm.
@@ -72,7 +73,7 @@ function harness(fire = true) {
     requestAnimationFrame: fn => { frames.set(++id, fn); return id; }, cancelAnimationFrame: frame => frames.delete(frame),
     getComputedStyle:()=>({scrollMarginTop:'16.2px'}),
     window: { scrollY:100,scrollX:0,scrollTo:options=>document.activeElement.closest('.hero-banner, .detail-hero-wide').scrolls.push(options), addEventListener: (name, fn) => listeners.set(name, fn), removeEventListener: name => listeners.delete(name), getComputedStyle: () => ({ gridTemplateColumns: '1fr 1fr' }), innerWidth: 960 },
-    require: name => { assert.equal(name, 'react'); return { useRef: value => ({ current: value }), useCallback: fn => fn, useEffect: fn => { const dispose = fn(); if (dispose) cleanup.push(dispose); } }; },
+    require: name => { if (name === '../parental-dpad-navigation.ts') return { parentalControls, parentalDpadTarget, parentalEntry }; assert.equal(name, 'react'); return { useRef: value => ({ current: value }), useCallback: fn => fn, useEffect: fn => { const dispose = fn(); if (dispose) cleanup.push(dispose); } }; },
   });
   exports.useDpadNavigation({ autoFocusFirst: false });
   const commit = () => { const pending = [...frames.values()]; frames.clear(); pending.forEach(fn => fn()); };

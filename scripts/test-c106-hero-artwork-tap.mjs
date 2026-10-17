@@ -1,13 +1,16 @@
+import {parentalFixtureBindings} from './lib/parental-fixture-bindings.mjs';
+import {meaningfulDetailGenres} from '../src/ui/detail-genres.ts';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import ts from 'typescript';
 import React from 'react';
 const read=file=>fs.readFileSync(new URL('../'+file,import.meta.url),'utf8');
-const load=(file,require,ports={})=>{const module={exports:{}};const code=ts.transpileModule(read(file),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.React,esModuleInterop:true}}).outputText;new Function('require','module','exports',...Object.keys(ports),code)(require,module,module.exports,...Object.values(ports));return module.exports;};
+const load=(file,require,ports={})=>{const module={exports:{}};const code=ts.transpileModule(read(file),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.React,esModuleInterop:true}}).outputText;new Function('require','module','exports',...Object.keys(ports),code)((name => parentalFixtureBindings(name) ?? (require)(name)),module,module.exports,...Object.values(ports));return module.exports;};
 const presentation=load('src/ui/device-presentation.ts',()=>({}));
 let choice='PHONE',refs=[],refIndex=0,now=0;
 const hooks={...React,useRef:value=>refs[refIndex++]||(refs[refIndex-1]={current:value}),useState:value=>[typeof value==='function'?value():value,()=>{}],useEffect:()=>{}};
 const hero=load('src/ui/components/Hero.tsx',name=>{
+ if(name.endsWith('detail-genres.ts'))return{meaningfulDetailGenres};
  if(name==='react')return hooks;
  if(name.includes('useDevicePresentation'))return{useDevicePresentation:()=>choice};
  if(name.endsWith('device-presentation.ts'))return presentation;
@@ -55,7 +58,7 @@ await test('STATIC_IMAGE_DRAG_CANCEL_STALE_ITEM_REJECTED_KEYBOARD_STILL_AVAILABL
 function carouselHarness(count=2,fire=false){const states=[],values=[],effects=[],timers=[];let stateIndex=0,refIndex=0,time=0;
  const hooks={...React,useMemo:fn=>fn(),useEffect:(run,deps)=>effects.push({run,deps}),useState:value=>{const index=stateIndex++;if(!(index in states))states[index]=typeof value==='function'?value():value;return[states[index],next=>{states[index]=typeof next==='function'?next(states[index]):next;}];},useRef:value=>values[refIndex++]||(values[refIndex-1]={current:value})};
  const options=Array.from({length:count},(_,i)=>({key:'key:'+i,item:item('row:'+i),fresh:false}));
- const {HomeHero}=load('src/ui/components/HomeHero.tsx',name=>name==='react'?hooks:name.includes('useHeroLayout')?{useHeroLayout:()=>false}:name.includes('useHeroArtwork')?{useHeroArtwork:items=>({eligible:items.map(item=>({item,uri:'synthetic'})),revision:0,pending:false})}:name.endsWith('Hero.tsx')?{Hero:()=>null}:{},{document:{activeElement:null},performance:{now:()=>time},navigator:{userAgent:fire?'Android AFTSS':'Android Mobile'},setTimeout:(fn,delay)=>{timers.push({fn,delay});return 1;},clearTimeout:()=>{}});
+ const {HomeHero}=load('src/ui/components/HomeHero.tsx',name=>name==='react'?hooks:name.endsWith('device-presentation.ts')?presentation:name.includes('useHeroLayout')?{useHeroLayout:()=>false}:name.includes('useHeroArtwork')?{useHeroArtwork:items=>({eligible:items.map(item=>({item,uri:'synthetic'})),revision:0,pending:false})}:name.endsWith('Hero.tsx')?{Hero:()=>null}:{},{document:{activeElement:null},performance:{now:()=>time},navigator:{userAgent:fire?'Android AFTSS':'Android Mobile'},setTimeout:(fn,delay)=>{timers.push({fn,delay});return 1;},clearTimeout:()=>{}});
  const render=(extra={})=>{stateIndex=0;refIndex=0;effects.length=0;return HomeHero({options,onSelect(){},nextBatch:async()=>false,displayed(){},...extra});};
  const target={closest:()=>target,classList:{contains:name=>name==='hero-artwork-link'}};
  const root={clientWidth:400,contains:()=>false,hasPointerCapture:()=>false,setPointerCapture(){}};

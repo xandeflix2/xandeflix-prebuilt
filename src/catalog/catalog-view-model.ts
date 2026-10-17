@@ -17,6 +17,7 @@ export const GRID_BATCH_SIZE = 48;
 export type ContentType = 'movie' | 'series';
 
 export interface CatalogItemViewModel {
+  parental?: { key: string; adult: boolean; age?: number };
   id: string;
   externalIds?: Pick<ExternalIds, 'tmdbId'>;
   kind: ContentType;

@@ -15,7 +15,7 @@ export function useHeroPlayback(model: CatalogReadModel) {
     if (pending.current) return;
     const current = generation.current;
     const active = () => current === generation.current;
-    pending.current = true; setBusy(true); setMessage('Preparando reprodução…');
+    pending.current = true; setBusy(true); setMessage(null);
     try {
       const result = await playHeroItem(item, model, active);
       if (!active()) return;

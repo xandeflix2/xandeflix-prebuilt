@@ -16,6 +16,8 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { useActiveCatalog } from './ui/hooks/useActiveCatalog.ts';
 import { useDpadNavigation } from './ui/hooks/useDpadNavigation.ts';
+import { useCatalogReturnNavigation } from './ui/hooks/useCatalogReturnNavigation.ts';
+import { requestFeaturedRotation } from './ui/hooks/useFeaturedRotation.ts';
 import {
   type NavigationState,
   type AppView,
@@ -27,7 +29,7 @@ import type { CatalogItemViewModel } from './catalog/catalog-view-model.ts';
 import { AppShell } from './ui/components/AppShell.tsx';
 import { NewContentProvider } from './ui/components/NewContentProvider.tsx';
 import { PlaybackErrorNotice } from './ui/components/PlaybackErrorNotice.tsx';
-import { LoadingState } from './ui/components/LoadingState.tsx';
+import { StartupLoadingScreen } from './ui/components/StartupLoadingScreen.tsx';
 import { NoActiveCatalogState } from './ui/components/NoActiveCatalogState.tsx';
 import { EmptyState } from './ui/components/EmptyState.tsx';
 import {
@@ -49,6 +51,8 @@ import { SeriesDetailPage } from './ui/pages/SeriesDetailPage.tsx';
 import { LocalSourceProvisioningPage } from './ui/pages/LocalSourceProvisioningPage.tsx';
 import { ActivationPage } from './ui/pages/ActivationPage.tsx';
 import { SettingsPage } from './ui/pages/SettingsPage.tsx';
+import { ParentalControlPage } from './ui/pages/ParentalControlPage.tsx';
+import { ParentalDetailGate } from './ui/components/ParentalDetailGate.tsx';
 import { PublicDeviceActivationPage } from './ui/pages/PublicDeviceActivationPage.tsx';
 import { ManagerPanelPage } from './debug/manager/ManagerPanelPage.tsx';
 import { LiveTvPage } from './ui/pages/LiveTvPage.tsx';
@@ -110,6 +114,9 @@ export default function App(): React.JSX.Element {
   const [authorizationGate, setAuthorizationGate] = useState<'CHECKING' | 'UNAUTHORIZED' | 'AUTHORIZED'>('CHECKING');
   const routeStateRef = useRef(routeState);
   routeStateRef.current = routeState;
+  const catalogSnapshotRef = useRef(activeCatalog?.metadata.snapshotId);
+  catalogSnapshotRef.current = activeCatalog?.metadata.snapshotId;
+  const catalogReturn = useCatalogReturnNavigation(routeState.current, activeCatalog?.metadata.snapshotId);
   const beforeLiveLeaveRef = useRef<(() => Promise<void>) | null>(null);
   const navigationIntentRef = useRef(0);
   const registerBeforeLiveLeave = useCallback((prepare: (() => Promise<void>) | null) => {
@@ -155,15 +162,25 @@ export default function App(): React.JSX.Element {
   }, []);
 
   const handleNavigate = useCallback((view: AppView, itemId?: string) => {
+    const current=routeStateRef.current.current,snapshot=catalogSnapshotRef.current;
+    catalogReturn.remember(current,snapshot);
+    catalogReturn.clearRequest();
+    if(view==='home'&&!itemId){
+      requestFeaturedRotation();
+      catalogReturn.requestHome(snapshot);
+      if(current.view==='home'&&!current.itemId){catalogReturn.apply(current,snapshot);return;}
+    }
     commitRoute((prev) => navigateTo(prev, view, itemId));
-  }, [commitRoute]);
+  }, [commitRoute, catalogReturn]);
 
   const handleBack = useCallback(() => {
+    if (!window.dispatchEvent(new Event('xandeflix:parental-back', { cancelable: true }))) return;
     if (!window.dispatchEvent(new Event('xandeflix:playback-error-back', { cancelable: true }))) return;
     const dialog = document.querySelector<HTMLDialogElement>('dialog[data-detail-modal][open]');
     if (dialog) { dialog.close(); return; }
+    catalogReturn.requestBack(navigateBack(routeStateRef.current).current,catalogSnapshotRef.current);
     commitRoute((prev) => navigateBack(prev));
-  }, [commitRoute]);
+  }, [commitRoute, catalogReturn]);
 
   const handleSelectItem = useCallback(
     (item: CatalogItemViewModel) => {
@@ -447,17 +464,18 @@ export default function App(): React.JSX.Element {
 
   // 1. Estado transitório mínimo de leitura do ponteiro local inicial
   if (isLoading && !readModel) {
-    return <LoadingState message="Lendo catálogo local ativo..." />;
+    return <StartupLoadingScreen stage="reading" previewEnabled={false}/>;
   }
 
-  if (routeState.current.view === 'settings') {
-    return <AppShell currentView="settings" onNavigate={handleNavigate} onBack={handleBack} canGoBack={canGoBack}>
-      <SettingsPage onOpenActivation={() => handleNavigate('activation')} />
+  if (routeState.current.view === 'settings' || routeState.current.view === 'parental-control') {
+    return <AppShell currentView={routeState.current.view} onNavigate={handleNavigate} onBack={handleBack} canGoBack={canGoBack}>
+      {routeState.current.view === 'parental-control' ? <ParentalControlPage readModel={readModel} onBack={handleBack}/>
+        : <SettingsPage onOpenActivation={() => handleNavigate('activation')} onOpenParental={() => handleNavigate('parental-control')}/>}
     </AppShell>;
   }
 
   if (authorizationGate === 'CHECKING') {
-    return <LoadingState message="Verificando autorizaÃ§Ã£o do dispositivo..." />;
+    return <StartupLoadingScreen stage="checking" previewEnabled={false}/>;
   }
 
   const isDebugManagerRoute =
@@ -489,6 +507,13 @@ export default function App(): React.JSX.Element {
     }
     return 'SYNCING_FIRST_REAL_CATALOG';
   };
+
+  // First sync is a dedicated screen; a usable local catalog still opens immediately.
+  if (!isExistingRealCatalog && ['home', 'movies', 'series', 'search', 'live'].includes(routeState.current.view)) {
+    return <FirstRealSyncState catalogState={getFirstRealSyncCatalogState()} progress={bootSyncProgress}
+      onOpenActivation={() => handleNavigate('activation')} onOpenPortal={() => handleNavigate('portal')}
+      onRetry={() => { setBootSyncError(undefined); getBootSyncCoordinator().startNonBlockingSync(); }}/>;
+  }
 
   // 3. Renderização da View Ativa
   const renderCurrentView = () => {
@@ -598,6 +623,7 @@ export default function App(): React.JSX.Element {
       case 'movie-detail':
         if (!readModel) return <EmptyState />;
         return (
+          <ParentalDetailGate key={`${readModel.catalog.metadata.snapshotId}:movie:${itemId}`} kind="movie" itemId={itemId || ''} readModel={readModel} onBack={handleBack}>
           <MovieDetailPage
             key={itemId}
             movieId={itemId || ''}
@@ -606,11 +632,13 @@ export default function App(): React.JSX.Element {
             onSelectItem={handleSelectItem}
             onHome={() => handleNavigate('home')}
           />
+          </ParentalDetailGate>
         );
 
       case 'series-detail':
         if (!readModel) return <EmptyState />;
         return (
+          <ParentalDetailGate key={`${readModel.catalog.metadata.snapshotId}:series:${itemId}`} kind="series" itemId={itemId || ''} readModel={readModel} onBack={handleBack}>
           <SeriesDetailPage
             key={itemId}
             seriesId={itemId || ''}
@@ -619,6 +647,7 @@ export default function App(): React.JSX.Element {
             onSelectItem={handleSelectItem}
             onHome={() => handleNavigate('home')}
           />
+          </ParentalDetailGate>
         );
 
       default:

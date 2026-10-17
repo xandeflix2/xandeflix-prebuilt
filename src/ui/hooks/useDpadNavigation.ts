@@ -17,6 +17,7 @@
  */
 
 import { useEffect, useCallback, useRef } from 'react';
+import { parentalControls, parentalDpadTarget, parentalEntry } from '../parental-dpad-navigation.ts';
 
 interface UseDpadNavigationOptions {
   onBack?: () => void;
@@ -79,10 +80,15 @@ function findNextDpadTarget(current: HTMLElement, key: Direction, previousConten
     : null;
   if (sideMenu && key === 'ArrowLeft' && current.closest('[data-dpad-region="live-categories"]')) return sideMenu;
   const pageBack = sideMenu ? sideShell?.querySelector<HTMLElement>('.page-back-row .focusable-item') : null;
+  const parentalPage = !current.closest('.modal-content, .player-overlay')
+    ? current.closest('.parental-page') : null;
+  if (parentalPage && !current.closest('.catalog-grid')) return parentalDpadTarget(parentalPage, current, key, pageBack || null, sideMenu);
   if (pageBack && key === 'ArrowUp' && current.closest('.filter-bar, .hero-actions, .detail-hero-wide .detail-actions')) return pageBack;
   if (sideMenu && current.closest('.page-back-row')) {
     if (key === 'ArrowDown') {
       const content = sideShell?.querySelector('.app-content');
+      const parental = content?.querySelector('.parental-page');
+      if (parental) return parentalEntry(parental) || current;
       return (content ? pageHeroControls(content)[0] : null) || current;
     }
     if (key === 'ArrowLeft') return focusableSibling(current, false) || sideMenu;
@@ -188,6 +194,9 @@ function findNextDpadTarget(current: HTMLElement, key: Direction, previousConten
       if (key === 'ArrowDown') return index >= 0 && index + 1 < items.length ? items[index + 1] : null;
       if (key === 'ArrowLeft') return null;
       const content = sideShell.querySelector('.app-content');
+      const parental = content?.querySelector('.parental-page');
+      if (parental) return previousContent && parentalControls(parental).includes(previousContent)
+        ? previousContent : parentalEntry(parental) || pageBack || current;
       if (previousContent?.isConnected && isFocusable(previousContent) && content?.contains(previousContent)
         && previousContent.getClientRects().length > 0) return previousContent;
       return content?.querySelector<HTMLElement>('[data-dpad-region="live-categories"] .active-group.focusable-item:not([disabled])')
@@ -437,6 +446,10 @@ export function useDpadNavigation(options: UseDpadNavigationOptions = {}): void 
       // 2. DPAD_CENTER / Enter / Espaço
       if (key === 'Enter' || (event as any).keyCode === 23 || key === ' ') {
         const active = document.activeElement as HTMLElement;
+        // Preserve the trusted native activation/IME and spaces in a PUK.
+        // The parental page separately rejects implicit submission from inputs.
+        if (active instanceof HTMLInputElement && active.type !== 'checkbox'
+          && active.closest('.parental-page')) return;
         if (active && active.classList.contains('focusable-item')) {
           active.click();
           event.preventDefault();

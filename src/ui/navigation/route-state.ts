@@ -19,6 +19,7 @@ export type AppView =
   | 'debug-source-setup'
   | 'activation'
   | 'settings'
+  | 'parental-control'
   | 'activate-device'
   | 'manager-panel'
   | 'portal';
@@ -45,6 +46,7 @@ export function createInitialRoute(): NavigationState {
     'activation',
     'activate-device',
     'settings',
+    'parental-control',
       'debug-source-setup',
       'manager-panel',
       'portal',

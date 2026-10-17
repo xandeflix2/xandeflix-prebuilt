@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import ts from 'typescript';
 import React from 'react';
+import {parentalFixtureBindings} from './lib/parental-fixture-bindings.mjs';
 import { CatalogReadModel } from '../src/catalog/catalog-read-model.ts';
 import * as selectors from '../src/catalog/catalog-selectors.ts';
 import * as presentation from '../src/catalog/category-presentation.ts';
@@ -15,6 +16,12 @@ function load(file, imports) {
   const module = { exports: {} };
   const code = ts.transpileModule(readFileSync(new URL('../' + file, import.meta.url), 'utf8'), { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.React } }).outputText;
   new Function('require', 'module', 'exports', code)(name => {
+    const parental=parentalFixtureBindings(name);if(parental)return parental;
+    if(name.includes('useHeroPlayback'))return {useHeroPlayback:()=>({})};
+    if(name.includes('useCatalogReturnNavigation'))return {useCatalogGridReturn:()=>{}};
+    if(name.includes('FavoriteTitles'))return {FavoriteTitles:()=>null};
+    if(name.includes('startup-catalog-preview'))return {selectStartupPosters:()=>[]};
+    if(name.includes('useFeaturedRotation'))return {useFeaturedRotation:model=>({movies:model.catalog.movies.slice(0,20).map(row=>selectors.movieToViewModel(model,row)),series:model.catalog.series.slice(0,20).map(row=>selectors.seriesToViewModel(model,row))})};
     for (const [key, value] of Object.entries(imports)) if (name.includes(key)) return value;
     throw Error('Uncontrolled dependency: ' + name);
   }, module, module.exports);

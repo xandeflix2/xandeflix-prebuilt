@@ -53,8 +53,13 @@ await test('FAVORITES_LIST_PAGINATION_COVERS_GROUPS_WITHOUT_LOSING_MATCHES',asyn
 });
 await test('LIVE_LAYOUT_EXCLUDES_VOD_SEEK_TIMELINE_EPISODE_AND_SPEED_CONTROLS',()=>{
   const xml=fs.readFileSync(new URL('../android/app/src/main/res/layout/xandeflix_live_controls.xml',import.meta.url),'utf8');
-  for(const id of ['live_previous','live_next','live_channels','live_categories','live_guide','live_favorite','live_favorites','exo_play_pause','live_resize','live_tracks'])assert.ok(xml.includes(id));
-  for(const forbidden of ['exo_rew','exo_ffwd','exo_progress','exo_position','exo_duration','player_episodes','player_speed'])assert.ok(!xml.includes(forbidden));
+  for(const id of ['live_previous','live_next','live_channels','live_categories','live_guide','live_favorite','live_favorites','exo_play_pause','live_resize'])assert.ok(xml.includes(id));
+  for(const forbidden of ['exo_rew','exo_ffwd','exo_progress','exo_position','exo_duration','player_episodes','player_speed','live_tracks'])assert.ok(!xml.includes(forbidden));
+  const liveControls=fs.readFileSync(new URL('../android/app/src/main/java/com/xandeflix/prebuilt/player/LivePlayerControls.java',import.meta.url),'utf8');
+  assert.ok(!liveControls.includes('live_tracks'));assert.ok(!liveControls.includes('showTracks'));assert.ok(!liveControls.includes('TrackSelectionDialogBuilder'));
+  const vodLayout=fs.readFileSync(new URL('../android/app/src/main/res/layout/xandeflix_player_controls.xml',import.meta.url),'utf8');
+  const vodControls=fs.readFileSync(new URL('../android/app/src/main/java/com/xandeflix/prebuilt/player/PlayerControls.java',import.meta.url),'utf8');
+  assert.ok(vodLayout.includes('player_tracks'));assert.ok(vodControls.includes('R.id.player_tracks).setOnClickListener'));assert.ok(vodControls.includes('TrackSelectionDialogBuilder'));
   const plugin=fs.readFileSync(new URL('../android/app/src/main/java/com/xandeflix/prebuilt/player/NativeAndroidPlayerPlugin.java',import.meta.url),'utf8');
   const set=plugin.slice(plugin.indexOf('public void setLiveControls'),plugin.indexOf('public boolean dispatchLiveKey'));
   assert.ok(set.includes('currentPreviewId.equals(call.getString("previewId"))'));

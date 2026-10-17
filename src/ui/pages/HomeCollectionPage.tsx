@@ -4,10 +4,11 @@ import type { CatalogItemViewModel } from '../../catalog/catalog-view-model.ts';
 import { movieToViewModel, seriesToViewModel } from '../../catalog/catalog-selectors.ts';
 import { CatalogGrid } from '../components/CatalogGrid.tsx';
 import { RecentTitles } from '../components/RecentTitles.tsx';
+import { FavoriteTitles } from '../components/FavoriteTitles.tsx';
 import { useSeriesHighlights } from '../hooks/useSeriesHighlights.ts';
 import { prioritizeSeries } from '../../catalog/series-content-updates.ts';
 
-const titles = { 'recent-watched': 'Recentes', 'featured-movies': 'Filmes em Destaque', 'featured-series': 'Séries em Destaque' } as const;
+const titles = { 'favorites': 'Favoritos', 'recent-watched': 'Recentes', 'featured-movies': 'Filmes em Destaque', 'featured-series': 'Séries em Destaque' } as const;
 export type HomeCollectionId = keyof typeof titles;
 export function isHomeCollectionId(value: unknown): value is HomeCollectionId {
   return typeof value === 'string' && Object.prototype.hasOwnProperty.call(titles, value);
@@ -36,9 +37,10 @@ export function HomeCollectionPage({ collection, readModel, onSelectItem, onBack
     <div className="page-header">
       <button type="button" className="focusable-item btn-secondary home-collection-back" onClick={onBack}>← Voltar</button>
       <h1 className="page-title">{titles[collection]}</h1>
-      <p className="page-subtitle">{collection === 'recent-watched' ? 'Filmes e séries assistidos recentemente' : `${items.length} títulos em destaque`}</p>
+      <p className="page-subtitle">{collection === 'favorites' ? 'Seus filmes e séries favoritos' : collection === 'recent-watched' ? 'Filmes e séries assistidos recentemente' : `${items.length} títulos em destaque`}</p>
     </div>
-    {collection === 'recent-watched' ? <RecentTitles readModel={readModel} presentation="collection"/>
+    {collection === 'favorites' ? <FavoriteTitles readModel={readModel} presentation="collection" onSelectItem={onSelectItem}/>
+      : collection === 'recent-watched' ? <RecentTitles readModel={readModel} presentation="collection"/>
       : <CatalogGrid items={items} onItemClick={onSelectItem} autoLoadMore/>}
   </main>;
 }

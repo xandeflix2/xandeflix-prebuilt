@@ -8,6 +8,7 @@ import { SeriesTrailer } from './SeriesTrailer.tsx';
 import { SeriesPersonalActions } from './SeriesPersonalActions.tsx';
 import { CastButton } from './CastButton.tsx';
 import { RelatedTitles } from './RelatedTitles.tsx';
+import { WatchProviders } from './WatchProviders.tsx';
 
 interface Props {
   detail: MovieDetailViewModel;
@@ -37,7 +38,7 @@ export function PhoneMovieDetail({ detail, identity, readModel, resolving, statu
   const extra = state?.key === key ? state.data : null;
   const loading = state?.key !== key;
   const source = readModel.moviesById.get(detail.id);
-  const genres = detail.genreLabels.length ? detail.genreLabels : detail.categoryLabels;
+  const genres = detail.genreLabels;
   const duration = detail.durationFormatted || (extra?.runtimeMinutes ? `${extra.runtimeMinutes}min` : undefined);
 
   return <>
@@ -48,11 +49,14 @@ export function PhoneMovieDetail({ detail, identity, readModel, resolving, statu
     <div className="series-phone-content">
       <h1 className="series-phone-title">{detail.title}</h1>
       <div className="series-phone-metadata" aria-label="Informações do filme">
+        <div className="series-phone-metadata-line">
         {detail.yearFormatted && <span>{detail.yearFormatted}</span>}
         {extra?.ageRating && <span className="series-age-rating series-age-rating--known" aria-label={`Classificação indicativa ${extra.ageRating}`}>
           {extra.ageRating === 'L' ? 'L' : `${extra.ageRating}+`}
         </span>}
         {duration && <span>{duration}</span>}
+        <WatchProviders identity={identity} inline/>
+        </div>
         {!!genres.length && <span className="series-phone-genres">{genres.slice(0, 4).join(' • ')}</span>}
       </div>
       <p className="series-phone-synopsis">{detail.overview || 'Sinopse indisponível para este filme.'}</p>
@@ -63,7 +67,7 @@ export function PhoneMovieDetail({ detail, identity, readModel, resolving, statu
         <CastButton/>
       </div>
       {statusMessage && <p role="status" aria-live="polite" className={`playback-status-notice ${statusKind === 'error' ? 'notice-error' : 'notice-info'}`}>{statusMessage}</p>}
-      {source && <SeriesPersonalActions key={detail.id} kind="movie" fingerprint={watchFingerprint('movie', source)} title={detail.title} tmdbId={extra?.tmdbId}/>}
+      {source && <SeriesPersonalActions key={detail.id} kind="movie" itemId={detail.id} fingerprint={watchFingerprint('movie', source)} title={detail.title} tmdbId={extra?.tmdbId}/>}
       {onSelectItem && <section className="series-phone-panel movie-phone-related" aria-label="Títulos semelhantes">
         <h2 className="section-heading">Títulos semelhantes</h2>
         <RelatedTitles kind="movie" itemId={detail.id} readModel={readModel} onSelectItem={onSelectItem} layout="grid"/>

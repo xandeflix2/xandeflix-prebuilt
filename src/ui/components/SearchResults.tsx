@@ -11,8 +11,12 @@ import type { CatalogItemViewModel } from '../../catalog/catalog-view-model.ts';
 import { movieToViewModel, seriesToViewModel } from '../../catalog/catalog-selectors.ts';
 import { MediaCard } from './MediaCard.tsx';
 import { Artwork } from './Artwork.tsx';
+import { useParentalControl } from '../hooks/useParentalControl.ts';
+import { canShowParentalItem } from '../../parental/parental-content.ts';
+import { LiveCatalogService } from '../../catalog/live/live-catalog.service.ts';
 
 interface SearchResultsProps {
+  parentalEditor?: boolean;
   results: SearchResultItem[];
   readModel: CatalogReadModel;
   onSelectItem: (item: CatalogItemViewModel) => void;
@@ -24,15 +28,25 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
   readModel,
   onSelectItem,
   onSelectLive,
+  parentalEditor = false,
 }) => {
+  const parental = useParentalControl();
+  const editor = parentalEditor && parental.admin;
+  const scope = `${readModel.catalog.metadata.snapshotId}:${results.map(r => r.kind + ':' + r.id).join('|')}:${editor}:${parental.status}:${parental.contentRevision}:${parental.lockRevision}:${parental.adultSession}`;
+  const [liveResolved, setLiveResolved] = React.useState<{ scope: string; ids: Set<string> }>({ scope: '', ids: new Set() });
   const [, setResolvedVersion] = React.useState(0);
 
   React.useEffect(() => {
     let active = true;
+    const liveIds = new Set<string>();
     void (async () => {
       for (const r of results) {
         if (!active) break;
-        if (r.kind === 'live') continue;
+        if (r.kind === 'live') {
+          try { if (await LiveCatalogService.loadChannelById(r.id, { parentalEditor: editor })) liveIds.add(r.id); } catch { /* Do not reveal unverified index artwork. */ }
+          if (active) setLiveResolved({ scope, ids: new Set(liveIds) });
+          continue;
+        }
         try {
           const resolved = r.kind === 'movie'
             ? await readModel.resolveMovieById(r.id)
@@ -44,7 +58,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
     return () => {
       active = false;
     };
-  }, [results, readModel]);
+  }, [results, readModel, scope, editor]);
 
   if (results.length === 0) {
     return null;
@@ -62,7 +76,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
       '';
 
     if (r.kind === 'live') {
-      cards.push({ kind: 'live', result: r, posterUri: rawPoster });
+      if (liveResolved.scope === scope && liveResolved.ids.has(r.id)) cards.push({ kind: 'live', result: r, posterUri: rawPoster });
       continue;
     }
 
@@ -73,8 +87,8 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
         if (!vm.posterUri && rawPoster) {
           vm.posterUri = rawPoster;
         }
-        cards.push({ kind: 'catalog', item: vm });
-      } else {
+        if (editor || canShowParentalItem(vm)) cards.push({ kind: 'catalog', item: vm });
+      } else if (editor) {
         cards.push({ kind: 'catalog', item: {
           id: r.id,
           kind: 'movie',
@@ -92,8 +106,8 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
         if (!vm.posterUri && rawPoster) {
           vm.posterUri = rawPoster;
         }
-        cards.push({ kind: 'catalog', item: vm });
-      } else {
+        if (editor || canShowParentalItem(vm)) cards.push({ kind: 'catalog', item: vm });
+      } else if (editor) {
         cards.push({ kind: 'catalog', item: {
           id: r.id,
           kind: 'series',
@@ -135,6 +149,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
           </button>
         ) : (
           <MediaCard
+            parentalEditor={editor}
             key={`${card.item.kind}:${card.item.id}`}
             item={card.item}
             onClick={onSelectItem}

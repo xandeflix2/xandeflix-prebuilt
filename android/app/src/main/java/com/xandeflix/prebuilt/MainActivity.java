@@ -158,6 +158,7 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(NativeAndroidPlayerPlugin.class);
         registerPlugin(NativePlayerPlugin.class);
         registerPlugin(LocalSecureSourceStorePlugin.class);
+        registerPlugin(com.xandeflix.prebuilt.security.LocalParentalControlPlugin.class);
         registerPlugin(PendingDeviceReactivationStorePlugin.class);
         registerPlugin(LargeSourceTransportPlugin.class);
         registerPlugin(AppUpdatesPlugin.class);

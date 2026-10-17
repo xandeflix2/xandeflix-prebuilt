@@ -496,7 +496,11 @@ public class NativeAndroidPlayerPlugin extends Plugin {
     }
 
     public boolean dispatchLiveKey(android.view.KeyEvent event) {
-        return previewFullscreen && !previewInPip && liveControls != null && liveControls.dispatchKey(event);
+        return shouldDispatchLiveKey(isPreviewActive, previewFullscreen, previewInPip, event.getKeyCode())
+                && liveControls != null && liveControls.dispatchKey(event);
+    }
+    static boolean shouldDispatchLiveKey(boolean active, boolean fullscreen, boolean inPip, int key) {
+        return active && !inPip && (fullscreen || LivePlayerControls.isChannelKey(key));
     }
     @PluginMethod
     public void openLivePanel(PluginCall call) {
@@ -563,8 +567,11 @@ public class NativeAndroidPlayerPlugin extends Plugin {
             previewView.requestFocus();
             previewView.setClickable(true);
             previewView.setControllerShowTimeoutMs(3000);
-            previewView.setControllerAutoShow(true);
-            previewView.showController();
+            boolean television = (activity.getResources().getConfiguration().uiMode & android.content.res.Configuration.UI_MODE_TYPE_MASK)
+                    == android.content.res.Configuration.UI_MODE_TYPE_TELEVISION;
+            previewView.setControllerAutoShow(!television);
+            if (television) previewView.hideController();
+            else previewView.showController();
             updatePreviewCastButtonVisibility();
             MainActivity.applyPhoneUiOrientation(activity, true);
             MainActivity.applyAppSystemUiPolicy(activity.getWindow(), true);
@@ -977,6 +984,7 @@ public class NativeAndroidPlayerPlugin extends Plugin {
         }
         updatePreviewCastButtonVisibility();
         MainActivity.applyPhoneUiOrientation(getPluginActivity(), false);
+        if(getBridge()!=null && getBridge().getWebView()!=null)getBridge().getWebView().requestFocus();
         notifyPreviewFullscreenChanged(false);
         return true;
     }

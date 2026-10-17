@@ -29,7 +29,7 @@ public final class PublicTrailerPolicy {
         return "<!doctype html><html><head><meta name='viewport' content='width=device-width,initial-scale=1'>"
             + "<meta name='referrer' content='strict-origin-when-cross-origin'><style>html,body,#player{margin:0;width:100%;height:100%;background:#000;overflow:hidden}</style></head><body>"
             + "<div id='player'></div><script>var player;function onYouTubeIframeAPIReady(){player=new YT.Player('player',{width:'100%',height:'100%',videoId:'" + id
-            + "',playerVars:{autoplay:1,playsinline:1,controls:1,rel:0,origin:'https://com.xandeflix.prebuilt'},events:{onReady:function(e){console.log('XANDE_PUBLIC_TRAILER:ready');e.target.playVideo()},onStateChange:function(e){if(e.data===1)console.log('XANDE_PUBLIC_TRAILER:playing');else if(e.data===2)console.log('XANDE_PUBLIC_TRAILER:player-paused')},onError:function(){console.log('XANDE_PUBLIC_TRAILER:error')}}})}"
+            + "',playerVars:{autoplay:1,playsinline:1,controls:0,rel:0,origin:'https://com.xandeflix.prebuilt'},events:{onReady:function(e){console.log('XANDE_PUBLIC_TRAILER:ready');e.target.playVideo()},onStateChange:function(e){if(e.data===1)console.log('XANDE_PUBLIC_TRAILER:playing');else if(e.data===2)console.log('XANDE_PUBLIC_TRAILER:player-paused')},onError:function(){console.log('XANDE_PUBLIC_TRAILER:error')}}})}"
             + "function playPublicTrailer(){if(player&&player.playVideo)player.playVideo()}"
             + "function pausePublicTrailer(){if(player&&player.pauseVideo)player.pauseVideo()}"
             + "</script><script src='https://www.youtube.com/iframe_api'></script></body></html>";

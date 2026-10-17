@@ -9,6 +9,7 @@ import {SeriesTrailer} from './SeriesTrailer.tsx';
 import {SeriesPersonalActions} from './SeriesPersonalActions.tsx';
 import {CastButton} from './CastButton.tsx';
 import {RelatedTitles} from './RelatedTitles.tsx';
+import {WatchProviders} from './WatchProviders.tsx';
 
 interface Props {detail:SeriesDetailViewModel;identity:ArtworkIdentity;readModel:CatalogReadModel;episodes:React.ReactNode;episodesLoading:boolean;episodesFailed:boolean;selectedSeasonIndex:number;resolving:boolean;onPlay:(id:string)=>void;onRetryEpisodes:()=>void;onBack:()=>void;onSelectItem?:(item:CatalogItemViewModel)=>void}
 export function PhoneSeriesDetail({detail,identity,readModel,episodes,episodesLoading,episodesFailed,selectedSeasonIndex,resolving,onPlay,onRetryEpisodes,onBack,onSelectItem}:Props){
@@ -31,7 +32,7 @@ export function PhoneSeriesDetail({detail,identity,readModel,episodes,episodesLo
   const localDuration=first?.durationFormatted;
   const duration=localDuration|| (extra?.runtimeMinutes?`${extra.runtimeMinutes}min`:undefined);
   const count=episodesLoading?extra?.episodeCount?`${extra.episodeCount} episódios (TMDB)`:'Carregando episódios…':episodesFailed?'Quantidade indisponível':`${available} ${available===1?'episódio disponível':'episódios disponíveis'}`;
-  const genres=detail.genreLabels.length?detail.genreLabels:detail.categoryLabels;
+  const genres=detail.genreLabels;
   const tabId=`series-${detail.id.replace(/[^a-z0-9_-]/gi,'-')}`;
   return <>
     <div data-detail-hero tabIndex={-1} className="focusable-item series-phone-hero">
@@ -40,10 +41,14 @@ export function PhoneSeriesDetail({detail,identity,readModel,episodes,episodesLo
     <div className="series-phone-content">
       <h1 className="series-phone-title">{detail.title}</h1>
       <div className="series-phone-metadata" aria-label="Informações da série">
+        <div className="series-phone-metadata-line">
         {detail.yearFormatted && <span>{detail.yearFormatted}</span>}
-        <span>{count}</span>
-        <span className={`series-age-rating${extra?.ageRating?' series-age-rating--known':''}`} aria-label={`Classificação indicativa: ${extra?.ageRating==='L'?'Livre':extra?.ageRating?extra.ageRating+' anos':'não informada'}`}>{extra?.ageRating==='L'?'L':extra?.ageRating?extra.ageRating+'+':'Classificação não informada'}</span>
+        {extra?.ageRating && <span className="series-age-rating series-age-rating--known" aria-label={`Classificação indicativa: ${extra.ageRating==='L'?'Livre':extra.ageRating+' anos'}`}>{extra.ageRating==='L'?'L':extra.ageRating+'+'}</span>}
         {duration && <span>{duration} por episódio</span>}
+        <WatchProviders identity={identity} inline/>
+        </div>
+        <span>{count}</span>
+        {!extra?.ageRating && <span className="series-age-rating" aria-label="Classificação indicativa: não informada">Classificação não informada</span>}
         {!!genres.length && <span className="series-phone-genres">{genres.slice(0,4).join(' • ')}</span>}
       </div>
       <p className="series-phone-synopsis">{detail.overview||'Sinopse indisponível para esta série.'}</p>
@@ -52,7 +57,7 @@ export function PhoneSeriesDetail({detail,identity,readModel,episodes,episodesLo
         <button type="button" className="focusable-item btn-secondary" onClick={onBack}>← Voltar</button>
         <CastButton/>
       </div>
-      <SeriesPersonalActions key={fingerprint} fingerprint={fingerprint} title={detail.title} tmdbId={extra?.tmdbId}/>
+      <SeriesPersonalActions key={fingerprint} itemId={detail.id} fingerprint={fingerprint} title={detail.title} tmdbId={extra?.tmdbId}/>
       <div className="series-phone-tabs" role="tablist" aria-label="Conteúdo da série">
         <button type="button" role="tab" id={`${tabId}-episodes`} aria-controls={`${tabId}-panel`} aria-selected={tab==='episodes'} tabIndex={tab==='episodes'?0:-1} className="focusable-item" onClick={()=>setTab('episodes')} onKeyDown={event=>{if(event.key==='ArrowRight'){setTab('related');document.getElementById(`${tabId}-related`)?.focus();}}}>Episódios</button>
         <button type="button" role="tab" id={`${tabId}-related`} aria-controls={`${tabId}-panel`} aria-selected={tab==='related'} tabIndex={tab==='related'?0:-1} className="focusable-item" onClick={()=>setTab('related')} onKeyDown={event=>{if(event.key==='ArrowLeft'){setTab('episodes');document.getElementById(`${tabId}-episodes`)?.focus();}}}>Títulos semelhantes</button>

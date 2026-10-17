@@ -43,6 +43,8 @@ import { armCastAuthorization,stopGoogleCast } from './google-cast.ts';
 import { NativeAndroidPlayer } from './native-android-player.bridge.ts';
 import {watchHistory,WatchHistory,watchFingerprint} from './watch-history.ts';
 import { isAdultCatalogItem } from './content-adult-policy.ts';
+import { authorizeParentalItem, parentalErrorMessage } from '../parental/parental-access.ts';
+import { movieToViewModel, seriesToViewModel } from '../catalog/catalog-selectors.ts';
 
 export type PlaybackStateListener = (session: PlaybackSessionInfo) => void;
 
@@ -147,6 +149,12 @@ export class PlaybackService {
     readModel: CatalogReadModel,
     options?: { startPositionMs?: number }
   ): Promise<NativePlayerLaunchResult> {
+    try {
+      const parentalMovie = readModel.moviesById.get(movieId) || await readModel.resolveMovieById(movieId);
+      if (!parentalMovie || !await authorizeParentalItem(movieToViewModel(readModel, parentalMovie), readModel.catalog.metadata.snapshotId)) {
+        return { success: false, state: 'NATIVE_PLAYER_ERROR', errorMessage: 'Conteúdo protegido pelo controle parental.' };
+      }
+    } catch (error) { return { success: false, state: 'NATIVE_PLAYER_ERROR', errorMessage: parentalErrorMessage(error) }; }
     this.invalidateEpisodePlayback();
     bootTelemetry.mark('MOVIE_PLAY_REQUESTED');
     const sessionId = `movie-${movieId}-${Date.now()}`;
@@ -226,6 +234,12 @@ export class PlaybackService {
     readModel: CatalogReadModel,
     options?: { startPositionMs?: number }
   ): Promise<NativePlayerLaunchResult> {
+    try {
+      const parentalSeries = readModel.seriesById.get(seriesId) || await readModel.resolveSeriesById(seriesId);
+      if (!parentalSeries || !await authorizeParentalItem(seriesToViewModel(readModel, parentalSeries), readModel.catalog.metadata.snapshotId)) {
+        return { success: false, state: 'NATIVE_PLAYER_ERROR', errorMessage: 'Conteúdo protegido pelo controle parental.' };
+      }
+    } catch (error) { return { success: false, state: 'NATIVE_PLAYER_ERROR', errorMessage: parentalErrorMessage(error) }; }
     this.invalidateEpisodePlayback();
     return this.playEpisodeInternal(seriesId, episodeId, readModel, options, this.episodeRun);
   }

@@ -20,6 +20,7 @@ import { getClientBootstrapService } from '../../bootstrap/client.ts';
 import { HomeHero } from '../components/HomeHero.tsx';
 import { useHeroPlayback } from '../hooks/useHeroPlayback.ts';
 import { RecentTitles } from '../components/RecentTitles.tsx';
+import { FavoriteTitles } from '../components/FavoriteTitles.tsx';
 import { useHomeHero } from '../hooks/useHomeHero.ts';
 import { MediaRail } from '../components/MediaRail.tsx';
 import { AsyncCategoryRail, SimpleRailQueue } from '../components/AsyncCategoryRail.tsx';
@@ -30,6 +31,8 @@ import { isReleaseCategory } from '../../catalog/category-presentation.ts';
 import type { HomeCollectionId } from './HomeCollectionPage.tsx';
 import { useSeriesHighlights } from '../hooks/useSeriesHighlights.ts';
 import { prioritizeSeries } from '../../catalog/series-content-updates.ts';
+import { useFeaturedRotation } from '../hooks/useFeaturedRotation.ts';
+import { selectStartupPosters } from '../../artwork/startup-catalog-preview.ts';
 
 interface HomePageProps {
   readModel: CatalogReadModel;
@@ -42,7 +45,7 @@ export const HomePage: React.FC<HomePageProps> = ({ readModel, onSelectItem, onS
   const root = useRef<HTMLElement>(null);
   const [preparingArtwork, setPreparingArtwork] = useState(false);
   const browseService = useMemo(
-    () => new SegmentedBrowseService(getClientBootstrapService().getStorage()),
+    () => new SegmentedBrowseService(getClientBootstrapService().getStorage(), readModel.catalog.metadata.snapshotId),
     [readModel.catalog.metadata.snapshotId]
   );
 
@@ -55,20 +58,16 @@ export const HomePage: React.FC<HomePageProps> = ({ readModel, onSelectItem, onS
   const recentSeries = useSeriesHighlights();
 
   // Faixas em destaque (first-fold imediato)
-  const featuredMovies = useMemo(
-    () =>
-      readModel.catalog.movies
-        .slice(0, 20)
-        .map((m) => movieToViewModel(readModel, m)),
-    [readModel]
-  );
+  const featured = useFeaturedRotation(readModel, storage, browseService);
+  const featuredMovies = featured.movies;
+  const startupPosters = useMemo(() => selectStartupPosters(readModel.catalog.movies.slice(0, 100).map(movie => {
+    const item = movieToViewModel(readModel, movie);
+    return { id: item.id, title: item.title, posterUri: item.posterUri, category: item.categoryLabels.join(' ') };
+  })), [readModel]);
 
   const featuredSeries = useMemo(
-    () => prioritizeSeries(recentSeries,
-      readModel.catalog.series
-        .slice(0, 20)
-        .map((s) => seriesToViewModel(readModel, s)), 20),
-    [readModel, recentSeries]
+    () => prioritizeSeries(recentSeries.slice(0, 4), featured.series, 20),
+    [featured.series, recentSeries]
   );
 
   // Categorias canônicas por tipo
@@ -127,10 +126,11 @@ export const HomePage: React.FC<HomePageProps> = ({ readModel, onSelectItem, onS
 
   return (
     <main ref={root} className="page-container home-page">
-      <StartupArtworkPreparation root={root} snapshot={readModel.catalog.metadata.snapshotId} onPreparing={setPreparingArtwork}/>
+      <StartupArtworkPreparation root={root} snapshot={readModel.catalog.metadata.snapshotId} posters={startupPosters} onPreparing={setPreparingArtwork}/>
       <HomeHero {...hero} {...heroPlayback} options={hero.candidates} onSelect={onSelectItem} />
 
       <div className="home-rails-container">
+        <FavoriteTitles readModel={readModel} onSelectItem={onSelectItem} onViewAll={() => onSelectCollection('favorites')}/>
         {movieCategories.map((cat, index) =>
           isReleaseCategory(cat.name) ? renderMovieCategory(cat, index) : null
         )}

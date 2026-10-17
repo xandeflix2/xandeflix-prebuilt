@@ -13,7 +13,7 @@
 
 import React, { useState } from 'react';
 import './AdminLicensesView.css';
-import { ManagerLicenseEditor } from './ManagerLicenseEditor.tsx';
+import { ManagerDeviceDeleteDialog, ManagerLicenseEditor } from './ManagerLicenseEditor.tsx';
 import { summarizeLicenseDevices } from './license-device-summary.ts';
 import type { RemoteManagerControlPlaneAuthority } from '../../control-plane/client/manager-remote-control-plane-authority.ts';
 import type {
@@ -67,6 +67,7 @@ export const AdminLicensesView: React.FC<AdminLicensesViewProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [editor, setEditor] = useState<{ license: ManagerLicenseListItem; mode: 'EDIT' | 'DELETE' } | null>(null);
+  const [deviceDeletion, setDeviceDeletion] = useState<{ license: ManagerLicenseListItem; device: ManagerLicenseDetailDeviceItem } | null>(null);
   const [statusFilter, setStatusFilter] = useState<'ALL' | LicenseStatus>('ALL');
   const [modeFilter, setModeFilter] = useState<'ALL' | LicenseMode>('ALL');
   const [showEmptyLicenses, setShowEmptyLicenses] = useState(false);
@@ -386,9 +387,11 @@ export const AdminLicensesView: React.FC<AdminLicensesViewProps> = ({
                       <time dateTime={l.createdAt}>{new Date(l.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}<wbr />/{new Date(l.createdAt).getFullYear()}</time>
                     </td>
                     <td data-label="Ações" style={{ padding: '0.75rem', textAlign: 'right' }}>
-                      {index === 0 && <div className="manager-license-actions">
-                        {authority && onUpdated && <button type="button" className="focusable-item" title="Editar licença" aria-label="Editar licença" onClick={() => setEditor({ license: l, mode: 'EDIT' })}>✎</button>}
-                        {authority && onUpdated && isMaster && l.customerId && <button type="button" className="focusable-item" title="Excluir cliente e todos os dispositivos" aria-label="Excluir cliente e todos os dispositivos" onClick={() => setEditor({ license: l, mode: 'DELETE' })}>🗑</button>}
+                      <div className="manager-license-actions">
+                        {index === 0 && authority && onUpdated && <button type="button" className="focusable-item" title="Editar licença" aria-label="Editar licença" onClick={() => setEditor({ license: l, mode: 'EDIT' })}>✎</button>}
+                        {authority?.deleteDevicePermanently && onUpdated && isMaster && d && <button type="button" className="focusable-item" title={`Excluir dispositivo ${d.displayCode}`} aria-label={`Excluir dispositivo ${d.displayCode}`} onClick={() => setDeviceDeletion({ license: l, device: d })}>🗑</button>}
+                        {index === 0 && !d && authority && onUpdated && isMaster && l.customerId && <button type="button" className="focusable-item" title="Excluir cliente e todos os dispositivos" aria-label="Excluir cliente e todos os dispositivos" onClick={() => setEditor({ license: l, mode: 'DELETE' })}>🗑</button>}
+                        {index === 0 && <>
                         <button
                           type="button"
                           className="focusable-item"
@@ -470,7 +473,8 @@ export const AdminLicensesView: React.FC<AdminLicensesViewProps> = ({
                             🚫
                           </button>
                         )}
-                      </div>}
+                        </>}
+                      </div>
                     </td>
                   </tr>
                 ));
@@ -481,6 +485,7 @@ export const AdminLicensesView: React.FC<AdminLicensesViewProps> = ({
       )}
 
       {/* Modal / Painel de Detalhes da Licença */}
+      {deviceDeletion && authority && onUpdated && isMaster && <ManagerDeviceDeleteDialog key={`${deviceDeletion.device.deviceId}:${deviceDeletion.device.displayCode}`} license={deviceDeletion.license} device={deviceDeletion.device} authority={authority} isMaster={isMaster} onClose={() => setDeviceDeletion(null)} onUpdated={onUpdated} onDeleteCustomer={deviceDeletion.license.customerId ? () => { setDeviceDeletion(null); setEditor({ license: deviceDeletion.license, mode: 'DELETE' }); } : undefined} />}
       {editor && authority && onUpdated && <ManagerLicenseEditor key={`${editor.license.licenseId}:${editor.mode}`} license={editor.license} availableLicenses={licenses} mode={editor.mode} authority={authority} isMaster={isMaster} onClose={() => setEditor(null)} onUpdated={onUpdated} onEditPrincipalLicense={principalLicense => setEditor({ license: principalLicense, mode: 'EDIT' })} />}
       {inspectLoading && (
         <div style={{ marginTop: '1.5rem', padding: '1rem', backgroundColor: '#151d30', borderRadius: '6px', textAlign: 'center', color: '#c084fc' }}>

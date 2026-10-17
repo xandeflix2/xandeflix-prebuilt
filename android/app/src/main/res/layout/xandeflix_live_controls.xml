@@ -23,7 +23,6 @@
                 <Button android:id="@+id/live_guide" android:layout_width="88dp" android:layout_height="48dp" android:text="Guia" android:textSize="13sp" android:textAllCaps="false" android:background="@drawable/player_control_focus" android:textColor="#FFFFFF"/>
                 <Button android:id="@+id/live_favorite" android:layout_width="128dp" android:layout_height="48dp" android:text="☆ Favoritar" android:textSize="13sp" android:textAllCaps="false" android:background="@drawable/player_control_focus" android:textColor="#FFFFFF"/>
                 <Button android:id="@+id/live_favorites" android:layout_width="104dp" android:layout_height="48dp" android:text="Favoritos" android:textSize="13sp" android:textAllCaps="false" android:background="@drawable/player_control_focus" android:textColor="#FFFFFF"/>
-                <Button android:id="@+id/live_tracks" android:layout_width="104dp" android:layout_height="48dp" android:text="Áudio/legendas" android:textSize="12sp" android:textAllCaps="false" android:background="@drawable/player_control_focus" android:textColor="#FFFFFF"/>
                 <Button android:id="@+id/live_resize" android:layout_width="104dp" android:layout_height="48dp" android:text="Ajustar tela" android:textSize="13sp" android:textAllCaps="false" android:background="@drawable/player_control_focus" android:textColor="#FFFFFF"/>
             </LinearLayout>
         </HorizontalScrollView>

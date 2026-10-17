@@ -9,12 +9,15 @@ import { createPresentationSeed, orderCategoryItems, isReleaseCategory } from '.
 import type { CatalogItemViewModel } from '../../catalog/catalog-view-model.ts';
 import { MediaCard } from './MediaCard.tsx';
 import { useRailArtworkPreparation } from '../hooks/useRailArtworkPreparation.ts';
+import { useParentalControl } from '../hooks/useParentalControl.ts';
+import { canShowParentalItem } from '../../parental/parental-content.ts';
 
 interface MediaRailProps {
   id: string;
   title: string;
   items: CatalogItemViewModel[];
   onItemClick: (item: CatalogItemViewModel) => void;
+  getItemKey?: (item:CatalogItemViewModel)=>string;
   preserveOrder?: boolean;
   onViewAll?: () => void;
   onViewAllFocus?: () => void;
@@ -26,11 +29,14 @@ export const MediaRail = React.memo<MediaRailProps>(function MediaRail({
   title,
   items,
   onItemClick,
+  getItemKey,
   preserveOrder=false,
   onViewAll,
   onViewAllFocus,
   startupArtworkCount = 0,
 }) {
+  const parental = useParentalControl();
+  items = useMemo(() => items.filter(canShowParentalItem), [items, parental.revision]);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const preparation = useRailArtworkPreparation();
   const [seed] = useState(createPresentationSeed);
@@ -97,7 +103,7 @@ export const MediaRail = React.memo<MediaRailProps>(function MediaRail({
       </div>
       <div className="media-rail-track" ref={scrollContainerRef}>
         {orderedItems.map((item, index) => (
-          <MediaCard key={item.id} item={item} onClick={onItemClick} prepareArtwork={preparation.prepare}
+          <MediaCard key={getItemKey?getItemKey(item):item.id} item={item} onClick={onItemClick} prepareArtwork={preparation.prepare}
             startupArtwork={index < Math.min(8, startupArtworkCount)} />
         ))}
       </div>

@@ -20,10 +20,12 @@ import { SeriesDetailSections } from '../components/SeriesDetailSections.tsx';
 import { SeriesPersonalActions } from '../components/SeriesPersonalActions.tsx';
 import { watchFingerprint, watchHistory } from '../../playback/watch-history.ts';
 import { PhoneSeriesDetail } from '../components/PhoneSeriesDetail.tsx';
+import { WatchProviders } from '../components/WatchProviders.tsx';
 import { usePhoneLayout } from '../hooks/usePhoneLayout.ts';
 import { useDetailInitialFocus } from '../hooks/useDetailInitialFocus.ts';
 import type { CatalogItemViewModel } from '../../catalog/catalog-view-model.ts';
 import { defaultPlaybackService } from '../../playback/playback.service.ts';
+import { meaningfulDetailGenres } from '../detail-genres.ts';
 
 interface SeriesDetailPageProps {
   seriesId: string;
@@ -44,13 +46,14 @@ export const SeriesDetailPage: React.FC<SeriesDetailPageProps> = ({
   const sourceDetail = getSeriesDetail(readModel, seriesId);
   const identity = sourceDetail ? { kind: 'series' as const, title: sourceDetail.title,
     year: sourceDetail.yearFormatted, tmdbId: sourceDetail.externalIds?.tmdbId, posterPath: tmdbPosterPath(sourceDetail.posterUri), sourcePosterUri: sourceDetail.posterUri } : undefined;
+  const sourceGenres = meaningfulDetailGenres(sourceDetail?.genreLabels || []);
   const metadata = useArtworkMetadata(identity, Boolean(sourceDetail && (!sourceDetail.overview || !sourceDetail.yearFormatted
-    || !sourceDetail.originalTitle || !sourceDetail.genreLabels.length)), 'high');
+    || !sourceDetail.originalTitle || !sourceGenres.length)), 'high');
   const detail = sourceDetail && { ...sourceDetail,
     originalTitle: sourceDetail.originalTitle || metadata?.originalTitle,
     yearFormatted: sourceDetail.yearFormatted || (metadata?.year ? String(metadata.year) : undefined),
     overview: sourceDetail.overview || metadata?.overview,
-    genreLabels: sourceDetail.genreLabels.length ? sourceDetail.genreLabels : metadata?.genres || [],
+    genreLabels: sourceGenres.length ? sourceGenres : meaningfulDetailGenres(metadata?.genres || []),
   };
   const [detailLoading, setDetailLoading] = useState(!detail);
   const [detailFailed, setDetailFailed] = useState(false);
@@ -115,7 +118,7 @@ export const SeriesDetailPage: React.FC<SeriesDetailPageProps> = ({
   const handlePlayEpisode = useCallback(
     async (episodeId: string) => {
       setResolvingEpisodeId(episodeId);
-      setEpisodeStatusNotice('Preparando reprodução...');
+      setEpisodeStatusNotice(null);
 
       try {
         const result = await defaultPlaybackService.playEpisode(seriesId, episodeId, readModel);
@@ -270,6 +273,7 @@ export const SeriesDetailPage: React.FC<SeriesDetailPageProps> = ({
               immersiveArtwork="poster"
               className="detail-poster-img"
             />
+            <WatchProviders identity={identity}/>
           </div>
 
           <div className="detail-info-col">
@@ -307,7 +311,7 @@ export const SeriesDetailPage: React.FC<SeriesDetailPageProps> = ({
 
             <div className="detail-actions series-detail-hero-actions">
               {identity && <DetailTrailer key={seriesId} title={detail.title} identity={identity} backdrop={detail.backdropUri} poster={detail.posterUri}/>}
-              <SeriesPersonalActions key={seriesId} title={detail.title}
+              <SeriesPersonalActions key={seriesId} itemId={seriesId} title={detail.title}
                 fingerprint={watchFingerprint('series',readModel.seriesById.get(seriesId)!)}
                 tmdbId={Number.isSafeInteger(publicId)&&publicId>0?publicId:undefined}/>
             </div>

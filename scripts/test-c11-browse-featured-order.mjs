@@ -24,6 +24,11 @@ function load(file, extra = {}) {
   };
   const module = { exports: {} };
   new Function('require', 'module', 'exports', ts.transpileModule(read(file), { compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.React } }).outputText)(name => {
+    if(name.includes('useHeroPlayback'))return {useHeroPlayback:()=>({})};
+    if(name.includes('BrowseHero'))return {BrowseHero:Hero};
+    if(name.includes('FavoriteTitles'))return {FavoriteTitles:()=>null};
+    if(name.includes('startup-catalog-preview'))return {selectStartupPosters:()=>[]};
+    if(name.includes('useFeaturedRotation'))return {useFeaturedRotation:model=>({movies:model.catalog.movies.slice(0,20).map(row=>selectors.movieToViewModel(model,row)),series:model.catalog.series.slice(0,20).map(row=>selectors.seriesToViewModel(model,row))})};
     for (const [part, value] of Object.entries(ports)) if (name.includes(part)) return value;
     throw Error('Uncontrolled dependency ' + name);
   }, module, module.exports);

@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 import ts from 'typescript';
+import { parentalControls, parentalDpadTarget, parentalEntry } from '../src/ui/parental-dpad-navigation.ts';
 
 const source = readFileSync(new URL('../src/ui/hooks/useDpadNavigation.ts', import.meta.url), 'utf8');
 const code = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText;
@@ -16,7 +17,7 @@ vm.runInNewContext(code, { exports, document, HTMLElement: Element,
   getComputedStyle:()=>({scrollMarginTop:'16.2px'}),
   MutationObserver: class { observe() {} disconnect() {} },
   requestAnimationFrame: fn => { frames.set(++serial, fn); return serial; }, cancelAnimationFrame: id => { if (frames.delete(id)) cancelled++; },
-  require: name => { assert.equal(name, 'react'); return {
+  require: name => { if (name === '../parental-dpad-navigation.ts') return { parentalControls, parentalDpadTarget, parentalEntry }; assert.equal(name, 'react'); return {
     useRef: value => ({ current: value }), useCallback: fn => { callbacks.push(fn); return fn; },
     useEffect: fn => { const dispose = fn(); if (dispose) cleanup.push(dispose); },
   }; },

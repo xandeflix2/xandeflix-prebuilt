@@ -4,6 +4,10 @@ export const STARTUP_ARTWORK_WAIT_MS = 20000;
 export interface StartupArtworkSample {
   total: number; ready: number; unavailable: number; waitingRails: boolean; heroSettled: boolean;
 }
+export function isStartupArtworkSettled(sample: StartupArtworkSample): boolean {
+  return sample.total > 0 && sample.total <= STARTUP_ARTWORK_LIMIT
+    && sample.ready + sample.unavailable === sample.total && sample.heroSettled && !sample.waitingRails;
+}
 export function sampleStartupArtwork(root: HTMLElement): StartupArtworkSample {
   const marked = [...root.querySelectorAll<HTMLElement>('.media-card[data-startup-artwork]')].slice(0, 32);
   const visible = [...root.querySelectorAll<HTMLElement>('.media-card')].slice(0, 40).filter(card => {
@@ -40,8 +44,8 @@ export function prepareStartupArtwork(options: {
     if (stopped) return;
     const sample = options.sample();
     options.update(sample);
-    const settled = sample.total > 0 && sample.total <= STARTUP_ARTWORK_LIMIT
-      && sample.ready + sample.unavailable === sample.total && sample.heroSettled && !sample.waitingRails;
+    if (stopped) return; // update may omit the presentation and cancel this very tick.
+    const settled = isStartupArtworkSettled(sample);
     const signature = `${sample.total}:${sample.ready}:${sample.unavailable}:${sample.heroSettled}:${sample.waitingRails}`;
     if (settled) {
       if (signature !== previous || stableSince === undefined) stableSince = now();

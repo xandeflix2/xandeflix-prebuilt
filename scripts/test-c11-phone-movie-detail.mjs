@@ -62,11 +62,12 @@ const require = name => name === 'react' ? { default: react, ...react }
   : name.includes('SeriesTrailer') ? { SeriesTrailer: stub('trailer') }
   : name.includes('SeriesPersonalActions') ? { SeriesPersonalActions: stub('personal') }
   : name.includes('CastButton') ? { CastButton: stub('cast') }
+  : name.includes('WatchProviders') ? { WatchProviders: stub('providers') }
   : { RelatedTitles: stub('related') };
 const module = { exports: {} };
 new Function('require', 'module', 'exports', ts.transpileModule(readFileSync(new URL('../src/ui/components/PhoneMovieDetail.tsx', import.meta.url), 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.React } }).outputText)(require, module, module.exports);
 let played = 0, backed = 0;
-const props = { detail: { id: 'movie-one', title: 'Public Movie', yearFormatted: '2026', overview: 'Movie synopsis', genreLabels: [], categoryLabels: ['Ação'] }, identity: { kind: 'movie', title: 'Public Movie' }, readModel: { moviesById: new Map([['movie-one', identity]]) }, resolving: false, statusMessage: null, statusKind: null, onPlay: () => played++, onBack: () => backed++, onSelectItem: () => {} };
+const props = { detail: { id: 'movie-one', title: 'Public Movie', yearFormatted: '2026', overview: 'Movie synopsis', genreLabels: ['Ação'], categoryLabels: ['Lançamentos'] }, identity: { kind: 'movie', title: 'Public Movie' }, readModel: { moviesById: new Map([['movie-one', identity]]) }, resolving: false, statusMessage: null, statusKind: null, onPlay: () => played++, onBack: () => backed++, onSelectItem: () => {} };
 const tree = module.exports.PhoneMovieDetail(props), html = renderToStaticMarkup(tree);
 for (const [before, after] of [['<trailer', '<h1'], ['<h1', 'Informações do filme'], ['Informações do filme', 'Movie synopsis'], ['Movie synopsis', 'movie-phone-watch'], ['movie-phone-watch', '<personal'], ['<personal', '<related']]) assert.ok(html.indexOf(before) < html.indexOf(after));
 assert.match(html, /14\+/); assert.match(html, /136min/); assert.match(html, /Ação/); assert.match(html, /data-kind="movie" data-layout="grid"/); assert.ok(!html.includes('episódios'));

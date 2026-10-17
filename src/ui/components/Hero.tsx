@@ -18,6 +18,11 @@ import { useImmersiveArtwork } from '../hooks/useImmersiveArtwork.ts';
 import { useContentBadge } from './NewContentProvider.tsx';
 import { useDevicePresentation } from '../hooks/useDevicePresentation.ts';
 import { isTelevisionPresentation, type DevicePresentation } from '../device-presentation.ts';
+import { PlatformCategoryLogo } from './PlatformCategoryBadge.tsx';
+import { meaningfulDetailGenres } from '../detail-genres.ts';
+import { useParentalControl } from '../hooks/useParentalControl.ts';
+import { canShowParentalItem } from '../../parental/parental-content.ts';
+import { useParentalClassification } from '../hooks/useParentalClassification.ts';
 
 export function canOpenHeroArtworkDetails(choice: DevicePresentation | null, userAgent: string, touchPoints = 0): boolean {
   if (choice) return choice === 'PHONE' || choice === 'TABLET';
@@ -49,7 +54,11 @@ function HeroPoster({ item, metadata }: { item: CatalogItemViewModel; metadata: 
 }
 
 export const Hero: React.FC<HeroProps> = ({ item, onSelect, onPlay, playbackBusy = false, playbackMessage, headingLevel = 1, mobilePoster = false, controls, artworkUri, onArtworkError }) => {
+  useParentalControl();
+  const allowed = canShowParentalItem(item);
+  useParentalClassification(item, allowed);
   const presentation = useDevicePresentation();
+  const sourceGenres = meaningfulDetailGenres(item.genreLabels);
   const artworkDetails = canOpenHeroArtworkDetails(presentation, typeof navigator === 'undefined' ? '' : navigator.userAgent,
     typeof navigator === 'undefined' ? 0 : navigator.maxTouchPoints);
   const artworkGesture = useRef<{ pointerId: number; x: number; y: number; key: string; moved: boolean }>();
@@ -62,16 +71,19 @@ export const Hero: React.FC<HeroProps> = ({ item, onSelect, onPlay, playbackBusy
   const badge = useContentBadge(item.kind, item.title);
   const immersive=useImmersiveArtwork(`${item.kind}:${item.id}:${artworkUri||''}`);
   const Title = headingLevel === 1 ? 'h1' : 'h2';
-  const cached = useCachedArtwork(artworkUri);
+  const cached = useCachedArtwork(allowed ? artworkUri : undefined);
   const identity = { kind: item.kind, title: item.title, year: item.yearFormatted, tmdbId: item.externalIds?.tmdbId, posterPath: tmdbPosterPath(item.posterUri), sourcePosterUri: item.posterUri };
-  const metadata = useArtworkMetadata(identity, mobilePoster || !item.overviewSnippet || !item.yearFormatted || !item.genreLabels.length
-    || (item.kind === 'movie' && !item.durationFormatted), 'high');
+  const metadata = useArtworkMetadata(identity, allowed && (mobilePoster || !item.overviewSnippet || !item.yearFormatted || !sourceGenres.length
+    || (item.kind === 'movie' && !item.durationFormatted)), 'high');
   const year = mobilePoster ? metadata?.year || item.yearFormatted : item.yearFormatted || metadata?.year;
   const duration = mobilePoster ? metadata?.durationFormatted || item.durationFormatted : item.durationFormatted || metadata?.durationFormatted;
-  const genres = mobilePoster && metadata?.genres.length ? metadata.genres : item.genreLabels.length ? item.genreLabels : metadata?.genres || [];
+  const genres = sourceGenres.length ? sourceGenres : meaningfulDetailGenres(metadata?.genres || []);
+  const platformCategory = item.categoryLabels.map(label => label.trim().replace(/^(?:s[eé]ries|filmes)\s*\|\s*/i, '').trim())
+    .find(label => label && !/^geral$/i.test(label))?.slice(0, 100);
   const overview = mobilePoster ? metadata?.overview || item.overviewSnippet : item.overviewSnippet || metadata?.overview;
+  if (!allowed) return null;
   return (
-    <section ref={immersive} className={`hero-banner hero-banner--actions${mobilePoster ? ' hero-banner--vertical' : ''}`} aria-label={`Destaque: ${item.title}`}>
+    <section ref={immersive} className={`hero-banner hero-banner--actions${mobilePoster ? ' hero-banner--vertical' : ''}${artworkDetails ? ' hero-banner--artwork-details' : ''}`} aria-label={`Destaque: ${item.title}`}>
       <div className="hero-backdrop-container">
         {artworkUri ? <img src={cached.src} alt={item.title} data-immersive-artwork={mobilePoster?'poster':'backdrop'} className={`hero-backdrop-img${mobilePoster?' hero-poster-img':''}`} loading="eager" decoding="async" {...{fetchpriority:'high'}} onError={() => {if(!cached.handleCacheError())onArtworkError?.();}}/>
           : mobilePoster ? <HeroPoster key={artworkIdentityKey(identity)} item={item} metadata={metadata} /> : <Artwork
@@ -107,6 +119,7 @@ export const Hero: React.FC<HeroProps> = ({ item, onSelect, onPlay, playbackBusy
         <div className="hero-meta">
           <span className="hero-badge">{item.kind === 'movie' ? 'FILME' : 'SÉRIE'}</span>
           {badge && <span className="hero-content-badge">{badge}</span>}
+          {platformCategory && <span className="hero-content-badge hero-category-badge" aria-label={platformCategory} title={platformCategory}><PlatformCategoryLogo label={platformCategory}/></span>}
           {year && <span className="hero-year">{year}</span>}
           {duration && (
             <span className="hero-duration">{duration}</span>

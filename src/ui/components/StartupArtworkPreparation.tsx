@@ -1,28 +1,57 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { prepareStartupArtwork, sampleStartupArtwork } from '../../artwork/startup-artwork-preparation.ts';
+import React, { useLayoutEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { isStartupArtworkSettled, prepareStartupArtwork, sampleStartupArtwork, type StartupArtworkSample } from '../../artwork/startup-artwork-preparation.ts';
+import type { StartupPoster } from '../../artwork/startup-catalog-preview.ts';
+import { StartupLoadingScreen } from './StartupLoadingScreen.tsx';
 
-const completed = new Set<string>();
+let homePresented = false;
 
 /** Fire-only startup presentation. The existing licensed catalog is already ready. */
-export function StartupArtworkPreparation({ root, snapshot, onPreparing }: {
-  root: React.RefObject<HTMLElement>; snapshot: string; onPreparing: (value: boolean) => void;
+export function StartupArtworkPreparation({ root, onPreparing, posters }: {
+  root: React.RefObject<HTMLElement>; snapshot: string; posters?: readonly StartupPoster[]; onPreparing: (value: boolean) => void;
 }) {
   const [active, setActive] = useState(false);
+  const [sample, setSample] = useState<StartupArtworkSample | null>(null);
+  const anchor = useRef<HTMLSpanElement>(null);
   const enter = useRef<HTMLButtonElement>(null);
   const finish = useRef<() => void>(() => {});
-  useEffect(() => {
-    const element = root.current;
-    if (!element || completed.has(snapshot)) return;
-    let stopped = false, started = false;
+  const ownsPresentation = useRef(false);
+  const finished = useRef(false);
+  useLayoutEffect(() => {
+    if (finished.current || (homePresented && !ownsPresentation.current)) return;
+    // The child's layout effect can precede assignment of the parent's main ref.
+    const element = anchor.current?.closest<HTMLElement>('.home-page') || root.current;
+    if (!element) return;
+    homePresented = true;
+    ownsPresentation.current = true;
+    if (!element.closest('.app-shell--fire-stick') || isStartupArtworkSettled(sampleStartupArtwork(element))) {
+      finished.current = true;
+      return;
+    }
+    const shell = element.closest<HTMLElement>('.app-shell');
+    const previousIsolation = shell?.getAttribute('data-startup-isolated') ?? null;
+    const wasInert = shell?.hasAttribute('inert');
+    shell?.setAttribute('data-startup-isolated', '');
+    shell?.setAttribute('inert', '');
+    let restored = false;
+    const restoreShell = () => {
+      if (restored) return;
+      restored = true;
+      if (previousIsolation === null) shell?.removeAttribute('data-startup-isolated');
+      else shell?.setAttribute('data-startup-isolated', previousIsolation);
+      if (!wasInert) shell?.removeAttribute('inert');
+    };
+    let stopped = false, checked = false, shown = false;
     let cancel = () => {};
-    let observer: MutationObserver | undefined;
     const done = () => {
       if (stopped) return;
       stopped = true; cancel();
-      completed.add(snapshot);
-      while (completed.size > 8) completed.delete(completed.values().next().value!);
+      finished.current = true;
+      document.removeEventListener('keydown', keydown, true);
+      element.classList.remove('home-page--startup-check');
+      restoreShell();
       onPreparing(false); setActive(false);
-      element.querySelector<HTMLElement>('.hero-actions .focusable-item, .rail-view-all, .media-card')?.focus({ preventScroll: true });
+      if (shown) element.querySelector<HTMLElement>('.hero-actions .focusable-item, .rail-view-all, .media-card')?.focus({ preventScroll: true });
     };
     const keydown = (event: KeyboardEvent) => {
       if (stopped) return;
@@ -32,32 +61,40 @@ export function StartupArtworkPreparation({ root, snapshot, onPreparing }: {
         event.preventDefault(); event.stopImmediatePropagation(); done();
       }
     };
-    const start = () => {
-      if (stopped || started || !element.closest('.app-shell--fire-stick')) return;
-      started = true; observer?.disconnect();
-      onPreparing(true); setActive(true);
-      cancel = prepareStartupArtwork({ sample: () => sampleStartupArtwork(element), update: () => {}, finish: done });
-      finish.current = done;
-      document.addEventListener('keydown', keydown, true);
+    // Reserve the first paint, letting a fast Home skip the animation at 250 ms.
+    // Mounted artwork keeps its geometry and the existing bounded eager loading.
+    element.classList.add('home-page--startup-check');
+    onPreparing(true);
+    finish.current = done;
+    document.addEventListener('keydown', keydown, true);
+    cancel = prepareStartupArtwork({
+      sample: () => sampleStartupArtwork(element),
+      update: sample => {
+        setSample(previous => previous && previous.total === sample.total && previous.ready === sample.ready
+          && previous.unavailable === sample.unavailable && previous.heroSettled === sample.heroSettled
+          && previous.waitingRails === sample.waitingRails ? previous : sample);
+        if (checked) return;
+        checked = true;
+        if (isStartupArtworkSettled(sample)) { done(); return; }
+        shown = true; setActive(true);
+      },
+      finish: done,
+    });
+    return () => {
+      stopped = true; cancel();
+      element.classList.remove('home-page--startup-check');
+      restoreShell();
+      document.removeEventListener('keydown', keydown, true);
+      onPreparing(false);
     };
-    start();
-    const shell = element.closest('.app-shell');
-    if (!started && shell && typeof MutationObserver !== 'undefined') {
-      observer = new MutationObserver(start);
-      observer.observe(shell, { attributes: true, attributeFilter: ['class'] });
-    }
-    return () => { stopped = true; cancel(); observer?.disconnect(); document.removeEventListener('keydown', keydown, true); if (started) onPreparing(false); };
-  }, [root, snapshot, onPreparing]);
+  }, [root, onPreparing]);
   useLayoutEffect(() => {
     if (active) enter.current?.focus({ preventScroll: true });
   }, [active]);
-  if (!active) return null;
-  return <div className="startup-artwork-preparation" role="dialog" aria-modal="true" aria-labelledby="startup-artwork-title" aria-describedby="startup-artwork-message">
-    <div className="startup-artwork-content">
-      <div className="startup-loading-symbol" aria-hidden="true"><span className="startup-loading-orbit"/><span className="startup-loading-play"><svg viewBox="0 0 32 32"><path d="M12 7v18l14-9Z"/></svg></span></div>
-      <h2 id="startup-artwork-title">A diversão já vai começar</h2>
-      <p id="startup-artwork-message" role="status" aria-live="polite">Estamos preparando tudo para você.<br/>Aguarde só mais um instante.</p>
-      <button ref={enter} type="button" className="btn-primary focusable-item" onClick={() => finish.current()}>Entrar agora</button>
-    </div>
-  </div>;
+  const percentage = sample && sample.total > 0 ? Math.min(sample.waitingRails ? 99 : 100,
+    Math.round(100 * (sample.ready + sample.unavailable + Number(sample.heroSettled)) / (sample.total + 1))) : undefined;
+  return <><span ref={anchor} hidden aria-hidden="true"/>{active && createPortal(<StartupLoadingScreen stage="artwork" modal
+    className="startup-artwork-preparation modal-content" posters={posters} percentage={percentage}
+    titleId="startup-artwork-title" messageId="startup-artwork-message"
+    actions={<button ref={enter} type="button" className="btn-primary focusable-item" onClick={() => finish.current()}>Entrar agora</button>}/>, document.body)}</>;
 }

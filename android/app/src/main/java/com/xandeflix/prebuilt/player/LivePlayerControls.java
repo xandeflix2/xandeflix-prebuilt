@@ -10,11 +10,10 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
-import androidx.media3.common.C;
 import androidx.media3.ui.AspectRatioFrameLayout;
 import androidx.media3.ui.PlayerView;
-import androidx.media3.ui.TrackSelectionDialogBuilder;
 import com.xandeflix.prebuilt.R;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -38,6 +37,8 @@ final class LivePlayerControls {
     private JSONArray rows = new JSONArray();
     private boolean disposing;
     private boolean fullscreen;
+    private int shortcutKey = KeyEvent.KEYCODE_UNKNOWN;
+    private Toast volumeToast;
 
     LivePlayerControls(Activity activity, PlayerView view, Action action, Runnable back) {
         this.activity=activity; this.view=view; this.action=action;
@@ -53,7 +54,6 @@ final class LivePlayerControls {
             view.setResizeMode(zoom?AspectRatioFrameLayout.RESIZE_MODE_ZOOM:AspectRatioFrameLayout.RESIZE_MODE_FIT);
             ((Button)v).setText(zoom?"Ajustar tela":"Preencher tela");
         });
-        view.findViewById(R.id.live_tracks).setOnClickListener(v -> showTracks(v));
     }
     static String text(String value,int max) {
         if(value==null)return "";
@@ -76,7 +76,7 @@ final class LivePlayerControls {
         for(int id:new int[]{R.id.live_previous,R.id.live_next,R.id.live_favorite,R.id.live_channels,R.id.live_categories,R.id.live_guide,R.id.live_favorites})view.findViewById(id).setEnabled(!value.optBoolean("busy"));
         if(dialog!=null&&dialog.isShowing()&&list!=null)updatePanel();
     }
-    void setFullscreen(boolean value) { fullscreen=value; if(!value)dismissPanel(); }
+    void setFullscreen(boolean value) { fullscreen=value; if(!value){shortcutKey=KeyEvent.KEYCODE_UNKNOWN;if(volumeToast!=null){volumeToast.cancel();volumeToast=null;}dismissPanel();} }
     private int dp(int value){return Math.round(value*activity.getResources().getDisplayMetrics().density);}
     private Button button(String title){Button b=new Button(activity);b.setText(title);b.setTextColor(Color.WHITE);b.setTextSize(14);b.setAllCaps(false);b.setBackgroundResource(R.drawable.player_control_focus);return b;}
     private void openPanel(String name,View trigger) {
@@ -130,29 +130,48 @@ final class LivePlayerControls {
         nextPage.setEnabled(!context.optBoolean("busy")&&context.optBoolean(categories?"nextGroups":"nextPage"));
         if(pageChanged&&count>0){list.requestFocus();list.setSelection(0);}
     }
-    private void showTracks(View trigger) {
-        if(view.getPlayer()==null)return;close(false);returnFocus=trigger;
-        Dialog value=new AlertDialog.Builder(activity).setTitle("Áudio e legendas").setItems(new String[]{"Áudio","Legendas"},(d,which)->{
-            d.dismiss();int type=which==0?C.TRACK_TYPE_AUDIO:C.TRACK_TYPE_TEXT;
-            Dialog tracks=new TrackSelectionDialogBuilder(activity,which==0?"Áudio":"Legendas",view.getPlayer(),type).setShowDisableOption(type==C.TRACK_TYPE_TEXT).build();
-            dialog=tracks;view.setControllerShowTimeoutMs(0);tracks.setOnDismissListener(x->{dialog=null;view.setControllerShowTimeoutMs(3000);view.showController();trigger.requestFocus();});tracks.show();
-        }).setNegativeButton("Voltar",null).create();
-        dialog=value;view.setControllerShowTimeoutMs(0);value.setOnDismissListener(d->{if(dialog!=value)return;dialog=null;view.setControllerShowTimeoutMs(3000);view.showController();trigger.requestFocus();});value.show();
-    }
     boolean dismissPanel(){if(dialog==null)return false;dialog.dismiss();return true;}
     boolean openRequestedPanel(String name) {
         int id="channels".equals(name)?R.id.live_channels:"categories".equals(name)?R.id.live_categories:"guide".equals(name)?R.id.live_guide:"favorites".equals(name)?R.id.live_favorites:0;
         if(id==0||disposing||context.optBoolean("busy"))return false;
         openPanel(name,view.findViewById(id));emit(name,null);return true;
     }
+    static boolean isChannelKey(int key) {
+        return key == KeyEvent.KEYCODE_CHANNEL_UP || key == KeyEvent.KEYCODE_CHANNEL_DOWN;
+    }
+    private void adjustVolume(int direction) {
+        if(view.getPlayer()==null)return;
+        float volume=Math.max(0f,Math.min(1f,view.getPlayer().getVolume()+direction*0.05f));
+        view.getPlayer().setVolume(volume);
+        if(volumeToast!=null)volumeToast.cancel();
+        volumeToast=Toast.makeText(activity,"Volume do app: "+Math.round(volume*100)+"%",Toast.LENGTH_SHORT);
+        volumeToast.show();
+    }
     boolean dispatchKey(KeyEvent event) {
-        if(dialog!=null)return false;
         int key=event.getKeyCode();
+        if(shortcutKey!=KeyEvent.KEYCODE_UNKNOWN && shortcutKey==key && event.getAction()==KeyEvent.ACTION_UP){shortcutKey=KeyEvent.KEYCODE_UNKNOWN;return true;}
+        if(shortcutKey!=KeyEvent.KEYCODE_UNKNOWN && shortcutKey==key && event.getAction()==KeyEvent.ACTION_DOWN && event.getRepeatCount()>0)return true;
+        if(dialog!=null)return false;
+        if(isChannelKey(key)) {
+            if(event.getAction()==KeyEvent.ACTION_DOWN && event.getRepeatCount()==0)
+                emit(key==KeyEvent.KEYCODE_CHANNEL_UP?"next":"previous",null);
+            return true;
+        }
+        if(fullscreen && !view.isControllerFullyVisible() && (key==KeyEvent.KEYCODE_DPAD_LEFT||key==KeyEvent.KEYCODE_DPAD_RIGHT||key==KeyEvent.KEYCODE_DPAD_UP||key==KeyEvent.KEYCODE_DPAD_DOWN)) {
+            if(event.getAction()==KeyEvent.ACTION_DOWN && event.getRepeatCount()==0) {
+                shortcutKey=key;
+                if(!disposing && !context.optBoolean("busy")) {
+                    if(key==KeyEvent.KEYCODE_DPAD_LEFT||key==KeyEvent.KEYCODE_DPAD_RIGHT)emit(key==KeyEvent.KEYCODE_DPAD_LEFT?"previous":"next",null);
+                    else adjustVolume(key==KeyEvent.KEYCODE_DPAD_UP?1:-1);
+                }
+            }
+            return true;
+        }
         if(event.getAction()==KeyEvent.ACTION_DOWN&&(key==KeyEvent.KEYCODE_DPAD_CENTER||key==KeyEvent.KEYCODE_ENTER||key==KeyEvent.KEYCODE_DPAD_UP||key==KeyEvent.KEYCODE_DPAD_DOWN||key==KeyEvent.KEYCODE_DPAD_LEFT||key==KeyEvent.KEYCODE_DPAD_RIGHT)) {
             if(!view.isControllerFullyVisible()||!view.hasFocus()){view.showController();view.findViewById(androidx.media3.ui.R.id.exo_play_pause).requestFocus();return true;}
         }
         return false;
     }
-    private void close(boolean dispose){disposing=dispose;if(dialog!=null){dialog.setOnDismissListener(null);dialog.dismiss();dialog=null;}list=null;panel=null;}
+    private void close(boolean dispose){disposing=dispose;shortcutKey=KeyEvent.KEYCODE_UNKNOWN;if(volumeToast!=null){volumeToast.cancel();volumeToast=null;}if(dialog!=null){dialog.setOnDismissListener(null);dialog.dismiss();dialog=null;}list=null;panel=null;}
     void close(){close(true);context=new JSONObject();}
 }

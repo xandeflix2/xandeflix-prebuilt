@@ -8,15 +8,24 @@ import { prioritizeSeries } from '../src/catalog/series-content-updates.ts';
 function load(file, imports) {
   const module={exports:{}};
   const output=ts.transpileModule(readFileSync(new URL('../'+file,import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.React,esModuleInterop:true}}).outputText;
-  new Function('require','module','exports','window',output)(name=>{
+  new Function('require','module','exports','window','document','HTMLElement',output)(name=>{
+    if(name.includes('useHeroPlayback'))return {useHeroPlayback:()=>({})};
+    if(name.includes('FavoriteTitles'))return {FavoriteTitles:()=>null};
+    if(name.includes('startup-catalog-preview'))return {selectStartupPosters:()=>[]};
+    if(name.includes('useFeaturedRotation'))return {useFeaturedRotation:model=>({movies:model.catalog.movies.slice(0,20),series:model.catalog.series.slice(0,20)})};
+    if(name==='@capacitor/browser')return {Browser:{}};
+    if(name.includes('usePhoneLayout'))return {usePhoneLayout:()=>true};
+    if(name.includes('playback-support-profile'))return {canUsePlaybackWhatsapp:()=>false};
+    if(name.includes('google-cast'))return {hasGoogleCast:()=>false,GoogleCast:{}};
+    if(['multi-device-contact.service','playback-support-diagnostic','playback-error-report.service','dpad-error-controls'].some(part=>name.includes(part)))return {};
     for(const [key,value] of Object.entries(imports))if(name.includes(key))return value;
     throw Error('Unexpected dependency: '+name);
-  },module,module.exports,imports.window);
+  },module,module.exports,imports.window,{activeElement:null},class{});
   return module.exports;
 }
 const passive={...React,useMemo:fn=>fn(),useRef:()=>({current:null}),useState:value=>[value,()=>{}]};
 const marker=name=>Object.assign(()=>null,{displayName:name}), Rail=marker('Rail'), Category=marker('Category'), Recent=marker('Recent');
-const imports={react:passive,'category-presentation':{isReleaseCategory},'catalog-selectors':{movieToViewModel:(_,item)=>item,seriesToViewModel:(_,item)=>item},
+const imports={react:passive,'category-presentation':{isReleaseCategory},'catalog-selectors':{movieToViewModel:(_,item)=>({...item,categoryLabels:[]}),seriesToViewModel:(_,item)=>({...item,categoryLabels:[]})},
   'segmented-browse.service':{SegmentedBrowseService:class{}},'bootstrap/client':{getClientBootstrapService:()=>({getStorage:()=>({})})},
   useCategoryPreviews:{useCategoryPreviews:()=>undefined},useHomeHero:{useHomeHero:()=>({})},HomeHero:{HomeHero:marker('Hero')},RecentTitles:{RecentTitles:Recent},
   useSeriesHighlights:{useSeriesHighlights:()=>[]},'series-content-updates':{prioritizeSeries},
@@ -41,8 +50,8 @@ console.log('PASS_REAL_HOME_RELEASE_RECENT_MOVIE_SERIES_DESTAQUE_NO_DUPLICATES_C
 
 let now=0,nextId=0,ri=0,ei=0;
 const refs=[],effects=[],timers=new Map();
-const window={setTimeout(fn,delay){const id=++nextId;timers.set(id,{fn,at:now+delay,delay});return id;},clearTimeout(id){timers.delete(id);}};
-const react={...React,useRef(value){const n=ri++;return refs[n]??(refs[n]={current:value});},useEffect(fn,deps){const n=ei++,prior=effects[n];if(!prior||deps.some((v,i)=>!Object.is(v,prior.deps[i]))){prior?.cleanup?.();effects[n]={deps,fn,changed:true};}}};
+const window={addEventListener(){},removeEventListener(){},setTimeout(fn,delay){const id=++nextId;timers.set(id,{fn,at:now+delay,delay});return id;},clearTimeout(id){timers.delete(id);}};
+const react={...React,useState:value=>[value,()=>{}],useRef(value){const n=ri++;return refs[n]??(refs[n]={current:value});},useEffect(fn,deps){const n=ei++,prior=effects[n];if(!prior||deps.some((v,i)=>!Object.is(v,prior.deps[i]))){prior?.cleanup?.();effects[n]={deps,fn,changed:true};}}};
 const {PlaybackErrorNotice}=load('src/ui/components/PlaybackErrorNotice.tsx',{react,window});
 function render(message,onDismiss){ri=ei=0;const tree=PlaybackErrorNotice({message,onDismiss});for(const effect of effects)if(effect.changed){effect.changed=false;effect.cleanup=effect.fn();}return tree;}
 function advance(ms){now+=ms;for(const [id,timer] of [...timers])if(timer.at<=now){timers.delete(id);timer.fn();}}

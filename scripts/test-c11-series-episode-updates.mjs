@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import ts from 'typescript';
 import React from 'react';
+import {parentalFixtureBindings} from './lib/parental-fixture-bindings.mjs';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { CatalogReadModel } from '../src/catalog/catalog-read-model.ts';
 import * as selectors from '../src/catalog/catalog-selectors.ts';
@@ -215,6 +216,13 @@ function load(file, extra = {}) {
     StartupArtworkPreparation: { StartupArtworkPreparation: marker('Startup') }, EmptyState: { EmptyState: marker('Empty') }, ...extra };
   const module = { exports: {} };
   new Function('require', 'module', 'exports', ts.transpileModule(readFileSync(new URL('../' + file, import.meta.url), 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.React, esModuleInterop: true } }).outputText)(name => {
+    const parental=parentalFixtureBindings(name);if(parental)return parental;
+    if(name.endsWith('useCardGenres.ts'))return{useCardGenres:item=>({ref:{current:null},genres:item.genreLabels||[],visible:true})};
+    if(name.includes('useHeroPlayback'))return {useHeroPlayback:()=>({})};
+    if(name.includes('BrowseHero'))return {BrowseHero:marker('BrowseHero')};
+    if(name.includes('FavoriteTitles'))return {FavoriteTitles:()=>null};
+    if(name.includes('startup-catalog-preview'))return {selectStartupPosters:()=>[]};
+    if(name.includes('useFeaturedRotation'))return {useFeaturedRotation:model=>({movies:model.catalog.movies.slice(0,20).map(row=>selectors.movieToViewModel(model,row)),series:model.catalog.series.slice(0,20).map(row=>selectors.seriesToViewModel(model,row))})};
     for (const [part, value] of Object.entries(ports)) if (name.includes(part)) return value;
     throw Error('Uncontrolled dependency ' + name);
   }, module, module.exports);
@@ -234,7 +242,8 @@ await test('ACTUAL_HOME_SERIES_COLLECTION_AND_HERO_HOOK_SHARE_UPDATED_SELECTION'
   const collection = elements(HomeCollectionPage({ ...props, collection: 'featured-series' })).find(node => node.type === Grid);
   assert.deepEqual(home.props.items, browse.props.items); assert.deepEqual(home.props.items, collection.props.items);
   assert.equal(home.props.items[0], highlighted[0]); assert.equal(home.props.preserveOrder, true);
-  assert.equal(browseNodes.find(node => node.type === Hero).props.items[0], highlighted[0]);
+  const overviewHero=browseNodes.find(node=>node.type?.displayName==='BrowseHero');
+  assert.equal(overviewHero.props.readModel,f.model);assert.equal(overviewHero.props.contentKind,'series');
   const exclusive = elements(CatalogBrowsePage({ ...props, kind: 'series', categoryId: 'disney' })).find(node => node.type === Hero);
   assert.ok(exclusive.props.items.every(item => item.categoryLabels.includes('Disney')));
   const { useHomeHero } = load('src/ui/hooks/useHomeHero.ts');

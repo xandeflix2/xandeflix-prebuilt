@@ -10,6 +10,23 @@
 .device-presentation-choice:focus { outline: 2px solid #ff6a70; outline-offset: 3px; border-color: #ff2635; box-shadow: 0 0 18px #ff263570; }
 .device-presentation-choice[aria-pressed=true] { border-color: #ff2635; }
 .device-presentation-help { color: #aeb8c8; font-size: 14px; }
+.device-presentation-choices--models { gap: 12px; }
+.device-presentation-choices--models .device-presentation-choice { min-height: 132px; padding: 12px; gap: 8px; }
+.device-presentation-choices--models .device-presentation-choice strong { font-size: 18px; }
+.device-presentation-choices--models .device-presentation-choice svg { width: 32px; height: 32px; flex-shrink: 0; }
+.device-presentation-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+.device-presentation-dialog .device-presentation-actions .btn-secondary { min-height: 44px !important; min-width: 88px; padding: 10px 20px !important; font-size: 14px !important; }
+@media (min-width: 600px) and (max-height: 640px) {
+  .device-presentation-dialog--models { padding: 16px; }
+  .device-presentation-dialog--models .device-presentation-brand { margin: 0 0 8px; }
+  .device-presentation-dialog--models h1 { margin: 0 0 8px; font-size: 26px; }
+  .device-presentation-dialog--models #device-presentation-description { margin: 0; font-size: 14px; }
+  .device-presentation-choices--models { margin: 16px 0; gap: 10px; }
+  .device-presentation-choices--models .device-presentation-choice { min-height: 112px; padding: 10px; gap: 6px; }
+  .device-presentation-choices--models .device-presentation-choice span { font-size: 13px; }
+  .device-presentation-choices--models .device-presentation-choice svg { width: 28px; height: 28px; }
+  .device-presentation-dialog--models .device-presentation-help { margin: 10px 0 0; }
+}
 html[data-device-presentation=tv] #root .app-shell .hero-banner { min-height: min(250px, 50vh) !important; height: clamp(250px, 56vh, 520px) !important; max-height: 70vh !important; }
 html[data-device-presentation=tv] .app-shell .mobile-bottom-nav { display: none !important; }
 @media (max-width: 599px) and (orientation: portrait) { .device-presentation-choices { grid-template-columns: 1fr; gap: 12px; } .device-presentation-choice { min-height: 100px; flex-direction: row; flex-wrap: wrap; } .device-presentation-choice span { flex-basis: 100%; } }

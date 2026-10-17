@@ -135,7 +135,7 @@ export function ManagerLicenseEditor({ license, availableLicenses = [], authorit
       if (cancelled) return;
       if ('snapshot' in result) setPreview(result);
       else { setDetail(result); setScreenPrincipal(current => selectedScreenPrincipal(result, current)); setCustomerName(result.customer?.nickname || ''); setDrafts(deviceDrafts(result)); setMaxDevices(String(result.license.maxDevices)); setMaxSessions(String(result.license.maxConcurrentSessions)); setPaidExtra(String(result.screenAllowance?.paidExtraScreens || 0)); setLabels(Object.fromEntries(result.devices.map(d => [d.deviceId, d.deviceLabel]))); }
-    }).catch(() => { if (!cancelled) setError('Não foi possível consultar os vínculos. Verifique sua permissão e tente novamente.'); })
+    }).catch(cause => { if (!cancelled) setError(mode === 'DELETE' ? managerDeletionFailure(cause, true) : 'Não foi possível consultar os vínculos. Verifique sua permissão e tente novamente.'); })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; alive.current = false; previousFocus?.focus(); };
   }, [authority, license.licenseId, mode]);
@@ -447,5 +447,85 @@ export function ManagerLicenseEditor({ license, availableLicenses = [], authorit
       device={detail.devices.find(d => d.deviceId === roleDialogId)!} children={detail.devices.filter(d => d.deviceRole === 'SECONDARY' && d.primaryDisplayCode === detail.devices.find(d => d.deviceId === roleDialogId)!.displayCode)}
       licenses={editableLicenses} currentLicenseId={license.licenseId} onCancel={() => setRoleDialogId('')}
       onConfirm={(principal, slot, treePlan) => { setDrafts(current => ({ ...current, [roleDialogId]: { ...current[roleDialogId], role: 'SECONDARY', principal, slot, treePlan, confirmed: true } })); setRoleDialogId(''); }} />}
+  </dialog>;
+}
+
+
+/** Closed messages only: never render an arbitrary RPC rejection or source secret. */
+export function managerDeletionFailure(cause: unknown, preview = false): string {
+  const code = cause instanceof Error ? cause.message : '';
+  const messages: Record<string, string> = {
+    MASTER_REQUIRED: 'Somente um gestor MASTER pode realizar esta exclusão.',
+    MANAGER_AUTH_REQUIRED: 'Sua sessão expirou. Entre novamente no painel para excluir.',
+    AUTH_REQUIRED: 'Sua sessão expirou. Entre novamente no painel para excluir.',
+    MANAGER_NOT_AUTHORIZED: 'Sua conta não tem autorização ativa para esta exclusão.',
+    MANAGER_SCOPE_DENIED: 'Sua conta não tem permissão para excluir este registro.',
+    CUSTOMER_SHARED_IDENTITY: 'A conta possui uma identidade administrativa ou compartilhada e não pode ser excluída por este fluxo. Para remover só o aparelho, use a exclusão individual do dispositivo.',
+    CROSS_CUSTOMER_BINDING_DENIED: 'Há aparelhos vinculados a outras contas. Revise os vínculos antes de excluir o cliente inteiro. A exclusão individual do dispositivo é uma operação separada.',
+    CUSTOMER_ID_REQUIRED: 'Esta licença não está associada a um cliente. Use a exclusão individual do dispositivo.',
+    LICENSE_NOT_FOUND: 'A licença não foi encontrada. Atualize o painel antes de continuar.',
+    INVALID_DEVICE_ID: 'O dispositivo não foi encontrado. Atualize o painel antes de continuar.',
+    DEVICE_DELETE_CONFIRMATION_REQUIRED: 'Digite o código do dispositivo para confirmar a exclusão.',
+    CUSTOMER_DELETE_CONFIRMATION_REQUIRED: 'Os vínculos ou a confirmação mudaram. Feche esta janela e consulte novamente antes de excluir.',
+    PRIMARY_HAS_SECONDARIES: 'Este dispositivo é principal de outros aparelhos. Transfira os secundários antes de excluir o principal.',
+  };
+  return (Object.hasOwn(messages, code) ? messages[code] : '') || (preview
+    ? 'Não foi possível consultar os vínculos do cliente. Atualize o painel e tente novamente. Para remover somente um aparelho, use a exclusão individual do dispositivo.'
+    : 'Não foi possível confirmar a exclusão do dispositivo. Atualize o painel e confira o registro antes de tentar novamente.');
+}
+
+interface DeviceDeleteDialogProps {
+  license: ManagerLicenseListItem;
+  device: ManagerLicenseDetailDeviceItem;
+  authority: RemoteManagerControlPlaneAuthority;
+  isMaster: boolean;
+  onClose: () => void;
+  onUpdated: () => Promise<unknown>;
+  onDeleteCustomer?: () => void;
+}
+
+/** Deletes exactly one device through the existing MASTER RPC, never its customer account. */
+export function ManagerDeviceDeleteDialog({ license, device, authority, isMaster, onClose, onUpdated, onDeleteCustomer }: DeviceDeleteDialogProps) {
+  const dialog = useRef<HTMLDialogElement>(null), guard = useRef(false), alive = useRef(false);
+  const heading = useId();
+  const [confirmation, setConfirmation] = useState(''), [busy, setBusy] = useState(false);
+  const [deleted, setDeleted] = useState(false), [error, setError] = useState(''), [message, setMessage] = useState('');
+  const normalized = confirmation.trim().toUpperCase();
+  const validCode = /^XF-[A-Z0-9-]{4,40}$/.test(device.displayCode);
+  const secondaryCount = (license.devices || []).filter(item => item.deviceRole === 'SECONDARY' && item.primaryDisplayCode === device.displayCode && item.deviceId !== device.deviceId).length;
+  useEffect(() => {
+    alive.current = true;
+    const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    if (isMaster) dialog.current?.showModal();
+    return () => { alive.current = false; previous?.focus(); };
+  }, [device.deviceId, isMaster]);
+  async function submit(event: React.FormEvent) {
+    event.preventDefault();
+    if (!isMaster || guard.current || deleted || secondaryCount > 0 || !validCode || normalized !== device.displayCode || !authority.deleteDevicePermanently) return;
+    guard.current = true; setBusy(true); setError('');
+    try {
+      await authority.deleteDevicePermanently(device.deviceId, normalized);
+      if (!alive.current) return;
+      setDeleted(true);
+      setMessage('Exclusão do dispositivo confirmada.');
+      try { await onUpdated(); }
+      catch { if (alive.current) setMessage('Exclusão do dispositivo confirmada, mas a lista não pôde ser atualizada. Feche esta janela e atualize o painel.'); }
+    } catch (cause) { if (alive.current) setError(managerDeletionFailure(cause)); }
+    finally { guard.current = false; if (alive.current) setBusy(false); }
+  }
+  if (!isMaster) return null;
+  return <dialog ref={dialog} className="license-editor" aria-labelledby={heading} onCancel={event => { event.preventDefault(); if (!guard.current) onClose(); }}>
+    <div className="license-editor__header"><h2 id={heading}>Excluir dispositivo permanentemente</h2><button type="button" className="focusable-item" aria-label="Fechar exclusão do dispositivo" disabled={busy} onClick={onClose}>✕</button></div>
+    <p><strong>{device.displayCode}</strong> — {device.deviceLabel || 'Sem apelido'}</p>
+    {error && <p role="alert" className="license-editor__error">{error}</p>}
+    {message && <p role="status">{message}</p>}
+    {!deleted && <form onSubmit={event => { void submit(event); }}>
+      <p>A exclusão é permanente: este aparelho perderá a autorização e a chave cadastrada será removida. A conta do cliente, a licença e as fontes serão mantidas.</p>
+      {secondaryCount > 0 && <p role="alert" className="license-editor__error">Este aparelho tem {secondaryCount} secundário(s). Transfira os secundários antes de excluir o principal.</p>}
+      <label>Digite {device.displayCode} para confirmar<input className="focusable-item" aria-label="Código do dispositivo para excluir" value={confirmation} disabled={busy} autoComplete="off" spellCheck={false} onChange={event => setConfirmation(event.target.value)} /></label>
+      <button type="submit" className="focusable-item license-editor__danger" disabled={busy || secondaryCount > 0 || !validCode || normalized !== device.displayCode || !authority.deleteDevicePermanently}>{busy ? 'Excluindo…' : 'Excluir somente este dispositivo'}</button>
+    </form>}
+    {!deleted && onDeleteCustomer && <section><p>Para remover o cliente inteiro, consulte primeiro todas as licenças e aparelhos afetados.</p><button type="button" className="focusable-item" disabled={busy} onClick={onDeleteCustomer}>Excluir cliente e todos os dispositivos…</button></section>}
+    <div className="license-editor__footer"><button type="button" className="focusable-item" disabled={busy} onClick={onClose}>{deleted ? 'Fechar' : 'Cancelar'}</button></div>
   </dialog>;
 }

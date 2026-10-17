@@ -1,3 +1,4 @@
+import {parentalFixtureBindings} from './lib/parental-fixture-bindings.mjs';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import ts from 'typescript';
@@ -62,10 +63,15 @@ let hookArgs;
 function load(file, imports) {
   const module = { exports: {} };
   const code = ts.transpileModule(readFileSync(new URL('../' + file, import.meta.url), 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.React } }).outputText;
-  new Function('require', 'module', 'exports', code)(name => {
+  new Function('require', 'module', 'exports', code)((name => parentalFixtureBindings(name) ?? (name => {
+    if(name.includes('useHeroPlayback'))return {useHeroPlayback:()=>({})};
+    if(name.includes('BrowseHero'))return {BrowseHero:Hero};
+    if(name.includes('FavoriteTitles'))return {FavoriteTitles:()=>null};
+    if(name.includes('startup-catalog-preview'))return {selectStartupPosters:()=>[]};
+    if(name.includes('useFeaturedRotation'))return {useFeaturedRotation:model=>({movies:model.catalog.movies.slice(0,20).map(row=>selectors.movieToViewModel(model,row)),series:model.catalog.series.slice(0,20).map(row=>selectors.seriesToViewModel(model,row))})};
     for (const [key, value] of Object.entries(imports)) if (name.includes(key)) return value;
     throw Error('Uncontrolled component dependency: ' + name);
-  }, module, module.exports);
+  })(name)), module, module.exports);
   return module.exports;
 }
 const imports = {

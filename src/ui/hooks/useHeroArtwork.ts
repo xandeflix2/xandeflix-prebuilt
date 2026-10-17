@@ -3,8 +3,12 @@ import type { CatalogItemViewModel } from '../../catalog/catalog-view-model.ts';
 import { artworkIdentityKey } from '../../artwork/tmdb-metadata.service.ts';
 import { heroArtworkIdentity, heroArtworkService, type HeroImageProfile } from '../../artwork/hero-artwork.service.ts';
 import { reserveHeroImageSlot } from '../../artwork/image-load-queue.ts';
+import { canShowParentalItem } from '../../parental/parental-content.ts';
+import { useParentalControl } from './useParentalControl.ts';
 
 export function useHeroArtwork(items: readonly CatalogItemViewModel[], profile: HeroImageProfile, limit = 20, maxPerKind = 0) {
+  useParentalControl();
+  items = items.filter(canShowParentalItem);
   const [revision, update] = useState(0);
   const [pendingState, setPendingState] = useState({selection:'',pending:true});
   const [retryEpoch,setRetryEpoch]=useState(0);
@@ -31,5 +35,6 @@ export function useHeroArtwork(items: readonly CatalogItemViewModel[], profile: 
     return()=>{active=false;releaseHero();if(timer)clearTimeout(timer);window.removeEventListener('online',online);};
   },[selection,profile,limit,maxPerKind,target,retryEpoch]);
   const eligible=items.flatMap(item=>{const uri=heroArtworkService.peek(item,profile);return uri?[{item,uri}]:[];}).slice(0,limit);
-  return {eligible,pending,revision,reject:(item:CatalogItemViewModel)=>{heroArtworkService.invalidate(item,profile);update(v=>v+1);setRetryEpoch(v=>v+1);}};
+  const eligibilityKey=eligible.map(v=>`${v.item.kind}:${v.item.id}:${v.uri}`).join('|');
+  return {eligible,eligibilityKey,pending,revision,reject:(item:CatalogItemViewModel)=>{heroArtworkService.invalidate(item,profile);update(v=>v+1);setRetryEpoch(v=>v+1);}};
 }

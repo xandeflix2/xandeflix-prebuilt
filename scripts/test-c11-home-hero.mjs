@@ -1,3 +1,4 @@
+import {parentalFixtureBindings} from './lib/parental-fixture-bindings.mjs';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -7,6 +8,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import * as homeHeroService from '../src/catalog/home-hero.service.ts';
 import * as tmdbModule from '../src/artwork/tmdb-metadata.service.ts';
 import * as catalogSelectors from '../src/catalog/catalog-selectors.ts';
+import * as devicePresentation from '../src/ui/device-presentation.ts';
 import { CatalogReadModel } from '../src/catalog/catalog-read-model.ts';
 import { HomeHeroService, currentYearHeroItems, isPhoneHeroProfile } from '../src/catalog/home-hero.service.ts';
 import { MemoryHomeHeroRepository } from '../src/catalog/home-hero.repository.ts';
@@ -132,14 +134,17 @@ function loadUi(relative) {
  const source = readFileSync(new URL(relative, import.meta.url), 'utf8');
  const code = ts.transpileModule(source, {compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.React,esModuleInterop:true}}).outputText;
  const mod={exports:{}};
- new Function('require','module','exports',code)((name)=>{
+ new Function('require','module','exports',code)((name => parentalFixtureBindings(name) ?? ((name)=>{
   if(name.endsWith('home-hero.service.ts'))return homeHeroService;
   if(name.endsWith('useSeriesHighlights.ts'))return{useSeriesHighlights:()=>[]};
   if(name.endsWith('NewContentProvider.tsx'))return{useContentBadge:()=>undefined};
+  if(name.endsWith('PlatformCategoryBadge.tsx'))return{PlatformCategoryLogo:()=>null};
+  if(name.endsWith('WatchProviders.tsx'))return{WatchProviders:()=>null};
   if(name.endsWith('DetailTrailer.tsx'))return{DetailTrailer:()=>null};
   if(name.endsWith('SeriesPersonalActions.tsx'))return{SeriesPersonalActions:()=>null};
   if(name.endsWith('SeriesDetailSections.tsx'))return loadUi('../src/ui/components/SeriesDetailSections.tsx');
   if(name.endsWith('watch-history.ts'))return{watchFingerprint:()=> 'synthetic-ssr-fingerprint',watchHistory:{list:()=>[],savedPosition:()=>0,subscribe:()=>()=>{},syncNativeProgress:async()=>{}}};
+  if(name.endsWith('detail-genres.ts'))return require('../src/ui/detail-genres.ts');
   if(name.endsWith('tmdb-metadata.service.ts'))return tmdbModule;
   if(name.endsWith('useArtworkMetadata.ts'))return{useArtworkMetadata:()=>mockMetadata};
   if(name.endsWith('useCachedArtwork.ts'))return{useCachedArtwork:uri=>({src:uri,handleCacheError:()=>false})};
@@ -150,7 +155,7 @@ function loadUi(relative) {
     if(name.endsWith('useHeroPlayback.ts'))return {useHeroPlayback:()=>({onPlay(){},playbackBusy:false,playbackMessage:null})};
   if(name.endsWith('usePhoneLayout.ts'))return{usePhoneLayout:()=>false};
   if(name.endsWith('useDevicePresentation.ts'))return{useDevicePresentation:()=>null};
-  if(name.endsWith('device-presentation.ts'))return{isTelevisionPresentation:()=>false};
+  if(name.endsWith('device-presentation.ts'))return devicePresentation;
   if(name.endsWith('useDetailInitialFocus.ts'))return{useDetailInitialFocus:()=>{}};
   if(name.endsWith('useHeroArtwork.ts'))return{useHeroArtwork:()=>({eligible:[],pending:true,revision:0,reject(){}})};
   if(name.endsWith('CategoryHero.tsx'))return loadUi('../src/ui/components/CategoryHero.tsx');
@@ -161,7 +166,7 @@ function loadUi(relative) {
   if(name.endsWith('Hero.tsx'))return loadUi('../src/ui/components/Hero.tsx');
   if(name.endsWith('Artwork.tsx'))return{Artwork:()=>React.createElement('div',{'data-backdrop':true})};
   return require(name);
- },mod,mod.exports);compiled.set(relative,mod.exports);return mod.exports;
+ })(name)),mod,mod.exports);compiled.set(relative,mod.exports);return mod.exports;
 }
 const {useHomeHero}=loadUi('../src/ui/hooks/useHomeHero.ts');
 const {HomeHero}=loadUi('../src/ui/components/HomeHero.tsx');
@@ -208,10 +213,10 @@ mockMetadata={kind:'movie',tmdbId:1,year:year-1,genres:['TMDB genre'],overview:'
 const {Hero}=loadUi('../src/ui/components/Hero.tsx');
 const phoneHtml=renderToStaticMarkup(React.createElement(Hero,{item:{id:'local-film',kind:'movie',title:'Local film',yearFormatted:'2001',overviewSnippet:'Source synopsis',genreLabels:['Source genre'],categoryLabels:[],durationFormatted:'1h'},mobilePoster:true,onSelect(){}}));
 assert.ok(phoneHtml.includes('hero-banner--vertical')&&phoneHtml.includes('alternate.jpg'));
-assert.ok(phoneHtml.includes('TMDB synopsis')&&phoneHtml.includes('TMDB genre')&&phoneHtml.includes(String(year-1))&&phoneHtml.includes('2h'));
-assert.ok(!phoneHtml.includes('Source synopsis')&&!phoneHtml.includes('Source genre'));
+assert.ok(phoneHtml.includes('TMDB synopsis')&&phoneHtml.includes('Source genre')&&phoneHtml.includes(String(year-1))&&phoneHtml.includes('2h'));
+assert.ok(!phoneHtml.includes('Source synopsis')&&!phoneHtml.includes('TMDB genre'));
 mockMetadata=null;
-console.log('PASS_PHONE_VERTICAL_ALTERNATIVE_PREFERS_TMDB_METADATA');
+console.log('PASS_PHONE_VERTICAL_TMDB_ARTWORK_METADATA_WITH_REAL_LOCAL_GENRE_PRIORITY');
 
 const episodeModel=new CatalogReadModel({...noYears.catalog,series:[{...row('series','list'),seasonIds:['season-list']}],seasons:[{id:'season-list',seriesId:'series-list',seasonNumber:1,title:'Season 1',episodeIds:['ep-1','ep-2']}],episodes:[1,2].map(n=>({id:'ep-'+n,seriesId:'series-list',seasonId:'season-list',episodeNumber:n,title:'Episode '+n,durationSeconds:1800,thumbnailUri:'https://source.synthetic.invalid/episode-'+n+'.jpg',artworkIds:[],streamIds:[]}))});
 const {SeriesDetailPage}=loadUi('../src/ui/pages/SeriesDetailPage.tsx');

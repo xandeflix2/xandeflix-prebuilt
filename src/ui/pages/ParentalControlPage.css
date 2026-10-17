@@ -1,0 +1,41 @@
+.parental-page { max-width: 1000px; }
+.parental-panel { background: #101624; border: 1px solid #ffffff25; border-radius: 14px; padding: clamp(16px,3vw,28px); margin: 16px 0; }
+.parental-page p,.parental-dialog p { color: #bac4d3; line-height: 1.5; margin: 12px 0; }
+.parental-page form,.parental-dialog form { display: grid; gap: 16px; }
+.parental-page label,.parental-dialog label { display: grid; gap: 8px; color: #e7edf7; }
+.parental-page input:not([type=checkbox]),.parental-page select,.parental-dialog input { width: 100%; min-height: 48px; background: #080d16; color: white; border: 1px solid #637087; border-radius: 8px; padding: 10px 12px; font-size: 16px; }
+.parental-page input[type=checkbox] { width: 22px; height: 22px; }
+.parental-page .parental-check { display: flex; align-items: center; gap: 12px; }
+.parental-fields { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; }
+.parental-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; }
+.parental-actions button { min-height: 46px; white-space: normal; }
+.parental-page [role=alert],.parental-dialog [role=alert] { color: #ff9e9e; }
+.parental-dialog { width: min(480px,calc(100vw - 32px)); max-height: 90vh; overflow: auto; background: #101624; color: white; border: 1px solid #65718a; border-radius: 16px; padding: 24px; margin: auto; }
+.parental-dialog::backdrop { background: #000b; }
+.parental-dialog-content { padding: 0; }
+.parental-rule-preview { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
+.parental-rule-preview img { width: 90px; height: 135px; object-fit: cover; border-radius: 8px; }
+@media(max-width:600px) { .parental-fields { grid-template-columns: 1fr; } }
+
+/* TV sizes are logical WebView pixels; touch profiles retain their field sizes. */
+#root .app-shell--television .parental-page { width: min(1040px,100%); padding: 16px 24px 28px; font-size: 13px; }
+#root .app-shell--television .parental-page h1 { font-size: 24px; line-height: 1.2; margin: 0 0 8px; padding-right: 100px; }
+#root .app-shell--television .parental-page h2 { font-size: 18px; line-height: 1.25; margin: 0; }
+#root .app-shell--television .parental-page h3 { font-size: 16px; }
+#root .app-shell--television .parental-page p { font-size: 13px; line-height: 1.4; margin: 4px 0; }
+#root .app-shell--television .parental-page .parental-remote-help { color: #9baabd; font-size: 12px; }
+#root .app-shell--television .parental-panel { min-width: 0; padding: 14px; margin: 12px 0 0; border-radius: 10px; }
+#root .app-shell--television .parental-page form { gap: 10px; }
+#root .app-shell--television .parental-page label { font-size: 13px; gap: 4px; }
+#root .app-shell--television .parental-page :is(input:not([type=checkbox]),select) { min-height: 34px; font-size: 14px; padding: 6px 10px; margin-top: 0; }
+#root .app-shell--television .parental-page input[type=checkbox] { width: 18px; height: 18px; flex-shrink: 0; }
+#root .app-shell--television .parental-page button { min-height: 34px !important; padding: 6px 12px !important; font-size: 13px !important; white-space: normal; }
+#root .app-shell--television .parental-fields { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+#root .app-shell--television .parental-actions { gap: 10px; margin-top: 10px; }
+#root .app-shell--television .parental-page .parental-check { gap: 10px; }
+#root .app-shell--television .parental-age-field { display: grid; gap: 6px; font-weight: 700; }
+#root .app-shell--television .parental-age-options { display: flex; flex-wrap: wrap; gap: 8px; }
+#root .app-shell--television .parental-age-options button { background: #202a3a; border: 1px solid #637087; border-radius: 6px; color: #e7edf7; }
+#root .app-shell--television .parental-age-options [aria-checked=true] { background: #7e1520; border-color: #f5838a; }
+#root .app-shell--television .parental-page .focusable-item { scroll-margin-block: 24px; }
+#root .app-shell--television .parental-page .focusable-item:focus { outline: 2px solid #fff !important; outline-offset: 2px; }

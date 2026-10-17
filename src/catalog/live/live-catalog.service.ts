@@ -8,6 +8,8 @@
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
 import type { LiveCatalog, LiveGroup, LiveChannel } from './live-tv.types.ts';
 import { resolveSegmentRelativePath } from '../../bootstrap/storage/segment-path-resolver.ts';
+import { canShowParentalLive, parentalLiveCatalog } from '../../parental/parental-content.ts';
+import { parentalControl } from '../../parental/parental-control.store.ts';
 
 const PREBUILT_DIR = 'prebuilt';
 const ACTIVE_POINTER_FILE = `${PREBUILT_DIR}/active.json`;
@@ -47,6 +49,7 @@ export async function readLiveChannelByIdFromSegments(
   segmentFiles: string[],
   readSegment: LiveSegmentRead,
   pageSize = 48,
+  includeRestricted = false,
 ): Promise<LiveChannelSelection | undefined> {
   const safePageSize = Math.max(1, Math.floor(pageSize));
   const groupIds = new Set(catalog.groups.map(group => group.id));
@@ -55,6 +58,7 @@ export async function readLiveChannelByIdFromSegments(
   const inspect = (value: unknown): LiveChannelSelection | undefined => {
     if (!value || typeof value !== 'object') return undefined;
     const channel = value as LiveChannel;
+    if (!includeRestricted && !canShowParentalLive(channel, catalog)) return undefined;
     if (typeof channel.id !== 'string' || !channel.id || !groupIds.has(channel.groupId) || seen.has(channel.id)) return undefined;
     seen.add(channel.id);
     const offset = groupCounts.get(channel.groupId) || 0;
@@ -108,6 +112,7 @@ export async function readLiveChannelPageForGroupFromSegments(
   pageSize = 48,
   filter = '',
 ): Promise<LiveChannelPage> {
+  if (!catalog.groups.some(group => group.id === groupId)) return { channels: [], offset: 0, totalAvailable: 0, nextOffset: null };
   const safeOffset = Math.max(0, Math.floor(offset));
   const safePageSize = Math.max(1, Math.floor(pageSize));
   const channels: LiveChannel[] = [];
@@ -128,6 +133,7 @@ export async function readLiveChannelPageForGroupFromSegments(
     for (const value of records) {
       if (!value || typeof value !== 'object') continue;
       const channel = value as LiveChannel;
+      if (!canShowParentalLive(channel, catalog)) continue;
       if (channel.groupId !== groupId || typeof channel.id !== 'string' || !channel.id || seenIds.has(channel.id)) continue;
       seenIds.add(channel.id);
       if (query && !channel.name?.toLocaleLowerCase().includes(query)) continue;
@@ -139,6 +145,7 @@ export async function readLiveChannelPageForGroupFromSegments(
 
   // Snapshots antigos podem conter somente o first-fold em `channelsByGroup`.
   for (const channel of catalog.channelsByGroup[groupId] || []) {
+    if (!canShowParentalLive(channel, catalog)) continue;
     if (typeof channel.id !== 'string' || !channel.id || seenIds.has(channel.id)) continue;
     seenIds.add(channel.id);
     if (query && !channel.name?.toLocaleLowerCase().includes(query)) continue;
@@ -194,7 +201,7 @@ export async function readLiveChannelsForGroupFromSegments(
   segmentFiles: string[],
   readSegment: LiveSegmentRead,
 ): Promise<LiveChannel[]> {
-  if (!groupId) return [];
+  if (!groupId || !catalog.groups.some(group => group.id === groupId)) return [];
   const channels: LiveChannel[] = [];
   const seen = new Set<string>();
   for (const fileName of segmentFiles) {
@@ -210,12 +217,14 @@ export async function readLiveChannelsForGroupFromSegments(
     for (const value of records) {
       if (!value || typeof value !== 'object') continue;
       const channel = value as LiveChannel;
+      if (!canShowParentalLive(channel, catalog)) continue;
       if (channel.groupId !== groupId || typeof channel.id !== 'string' || seen.has(channel.id)) continue;
       seen.add(channel.id);
       channels.push(channel);
     }
   }
   for (const channel of catalog.channelsByGroup[groupId] || []) {
+    if (!canShowParentalLive(channel, catalog)) continue;
     if (!seen.has(channel.id)) {
       seen.add(channel.id);
       channels.push(channel);
@@ -244,10 +253,11 @@ export class LiveCatalogService {
   }
 
   /** Carrega o first-fold Live do snapshot atualmente ativo. */
-  static async loadLiveCatalog(): Promise<LiveCatalog | null> {
+  static async loadLiveCatalog(parentalEditor = false): Promise<LiveCatalog | null> {
+    if (parentalEditor && !parentalControl.getSnapshot().admin) throw new Error('PARENTAL_PIN_REQUIRED');
     const pointer = await this.readActivePointer();
     if (!pointer?.snapshotId) return null;
-    if (this.cachedCatalog?.snapshotId === pointer.snapshotId) return this.cachedCatalog;
+    if (this.cachedCatalog?.snapshotId === pointer.snapshotId) return parentalEditor ? this.cachedCatalog : parentalLiveCatalog(this.cachedCatalog);
 
     try {
       const file = await Filesystem.readFile({
@@ -258,7 +268,7 @@ export class LiveCatalogService {
       if (typeof file.data !== 'string' || !file.data) return null;
       const parsed = this.ensureChannelsByGroup(JSON.parse(file.data) as LiveCatalog);
       this.cachedCatalog = parsed;
-      return parsed;
+      return parentalEditor ? parsed : parentalLiveCatalog(parsed);
     } catch {
       return null;
     }
@@ -334,6 +344,7 @@ export class LiveCatalogService {
 
   /** Busca de ID no snapshot ativo; não hidrata outros grupos nem consulta rede. */
   static async loadChannelById(channelId: string, options?: {
+    parentalEditor?: boolean;
     expectedSnapshotId?: string;
     signal?: AbortSignal;
     pageSize?: number;
@@ -349,7 +360,7 @@ export class LiveCatalogService {
       if (options?.signal?.aborted) throw new Error('LIVE_SELECTION_CANCELLED');
     };
     await check();
-    const catalog = await this.loadLiveCatalog();
+    const catalog = await this.loadLiveCatalog(options?.parentalEditor);
     await check();
     if (!catalog || catalog.snapshotId !== pointer.snapshotId) throw new Error('LIVE_SELECTION_CHANGED');
     const segmentFiles = await this.resolveLiveSegmentFiles(pointer.snapshotId, catalog);
@@ -359,7 +370,7 @@ export class LiveCatalogService {
       const json = await this.readActiveSegment(pointer.snapshotId, fileName);
       await check();
       return json;
-    }, options?.pageSize);
+    }, options?.pageSize, options?.parentalEditor === true && parentalControl.getSnapshot().admin);
     await check();
     return selected;
   }

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <data-extraction-rules>
     <cloud-backup>
+        <exclude domain="sharedpref" path="xandeflix_parental.xml" />
         <exclude domain="file" path="app-updates/" />
         <exclude domain="sharedpref" path="app_updates.xml" />
         <exclude domain="file" path="device_identity.json" />
@@ -11,6 +12,7 @@
         <exclude domain="root" path="app_webview" />
     </cloud-backup>
     <device-transfer>
+        <exclude domain="sharedpref" path="xandeflix_parental.xml" />
         <exclude domain="file" path="app-updates/" />
         <exclude domain="sharedpref" path="app_updates.xml" />
         <exclude domain="file" path="device_identity.json" />

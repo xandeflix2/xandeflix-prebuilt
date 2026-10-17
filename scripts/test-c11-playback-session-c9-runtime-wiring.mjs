@@ -1,3 +1,5 @@
+import {installUnconfiguredParentalFixture} from './lib/parental-fixture-bindings.mjs';
+installUnconfiguredParentalFixture();
 /**
  * C11/C9 runtime wiring: prova o ciclo compartilhado do PlaybackService sem
  * depender de VOD upstream ou de um dispositivo físico.
@@ -13,6 +15,7 @@ const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 
 function createCatalog() {
   return new CatalogReadModel({
+    metadata: { schemaVersion: 1, snapshotId: 'synthetic-c9-parental', catalogVersion: '1', generatedAt: '2026-10-16', counts: {} },
     version: '1.0.0',
     generatedAt: '2026-09-22T00:00:00.000Z',
     sourceNamespace: 'c9-runtime-test',
