@@ -240,3 +240,15 @@ sem acesso a plaintext. A exceção exige autenticação Master, autorização
 server-side, cofre criptografado em repouso e auditoria de cada reveal.
 
 Qualquer mudança em source, Supabase, Manager, Control Plane, playback, catálogo ou search deve ler este boundary e preservar estas invariantes. Este documento não autoriza alterações em runtime, Android, migrations, schema remoto, dados remotos, dispositivos, playback, commit, push, PR ou merge.
+
+## C154 - plataforma web HTTPS explicitamente autorizada - 2026-10-17
+
+Pedido de publicacao do aplicativo web autoriza nessa plataforma o cofre
+AES-GCM/IndexedDB com CryptoKey nao exportavel ja validado em C136. E uma
+implementacao local especifica do navegador, sem equivalencia com Keystore
+Android ou protecao contra um perfil de navegador comprometido. Fonte so
+e entregue apos autorizacao real e selada localmente; plaintext so em RAM.
+Nao muda vault remoto, roles, C9, ativacao, catalogo/busca locais ou acesso
+direto a fonte. Nao autoriza proxy/relay central, copia de identidade entre
+origins ou embutir fontes em assets publicos. Escopo/validacao/publicacao em
+[C11_WEB_PUBLICATION.md](C11_WEB_PUBLICATION.md), preservando demais regras.

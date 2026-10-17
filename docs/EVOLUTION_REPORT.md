@@ -3065,3 +3065,28 @@ por ls-remote e divergencia0/0.8 caminhos/blobs iguais ao manifesto auditado.
 Correcao do ENOENT esta no GitHub; este fechamento altera somente evidencia
 e memorias. Build completo local PASS; resultado Linux da Vercel e login
 online ainda precisam de verificacao na conta correta. NEXT_GATE_STARTED=NAO.
+
+
+## C154 - publicacao do aplicativo web autorizada - 2026-10-17
+
+Usuario solicitou publicacao do consumidor apos confirmar painel online.
+Spec previa C11_WEB_PUBLICATION.md, evidencia correspondente. Clone/main/origin
+canonicos, HEAD a808826, baseline1194 limpo; patch9 existentes+8 novos.
+Build separado consumidor /app e painel raiz/admin/master; ativacao real,
+fonte cifrada local, catalogo/busca locais, playback direto, DEBUG=false.
+Sem novos secrets/deps/backend/Android ou copia de identidade entre origins.
+Cofre web aprovado apenas nessa plataforma HTTPS, sem equivalencia Keystore.
+Lock26+27+9+6 antes/depois/build PASS; painel7, publicacao8, cofre9, player10,
+catalogo5 PASS. site:build integral PASS. Chrome isolado real-time renderizou
+ativacao/contexto seguro/layout sem badge; fonte/video reais ainda dependem
+da ativacao legitima do navegador publico. Nao alegar reproducao homologada.
+
+Erros de verificacao resolvidos: nomes de arquivos presumidos nao encontrados
+(inventario rg corrigiu); expectativa de picker Android no web incorreta;
+dump de Chrome com relogio virtual nao deterministico. Helper privado passou
+com DOM esperado de ativacao e relogio real. Produto/guards nao alterados para
+aceitar os testes. Avisos Vite de chunk/externalizacao nao sao falha de build.
+MCP Vercel continua xandeflix4, nenhuma mutacao; usar integracao Git xandeflix2.
+Usuario pediu xandeflix.vercel.app, GET200, propriedade pendente de resposta;
+nao tomar dominio nem trocar DNS. Git commit/push autorizados pela publicacao
+ativa; envio/HTTPS serao conferidos. CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO.

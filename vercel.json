@@ -2,14 +2,16 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "vite",
   "installCommand": "npm ci",
-  "buildCommand": "npm run manager:build",
-  "outputDirectory": "tmp/c151-manager-production/site",
+  "buildCommand": "npm run site:build",
+  "outputDirectory": "tmp/c154-web-production/site",
   "rewrites": [
     { "source": "/", "destination": "/manager.html" },
     { "source": "/admin", "destination": "/manager.html" },
     { "source": "/master", "destination": "/manager.html" },
     { "source": "/manager", "destination": "/manager.html" },
-    { "source": "/manager-reset-password", "destination": "/manager.html" }
+    { "source": "/manager-reset-password", "destination": "/manager.html" },
+    { "source": "/app", "destination": "/app/app.html" },
+    { "source": "/app/", "destination": "/app/app.html" }
   ],
   "headers": [
     { "source": "/(.*)", "headers": [

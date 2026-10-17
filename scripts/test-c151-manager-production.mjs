@@ -102,10 +102,11 @@ await test('PUBLIC_CONFIG_IS_INSTALLED_BEFORE_REAL_ENTRY_BOOTSTRAPS', () => {
 });
 await test('VERCEL_ROUTES_BUILD_AND_ARTIFACT_BOUNDARY', () => {
   const config = JSON.parse(fs.readFileSync('vercel.json', 'utf8'));
-  assert.equal(config.buildCommand, 'npm run manager:build');
-  assert.equal(config.outputDirectory, 'tmp/c151-manager-production/site'); assert.equal(Object.hasOwn(config, 'public'), false);
-  assert.deepEqual(config.rewrites.map(rule => rule.source), ['/', '/admin', '/master', '/manager', '/manager-reset-password']);
-  assert.ok(config.rewrites.every(rule => rule.destination === '/manager.html'));
+  assert.equal(config.buildCommand, 'npm run site:build');
+  assert.equal(config.outputDirectory, 'tmp/c154-web-production/site'); assert.equal(Object.hasOwn(config, 'public'), false);
+  assert.deepEqual(config.rewrites.map(rule => rule.source), ['/', '/admin', '/master', '/manager', '/manager-reset-password', '/app', '/app/']);
+  assert.ok(config.rewrites.slice(0, 5).every(rule => rule.destination === '/manager.html'));
+  assert.ok(config.rewrites.slice(5).every(rule => rule.destination === '/app/app.html'));
   assert.ok(!config.rewrites.some(rule => rule.source.includes('*')));
   const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
   assert.match(pkg.scripts['manager:build'], /^npm run c11:new-device:lock && tsc && vite build --config vite.manager.config.ts$/);

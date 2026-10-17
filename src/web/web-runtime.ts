@@ -5,6 +5,7 @@ import { Capacitor } from '@capacitor/core';
 import { readWebCatalogFile } from './web-catalog-files.ts';
 import { defaultPlaybackService } from '../playback/playback.service.ts';
 import './web-runtime.css';
+declare const __XANDEFLIX_WEB_PUBLIC__: boolean;
 export function mountWebRuntimeNotice(): void {
   if (!isWebValidation() || document.querySelector('.web-validation-badge')) return;
   document.documentElement.dataset.webValidation = 'true';
@@ -33,6 +34,7 @@ export function mountWebRuntimeNotice(): void {
       throw error;
     }
   };
+  if (typeof __XANDEFLIX_WEB_PUBLIC__ !== 'undefined' && __XANDEFLIX_WEB_PUBLIC__) return;
   const badge = document.createElement('button'); badge.className = 'web-validation-badge'; badge.type = 'button';
   badge.textContent = 'Conferência web'; badge.title = 'Recursos da versão web';
   badge.onclick = () => {

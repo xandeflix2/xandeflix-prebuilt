@@ -63,3 +63,11 @@ Vercel e crie novo deployment; nao habilite modo debug como alternativa.
 Referencias oficiais: [Vite na Vercel](https://vercel.com/docs/frameworks/frontend/vite),
 [Node.js suportado](https://vercel.com/docs/functions/runtimes/node-js/node-js-versions),
 [URLs de retorno Supabase](https://supabase.com/docs/guides/auth/redirect-urls).
+
+## C154 - aplicativo web adicional
+
+A publicacao conjunta usa agora `npm run site:build` e a saida
+tmp/c154-web-production/site. O build dedicado `manager:build` continua
+disponivel e identico. Raiz/rotas/callback/autoridade do painel preservados;
+o consumidor abre separadamente em /app. Procedimento e limites em
+[VERCEL_APP.md](VERCEL_APP.md). A publicacao web nao instala nem muda APKs.
