@@ -3090,3 +3090,28 @@ MCP Vercel continua xandeflix4, nenhuma mutacao; usar integracao Git xandeflix2.
 Usuario pediu xandeflix.vercel.app, GET200, propriedade pendente de resposta;
 nao tomar dominio nem trocar DNS. Git commit/push autorizados pela publicacao
 ativa; envio/HTTPS serao conferidos. CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO.
+
+
+## C154 - envio e publicacao HTTPS confirmados - 2026-10-17
+
+Commit funcional 4505bcef8e374a3c589162bad0f72cd970f2b105 enviado a origin/main e conferido
+por ls-remote/divergencia0/0,17 caminhos/blobs auditados,1185 arquivos baseline
+preservados, APK149 intacto. Implantacao Vercel nm3x9sSdkmMfqSwCSitMhSntipiye18Y
+com check GitHub success. HTTPS real: raiz/admin e /app(/)200 com entradas
+separadas, assets200 e headers; /.env.local e /api/control-plane/state404.
+Chrome isolado real-time no dominio publico renderizou ativacao, contexto
+seguro e layout web sem badge. Fonte/catalogo/video reais nao certificados:
+o novo origin exige ativacao legitima pelo gestor, sem copiar localhost.
+Monitor auxiliar inicialmente comparou contexto com travessao Unicode que
+PowerShell codificou diferente; corrigido para sufixo ASCII do projeto. Nao
+era ausencia de deployment nem falha do produto.
+
+Usuario confirmou que xandeflix.vercel.app pertence ao seu projeto
+xandeflix4s-projects/xandeflix. Perguntou sobre excluir/mudar endereco; nenhuma
+exclusao, transferencia, tomada de alias ou mutacao da equipe antiga foi
+realizada. Conexao correta xandeflix2 ainda nao disponivel ao agente; orientar
+alterar somente dominio no painel, preservando projeto/dados, e adicionar ao
+projeto novo apos liberacao. Alterar nome do projeto sozinho nao comprova
+reatribuicao do dominio. Este fechamento altera somente evidencia/memorias.
+Publicacao /app concluida; troca de dominio ainda nao concluida.
+CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO.
