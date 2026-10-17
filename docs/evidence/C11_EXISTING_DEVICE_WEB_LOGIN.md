@@ -180,3 +180,41 @@ pendentes deste registro. Fonte/catalogo/playback real de cliente nao testados:
 sucesso de autenticacao nao e certificacao de codec/CORS/HTTPS ou catalogo.
 Nenhum APK novo, instalacao/reset de aparelho ou alteracao no projeto protegido.
 CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO.
+
+## Publicacao e verificacao HTTPS — 2026-10-17
+
+Auditoria funcional repetida PASS antes do stage exato dos33 arquivos.
+Commit fd5a8e837a8e7ee5079b684fa11580859a95b49a enviado a origin/main sem
+force, PR ou outro repositorio. Blobs staged/commit comparados, remoto/HEAD
+iguais, arvore limpa. Vercel GitHub status success para o projeto correto:
+https://vercel.com/xandeflix2/xandeflix-prebuilt-nm3x/G3iGSVA1dzXh3X92TP7BUFtRyozX
+concluido2026-10-17T21:46:53Z. Projeto irmao xandeflix-prebuilt da mesma equipe
+tambem recebeu o push pela integracao existente; nenhuma configuracao externa
+foi alterada pelo agente. Build automatico preserva os checks site:build.
+
+HTTP publico real PASS nos origins xandeflix-prebuilt-nm3x.vercel.app e
+xandeflix.vercel.app: / e /admin200 com painel; /app e /app/200 com entry
+consumidor distinto e novo bundle de login; assets JS/CSS200 e MIME correto;
+DENY/nosniff; /.env.local e /api/control-plane/state404. Os dois aliases
+servem o mesmo HTML /app SHA256
+5678b9ee2fbf549dab30aa0d73382945f71b6948de0998dce9353f1366fea26a.
+Chrome real isolado no alias principal PASS: tres campos obrigatorios,
+chave/PIN mascarados, contexto HTTPS seguro, zero Storage/DB antes de login,
+sem identidade/ativacao nova. Screenshot remoto conferivel em tmp/c155;
+perfil do usuario intacto. Dados sintéticos anteriores ja removidos.
+
+Conector Vercel open_deployments listado no catalogo retornou tool not found;
+get_deployment na equipe correta foi negado403. CLI Vercel nao instalada.
+Sem repetir chamada/operar equipe antiga, status foi confirmado pela conexao
+GitHub correta e por HTTP/Chrome publicos. Logs privados/observabilidade de
+runtime Vercel nao acessiveis nesta sessao; nao declarar scan limpo ou drains
+configurados. Isso nao impediu a publicacao via integracao Git existente.
+
+Operacao: painel Dispositivos -> Configurar PIN de acesso web -> cadastrar
+seis digitos; depois https://xandeflix.vercel.app/app com codigo, chave
+permanente e PIN. PIN parental nao sincroniza sozinho. Nenhum cliente real
+foi cadastrado/alterado pelo agente para testar fonte. Autenticacao/lockout/C9
+testados; fonte/catalogo/playback real e homologacao fisica continuam nao
+certificados. Sem novo APK ou instalacao, demais dispositivos preservados.
+Fechamento documental posterior nao altera os bundles testados.
+CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO.

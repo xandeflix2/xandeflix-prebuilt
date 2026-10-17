@@ -27,12 +27,12 @@ licenca. Este registro precede a alteracao dos contratos relacionados.
 
 EMENDA_LIMITADA_AUTORIZADA=SIM; IMPLEMENTACAO_WEB_CONCLUIDA=SIM;
 SUPABASE_CANONICO_ACESSIVEL=SIM (conexao confirmada na fase funcional abaixo);
-EMENDA_PUBLICADA=NAO.
+EMENDA_PUBLICADA=SIM; FRONTEND_PUBLICADO=SIM.
 EMENDA_DOCUMENTAL_VALIDADA=SIM (auditoria/lock descritos na evidencia C155).
 CURRENT_GATE=NONE; CURRENT_LOCAL_CYCLE=C155_EXISTING_DEVICE_WEB_LOGIN;
 NEXT_GATE_STARTED=NAO. A etapa documental abaixo e historica; a fase funcional
 posterior registra a autorizacao de implantacao/Git. Novo APK nao autorizado
-neste ciclo web. Frontend aguarda publicacao; playback real nao homologado.
+neste ciclo web. Frontend publicado/verificado; playback real nao homologado.
 
 ### Allowlist desta etapa documental
 
@@ -399,4 +399,9 @@ Fonte precisa ser compativel com acesso direto HTTPS/CORS do navegador;
 esta alteracao nao cria proxy nem certifica reproducao de uma fonte real.
 
 Backend implantado e testes sinteticos reais concluidos; resultado detalhado
-na evidencia C155. Publicacao frontend/commit pendentes neste registro.
+na evidencia C155. Publicacao funcional fd5a8e837a8e7ee5079b684fa11580859a95b49a
+em origin/main; Vercel xandeflix2/xandeflix-prebuilt-nm3x concluida, HTTPS e
+Chrome isolado confirmam /app nos dois enderecos. Painel continua em /admin.
+https://xandeflix.vercel.app/app e o acesso consumidor; cadastrar PIN web no
+painel antes do primeiro login. Fonte/playback real de cliente permanecem
+pendentes de homologacao pelo responsavel, sem alegar sucesso de midia.

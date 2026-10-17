@@ -2754,3 +2754,22 @@ Wrapper C9 antigo limitado por scriptC8 ausente no baseline; nao relaxado.
 Codigo/frontend local e backend concluidos; commit/push/Vercel seguintes
 ja autorizados. Playback de fonte real nao homologado. Sem APK/instalacao.
 CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO. Contrato/evidencia C155 detalham.
+
+## C155 — publicacao web concluida e verificada — 2026-10-17
+
+Commit funcional fd5a8e837a8e7ee5079b684fa11580859a95b49a push origin/main
+canonico,33 arquivos permitidos, remoto/HEAD iguais e arvore limpa.
+Vercel xandeflix2/xandeflix-prebuilt-nm3x G3iGSVA1dzXh3X92TP7BUFtRyozX
+status GitHub success2026-10-17T21:46:53Z. HTTP real dos dois aliases PASS:
+xandeflix.vercel.app e xandeflix-prebuilt-nm3x.vercel.app; painel /admin e
+consumidor /app separados, assets/headers corretos, arquivos privados404.
+Chrome isolado no alias principal confirma tres campos sem criar identidade.
+Operacao: Dispositivos -> Configurar PIN de acesso web, depois /app com
+codigo/chave/PIN existentes. PIN local nao enviado automaticamente.
+Vercel MCP tool not found/403 na equipe correta; CLI ausente. Sem operar
+equipe antiga, status acompanhado via GitHub e verificacao HTTP/Chrome.
+Logs privados/drains nao inspecionados, nao alegar observabilidade limpa.
+Fixture sintetico removido; nenhum cliente/fonte real modificado. Fonte e
+playback real nao homologados pelo agente; nenhum APK ou instalacao nova.
+Fechamento documental nao modifica bundles. CURRENT_GATE=NONE;
+NEXT_GATE_STARTED=NAO. Contrato/evidencia C155 consolidados.
