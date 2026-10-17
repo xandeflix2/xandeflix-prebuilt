@@ -119,3 +119,39 @@ append-only; helpers/logs/schema privados tmp/c152-vercel-public-fix.
 Auditar baseline/segredos/stage nominal, enviar origin/main e conferir SHA
 remoto; fechamento documental separado permitido. Nenhuma operacao na conta
 Vercel xandeflix4. Deploy correto ainda depende da conta do usuario.
+
+## C153 - paths POSIX no harness de ativacao obrigatorio - 2026-10-17
+
+Usuario apresentou falha Linux Vercel de manager:build no lock, procurando
+/path0/src/ui/device-presentation.ts em vez de /vercel/path0/src/ui/....
+Arquivo existe no repositorio; o loader do teste concatena file:/// com cwd
+POSIX que ja comeca por / e, ao resolver imports encadeados absolutos, trata
+vercel como host e perde essa parte do caminho. Testes Windows anteriores
+nao cobriam essa fronteira. Nao e falha de ativacao do aplicativo.
+
+Preflight clone ativo/main/origin esperado, HEAD
+b9d8535077d06fe4841a4e30faee711dbb9d5622, arvore limpa. Baseline1193/copias
+em tmp/c153-activation-posix-path antes do patch. Contratos e lock preservados.
+CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO. Continuacao corretiva da publicacao
+e commit/push autorizados, sem PR/force/Supabase/dispositivos/outra conta.
+
+Especificacao anterior ao codigo: alterar somente a conversao de paths do
+require sintetico em test-c11-new-device-activation.mjs, usando path.resolve,
+pathToFileURL e fileURLToPath de Node. Nenhuma mudanca em fixtures, estados,
+asserts26 ou prazos. Nao normalizar caches/refatorar o harness inteiro.
+Reproduzir antes a perda de /vercel em dois imports encadeados com a logica
+real extraida do teste. Validar depois POSIX Vercel/espacos/Unicode/percentual,
+Windows drives/espacos/UNC com adaptadores nativos Node de path/URL por SO.
+Acrescentar essa regressao ao lock sem remover suites/negativos/criterios.
+
+Allowlist: scripts/test-c11-new-device-activation.mjs (imports Node e duas
+linhas de resolucao); scripts/test-c11-new-device-activation-lock.mjs (somente
+linha de suite adicional); novo scripts/test-c153-activation-loader-paths.mjs;
+este contrato, evidencia C11_MANAGER_VERCEL_PRODUCTION.md e3 memorias append;
+helpers/logs privados tmp/c153-activation-posix-path e build ignorado habitual.
+Lock antes/depois e manager:build integral devem passar; nenhum bypass do
+prebuild. Nao alterar runtime/Android/Auth/catalog/search/player/env/dep.
+Auditoria inversa e hashes, segredos, stage nominal/commit/push e SHA remoto.
+Fechamento documental separado permitido. WSL apenas retornou help, sem
+Linux utilizavel confirmado; nao instalar ambiente nem alegar build Linux
+fisico sem executa-lo. Nova implantacao Vercel deve usar o novo commit.

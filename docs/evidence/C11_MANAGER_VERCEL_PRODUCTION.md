@@ -111,3 +111,30 @@ por ls-remote/divergencia0/0.7 caminhos/blobs iguais ao manifesto, nenhuma
 mudanca funcional adicional. Falha public corrigida no repositorio; este
 fechamento altera somente evidencia/memorias. Publicacao remota nao foi
 executada pelo agente, sem acesso a nova conta. NEXT_GATE_STARTED=NAO.
+
+
+## C153 - correcao dos paths Linux no teste obrigatorio Vercel - 2026-10-17
+
+Falha real em b9d8535: manager:build procurou /path0/src/ui/device-presentation.ts.
+O arquivo esta rastreado; o require sintetico do harness gerava file:////vercel
+e perdia vercel como host no segundo import. Regressao nova executa a logica
+real extraida: antes reproduziu exatamente /path0, depois6/6 cenarios PASS
+(POSIX Vercel, espacos/Unicode/hash/percentual, dot segments, Windows C/D e
+UNC). Agora usa path.resolve/pathToFileURL/fileURLToPath, somente no teste.
+Assertions26, fixtures, prazos, cache e runtime permanecem iguais; lock
+recebe apenas a suite adicional, sem remover/relaxar validacoes existentes.
+
+Lock antes/depois e no manager:build PASS26 ativacao+27 promocao+9 negativos;
+suite de paths6/6 e painel7/7 PASS. manager:build integral (lock+tsc+Vite) e
+verificacao dos6 assets PASS; config publica presente, sem env alheio, player
+ou entrada de consumidor. Node24.19.0/Windows; paths POSIX simulados com
+adaptadores nativos Node, sem alegar build Linux fisico ou deploy remoto.
+WSL retornou help, sem distribuicao utilizavel confirmada; nada instalado.
+
+Auditoria baseline1193/1186 preservados,7 existentes alterados+1 teste novo;
+inversa exata dos dois scripts, documentos/memorias somente append. Nenhum
+source/runtime/Android/Auth/Supabase/catalog/search/playback/env/dependencia
+alterado. APK149 preservado. Git commit/push corretivos continuam autorizados
+pela solicitacao de publicacao; envio confirmado sera registrado abaixo.
+A nova implantacao deve usar o novo commit de main, e nao repetir b9d8535.
+Nenhuma operacao em conta Vercel incorreta. NEXT_GATE_STARTED=NAO.

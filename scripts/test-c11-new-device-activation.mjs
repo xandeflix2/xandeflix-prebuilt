@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import vm from 'node:vm';
 import { createHash, webcrypto } from 'node:crypto';
 import ts from 'typescript';
@@ -101,8 +103,8 @@ function harness(options = {}) {
       };
       if (specifier === './device-pairing.service.ts') return { getDevicePairingService: () => ({ getOrCreateDeviceToken: () => identity.getOrCreateDeviceAuthToken() }) };
       if (specifier === './control-plane-client.ts') return { getControlPlaneClient: () => ({ resolveSource: async () => ({ mode: 'SELF_SERVICE' }) }) };
-      const resolved = new URL(specifier, new URL(file, `file:///${process.cwd().replaceAll('\\', '/')}/`));
-      return load(decodeURIComponent(resolved.pathname).replace(/^\/(\w:)/, '$1'));
+      const resolved = new URL(specifier, pathToFileURL(path.resolve(file)));
+      return load(fileURLToPath(resolved));
     };
     const execute = vm.runInContext(`(function(exports, require) { ${code}\n })`, context, { filename: file });
     execute(exports, require);
