@@ -2901,3 +2901,13 @@ Publicacao C158 confirmada em producao. Commit funcional e9d568aef979a14a31d0f77
 ## C159 — continuidade da sessao web — 2026-10-18
 
 C159 implementa retomada cifrada/revalidada de sessao na recarga da mesma aba, apos emenda limitada documentada antes do codigo. Primeiro login exige tres fatores; Sair/revogacao/expiracao preservados. 16 testes, Chrome isolado com reload real e RPC sintetica, lock/site:build completos PASS. APK/native e dados de cliente/fonte/Supabase intactos. Logs reais identificam TLS/HTTP/CORS/certificados da fonte como bloqueios externos; nao ha correcao desses transportes neste patch. Publicacao Git do projeto equipe2 segue autorizada e pendente. NEXT_GATE_STARTED=NAO.
+
+## C159 — reparo de sincronizacao do teste — 2026-10-18
+
+Primeiro deployment fc5e851 falhou na Vercel; nao declarar entrega publicada.
+Conector403 no projeto equipe2; log remoto solicitado ao titular, causa
+remota ainda nao confirmada. Reproduzida corrida do harness com40ms de
+decifragem; teste agora aguarda RPC/condicao, mantendo bloqueio de App ate
+confirmacao. Suite16 e site:build completos PASS. Somente teste e registros
+do mesmo ciclo, runtime/APK/backend intactos. Nova publicacao autorizada
+no mesmo projeto, sem equipe4. NEXT_GATE_STARTED=NAO.

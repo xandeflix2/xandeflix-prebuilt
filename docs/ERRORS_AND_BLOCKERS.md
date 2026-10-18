@@ -3232,3 +3232,16 @@ Publicacao C158 READY no projeto equipe2 xandeflix-prebuilt-nm3x, commit funcion
 ## C159 — continuidade da sessao web — 2026-10-18
 
 Fonte atual permanece parcialmente incompativel com web: TLS de destino de filme, Live redirecionado para HTTP, API/EPG CORS+404, imagens com certificado invalido. Nao confundir com codec confirmado nem corrigir por bypass/proxy. Leituras iniciais de dois caminhos EPG inexistentes e glob posicional invalido foram corrigidas pela descoberta de arquivos; patch documental com contexto invalido rejeitado atomicamente e reaplicado. Helper de baseline com Git por arquivo foi interrompido apenas no processo Node proprio e substituido por leitura em lote. Fixture Chrome inicialmente nao reconheceu separador Windows e tentou compilar App completo (imports Node); normalizacao do caminho corrigiu somente fixture. Revisao incluiu rejeicao de CryptoKey corrompida/timeout; suite16 e build final completos passam. Sem operacao com credenciais recebidas ou backend real. Publicacao pendente.
+
+## C159 — build remoto e corrida no harness — 2026-10-18
+
+Deployment fc5e851 recebeu failure. Consulta unica do deployment no escopo
+xandeflix2 retornou403; CLI ausente e CUA sem superficies. Log solicitado
+ao usuario; nao presumir causa exata remota. Consulta metadata de ferramentas
+por descricao gerou saida excessiva; usar somente nomes exatos. WSL sem
+distribuicao utilizavel e Docker ausente; nada instalado.
+Repro sintetico de decifragem atrasada40ms confirmou TypeError calls[0].op
+no teste C159, cuja espera por12 setImmediate nao garantia fim do WebCrypto.
+Reparo aguarda condicao limitada5s, preserva todos os controles e adiciona
+latencia ao mesmo teste. Suite16/site:build PASS, runtime/APK inalterados.
+Falhas de transporte da fonte permanecem; nenhum bypass/relay implementado.

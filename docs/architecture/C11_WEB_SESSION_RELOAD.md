@@ -74,3 +74,18 @@ Chrome proprio: login sintetico -> reload real -> RPC sintetica -> App;
 Sair retorna login e remove envelope. Sem dados reais do usuario.
 Auditar allowlist/prefixos/APK, publicar Git canonico e verificar aliases e
 admin. Falhas da fonte continuam externas, nao solucionadas por este patch.
+
+## Verificacao remota e espera deterministica — 2026-10-18
+
+Primeiro commit fc5e851 foi aceito no Git, mas recebeu status de build
+failure na Vercel. Nao considerar publicado. Conector recebe403 no escopo
+xandeflix2; CLI local indisponivel, CUA sem superficies. Logs solicitados ao
+usuario; nenhuma tentativa em equipe4 ou leitura de autenticacao privada.
+Repro local confirmou falha independente no harness: apos12 setImmediate,
+WebCrypto pode nao ter terminado; leitura calls[0].op produz TypeError.
+Com40ms de latencia sintetica, reproduz sem mudar runtime. Teste deve aguardar
+condicao observavel com prazo fechado, depois exigir App bloqueado enquanto
+RPC esta pendente e mesma sessao apos confirmacao. Incluir essa latencia no
+caso existente, sem retirar asserts, mudar prazos do produto ou autorizar
+cache offline. Allowlist da correcao: suite C159, este contrato, evidencia e
+tres memorias append-only; runtime/package/lock/dep/backend inalterados.

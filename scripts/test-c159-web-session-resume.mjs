@@ -13,6 +13,10 @@ const session = { success: true, sessionToken: token, sessionId: '00000000-0000-
 let tests = 0;
 const test = async (name, run) => { await run(); tests++; console.log('PASS ' + name); };
 const tick = async () => { for (let i = 0; i < 12; i++) await new Promise(resolve => setImmediate(resolve)); };
+const until = async predicate => {
+  const deadline = Date.now() + 5000;
+  while (!predicate()) { assert.ok(Date.now() < deadline, 'ASYNC_TEST_CONDITION_TIMEOUT'); await new Promise(resolve => setTimeout(resolve, 5)); }
+};
 function storage() {
   const data = new Map();
   return { get length() { return data.size; }, key: index => [...data.keys()][index] ?? null, getItem: key => data.get(key) ?? null,
@@ -56,7 +60,7 @@ function harness({ raw = storage(), database = new IDBFactory(), navigation = 'r
   const resume = load('src/web-production/session-resume.ts');
   return { resume, load, raw, database, window, document, root, form, fields, submit, calls, logs, timers, replaced, media, clock, get imported() { return imported; },
     setContext: f => { contextOperation = f; }, setLogin: f => { loginOperation = f; },
-    login: async () => { const promise = load('src/web-production/login.ts').requireWebLogin(); await tick(); fields.displayCode.value = 'XF-TEST-0159'; fields.accessKey.value = '159731'; fields.pin.value = '248592'; form.dispatchEvent(new Event('submit', { cancelable: true })); await promise; } };
+    login: async () => { const promise = load('src/web-production/login.ts').requireWebLogin(); await until(() => root.innerHTML.includes('<form')); fields.displayCode.value = 'XF-TEST-0159'; fields.accessKey.value = '159731'; fields.pin.value = '248592'; form.dispatchEvent(new Event('submit', { cancelable: true })); await promise; } };
 }
 const getStoredKey = database => new Promise((resolve, reject) => { const request = database.open('xandeflix.web-auth.v1', 1); request.onerror = reject; request.onsuccess = () => { const db = request.result, tx = db.transaction('keys'); const read = tx.objectStore('keys').get('key'); read.onsuccess = () => resolve(read.result); tx.oncomplete = () => db.close(); }; });
 
@@ -129,18 +133,22 @@ await test('MANUAL_THREE_FACTOR_LOGIN_SAVES_ONLY_DELEGATED_PROOF_BEFORE_SCOPE', 
 });
 await test('RELOAD_REVALIDATES_SERVER_BEFORE_APP_NO_LOGIN_OR_NEW_IDENTITY', async () => {
   const first = harness({ navigation: 'navigate' }); await first.login();
-  const reload = harness({ raw: first.raw, database: first.database }); let confirm;
+  const delayedCrypto = { getRandomValues: a => webcrypto.getRandomValues(a), subtle: {
+    generateKey: webcrypto.subtle.generateKey.bind(webcrypto.subtle), encrypt: webcrypto.subtle.encrypt.bind(webcrypto.subtle),
+    decrypt: async (...args) => { await new Promise(resolve => setTimeout(resolve, 40)); return webcrypto.subtle.decrypt(...args); },
+  } };
+  const reload = harness({ raw: first.raw, database: first.database, crypto: delayedCrypto }); let confirm;
   reload.setContext(() => new Promise(resolve => { confirm = resolve; }));
-  reload.load('src/web-production/main.ts'); await tick(); assert.equal(reload.imported, 0); assert.equal(reload.calls[0].op, 'rpc_web_session_context');
+  reload.load('src/web-production/main.ts'); await until(() => typeof confirm === 'function'); assert.equal(reload.imported, 0); assert.equal(reload.calls[0].op, 'rpc_web_session_context');
   assert.throws(() => reload.load('src/web-production/session-context.ts').publicWebSession());
-  confirm(session); for (let i = 0; i < 60 && !reload.imported; i++) await tick();
+  confirm(session); await until(() => reload.imported > 0);
   assert.equal(reload.imported, 1); assert.ok(!reload.calls.some(c => c.op === 'LOGIN'));
   assert.equal(reload.load('src/web-production/session-context.ts').publicWebSession().sessionId, session.sessionId);
 });
 await test('REVOKED_OR_FORGED_SERVER_RESPONSE_DISCARDS_CACHE_WITHOUT_APP', async () => {
   for (const response of [() => Promise.reject(Error('revoked')), async () => ({ success: true, activation: { status: 'AUTHORIZED' } })]) {
     const h = harness(); await h.resume.rememberWebSession(token, 900, 900); h.setContext(response);
-    h.load('src/web-production/main.ts'); for (let i = 0; i < 40 && !h.root.innerHTML.includes('<form'); i++) await tick();
+    h.load('src/web-production/main.ts'); await until(() => h.root.innerHTML.includes('<form'));
     assert.ok(h.root.innerHTML.includes('<form')); assert.equal(h.imported, 0); assert.equal(h.raw.getItem(KEY), null);
     assert.ok(h.calls.some(c => c.op === 'rpc_web_logout'));
   }
@@ -156,7 +164,7 @@ await test('EXPLICIT_SIGNOUT_AND_FAILED_HEARTBEAT_REMOVE_PROOF_AND_REVOKE', asyn
     const h = harness({ navigation: 'navigate' }); await h.login();
     if (action === 'signout') h.window.dispatchEvent(new Event('xandeflix:web-signout'));
     else { h.setContext(() => Promise.reject(Error('expired'))); h.timers[0](); }
-    await tick(); assert.equal(h.raw.getItem(KEY), null); assert.ok(h.calls.some(c => c.op === 'rpc_web_logout')); assert.equal(h.replaced.at(-1), '/app');
+    await until(() => h.replaced.length > 0); assert.equal(h.raw.getItem(KEY), null); assert.ok(h.calls.some(c => c.op === 'rpc_web_logout')); assert.equal(h.replaced.at(-1), '/app');
   }
 });
 await test('INVALID_LIFETIME_TOKEN_AND_PLAINTEXT_RECORD_NEVER_AUTHORIZE', async () => {

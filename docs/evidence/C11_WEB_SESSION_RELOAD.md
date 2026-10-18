@@ -39,3 +39,26 @@ a7012e334e87ec2eac56715b7ae89fef523e9548cd4a9db01f8b7f83b3b8deee.
 Allowlist, demais arquivos rastreados, prefixos de memoria e segredos auditados.
 Publicacao ainda pendente neste registro; helpers/evidencias ignorados em
 tmp/c159-web-session-reload. Nenhuma nova dependencia ou chave de servidor.
+
+## Reparo do harness e nova verificacao — 2026-10-18
+
+Commit fc5e851795749b7f1ee84e39d33e212a4c64539d foi enviado, mas o deployment
+C4MYHu9PJx5UKgcPgw53Xi7tkCVw recebeu failure; entrega em producao NAO
+confirmada. Conector403 no escopo correto xandeflix2, sem CLI local nem
+superficie CUA. Log remoto solicitado ao titular; causa remota ainda nao
+confirmada. Nao consultar equipe4 nem credenciais privadas.
+
+Reprodutor privado introduziu40ms na decifragem WebCrypto: teste anterior
+acessava calls[0].op antes da RPC e gerava TypeError. Corrigida somente a
+sincronizacao do harness C159 para aguardar condicao observavel com limite
+de5s. Mesmo caso agora inclui decifragem atrasada e continua exigindo que a
+App e sessao fiquem bloqueadas ate a confirmacao do servidor. Nenhuma
+assertion/controle removido, nenhum prazo do produto alterado.
+
+Suite C15916/16 e site:build completo PASS novamente, incluindo lock, tsc,
+ambos Vite e C151-C158. Logs privados scheduling-repro.log,
+c159-scheduling-fixed.log e site-scheduling-fixed.log. Runtime do commit
+fc5e851 e APK C156 intactos; testes Chrome anteriores continuam evidencias
+sinteticas desse mesmo runtime, sem certificar cliente/fonte reais.
+Allowlist deste reparo: teste C159, especificacao, esta evidencia e tres
+memorias append-only. Publicacao permanece pendente ate status/verificacao.
