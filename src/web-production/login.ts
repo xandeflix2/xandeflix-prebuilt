@@ -1,11 +1,28 @@
 import { clearPublicWebSession, installPublicWebSession, type WebSessionResponse } from './session-context.ts';
 import { installWebStorageScope } from './session-storage.ts';
 import { WEB_ACCESS_ERROR, webAccessRequest, webSessionRequest } from './web-access.client.ts';
+import { clearWebSessionResume, rememberWebSession, takeWebSessionForReload } from './session-resume.ts';
 import './login.css';
 
-export function requireWebLogin(): Promise<void> {
+export async function requireWebLogin(): Promise<void> {
   const root = document.getElementById('root');
   if (!root) return Promise.reject(new Error('WEB_ROOT_REQUIRED'));
+  const resumed = await takeWebSessionForReload();
+  if (resumed) {
+    root.textContent = 'Conferindo sua sessão…';
+    try {
+      const context = await webSessionRequest('rpc_web_session_context', resumed);
+      const session = { ...context, sessionToken: resumed } as unknown as WebSessionResponse;
+      installPublicWebSession(session);
+      installWebStorageScope(session.activation.deviceId);
+      await rememberWebSession(resumed, session.ttlSeconds, session.absoluteTtlSeconds);
+      installSessionLifecycle(resumed);
+      return;
+    } catch {
+      clearPublicWebSession(); clearWebSessionResume();
+      void webSessionRequest('rpc_web_logout', resumed, true).catch(() => {});
+    }
+  }
   root.innerHTML = `<main class="web-login"><form class="web-login-card" aria-labelledby="web-login-title" autocomplete="off">
     <div class="web-login-brand">XANDE<span>FLIX</span></div><h1 id="web-login-title">Acessar minha conta</h1>
     <p>Use os dados de um aparelho já ativado e seu PIN web. Para criar ou recuperar esse PIN, abra Configurações → PIN web no aparelho e tenha o PUK em mãos.</p>
@@ -32,10 +49,11 @@ export function requireWebLogin(): Promise<void> {
           token = session.sessionToken;
           installPublicWebSession(session);
           installWebStorageScope(session.activation.deviceId);
+          await rememberWebSession(session.sessionToken, session.ttlSeconds, session.absoluteTtlSeconds);
           installSessionLifecycle(session.sessionToken);
           resolve();
         } catch {
-          clearPublicWebSession();
+          clearPublicWebSession(); clearWebSessionResume();
           if (token) void webSessionRequest('rpc_web_logout', token, true).catch(() => {});
           status.textContent = WEB_ACCESS_ERROR;
         } finally {
@@ -50,7 +68,7 @@ function installSessionLifecycle(token: string): void {
   const stop = () => document.querySelectorAll('video,audio').forEach(media => { (media as HTMLMediaElement).pause(); media.removeAttribute('src'); (media as HTMLMediaElement).load(); });
   const logout = () => {
     if (closed) return; closed = true;
-    stop(); clearPublicWebSession();
+    stop(); clearPublicWebSession(); clearWebSessionResume();
     void webSessionRequest('rpc_web_logout', token, true).catch(() => {});
     window.location.replace('/app');
   };
@@ -58,13 +76,18 @@ function installSessionLifecycle(token: string): void {
     if (closed || checking) return; checking = true;
     try {
       const context = await webSessionRequest('rpc_web_session_context', token);
-      if (!closed) installPublicWebSession({ ...context, sessionToken: token } as unknown as WebSessionResponse);
+      if (!closed) {
+        const session = { ...context, sessionToken: token } as unknown as WebSessionResponse;
+        installPublicWebSession(session);
+        await rememberWebSession(token, session.ttlSeconds, session.absoluteTtlSeconds);
+      }
     } catch { logout(); } finally { checking = false; }
   };
   window.setInterval(() => { void verify(); }, 60000);
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') void verify(); });
   window.addEventListener('xandeflix:web-signout', logout);
-  window.addEventListener('pagehide', () => { closed = true; stop(); clearPublicWebSession(); void webSessionRequest('rpc_web_logout', token, true).catch(() => {}); });
+  window.addEventListener('pagehide', () => { closed = true; stop(); clearPublicWebSession(); });
+  window.addEventListener('pageshow', event => { if (event.persisted && closed) window.location.reload(); });
   const button = document.createElement('button'); button.type = 'button'; button.className = 'web-account-signout';
   button.textContent = 'Sair'; button.title = 'Encerrar acesso web'; button.setAttribute('aria-label', 'Encerrar acesso web');
   button.addEventListener('click', logout); document.body.appendChild(button);

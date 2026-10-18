@@ -134,3 +134,14 @@ exige prova vinculada ao PUK no aparelho, sem reset administrativo legado.
 PINs C155 sem recovery exigem PIN web atual para vincular recuperacao; nao
 prometer recuperacao retroativa sem essa preparacao. Bloqueio3h preservado.
 Nenhuma mudanca em fonte/vault/catalogo/busca/player/identidade/licenca/ativacao.
+
+## C159 — continuidade da sessao na recarga da mesma aba — 2026-10-18
+
+Pedido do usuario sobre Ctrl+F5 autoriza a excecao limitada documentada em
+[C11_WEB_SESSION_RELOAD.md](C11_WEB_SESSION_RELOAD.md): somente prova web
+opaca efemera cifrada localmente, chave AES nao exportavel, mesma aba/origin
+e validacao server-side antes de App. Nao salvar os tres fatores, token
+nativo, fonte ou resposta de autorizacao. Nao mudar prazo/revogacao/licenca,
+C9, namespace de clientes, APK ou exigencia de primeiro login real. Sair
+remove prova e revoga; pagehide interrompe midia sem revogar por recarga.
+Nao autoriza proxy/relay, bypass HTTPS/CORS/TLS ou nova ativacao de navegador.

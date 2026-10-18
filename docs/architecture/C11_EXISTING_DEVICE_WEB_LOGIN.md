@@ -1,5 +1,11 @@
 # C155 - acesso web com dispositivo existente - 2026-10-17
 
+> C159, 2026-10-18: a regra historica de novo login em toda recarga e
+> superseded somente pela retomada cifrada/revalidada da mesma aba definida
+> em [C11_WEB_SESSION_RELOAD.md](C11_WEB_SESSION_RELOAD.md). Tres fatores no
+> primeiro acesso, nenhum PIN/chave permanente salvo, autoridade remota e
+> demais restricoes permanecem. Texto historico abaixo e preservado.
+
 ## Pedido vigente e preflight
 
 Usuario reportou falha na etapa Catalogo apos ativar o navegador publicado e

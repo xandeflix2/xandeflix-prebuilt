@@ -3325,3 +3325,8 @@ Ciclo local C158 especificado antes do codigo. Diagnostico web RAM de filme/seri
 ## C158 — fechamento da publicacao web — 2026-10-17
 
 Publicacao C158 confirmada em producao. Commit funcional e9d568aef979a14a31d0f770453f1dbf8edf8639; Vercel equipe xandeflix2, projeto xandeflix-prebuilt-nm3x, deployment 7RYbkJgd8kLCjcpfiLhLZZjo86GL READY por status GitHub. https://xandeflix.vercel.app e alias nm3x: admin/app200, 14 assets identicos ao build aprovado, headers DENY/nosniff, .env.local e /api/control-plane/state404. Main main-DSLXSd84.js SHA256 086d3a289b2c29de5e8cc64e0d8db26cbbafa8ac93ae45f46ca4a2ef6e01ffce; TMDB_CONFIGURED=SIM. Correcao de evento tardio e diagnostico publicados; reproducao real de lancamentos/Live e carregamento das series que falham NAO certificados. Usuario deve repetir tentativas e fornecer somente WEB_MOVIE_/WEB_LIVE_/WEB_SERIES_DETAILS_ do suporte, sem URLs/credenciais. Nenhum proxy/relay, backend, APK ou dispositivo alterado. Este fechamento modifica somente documentacao. NEXT_GATE_STARTED=NAO.
+
+
+## C159 — continuidade da sessao web — 2026-10-18
+
+C159 implementa retomada cifrada/revalidada de sessao na recarga da mesma aba, apos emenda limitada documentada antes do codigo. Primeiro login exige tres fatores; Sair/revogacao/expiracao preservados. 16 testes, Chrome isolado com reload real e RPC sintetica, lock/site:build completos PASS. APK/native e dados de cliente/fonte/Supabase intactos. Logs reais identificam TLS/HTTP/CORS/certificados da fonte como bloqueios externos; nao ha correcao desses transportes neste patch. Publicacao Git do projeto equipe2 segue autorizada e pendente. NEXT_GATE_STARTED=NAO.

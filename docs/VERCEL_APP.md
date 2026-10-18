@@ -13,6 +13,10 @@ nunca em URL, conversa ou log. Configuracoes -> Ativacao na web exibe a sessao
 existente e a comparacao entre a fonte vinculada e o catalogo local.
 Atualizacoes com Ctrl+F5 preservam armazenamento; nao limpar dados do site
 para atualizar, pois o catalogo esta isolado por aparelho/origin.
+Desde C159, recarregar a mesma aba tambem permite retomar a sessao vigente,
+apos nova verificacao no servidor. Somente prova efemera cifrada fica na
+sessionStorage da aba; PIN e chave de acesso nao sao salvos. Sair remove
+essa prova e revoga a sessao. Vencimento/revogacao exigem os tres dados.
 
 O build `npm run site:build` valida o lock, TypeScript, painel e app e compoe
 `tmp/c154-web-production/site`. O vercel.json seleciona esse comando e as

@@ -3227,3 +3227,8 @@ Falhas de conteudo real ainda sem causa confirmada: filme fecha, Live com codigo
 ## C158 — fechamento da publicacao web — 2026-10-17
 
 Publicacao C158 READY no projeto equipe2 xandeflix-prebuilt-nm3x, commit funcional e9d568aef979a14a31d0f770453f1dbf8edf8639. Ambos aliases servem 14 assets atuais; admin/app200, caminhos sensiveis404. Consulta read-only a app/index.html inexistente foi corrigida pela rota canonica /app/app.html definida em vercel.json, sem mudanca de produto. Falhas reais de lancamentos/Live/detalhes ainda aguardam enums do usuario; nao afirmar codec ou CORS como causa sem evidencia. Nenhuma fonte/cliente/Supabase/APK alterado.
+
+
+## C159 — continuidade da sessao web — 2026-10-18
+
+Fonte atual permanece parcialmente incompativel com web: TLS de destino de filme, Live redirecionado para HTTP, API/EPG CORS+404, imagens com certificado invalido. Nao confundir com codec confirmado nem corrigir por bypass/proxy. Leituras iniciais de dois caminhos EPG inexistentes e glob posicional invalido foram corrigidas pela descoberta de arquivos; patch documental com contexto invalido rejeitado atomicamente e reaplicado. Helper de baseline com Git por arquivo foi interrompido apenas no processo Node proprio e substituido por leitura em lote. Fixture Chrome inicialmente nao reconheceu separador Windows e tentou compilar App completo (imports Node); normalizacao do caminho corrigiu somente fixture. Revisao incluiu rejeicao de CryptoKey corrompida/timeout; suite16 e build final completos passam. Sem operacao com credenciais recebidas ou backend real. Publicacao pendente.
