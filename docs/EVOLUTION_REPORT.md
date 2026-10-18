@@ -3315,3 +3315,8 @@ Aguardar diagnostico WEB_SUPPORT apos atualizar para identificar bloqueio/erro
 real; nao alegar resolucao de DIRECTORY_SOURCE_NOT_AUTHORIZED ou playback.
 Estrategia HTTP por relay/VPS rejeitada e nao implementada.
 NEXT_GATE_STARTED=NAO.
+
+
+## C158 — diagnostico de reproducao e detalhes web — 2026-10-17
+
+Ciclo local C158 especificado antes do codigo. Diagnostico web RAM de filme/serie/Live/episodios, isolamento de callbacks tardios e preservacao de eventos/C9/nativo. Lock/site:build completos PASS, C15814/C13610/C10512+7 e Chrome sintetico PASS, controle negativo reproduz falha antiga. APK C156 e arquivos fora da allowlist preservados. Publicacao no projeto equipe2 autorizada pelo escopo em curso, ainda pendente. Conteudos reais nao certificados. NEXT_GATE_STARTED=NAO.

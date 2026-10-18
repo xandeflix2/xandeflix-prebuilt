@@ -26,6 +26,7 @@ import { useDetailInitialFocus } from '../hooks/useDetailInitialFocus.ts';
 import type { CatalogItemViewModel } from '../../catalog/catalog-view-model.ts';
 import { defaultPlaybackService } from '../../playback/playback.service.ts';
 import { meaningfulDetailGenres } from '../detail-genres.ts';
+import { observeWebSeriesDetails } from '../../web/web-playback-diagnostic.ts';
 
 interface SeriesDetailPageProps {
   seriesId: string;
@@ -99,7 +100,7 @@ export const SeriesDetailPage: React.FC<SeriesDetailPageProps> = ({
     if (typeof (readModel as any).loadEpisodesForSeries === 'function') {
       setEpisodesLoading(true);
       setEpisodesFailed(false);
-      (readModel as any).loadEpisodesForSeries(seriesId)
+      observeWebSeriesDetails(() => readModel.loadEpisodesForSeries(seriesId))
         .then(() => {
           if (isMounted) {
             setEpisodesLoading(false);

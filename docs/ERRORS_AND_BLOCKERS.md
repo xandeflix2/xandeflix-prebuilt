@@ -3217,3 +3217,8 @@ Aguardar diagnostico WEB_SUPPORT apos atualizar para identificar bloqueio/erro
 real; nao alegar resolucao de DIRECTORY_SOURCE_NOT_AUTHORIZED ou playback.
 Estrategia HTTP por relay/VPS rejeitada e nao implementada.
 NEXT_GATE_STARTED=NAO.
+
+
+## C158 — diagnostico de reproducao e detalhes web — 2026-10-17
+
+Falhas de conteudo real ainda sem causa confirmada: filme fecha, Live com codigo generico e algumas series rejeitam detalhes. Diagnostico C158 agora conserva enums distintos sem segredos; nao relaxar source/codec/validacao. Fixture inicial assumiu ausencia de HLS nativo no Chrome; corrigida somente a capability sintetica para exercitar hls.js. Leituras iniciais usaram dois caminhos inexistentes e um glob posicional invalido, corrigidos pelos caminhos descobertos. Patch documental sem contexto correspondente falhou sem escrita e foi reaplicado com contexto real. Helper de auditoria primeiro leu log UTF16 do PowerShell como UTF8 e nao reconheceu marcador presente; corrigida somente decodificacao pelo BOM. Build e suites finais passam. Nao houve falha de produto causada por esses comandos. Producao e retorno real pendentes.

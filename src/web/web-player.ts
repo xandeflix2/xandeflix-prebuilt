@@ -1,11 +1,12 @@
 import { WebPlugin } from '@capacitor/core';
 import type { NativePlaybackRequest, NativePreviewRequest, NativePreviewUpdateRequest, NativeLiveContext, NativeLiveAction, NativePlayerProgressEvent } from '../playback/native-android-player.bridge.ts';
 import { attachWebMedia, normalizeWebMediaRequest, type WebMediaResource } from './web-media.ts';
+import { beginWebPlayback, markWebPlayback, htmlMediaFailure, webMediaException, type WebMediaFailure } from './web-playback-diagnostic.ts';
 
 type Surface = { id: string; host: HTMLDivElement; video: HTMLVideoElement; status: HTMLElement; tools: HTMLElement;
   preview: boolean; obscured: boolean; full: boolean; controller: AbortController; destroy?: WebMediaResource;
   request: NativePlaybackRequest; context?: NativeLiveContext; progressAt: number; savedFocus: Element | null;
-  locked: boolean; navigating?: boolean; timer?: ReturnType<typeof setTimeout>; ui?: { play: HTMLButtonElement; seek?: HTMLInputElement; time?: HTMLElement; duration?: HTMLElement } };
+  locked: boolean; diagnostic: number; navigating?: boolean; timer?: ReturnType<typeof setTimeout>; ui?: { play: HTMLButtonElement; seek?: HTMLInputElement; time?: HTMLElement; duration?: HTMLElement } };
 
 /** Explicit browser implementation, registered only in the local web validation build. */
 export class WebPlayer extends WebPlugin {
@@ -71,8 +72,9 @@ export class WebPlayer extends WebPlugin {
     this.drop(); this.notifyListeners('resume', { positionMs, ended, ...(error ? { errorCode: 'SOURCE_UNAVAILABLE', errorCategory: 'SOURCE_UNAVAILABLE' } : {}) });
     if (surface.savedFocus instanceof HTMLElement && surface.savedFocus.isConnected) surface.savedFocus.focus();
   }
-  private fail(surface: Surface) {
+  private fail(surface: Surface, reason: WebMediaFailure = { stage: 'LOAD', code: 'UNKNOWN' }) {
     if (this.surface !== surface || surface.controller.signal.aborted) return;
+    markWebPlayback(surface.diagnostic, 'FAILED', reason);
     surface.status.textContent = 'Não foi possível reproduzir no navegador. Confira CORS, HTTPS e o formato de vídeo oferecido pela fonte.';
     surface.controller.abort(); const destroy = surface.destroy; surface.destroy = undefined; destroy?.(); surface.video.pause(); surface.video.removeAttribute('src'); surface.video.load();
     if (surface.preview) this.notifyListeners('nativePreviewError', { previewId: surface.id, errorCode: 'LIVE_PREVIEW_PLAYBACK_FAILED' });
@@ -99,8 +101,14 @@ export class WebPlayer extends WebPlugin {
   }
   private togglePlayback(surface: Surface) {
     if (surface.navigating) return;
-    if (surface.video.paused) void surface.video.play().catch(() => this.fail(surface)); else surface.video.pause();
+    if (surface.video.paused) this.play(surface); else surface.video.pause();
     this.refresh(surface); this.reveal(surface);
+  }
+  private play(surface: Surface) {
+    const controller = surface.controller;
+    void surface.video.play().catch(error => {
+      if (surface === this.surface && surface.controller === controller && !controller.signal.aborted) this.fail(surface, webMediaException(error, 'PLAY'));
+    });
   }
   private refresh(surface: Surface) {
     const ui = surface.ui; if (!ui) return;
@@ -189,17 +197,20 @@ export class WebPlayer extends WebPlugin {
     this.notifyListeners('episodeNavigation', { playbackId: surface.request.playbackId, requestId: 'web-nav-' + (++this.sequence), reason, episodeId });
   }
   private create(original: NativePlaybackRequest, preview: boolean, bounds?: NativePreviewRequest) {
-    const request = normalizeWebMediaRequest(original); this.drop();
+    const diagnostic = beginWebPlayback(original);
+    let request: NativePlaybackRequest;
+    try { request = normalizeWebMediaRequest(original); }
+    catch (error) { markWebPlayback(diagnostic, 'FAILED', webMediaException(error, 'VALIDATION')); throw error; }
+    this.drop();
     const host = document.createElement('div'), video = document.createElement('video'), status = document.createElement('p'), tools = document.createElement('div');
     host.className = 'web-player-host player-overlay'; video.controls = false; video.style.objectFit = 'contain'; video.playsInline = true; video.preload = 'metadata'; video.setAttribute('aria-label', request.title || 'Player de vídeo');
     status.className = 'web-player-status'; status.setAttribute('role','status'); tools.className = 'web-player-tools';
     host.append(video, tools, status); document.body.append(host);
     const surface: Surface = { id: 'web-preview-' + (++this.sequence), host, video, status, tools, preview, obscured: false, full: !preview,
-      controller: new AbortController(), request, progressAt: 0, savedFocus: document.activeElement, locked: false };
+      controller: new AbortController(), request, progressAt: 0, savedFocus: document.activeElement, locked: false, diagnostic };
     this.surface = surface; this.controls(surface); if (!preview) { this.fullscreen(surface, true); tools.querySelector('button')?.focus(); }
     else if (bounds) this.bounds(surface, bounds);
-    video.addEventListener('error', () => this.fail(surface));
-    video.addEventListener('playing', () => { if (this.surface === surface) { status.textContent = ''; if (preview) this.notifyListeners('nativePreviewPlaying', { previewId: surface.id }); } });
+    video.addEventListener('playing', () => { if (this.surface === surface && !surface.controller.signal.aborted) { markWebPlayback(surface.diagnostic, 'PLAYING'); status.textContent = ''; if (preview) this.notifyListeners('nativePreviewPlaying', { previewId: surface.id }); } });
     video.addEventListener('loadedmetadata', () => { const position = request.startPositionMs; if (position && position > 0 && Number.isFinite(video.duration)) video.currentTime = Math.min(position / 1000, video.duration); });
     video.addEventListener('timeupdate', () => { this.refresh(surface); if (Date.now() - surface.progressAt >= 5000) { surface.progressAt = Date.now(); this.checkpoint(surface); } });
     for (const event of ['play','pause','loadedmetadata','durationchange']) video.addEventListener(event, () => { this.refresh(surface); this.reveal(surface); });
@@ -209,7 +220,7 @@ export class WebPlayer extends WebPlugin {
       if (surface.obscured || this.surface !== surface) return;
       if (surface.full) { this.reveal(surface); return; }
       if (!preview) return;
-      if (video.paused) void video.play().catch(() => this.fail(surface));
+      if (video.paused) this.play(surface);
       else this.notifyListeners('nativePreviewTap', { previewId: surface.id });
     });
     void this.load(surface, request); return surface;
@@ -220,11 +231,16 @@ export class WebPlayer extends WebPlugin {
   private async load(surface: Surface, request: NativePlaybackRequest) {
     surface.controller.abort(); const previous = surface.destroy; surface.destroy = undefined; previous?.(); surface.controller = new AbortController(); surface.request = request;
     const controller = surface.controller;
+    const current = () => this.surface === surface && surface.controller === controller && !controller.signal.aborted;
+    const fail = (reason?: WebMediaFailure) => { if (current()) this.fail(surface, reason); };
+    surface.video.addEventListener('error', () => fail(htmlMediaFailure(surface.video.error?.code)), { signal: controller.signal });
+    let stage: WebMediaFailure['stage'] = 'LOAD';
     try {
-      const destroy = await attachWebMedia(surface.video, request, controller.signal, () => this.fail(surface));
+      const destroy = await attachWebMedia(surface.video, request, controller.signal, fail);
       if (this.surface !== surface || controller.signal.aborted) { destroy(); return; } surface.destroy = destroy;
-      await surface.video.play().catch(error => { if (error?.name === 'NotAllowedError') surface.status.textContent = surface.preview ? 'Toque no vídeo para iniciar.' : 'Use o controle de reprodução para iniciar o vídeo.'; else throw error; });
-    } catch { if (this.surface === surface && !controller.signal.aborted) this.fail(surface); }
+      stage = 'PLAY';
+      await surface.video.play().catch(error => { if (!current()) return; if (error?.name === 'NotAllowedError') { markWebPlayback(surface.diagnostic, 'AUTOPLAY_BLOCKED'); surface.status.textContent = surface.preview ? 'Toque no vídeo para iniciar.' : 'Use o controle de reprodução para iniciar o vídeo.'; } else throw error; });
+    } catch (error) { fail(webMediaException(error, stage)); }
   }
   async open(request: NativePlaybackRequest) {
     if (request.replacePlaybackId && (this.surface?.request.playbackId !== request.replacePlaybackId || !request.navigationRequestId)) throw new Error('INVALID_REQUEST');
@@ -243,7 +259,14 @@ export class WebPlayer extends WebPlugin {
       this.controls(surface);
     }
     if (request.suspendPlayback) { surface.controller.abort(); surface.destroy?.(); surface.destroy = undefined; surface.video.pause(); surface.video.removeAttribute('src'); surface.video.load(); }
-    if (request.uri) { const next = normalizeWebMediaRequest({ uri: request.uri, headers: request.headers, kind: 'live' as const }); void this.load(surface, next); }
+    if (request.uri) {
+      const original = { uri: request.uri, headers: request.headers, kind: 'live' as const };
+      const diagnostic = beginWebPlayback(original);
+      let next: NativePlaybackRequest;
+      try { next = normalizeWebMediaRequest(original); }
+      catch (error) { markWebPlayback(diagnostic, 'FAILED', webMediaException(error, 'VALIDATION')); throw error; }
+      surface.diagnostic = diagnostic; void this.load(surface, next);
+    }
     this.bounds(surface, request); return { accepted: true, previewId: surface.id };
   }
   async stopPreview(options?: { previewId?: string }) { const surface = this.surface; if (surface) this.requirePreview(options?.previewId); this.drop(); return { accepted: true, previewId: options?.previewId }; }

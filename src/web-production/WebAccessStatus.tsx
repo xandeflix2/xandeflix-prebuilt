@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { publicWebSession } from './session-context.ts';
 import { readActiveSourceStatus, type ActiveSourceStatus } from '../ui/settings/active-source-status.ts';
 import { getWebCatalogRefresh } from '../web/web-source-connection.ts';
+import { webPlaybackDiagnosticLines } from '../web/web-playback-diagnostic.ts';
 
 declare const __XANDEFLIX_WEB_TMDB_CONFIGURED__: boolean;
 interface WebAccessStatusSnapshot {
@@ -38,6 +39,7 @@ export function webAccessDiagnostic(value?: WebAccessStatusSnapshot): string {
   }
   const refresh = getWebCatalogRefresh();
   lines.push('CATALOG_LAST_OUTCOME=' + refresh.outcome, 'CATALOG_LAST_HAD_ERROR=' + (refresh.hadError ? 'SIM' : 'NAO'), 'CATALOG_LAST_ERROR_CODE=' + refresh.errorCode, 'CATALOG_REFRESH_BLOCKER=' + refresh.blocker);
+  lines.push(...webPlaybackDiagnosticLines());
   return lines.join('\n');
 }
 

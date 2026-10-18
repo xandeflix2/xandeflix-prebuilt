@@ -1,4 +1,5 @@
 import type { NativePlaybackRequest } from '../playback/native-android-player.bridge.ts';
+import { hlsMediaFailure, mpegtsMediaFailure, type WebMediaFailure } from './web-playback-diagnostic.ts';
 export type WebMediaTrack = { label: string; selected: boolean; select: () => void };
 export type WebMediaResource = (() => void) & { tracks?: () => { audio: WebMediaTrack[]; subtitles: WebMediaTrack[] } };
 function browserTracks(video: HTMLVideoElement) {
@@ -32,7 +33,7 @@ export function validateWebMedia(request: Pick<NativePlaybackRequest, 'uri' | 'h
 
 /** Each attachment owns one direct transport. Destroy also aborts library downloads. */
 export async function attachWebMedia(video: HTMLVideoElement, request: Pick<NativePlaybackRequest, 'uri' | 'headers' | 'kind'>,
-  signal: AbortSignal, failure: () => void): Promise<WebMediaResource> {
+  signal: AbortSignal, failure: (reason?: WebMediaFailure) => void): Promise<WebMediaResource> {
   validateWebMedia(request);
   const check = () => { if (signal.aborted) throw new Error('WEB_MEDIA_CANCELLED'); };
   const clear = () => { video.pause(); video.removeAttribute('src'); video.load(); };
@@ -42,7 +43,7 @@ export async function attachWebMedia(video: HTMLVideoElement, request: Pick<Nati
     if (!Hls.isSupported()) throw new Error('WEB_MEDIA_UNSUPPORTED');
     const hls = new Hls({ debug: false, enableWorker: true, maxBufferLength: 20, backBufferLength: 20,
       xhrSetup: xhr => { for (const [name, value] of Object.entries(request.headers || {})) xhr.setRequestHeader(name, value); } });
-    hls.on(Hls.Events.ERROR, (_, data) => { if (data.fatal && !signal.aborted) failure(); });
+    hls.on(Hls.Events.ERROR, (_, data) => { if (data.fatal && !signal.aborted) failure(hlsMediaFailure(data.type, data.details, data.response?.code)); });
     hls.attachMedia(video); hls.loadSource(request.uri);
     return Object.assign(() => { hls.destroy(); clear(); }, { tracks: () => ({
       audio: hls.audioTracks.map((track, index) => ({ label: track.name || track.lang || `Áudio ${index + 1}`, selected: hls.audioTrack === index, select: () => { hls.audioTrack = index; } })),
@@ -58,7 +59,7 @@ export async function attachWebMedia(video: HTMLVideoElement, request: Pick<Nati
     const player = mpegts.createPlayer({ type: new URL(request.uri).pathname.toLowerCase().endsWith('.flv') ? 'flv' : 'mpegts',
       isLive: request.kind === 'live', cors: true, url: request.uri }, { enableWorker: true, headers: request.headers,
       autoCleanupSourceBuffer: true, autoCleanupMaxBackwardDuration: 30, autoCleanupMinBackwardDuration: 10 });
-    player.on(mpegts.Events.ERROR, () => { if (!signal.aborted) failure(); });
+    player.on(mpegts.Events.ERROR, (type, detail, info) => { if (!signal.aborted) failure(mpegtsMediaFailure(type, detail, info?.code)); });
     player.attachMediaElement(video); player.load();
     return Object.assign(() => { player.unload(); player.detachMediaElement(); player.destroy(); clear(); }, { tracks: () => browserTracks(video) });
   }
