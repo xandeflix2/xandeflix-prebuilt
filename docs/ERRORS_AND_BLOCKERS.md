@@ -3245,3 +3245,14 @@ no teste C159, cuja espera por12 setImmediate nao garantia fim do WebCrypto.
 Reparo aguarda condicao limitada5s, preserva todos os controles e adiciona
 latencia ao mesmo teste. Suite16/site:build PASS, runtime/APK inalterados.
 Falhas de transporte da fonte permanecem; nenhum bypass/relay implementado.
+
+## C159 — publicacao recuperada, fonte continua limitada — 2026-10-18
+
+Novo deployment251b937 no projeto equipe2 nm3x passou e producao foi
+verificada por hashes, rotas e Chrome anonimo. Bloqueio de publicacao
+resolvido; causa exata do primeiro build continua sem log remoto, nao
+presumir conclusao retrospectiva. Nao confundir retomada de login com
+correcao de conteudo: erro TLS no filme, redirecionamento HTTP Live,
+API/EPG sem CORS+404 e certificado de imagens dependem do fornecedor.
+Nao foram acessadas fontes/credenciais recebidas nem backend de cliente.
+Nenhum novo erro de verificacao neste fechamento. NEXT_GATE_STARTED=NAO.

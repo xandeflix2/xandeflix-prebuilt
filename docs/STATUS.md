@@ -2911,3 +2911,14 @@ decifragem; teste agora aguarda RPC/condicao, mantendo bloqueio de App ate
 confirmacao. Suite16 e site:build completos PASS. Somente teste e registros
 do mesmo ciclo, runtime/APK/backend intactos. Nova publicacao autorizada
 no mesmo projeto, sem equipe4. NEXT_GATE_STARTED=NAO.
+
+## C159 — publicacao web confirmada — 2026-10-18
+
+Commit251b937 publicado no projeto xandeflix2/xandeflix-prebuilt-nm3x;
+deployment kJSyT6v3GesZHA23BTQyB2caw7Nk success/READY. Ambos aliases com
+admin/app200,14assets identicos ao build, rotas sensiveis404, Chrome anonimo
+isolado PASS. Runtime de retomada revalidada ja disponivel; primeiro login
+na versao nova cria envelope cifrado. Expiracao/Sair preservados. Teste de
+login/reload real foi sintetico local, nao certifica cliente real. Midia/EPG/
+imagens continuam dependentes da correcao de transporte pelo fornecedor;
+sem proxy/VPS/bypass/backend/APK. Fechamento documental. NEXT_GATE_STARTED=NAO.

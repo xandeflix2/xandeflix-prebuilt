@@ -62,3 +62,30 @@ fc5e851 e APK C156 intactos; testes Chrome anteriores continuam evidencias
 sinteticas desse mesmo runtime, sem certificar cliente/fonte reais.
 Allowlist deste reparo: teste C159, especificacao, esta evidencia e tres
 memorias append-only. Publicacao permanece pendente ate status/verificacao.
+
+## Publicacao confirmada — 2026-10-18
+
+Reparo 251b937185413313cce28e6babf58775883fd7a5 em origin/main. Projeto correto
+xandeflix2/xandeflix-prebuilt-nm3x recebeu success/READY no deployment
+https://vercel.com/xandeflix2/xandeflix-prebuilt-nm3x/kJSyT6v3GesZHA23BTQyB2caw7Nk
+via status GitHub. Isso encerra o bloqueio de publicacao; nao identifica
+retroativamente a causa exata do primeiro build, cujos logs nao foram lidos.
+
+Ambos aliases https://xandeflix.vercel.app e
+https://xandeflix-prebuilt-nm3x.vercel.app conferidos por leitura publica:
+/ /admin /app /app/200, HTML e14assets JS/CSS identicos ao build aprovado,
+DENY/nosniff, .env.local e /api/control-plane/state404. Entry contem AES-GCM
+e retomada C159; main-CA-lXcaD.js SHA256
+f5ef9fff5d0f9e85af99882587cba929cbce38e49dd99bdd50b569c1170041af.
+TMDB_CONFIGURED=SIM. Chrome isolado remoto passou: login de3campos,
+senhas mascaradas, sem identidade/ativacao/storage antes de autenticar;
+captura visual revisada. Nao foi usado login nem conteudo de cliente real.
+Provas privadas production-result.json e browser-remote.json em tmp C159.
+
+Usuario precisa entrar uma vez na versao nova para formar envelope; depois
+reload da mesma aba revalida sessao ainda valida sem repetir fatores. Sair,
+expiracao/revogacao ou nova navegacao exigem login. Fonte parcialmente
+incompativel permanece dependencia do fornecedor: TLS de midia, destinos
+HTTP, API/EPG sem CORS+404 e imagens com certificado invalido. Sem relay,
+bypass, backend/APK/dispositivo ou novas leituras da fonte real.
+Fechamento somente nesta evidencia e tres memorias. NEXT_GATE_STARTED=NAO.
