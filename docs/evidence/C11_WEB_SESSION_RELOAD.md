@@ -89,3 +89,24 @@ incompativel permanece dependencia do fornecedor: TLS de midia, destinos
 HTTP, API/EPG sem CORS+404 e imagens com certificado invalido. Sem relay,
 bypass, backend/APK/dispositivo ou novas leituras da fonte real.
 Fechamento somente nesta evidencia e tres memorias. NEXT_GATE_STARTED=NAO.
+
+## Confirmacao tardia do log remoto — 2026-10-18
+
+Titular enviou as linhas finais do primeiro deployment C4MYHu9PJx5UKgcPgw53Xi7tkCVw:
+TypeError lendo op de undefined, test-c159-web-session-resume.mjs:134:123,
+no caso iniciado na linha130; Node24.21.0, site:build exit1. O trecho coincide
+com calls[0].op e com o reprodutor local anterior ao reparo251b937. Causa
+do primeiro build agora confirmada: espera insuficiente do harness antes
+da conclusao da decifragem/RPC. Nao era falha de autenticacao em runtime.
+O reparo ja publicado aguarda a condicao observavel e mantem os controles.
+
+Preflight deste registro: clone independente canonico, main/origin esperados,
+HEAD9b105dadfa9db5a2d2367897c83f77467575fbdf limpo. AGENTS, Architecture e
+Execution relidos. CURRENT_GATE=NONE, mesmo cicloC159. Allowlist somente
+esta evidencia e tres memorias append-only; Git/publicacao continuam
+autorizados, sem PR, codigo, testes, build, backend, fontes ou dispositivos.
+Status do HEAD9b105da no projeto equipe2 nm3x success, deployment
+https://vercel.com/xandeflix2/xandeflix-prebuilt-nm3x/5phqwFUyCAt6dmVFBACrJXkjLVQY
+O registro anterior de causa ainda desconhecida descrevia o conhecimento
+daquele momento e e preservado. Falhas da fonte seguem externas.
+NEXT_GATE_STARTED=NAO.

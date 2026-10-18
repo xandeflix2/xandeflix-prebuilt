@@ -2922,3 +2922,13 @@ na versao nova cria envelope cifrado. Expiracao/Sair preservados. Teste de
 login/reload real foi sintetico local, nao certifica cliente real. Midia/EPG/
 imagens continuam dependentes da correcao de transporte pelo fornecedor;
 sem proxy/VPS/bypass/backend/APK. Fechamento documental. NEXT_GATE_STARTED=NAO.
+
+## C159 — causa do primeiro build confirmada — 2026-10-18
+
+Log remoto enviado pelo titular confirma TypeError lendo op no testeC159
+linha134, Node24.21.0. Coincide com a corrida reproduzida e ja corrigida por
+251b937; nenhuma nova mudanca de runtime necessaria. HEAD9b105da recebeu
+success no projeto equipe2 nm3x, deployment5phqwFUyCAt6dmVFBACrJXkjLVQY.
+Atualizacao somente de evidencia e memorias, append-only, main/origin
+canonicos e limpos no preflight. Sem nova suite/build/APK. Fonte continua
+dependencia externa. NEXT_GATE_STARTED=NAO.

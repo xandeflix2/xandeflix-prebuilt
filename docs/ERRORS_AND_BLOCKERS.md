@@ -3256,3 +3256,12 @@ correcao de conteudo: erro TLS no filme, redirecionamento HTTP Live,
 API/EPG sem CORS+404 e certificado de imagens dependem do fornecedor.
 Nao foram acessadas fontes/credenciais recebidas nem backend de cliente.
 Nenhum novo erro de verificacao neste fechamento. NEXT_GATE_STARTED=NAO.
+
+## C159 — log remoto confirma a corrida corrigida — 2026-10-18
+
+Retorno tardio do titular confirma o TypeError calls[0].op no testeC159,
+linha134, Node24.21.0, site:build exit1 do primeiro deployment. Assim, a
+causa anteriormente apenas reproduzida localmente tambem esta confirmada
+no build remoto. Reparo251b937 e fechamento9b105da ja receberam success no
+projeto correto. Nenhuma nova falha/runtime alterado neste registro; nao
+confundir com TLS/HTTP/CORS/certificados da fonte. NEXT_GATE_STARTED=NAO.
