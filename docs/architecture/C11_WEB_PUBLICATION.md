@@ -81,3 +81,17 @@ GitHub/Vercel nm3x e GET HTTPS de /app, /app/, raiz e /admin e seus assets.
 HTTP200 nao certifica sessao ativada/catalogo/reproducao da fonte real. Registrar
 primeira fronteira nao verificada e orientar ativacao no painel, sem inventar
 acesso/credenciais. Nenhum proximo Gate ou recurso extra iniciado.
+
+## Atualizacao limitada C157 — TMDB e suporte de sessao web — 2026-10-17
+
+Pedido explicito de elementos TMDB ausentes e diagnostico falso de ativacao.
+Especificacao/allowlist anterior ao codigo em C11_WEB_SOURCE_HTTPS_DIAGNOSIS.md.
+Permitir whitelist exata adicional de VITE_TMDB_API_KEY v3 (32hex) no build
+web, somente como credencial de leitura do aplicativo visivel ao cliente ja
+prevista em C11_SOURCE_FIRST_TMDB_ARTWORK.md. Nao incluir read-access JWT,
+chaves privadas, fonte ou variaveis arbitrarias. Valor nunca em Git/docs/logs;
+sem chave, app preserva imagens da fonte e metadados extras desativados.
+Suporte web usa sessao delegada C155/C156 existente, sem geracao de chave ou
+UI de ativacao nativa. Nao relaxa autorizacao, fonte/versao/protocolo nem C9.
+Gateway/VPS/relay recusado pelo usuario; proibir retransmissao central continua
+vigente, inclusive para fonte HTTP. Nenhum servico de banda contratado/criado.

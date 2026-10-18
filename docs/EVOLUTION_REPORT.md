@@ -3259,3 +3259,39 @@ PUK/verificadores nunca enviados, fixture sintetico removido, nenhum cliente
 real alterado. Homologacao fisica/fonte/playback reais pendentes, sem impedir
 entrega do recurso testado. Fechamento documental nao altera bundles/APK.
 CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO.
+
+## C157 — investigacao web HTTPS/fonte HTTP — 2026-10-17
+
+Preflight clone/main/origin canonicos HEADa662703, arvore limpa e contratos
+lidos. Console real: autorizacao/SOURCE_READY, depois Mixed Content; nao
+confundir site HTTPS Vercel com servidor da fonte. Especificacao/allowlist
+antes do codigo em C11_WEB_SOURCE_HTTPS_DIAGNOSIS.md. Observar e informar
+bloqueio sanitizado somente web, sem fonte/URLs/proxy/relaxamento de browser,
+sem mudar loading/search/player nativos. Protocolo da fonte perguntado sem
+segredos; dependencia externa nao resolvida por UI. Git/publicacao da mesma
+equipe autorizados, sem APK/install/backend/reset. Globs Windows e caminho
+useBootSync inexistente nas leituras corrigidos com inventario real; nenhum
+arquivo funcional alterado por essas falhas. NEXT_GATE_STARTED=NAO.
+
+## C157 — resultado web e dependencias reais — 2026-10-17
+
+Fonte HTTP confirmada, gateway/VPS/relay e custos de banda expressamente
+recusados pelo usuario. Depois relatou catalogo abrindo com HTTPS, erro
+DIRECTORY_SOURCE_NOT_AUTHORIZED e adiamento na atualizacao. Nao certificar
+midia HTTPS nem remover validacao. Corrigidos somente web: aviso sanitizado
+Mixed Content; tela de suporte usa sessao existente, sem gerar chave nativa;
+whitelist de leitura TMDB32hex (chave nao registrada no Git/log); classificacao
+de LOCAL_FIRST_ACTIVE_PRESERVED com erro como falha, e enums da ultima
+atualizacao/guard. Protecoes e comportamento nativos preservados.
+Lock/site:build TypeScript e suites C1517/C1548/C15511/C15610/C15715 PASS.
+Directory C10512 e fonte/refresh C1358 PASS. Chrome isolado sintetico com
+React real confirmou bloqueio, aviso/retry e suporte web; nao usou cliente
+ou fonte real. TMDB local movie550 respondeu200 com backdrop, sem valor
+de credencial nos registros; configuracao Production Vercel depende titular.
+C111 extra nao compilou fixture por imports preexistentes nao declarados;
+App e teste iguais ao baseline, sem modificar/relaxar assertions e sem
+reportar PASS dessa suite. Falhas do ciclo: mock novo import C154, __dirname
+no VM C157 e React import sem uso corrigidos; leituras Windows/caminhos
+errados e patch com contexto ausente nao alteraram dados.
+Auditoria/publicacao conforme evidencia C11_WEB_SOURCE_HTTPS_DIAGNOSIS.md;
+nenhum backend/fonte real/APK/dispositivo alterado. NEXT_GATE_STARTED=NAO.

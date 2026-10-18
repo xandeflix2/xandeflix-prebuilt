@@ -23,12 +23,13 @@ interface Props {
   modal?: boolean;
   className?: string;
   actions?: React.ReactNode;
+  notice?: string;
   titleId?: string;
   messageId?: string;
 }
 
 /** Presentation only: does not start sync, fetch catalogs or control app readiness. */
-export function StartupLoadingScreen({ stage = 'checking', percentage, posters, previewEnabled = true, modal = false, className = '', actions,
+export function StartupLoadingScreen({ stage = 'checking', percentage, posters, previewEnabled = true, modal = false, className = '', actions, notice,
   titleId = 'startup-loading-title', messageId = 'startup-loading-message' }: Props) {
   const observed = useSyncExternalStore(subscribeStartupCatalogPreview, getStartupCatalogPreview, getEmptyStartupCatalogPreview);
   const phone = usePhoneLayout();
@@ -74,6 +75,7 @@ export function StartupLoadingScreen({ stage = 'checking', percentage, posters, 
         <p className="startup-loading-eyebrow">{mobile && trending ? 'TENDÊNCIAS DO CINEMA · TMDB' : 'SEU CINEMA, DO SEU JEITO'}</p>
         <h1 id={titleId}>{paused ? stage === 'offline' ? 'Vamos continuar quando a conexão voltar' : 'Precisamos tentar mais uma vez' : 'A diversão já vai começar'}</h1>
         <p className="startup-loading-subtitle">{paused ? 'Seu acesso continua protegido. Você pode conferir a conexão e tentar novamente.' : 'Estamos preparando sua experiência. Em instantes, você poderá explorar seus próximos favoritos.'}</p>
+        {notice && <p className="startup-loading-subtitle" role="status">{notice}</p>}
         <div className="startup-loading-progress-heading"><span id={messageId} role="status" aria-live="polite">{stageMessages[stage]}</span>
           <strong>{measured === undefined ? `${String(step + 1).padStart(2, '0')} / 04` : `${Math.round(measured)}%`}</strong></div>
         <div className={`startup-loading-progress${measured === undefined && !paused ? ' startup-loading-progress--active' : ''}`}

@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useSyncExternalStore } from 'react';
 import type { BootSyncProgress } from '../../bootstrap/boot-sync-coordinator.ts';
 import { StartupLoadingScreen, type StartupLoadingStage } from './StartupLoadingScreen.tsx';
+import { getWebSourceConnection, getEmptyWebSourceConnection, subscribeWebSourceConnection } from '../../web/web-source-connection.ts';
 
 export type FirstRealSyncCatalogState =
   | 'SYNCING_FIRST_REAL_CATALOG'
@@ -19,6 +20,7 @@ interface FirstRealSyncStateProps {
 export const FirstRealSyncState: React.FC<FirstRealSyncStateProps> = ({
   catalogState, progress, onOpenActivation, onOpenPortal, onRetry,
 }) => {
+  const connection = useSyncExternalStore(subscribeWebSourceConnection, getWebSourceConnection, getEmptyWebSourceConnection);
   const paused = catalogState !== 'SYNCING_FIRST_REAL_CATALOG';
   const stage: StartupLoadingStage = catalogState === 'OFFLINE_WAITING_FOR_SYNC' ? 'offline'
     : catalogState === 'CATALOG_SYNC_ERROR' ? 'error'
@@ -27,7 +29,10 @@ export const FirstRealSyncState: React.FC<FirstRealSyncStateProps> = ({
     : !progress || ['IDLE', 'CHECKING', 'CHECKING_SOURCE'].includes(progress.state) ? 'checking' : 'catalog';
   const percentage = !paused && typeof progress?.percentage === 'number' && Number.isFinite(progress.percentage)
     ? Math.min(99, Math.max(0, progress.percentage)) : undefined;
-  return <StartupLoadingScreen stage={stage} percentage={percentage} actions={paused ? <>
+  return <StartupLoadingScreen stage={stage} percentage={percentage}
+    notice={catalogState === 'CATALOG_SYNC_ERROR' && connection === 'HTTP_IN_HTTPS_BLOCKED'
+      ? 'O navegador bloqueou requisições HTTP durante o carregamento. O site já usa HTTPS. Para usar esta fonte no site, é necessário um acesso HTTPS compatível ao catálogo e aos vídeos.' : undefined}
+    actions={paused ? <>
     {onRetry && <button type="button" className="focusable-item btn-primary" onClick={onRetry}>Tentar novamente</button>}
     {onOpenActivation && <button type="button" className="focusable-item btn-secondary" onClick={onOpenActivation}>Ver ativação</button>}
     {onOpenPortal && <button type="button" className="focusable-item btn-secondary" onClick={onOpenPortal}>Portal do cliente</button>}

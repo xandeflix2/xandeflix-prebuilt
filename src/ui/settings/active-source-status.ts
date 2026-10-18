@@ -5,6 +5,9 @@ import { getBootSyncCoordinator } from '../../bootstrap/boot-sync-coordinator.ts
 import { canRefreshCatalog } from '../../bootstrap/automatic-source-refresh.ts';
 import { defaultPlaybackService } from '../../playback/playback.service.ts';
 import { GoogleCast, hasGoogleCast } from '../../playback/google-cast.ts';
+import { observeWebCatalogRefresh, observeWebRefreshBlocker } from '../../web/web-source-connection.ts';
+declare const __XANDEFLIX_WEB_PUBLIC__: boolean;
+const publicWeb = typeof __XANDEFLIX_WEB_PUBLIC__ !== 'undefined' && __XANDEFLIX_WEB_PUBLIC__;
 
 export interface SourceIdentity { id: string; version: number }
 export interface ActiveSourceStatus {
@@ -58,8 +61,14 @@ export async function canUpdateSourceCatalog(): Promise<boolean> {
   const safe = () => Boolean(document.querySelector('.settings-page')) && canRefreshCatalog({ visible: document.visibilityState === 'visible', online: navigator.onLine !== false,
     view: 'settings', playbackState: defaultPlaybackService.getCurrentSession().state,
     modalOpen: Boolean(document.querySelector('[data-detail-modal], .parental-dialog[open]')) });
-  if (!safe()) return false;
-  try { if (hasGoogleCast() && (await GoogleCast.status()).active) return false; } catch { return false; }
+  if (!safe()) {
+    if (publicWeb) observeWebRefreshBlocker(!document.querySelector('.settings-page') ? 'NOT_SETTINGS'
+      : document.visibilityState !== 'visible' ? 'HIDDEN' : navigator.onLine === false ? 'OFFLINE'
+        : document.querySelector('[data-detail-modal], .parental-dialog[open]') ? 'MODAL_OPEN' : 'PLAYBACK_ACTIVE');
+    return false;
+  }
+  try { if (hasGoogleCast() && (await GoogleCast.status()).active) { if (publicWeb) observeWebRefreshBlocker('CAST_ACTIVE'); return false; } }
+  catch { if (publicWeb) observeWebRefreshBlocker('CAST_UNAVAILABLE'); return false; }
   return safe();
 }
 export async function updateSourceCatalog(deps = { canRun: canUpdateSourceCatalog,
@@ -71,14 +80,15 @@ export async function updateSourceCatalog(deps = { canRun: canUpdateSourceCatalo
     if (hasGoogleCast()) {
       listener = await GoogleCast.addListener('state', state => { casting = state.active; });
       casting = (await GoogleCast.status()).active;
-      if (casting) return 'deferred';
+      if (casting) { if (publicWeb) observeWebRefreshBlocker('CAST_ACTIVE'); return 'deferred'; }
     }
     const canPromote = () => !casting && Boolean(document.querySelector('.settings-page')) && document.visibilityState === 'visible' && navigator.onLine !== false
       && !document.querySelector('[data-detail-modal], .parental-dialog[open]')
       && !['RESOLVING','READY_TO_START','OPENING_NATIVE_PLAYER','BUFFERING','PLAYING','PAUSED'].includes(defaultPlaybackService.getCurrentSession().state);
     const result = await deps.sync(canPromote);
+    if (publicWeb) observeWebCatalogRefresh(result.outcome, 'error' in result ? result.error : undefined);
     return result.outcome === 'PROMOTED' ? 'updated' : result.outcome === 'NO_OP' ? 'unchanged'
-      : result.outcome === 'LOCAL_FIRST_ACTIVE_PRESERVED' ? 'deferred' : 'failed';
+      : result.outcome === 'LOCAL_FIRST_ACTIVE_PRESERVED' ? publicWeb && 'error' in result && result.error ? 'failed' : 'deferred' : 'failed';
   } catch { return 'failed'; }
   finally { await listener?.remove().catch(() => {}); }
 }

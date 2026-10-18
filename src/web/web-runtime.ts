@@ -4,6 +4,7 @@ import { getBootSyncCoordinator } from '../bootstrap/boot-sync-coordinator.ts';
 import { Capacitor } from '@capacitor/core';
 import { readWebCatalogFile } from './web-catalog-files.ts';
 import { defaultPlaybackService } from '../playback/playback.service.ts';
+import { getWebSourceConnection, observeWebSourceFailure, resetWebSourceConnection } from './web-source-connection.ts';
 import './web-runtime.css';
 declare const __XANDEFLIX_WEB_PUBLIC__: boolean;
 export function mountWebRuntimeNotice(): void {
@@ -16,7 +17,10 @@ export function mountWebRuntimeNotice(): void {
   window.addEventListener('keydown', preserveSearchSpace, true);
   let outcome = 'NAO_OBSERVADO', transport = { stage: 'NAO_OBSERVADO', error: 'NAO_OBSERVADO', status: 'NAO_OBSERVADO' };
   const safe = (value: unknown) => typeof value === 'string' && /^[A-Z][A-Z0-9_]{1,80}$/.test(value) ? value : 'NAO_INFORMADO';
-  getBootSyncCoordinator().subscribe((_, result) => { if (result) outcome = safe(result.outcome); });
+  getBootSyncCoordinator().subscribe((state, result) => {
+    if (state === 'CHECKING_SOURCE' || state === 'READY') resetWebSourceConnection();
+    if (result) outcome = safe(result.outcome);
+  });
   const originalFetch = window.fetch.bind(window);
   window.fetch = async (input, init) => {
     let url: URL;
@@ -30,7 +34,8 @@ export function mountWebRuntimeNotice(): void {
       if (sourceRequest) transport = { stage: 'HTTP_RESPONSE', error: response.type === 'opaque' ? 'CORS_CONFIRMED' : response.ok ? 'NONE' : 'HTTP_ERROR', status: response.type === 'opaque' ? 'OPAQUE' : 'HTTP_' + Math.floor(response.status / 100) + 'XX' };
       return response;
     } catch (error) {
-      if (sourceRequest) transport = { stage: 'REQUEST_START', error: error instanceof DOMException && error.name === 'AbortError' ? 'ABORTED' : 'NETWORK_OR_CORS', status: 'NO_RESPONSE' };
+      if (sourceRequest) transport = { stage: 'REQUEST_START', error: error instanceof DOMException && error.name === 'AbortError' ? 'ABORTED'
+        : observeWebSourceFailure(url, error) ? 'HTTP_IN_HTTPS_BLOCKED' : 'NETWORK_OR_CORS', status: 'NO_RESPONSE' };
       throw error;
     }
   };
@@ -55,6 +60,7 @@ export function mountWebRuntimeNotice(): void {
       'PLAYER=' + (Capacitor.isPluginAvailable('NativeAndroidPlayer') ? 'DISPONIVEL' : 'RECARREGAR_PAGINA'),
       'CATALOG_STATE=' + code(progress.state), 'CATALOG_OUTCOME=' + outcome, 'CATALOG_ERROR=' + code(progress.error),
       'SOURCE_FETCH_STAGE=' + transport.stage, 'SOURCE_FETCH_ERROR=' + transport.error, 'SOURCE_HTTP_STATUS=' + transport.status,
+      'SOURCE_WEB_CONNECTION=' + getWebSourceConnection(),
       'PLAYBACK_STATE=' + safe(playback.state), 'PLAYBACK_ERROR=' + safe(playback.errorCategory),
       'VIDEO_READY_STATE=' + (video?.readyState ?? 'NONE'), 'VIDEO_ADVANCED=' + (video && video.currentTime > 0 ? 'SIM' : 'NAO'),
       'VIDEO_ERROR_CODE=' + (video?.error?.code || 0)].join('\n');

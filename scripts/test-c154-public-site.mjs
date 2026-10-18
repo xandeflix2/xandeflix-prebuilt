@@ -63,14 +63,16 @@ await test('PUBLIC_BUILD_EXPOSES_ONLY_CANONICAL_PUBLIC_CONFIG', () => {
   const helper = execute('src/manager/public-config.ts', context, {});
   const config = execute('vite.app.config.ts', context, {
     vite: { defineConfig: (value) => value, loadEnv: (_mode, _root, prefix) => {
-      assert.equal(prefix, 'VITE_SUPABASE_');
-      return { VITE_SUPABASE_URL: fixture.url, VITE_SUPABASE_PUBLISHABLE_KEY: fixture.publishableKey, VITE_DEBUG_BUILD: 'true', VITE_TMDB_API_KEY: 'synthetic_unrelated_credential' };
+      assert.ok(['VITE_SUPABASE_', 'VITE_TMDB_API_KEY'].includes(prefix));
+      return { VITE_SUPABASE_URL: fixture.url, VITE_SUPABASE_PUBLISHABLE_KEY: fixture.publishableKey, VITE_DEBUG_BUILD: 'true', VITE_TMDB_API_KEY: 'ab'.repeat(16), VITE_TMDB_READ_ACCESS_TOKEN: 'synthetic_unrelated_credential' };
     } }, '@vitejs/plugin-react': () => ({}), 'node:path': path, './src/manager/public-config.ts': helper,
   }).default({ mode: 'production' });
   assert.equal(config.base, '/app/'); assert.equal(config.envPrefix.length, 0);
   assert.equal(config.define.__XANDEFLIX_DEBUG_BUILD__, 'false');
   assert.equal(config.define.__XANDEFLIX_WEB_VALIDATION__, 'true');
   assert.equal(config.define.__XANDEFLIX_WEB_PUBLIC__, 'true');
+  assert.equal(JSON.parse(config.define['import.meta.env.VITE_TMDB_API_KEY']), 'ab'.repeat(16));
+  assert.equal(config.define.__XANDEFLIX_WEB_TMDB_CONFIGURED__, 'true');
   assert.deepEqual(JSON.parse(config.define.__XANDEFLIX_APP_PUBLIC_CONFIG__), fixture);
   assert.doesNotMatch(JSON.stringify(config), /synthetic_unrelated_credential/);
   assert.equal(config.build.sourcemap, false);
@@ -87,6 +89,7 @@ await test('PUBLIC_RUNTIME_PRESERVES_LOCAL_CATALOG_FETCH_AND_SEARCH_INPUT_WITHOU
       '../bootstrap/boot-sync-coordinator.ts': { getBootSyncCoordinator: () => ({ subscribe: () => {} }) },
       '@capacitor/core': {}, './web-catalog-files.ts': { readWebCatalogFile: async (url) => url.pathname.startsWith('/DATA/prebuilt/') ? new Response('local-catalog') : undefined },
       '../playback/playback.service.ts': {}, './web-runtime.css': {},
+      './web-source-connection.ts': { getWebSourceConnection: () => 'NOT_OBSERVED', observeWebSourceFailure: () => false, resetWebSourceConnection() {} },
     });
     if (publicBuild) runtime.mountWebRuntimeNotice();
     else assert.throws(() => runtime.mountWebRuntimeNotice(), /BADGE_REACHED/, 'Local conference badge remains available');

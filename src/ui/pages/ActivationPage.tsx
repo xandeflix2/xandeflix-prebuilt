@@ -50,6 +50,8 @@ import { buildActivationDiagnostics } from '../activation/activation-diagnostics
 import { copyActivationText } from '../activation/activation-clipboard.ts';
 import './ActivationPage.css';
 import { ActivationHandoff } from '../components/ActivationHandoff.tsx';
+import { isPublicConsumerWeb } from '../../web-production/session-context.ts';
+import { WebAccessStatus } from '../../web-production/WebAccessStatus.tsx';
 
 
 interface ActivationPageProps {
@@ -60,7 +62,10 @@ interface ActivationPageProps {
   onCatalogImported?: () => Promise<void> | void;
 }
 
-export const ActivationPage: React.FC<ActivationPageProps> = ({
+export const ActivationPage: React.FC<ActivationPageProps> = props =>
+  isPublicConsumerWeb() ? <WebAccessStatus {...props}/> : <NativeActivationPage {...props}/>;
+
+const NativeActivationPage: React.FC<ActivationPageProps> = ({
   onBack,
   showBackButton = true,
   onOpenSettings,
