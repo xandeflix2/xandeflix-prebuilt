@@ -72,3 +72,23 @@ Lock e site:build finais completos PASS com exit0. Publicacao em andamento.
 Ultima fonte real ainda depende do diagnostico atualizado; nao alegar resolucao
 de DIRECTORY_SOURCE_NOT_AUTHORIZED, TMDB na Vercel ou playback de producao.
 CURRENT_GATE=NONE; NEXT_GATE_STARTED=NAO.
+
+## C157 — publicacao web verificada, fonte real em diagnostico — 2026-10-17
+
+Commit funcional8f7db18 publicado por origin/main, projeto canonico Vercel
+xandeflix2/xandeflix-prebuilt-nm3x READY:
+https://vercel.com/xandeflix2/xandeflix-prebuilt-nm3x/B8FGeXpgEBh72DXttrvzaqPCVrzB
+Ambos aliases / /admin /app /app/ HTTP200 e entries corretos; .env.local e
+api/control-plane/state404, headers DENY/nosniff. Bundle com UI C157 e
+TMDB_CONFIGURED=SIM: nao precisa cadastrar variavel agora. Isso nao certifica
+consumo TMDB de producao. HTML appSHA256689edf40ef1e5503a553f14dfd19a62917eb7382b48b915cc40986481a78b4cf
+e mainSHA256771060cbfb250aea521516c2b0ead567dd14ad1e45009537f016acb0b15ccd38
+iguais nos aliases. Chrome isolado remoto: login3campos, senhas mascaradas,
+sem identidade/ativacao ou storage antes do login; nao usou sessao real.
+Supabase sem escritas; sem logs runtime Vercel acessiveis nesta conexao.
+Helper inline de preparo do browser falhou por quoting PowerShell; substituido
+por arquivo .mjs e teste remoto PASS, sem alterar fonte ou navegador usuario.
+Aguardar diagnostico WEB_SUPPORT apos atualizar para identificar bloqueio/erro
+real; nao alegar resolucao de DIRECTORY_SOURCE_NOT_AUTHORIZED ou playback.
+Estrategia HTTP por relay/VPS rejeitada e nao implementada.
+NEXT_GATE_STARTED=NAO.
