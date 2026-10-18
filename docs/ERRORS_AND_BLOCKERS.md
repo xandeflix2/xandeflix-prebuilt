@@ -3222,3 +3222,8 @@ NEXT_GATE_STARTED=NAO.
 ## C158 — diagnostico de reproducao e detalhes web — 2026-10-17
 
 Falhas de conteudo real ainda sem causa confirmada: filme fecha, Live com codigo generico e algumas series rejeitam detalhes. Diagnostico C158 agora conserva enums distintos sem segredos; nao relaxar source/codec/validacao. Fixture inicial assumiu ausencia de HLS nativo no Chrome; corrigida somente a capability sintetica para exercitar hls.js. Leituras iniciais usaram dois caminhos inexistentes e um glob posicional invalido, corrigidos pelos caminhos descobertos. Patch documental sem contexto correspondente falhou sem escrita e foi reaplicado com contexto real. Helper de auditoria primeiro leu log UTF16 do PowerShell como UTF8 e nao reconheceu marcador presente; corrigida somente decodificacao pelo BOM. Build e suites finais passam. Nao houve falha de produto causada por esses comandos. Producao e retorno real pendentes.
+
+
+## C158 — fechamento da publicacao web — 2026-10-17
+
+Publicacao C158 READY no projeto equipe2 xandeflix-prebuilt-nm3x, commit funcional e9d568aef979a14a31d0f770453f1dbf8edf8639. Ambos aliases servem 14 assets atuais; admin/app200, caminhos sensiveis404. Consulta read-only a app/index.html inexistente foi corrigida pela rota canonica /app/app.html definida em vercel.json, sem mudanca de produto. Falhas reais de lancamentos/Live/detalhes ainda aguardam enums do usuario; nao afirmar codec ou CORS como causa sem evidencia. Nenhuma fonte/cliente/Supabase/APK alterado.

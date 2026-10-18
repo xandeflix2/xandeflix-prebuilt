@@ -2891,3 +2891,8 @@ NEXT_GATE_STARTED=NAO.
 ## C158 — diagnostico de reproducao e detalhes web — 2026-10-17
 
 Ciclo local C158 especificado antes do codigo. Diagnostico web RAM de filme/serie/Live/episodios, isolamento de callbacks tardios e preservacao de eventos/C9/nativo. Lock/site:build completos PASS, C15814/C13610/C10512+7 e Chrome sintetico PASS, controle negativo reproduz falha antiga. APK C156 e arquivos fora da allowlist preservados. Publicacao no projeto equipe2 autorizada pelo escopo em curso, ainda pendente. Conteudos reais nao certificados. NEXT_GATE_STARTED=NAO.
+
+
+## C158 — fechamento da publicacao web — 2026-10-17
+
+Publicacao C158 confirmada em producao. Commit funcional e9d568aef979a14a31d0f770453f1dbf8edf8639; Vercel equipe xandeflix2, projeto xandeflix-prebuilt-nm3x, deployment 7RYbkJgd8kLCjcpfiLhLZZjo86GL READY por status GitHub. https://xandeflix.vercel.app e alias nm3x: admin/app200, 14 assets identicos ao build aprovado, headers DENY/nosniff, .env.local e /api/control-plane/state404. Main main-DSLXSd84.js SHA256 086d3a289b2c29de5e8cc64e0d8db26cbbafa8ac93ae45f46ca4a2ef6e01ffce; TMDB_CONFIGURED=SIM. Correcao de evento tardio e diagnostico publicados; reproducao real de lancamentos/Live e carregamento das series que falham NAO certificados. Usuario deve repetir tentativas e fornecer somente WEB_MOVIE_/WEB_LIVE_/WEB_SERIES_DETAILS_ do suporte, sem URLs/credenciais. Nenhum proxy/relay, backend, APK ou dispositivo alterado. Este fechamento modifica somente documentacao. NEXT_GATE_STARTED=NAO.
