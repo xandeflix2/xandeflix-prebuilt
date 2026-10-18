@@ -160,3 +160,63 @@ store web enums/booleanos de guard/resultado, sem alterar guard/canPromote,
 coordenador, pedidos ou comportamento nativo. WebAccessStatus mostra esses
 enums de ultima tentativa. Ampliar suite C157 para provar guard, erro de
 preservacao, resultado sem erro e comportamento nativo anterior intacto.
+
+## Revisao final da conexao direta e dependencia do fornecedor — 2026-10-18
+
+Usuario pediu correcao definitiva e confirmou que usa fonte de terceiros,
+sem acesso administrativo ao servidor. Mantida decisao anterior contra
+gateway/VPS/relay/custos de banda. Nao ha autorizacao para contornar TLS,
+CORS ou Mixed Content, nem para desabilitar /app parcialmente funcional.
+
+Preflight: clone independente C:/Xandeflix/xandeflix-prebuilt-c11-main,
+main/origin canonicos, HEAD007c1851459763b520acd4a412e70c918e059727 limpo.
+AGENTS, Architecture, Execution, Source Boundary e especificacao existente
+consultados. CURRENT_GATE=NONE; mesmo diagnostico web autorizado, sem novo
+Gate. Allowlist deste registro: este documento e tres memorias append-only.
+Git/publicacao de registros do reparo continuam autorizados; PR=NAO.
+Sem alteracoes de codigo/testes/build/backend/APK/cliente/fonte/dispositivo.
+
+Revisao read-only confirmou: source-directory-api preserva scheme/origin
+da configuracao autorizada; source-directory-details consulta diretamente
+get_series_info, sem relay; web-media valida protocolo e usa URI original;
+web-runtime observa falha e relanca o mesmo erro, sem mudar URL; EPG faz
+fetch direto no endpoint provisionado. Nao foi identificada nessas rotas
+uma reescrita local que explique o destino HTTP ou repare TLS/CORS da fonte.
+Isso nao certifica todas as series nem atribui seus erros sem diagnostico.
+
+Console real ja entregue pelo usuario comprova ERR_SSL_PROTOCOL_ERROR em
+filme, HTTP final bloqueado em Live, API/EPG sem Access-Control-Allow-Origin
+e404, imagens com ERR_CERT_COMMON_NAME_INVALID. Enderecos, contas e tokens
+reais nao transcritos nem consultados. Correcao desses transportes exige
+acao do fornecedor; mudar somente o endereco inicial para HTTPS nao basta.
+
+### Pedido tecnico pronto para o fornecedor
+
+O aplicativo web usa conexao direta do navegador, em
+https://xandeflix.vercel.app. Precisamos que a fonte ofereca:
+
+1. HTTPS funcional com certificado valido para cada host final de filmes,
+   episodios, canais e imagens, inclusive portas e redirecionamentos.
+   Manifestos/segmentos/chaves, quando usados, tambem devem permanecer HTTPS.
+2. API player_api.php acessivel e com respostas JSON validas para a conta,
+   inclusive get_series_info e get_short_epg; corrigir respostas404 das
+   rotas anunciadas ou fornecer os endpoints oficiais compativeis.
+3. Nas respostas da API e nas midias lidas por fetch/HLS/MPEGTS, permitir
+   a origem https://xandeflix.vercel.app por Access-Control-Allow-Origin.
+   Se o alias nm3x for usado, inclui-lo na allowlist com uma unica origem
+   correspondente por resposta. Vary: Origin ao selecionar origem dinamica.
+   Atender OPTIONS/headers apenas quando requisitados pelo preflight.
+4. Entregar formatos e codecs reproduziveis pelo navegador alvo. Sucesso
+   de download M3U ou reproducao em app nativo nao comprova compatibilidade
+   web; verificar TLS/CORS antes de atribuir falha a codec.
+
+Sem URL/usuario/senha/PIN/PUK/HAR no pedido publico ou no repositorio.
+Depois da resposta do fornecedor, validar itens realmente afetados no
+navegador antes de declarar resolucao. Nenhum endpoint novo sera adivinhado.
+Enquanto isso, correcao definitiva de reproducao web NAO CONCLUIDA; painel
+e /app existentes preservados, sem alegar funcionamento de conteudo real.
+
+Referencias primarias verificadas:
+https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS
+https://developer.mozilla.org/en-US/docs/Web/Security/Defenses/Mixed_content
+NEXT_GATE_STARTED=NAO.

@@ -2932,3 +2932,13 @@ success no projeto equipe2 nm3x, deployment5phqwFUyCAt6dmVFBACrJXkjLVQY.
 Atualizacao somente de evidencia e memorias, append-only, main/origin
 canonicos e limpos no preflight. Sem nova suite/build/APK. Fonte continua
 dependencia externa. NEXT_GATE_STARTED=NAO.
+
+## Conexao web direta — dependencia do fornecedor confirmada — 2026-10-18
+
+Pedido de correcao definitiva revisado no clone canonico HEAD007c185 limpo.
+Usuario confirmou fonte de terceiros. Protocolos/URIs preservados nas rotas
+revisadas; logs mostram TLS de filme, HTTP final Live, CORS+404 API/EPG e
+certificados de imagens. Pedido tecnico pronto em C11_WEB_SOURCE_HTTPS_DIAGNOSIS.md.
+Correcao definitiva desses transportes depende do fornecedor e NAO esta
+concluida. Sem codigo/dep/backend/APK, bypass ou estrategia de banda. Registro
+documental autorizado, sem novo Gate. NEXT_GATE_STARTED=NAO.

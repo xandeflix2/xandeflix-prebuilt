@@ -3265,3 +3265,16 @@ causa anteriormente apenas reproduzida localmente tambem esta confirmada
 no build remoto. Reparo251b937 e fechamento9b105da ja receberam success no
 projeto correto. Nenhuma nova falha/runtime alterado neste registro; nao
 confundir com TLS/HTTP/CORS/certificados da fonte. NEXT_GATE_STARTED=NAO.
+
+## Conexao web direta — bloqueio externo permanece — 2026-10-18
+
+Fonte de terceiros confirmada pelo usuario. Acesso administrativo ao
+servidor da fonte nao disponivel ao executor; correcao de TLS, redirects
+HTTP, CORS e rotas404 depende do fornecedor. Nao declarar correcao definitiva
+sem teste real apos esses ajustes. Nao implementar bypass/relay nem testar
+credenciais recebidas. Pedido tecnico sem segredos preparado no diagnostico.
+Leitura inicial incluiu diretorio src/player inexistente; inventario retornou
+demais resultados, erro nao alterou arquivos. Leituras seguintes usaram
+src/web/web-media.ts e caminhos existentes. Saidas amplas foram truncadas;
+revisao focada posterior confirmou rotas relevantes. Nenhum erro de produto
+novo ou teste alterado. NEXT_GATE_STARTED=NAO.
