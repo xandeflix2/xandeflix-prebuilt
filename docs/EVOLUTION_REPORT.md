@@ -3405,3 +3405,28 @@ localhost:3000 desta sessao deu timeout, sem fonte/midia/credenciais lidas.
 Comparacao com producao segue pendente, sem proxy/VPS/bypass.
 Capturas novas de switch TV e PIN celular revisadas; quatro perfis sinteticos
 e verificacao visual passam. Fechamento documental, NEXT_GATE_STARTED=NAO.
+
+
+## C160 — APK atualizado para testes — 2026-10-18
+
+Pedido explicito de APK, preflight HEAD076f8169b31280b782271c5a78f55503ee42e82e limpo, clone
+independente/main/origin canonicos. Emenda anterior ao build no contratoC160.
+Gradle mudou somente31->32; runtime corresponde ao C160 publicado.
+APK 1.0.32/code32, packagecom.xandeflix.prebuilt,
+11396286bytes, SHA2560cd6287ee3b1fcbf8d6110e32611e37d287c63c27e65c44fb5c948b837438170. Arquivo ignorado
+tmp/c160-parental-apk/Xandeflix-v1.0.32-C160.apk, APK C156 preservado.
+Assinatura SHA256b235c7117c9660e17cf0732cd6493600a812692af289e627454988ea096e848d, mesma do anterior.
+Build nativo sem servidor dev/sem player ou cofre browser, assets dist
+verificados (8), configuracao HTTPS standalone; switch
+parental, PIN web e PUK recovery presentes. 1412 recursos
+nativos identicos ao anterior, 205 testes Android em
+35 suites, sem failures/errors/skips. C16012/12, lock
+inicial/prebuild/final, tsc/Vite, cap sync e Gradle PASS.
+Nenhuma fonte, backend, identidade, dado ou aparelho real consultado/alterado.
+Sem instalacao/QA fisica. Artefato para atualizar manualmente sobre a versao
+atual mantendo PIN/PUK/ativacao. Warning Vite de tamanho de chunk permanece
+informativo; nao motivou refatoracao. Auditoria de 1235 demais hashes,
+memorias append-only e diff --check deve passar antes da entrega.
+Git de versionamento/registro autorizado no escopo em curso; PR=NAO.
+Comparacao localhost/producao anterior continua pendente; APK nao certifica
+compatibilidade da fonte com navegador publico. NEXT_GATE_STARTED=NAO.

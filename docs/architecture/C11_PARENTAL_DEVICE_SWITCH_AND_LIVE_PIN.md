@@ -59,3 +59,30 @@ destinos/permissoes de producao; nao atribuir essa diferenca somente ao
 protocolo. Vite e servidor estatico lidos nao mostram proxy de midia.
 Investigacao web permanece aberta, sem executar relay/VPS/bypass.
 NEXT_GATE_STARTED=NAO.
+
+## Entrega APK solicitada — 2026-10-18 — anterior ao build
+
+Usuario pediu expressamente APK atualizado para testes nos dispositivos.
+Esta entrega sucede a restricao anterior de nao gerar APK neste ciclo.
+Mesmo C160; nenhuma nova alteracao funcional ou proximo Gate. Preflight
+clone independente/main/origin canonicos, HEAD076f8169b31280b782271c5a78f55503ee42e82e
+limpo, AGENTS/Architecture/Execution/Activation Lock e escopoC160 relidos.
+Git de versionamento/registro continua autorizado; PR/backend/install=NAO.
+
+Allowlist adicional estrita: android/app/build.gradle somente versionCode
+31->32 e versionName1.0.31->1.0.32; esta emenda, evidenciaC160 e tres memorias
+append-only. Build nativo padrao sem validacao/player/cofre web, debug flag
+false. Outputs ignorados usuais dist/Android build/assets e
+tmp/c160-parental-apk; nao sobrescrever APKs ja entregues, keystores ou dados.
+Cap sync nao autoriza mudar configuracoes/plugins/source/backup/ativacao.
+Qualquer diferenca rastreada fora da allowlist exige auditoria antes de seguir.
+
+Aceitacao: lock antes da mudanca, npm run build com hook e tsc/Vite; suiteC160;
+cap sync android e Gradle testDebugUnitTest/assembleDebug; verificar package
+com.xandeflix.prebuilt, v1.0.32/code32, min23/target35, assinatura identica ao
+APK C156, configuracao HTTPS standalone sem servidor dev, assets equivalentes
+ao dist aprovado, C160 e PIN web inclusos, exclusao de player/cofre browser,
+recursos nativos preservados, metadados/sha256 e auditoria final do lock.
+APK C156 permanece intacto. Nao instalar nem alegar QA fisica. Oferecer
+arquivo assinado para atualizacao manual sobre a versao instalada, preservando
+PIN/PUK/identidade/catalogo existentes. NEXT_GATE_STARTED=NAO.
