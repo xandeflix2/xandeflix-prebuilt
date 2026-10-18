@@ -3371,3 +3371,15 @@ certificados de imagens. Pedido tecnico pronto em C11_WEB_SOURCE_HTTPS_DIAGNOSIS
 Correcao definitiva desses transportes depende do fornecedor e NAO esta
 concluida. Sem codigo/dep/backend/APK, bypass ou estrategia de banda. Registro
 documental autorizado, sem novo Gate. NEXT_GATE_STARTED=NAO.
+
+## C160 — opcao parental local e PIN Live — 2026-10-18
+
+Pedido posterior implementado conforme spec previa: off/on protegido pelo
+PIN atual, sem apagar verificadores/preferencias; adultos mantem opt-in/18/PIN.
+Canais comuns livres de filtro/PIN etario; adulto elegivel selecionado sem
+sessao abre modal antes de autorizar apenas aquele canal. Legacy permanece
+ativo e falhas fechadas. SuiteC16012, C12616, C12811, C135clock12 e C1489 PASS;
+lock/site:build completos PASS. Chrome sintetico PC/tablet/TV/celular PASS.
+Publicacao web pendente, APK/instalacao nao executados neste pedido. Comparacao
+localhost HTTP/HTTPS versus producao permanece pendente, sem bypass/relay.
+NEXT_GATE_STARTED=NAO.

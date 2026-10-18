@@ -7,9 +7,10 @@ export interface ParentalPolicy { maxAge: number; allowAdult: boolean }
 export interface ParentalRule { key: string; minAge: number; alwaysPin: boolean; adult: boolean }
 export interface ParentalStorage { read(): Promise<string | null>; write(value: string): Promise<void> }
 interface Verifier { salt: string; hash: string }
-interface RecordV1 { version: 1; iterations: number; pin: Verifier; puk: Verifier; policy: ParentalPolicy; failures: number; blockedUntil: number; pinBlock?: ParentalPinBlock; rules: ParentalRule[] }
+interface RecordV1 { version: 1; iterations: number; pin: Verifier; puk: Verifier; policy: ParentalPolicy; enabled?: boolean; failures: number; blockedUntil: number; pinBlock?: ParentalPinBlock; rules: ParentalRule[] }
 export interface ParentalSnapshot {
   status: 'loading' | 'unconfigured' | 'ready' | 'error'; policy: ParentalPolicy;
+  enabled: boolean;
   admin: boolean; adultSession: boolean; busy: boolean; revision: number;
   contentRevision: number;
   lockRevision: number;
@@ -30,12 +31,12 @@ function parse(raw: string): RecordV1 {
   const v = JSON.parse(raw) as RecordV1;
   if (v.version !== 1 || v.iterations !== PARENTAL_KDF_ITERATIONS || ![v.pin, v.puk].every(s => s && /^[a-f\d]{32}$/.test(s.salt) && /^[a-f\d]{64}$/.test(s.hash))
     || !Number.isSafeInteger(v.failures) || v.failures < 0 || !Number.isSafeInteger(v.blockedUntil) || v.blockedUntil < 0) throw new Error('PARENTAL_INVALID_RECORD');
-  if (!Array.isArray(v.rules) || v.rules.length > 256) throw new Error('PARENTAL_INVALID_RECORD');
+  if ((v.enabled !== undefined && typeof v.enabled !== 'boolean') || !Array.isArray(v.rules) || v.rules.length > 256) throw new Error('PARENTAL_INVALID_RECORD');
   const block = v.pinBlock;
   if (block !== undefined && (!validParentalClock({ clockId: block.clockId, elapsedMs: block.elapsedAtMs })
     || !Number.isSafeInteger(block.remainingMs) || block.remainingMs <= 0 || block.remainingMs > PARENTAL_PIN_BLOCK_MS)) throw new Error('PARENTAL_INVALID_RECORD');
   const rules = v.rules.map(validateRule);
-  return { version: 1, iterations: PARENTAL_KDF_ITERATIONS, pin: { salt: v.pin.salt, hash: v.pin.hash }, puk: { salt: v.puk.salt, hash: v.puk.hash }, policy: validatePolicy(v.policy), failures: v.failures, blockedUntil: v.blockedUntil, ...(block ? { pinBlock: { clockId: block.clockId, elapsedAtMs: block.elapsedAtMs, remainingMs: block.remainingMs } } : {}), rules };
+  return { version: 1, iterations: PARENTAL_KDF_ITERATIONS, pin: { salt: v.pin.salt, hash: v.pin.hash }, puk: { salt: v.puk.salt, hash: v.puk.hash }, policy: validatePolicy(v.policy), ...(v.enabled !== undefined ? { enabled: v.enabled } : {}), failures: v.failures, blockedUntil: v.blockedUntil, ...(block ? { pinBlock: { clockId: block.clockId, elapsedAtMs: block.elapsedAtMs, remainingMs: block.remainingMs } } : {}), rules };
 }
 function validateRule(v: ParentalRule): ParentalRule {
   if (!v || !/^(movie|series|live):[a-f0-9]{32}$/.test(v.key) || !(PARENTAL_AGES as readonly number[]).includes(v.minAge) || typeof v.alwaysPin !== 'boolean' || typeof v.adult !== 'boolean') throw new Error('PARENTAL_INVALID_RULE');
@@ -60,7 +61,7 @@ export class ParentalControlStore {
   private prompt?: { id: number; key: string; adult: boolean; unlockSession?: boolean; epoch?: number; finish: (allowed: boolean) => void };
   private expiry?: ReturnType<typeof setTimeout>;
   private lockEpoch = 0;
-  private snapshot: ParentalSnapshot = { status: 'loading', policy: { maxAge: 18, allowAdult: false }, admin: false, adultSession: false, busy: false, revision: 0, contentRevision: 0, lockRevision: 0, grantRevision: 0, prompt: null };
+  private snapshot: ParentalSnapshot = { status: 'loading', policy: { maxAge: 18, allowAdult: false }, enabled: true, admin: false, adultSession: false, busy: false, revision: 0, contentRevision: 0, lockRevision: 0, grantRevision: 0, prompt: null };
   constructor(options: { storage: ParentalStorage; crypto?: () => Crypto; now?: () => number; clock?: () => Promise<ParentalClock>; preparePukChange?: (current: string, next: string) => Promise<() => Promise<void>> }) {
     this.storage = options.storage; this.crypto = options.crypto || (() => globalThis.crypto); this.now = options.now || Date.now;
     this.preparePukChange = options.preparePukChange;
@@ -71,6 +72,7 @@ export class ParentalControlStore {
   getSnapshot = () => this.snapshot;
   private emit() {
     this.snapshot = { ...this.snapshot, policy: this.record ? { ...this.record.policy } : this.snapshot.policy,
+      enabled: this.record?.enabled !== false,
       admin: this.adminUntil > this.now(), adultSession: this.adultUntil > this.now(), revision: this.snapshot.revision + 1 };
     for (const listener of this.listeners) listener();
   }
@@ -86,7 +88,7 @@ export class ParentalControlStore {
     try {
       const raw = JSON.stringify(record); await this.storage.write(raw);
       if (await this.storage.read() !== raw) throw new Error('PARENTAL_WRITE_FAILED');
-      if (JSON.stringify(this.record?.policy) !== JSON.stringify(record.policy) || JSON.stringify(this.record?.rules) !== JSON.stringify(record.rules)) this.snapshot.contentRevision++;
+      if (this.record?.enabled !== record.enabled || JSON.stringify(this.record?.policy) !== JSON.stringify(record.policy) || JSON.stringify(this.record?.rules) !== JSON.stringify(record.rules)) this.snapshot.contentRevision++;
       this.record = record; this.snapshot.status = 'ready'; this.emit();
     } catch { this.snapshot.status = 'error'; this.lock(); throw new Error('PARENTAL_STORAGE_UNAVAILABLE'); }
   }
@@ -162,6 +164,14 @@ export class ParentalControlStore {
   async updatePolicy(policy: ParentalPolicy) {
     return this.run(async () => { this.requireAdmin(); const next = validatePolicy(policy); this.grants.clear(); this.adultUntil = 0; await this.save({ ...this.record!, policy: next }); });
   }
+  async setEnabled(enabled: boolean): Promise<void> {
+    return this.run(async () => {
+      this.requireAdmin();
+      if (typeof enabled !== 'boolean') throw new Error('PARENTAL_INVALID_POLICY');
+      this.lock();
+      await this.save({ ...this.record!, enabled });
+    });
+  }
   async changePin(current: string, pin: string): Promise<boolean> {
     return this.run(async () => { this.requireAdmin(); if (!validateParentalPin(pin)) throw new Error('PARENTAL_INVALID_SECRET'); if (!await this.check(current, 'pin')) return false;
       await this.save({ ...this.record!, pin: await this.verifier(pin) }); this.lock(); return true; });
@@ -229,6 +239,7 @@ export class ParentalControlStore {
     if (signal?.aborted) return false;
     if (this.snapshot.status === 'error') throw new Error('PARENTAL_STORAGE_UNAVAILABLE');
     if (!this.record) { if (adult) throw new Error('PARENTAL_SETUP_REQUIRED'); return true; }
+    if (!adult && this.record.enabled === false) return true;
     if (adult && !this.adultVisible()) throw new Error('PARENTAL_ADULT_DISABLED');
     const effectiveAge = adult ? Math.max(age ?? 0, 18) : age;
     if (effectiveAge !== undefined && effectiveAge > this.record.policy.maxAge) return false;
@@ -241,21 +252,21 @@ export class ParentalControlStore {
       this.prompt = { id, key, adult, finish }; signal?.addEventListener('abort', abort, { once: true });
       this.snapshot.prompt = { id, reason: adult ? 'Conteúdo adulto. Informe o PIN para continuar.' : alwaysPin ? 'Conteúdo protegido por uma regra manual. Informe o PIN para continuar.' : age === undefined ? 'Conteúdo sem classificação. Informe o PIN para continuar.' : 'Classificação acima do limite deste aparelho. Informe o PIN para continuar.' }; this.emit(); });
   }
-  async requestAdultSession(signal?: AbortSignal): Promise<boolean> {
+  async requestAdultSession(signal?: AbortSignal, selectedKey?: string): Promise<boolean> {
     await this.load();
     if (signal?.aborted) return false;
     if (this.snapshot.status === 'error') throw new Error('PARENTAL_STORAGE_UNAVAILABLE');
     if (!this.record) throw new Error('PARENTAL_SETUP_REQUIRED');
     if (!this.record.policy.allowAdult) throw new Error('PARENTAL_ADULT_DISABLED');
     if (this.record.policy.maxAge !== 18) throw new Error('PARENTAL_ADULT_AGE_LIMIT');
-    if (this.adultVisible()) return true;
+    if (this.adultVisible()) return selectedKey ? this.authorize(selectedKey, 18, true, true, signal) : true;
     if (!this.listeners.size) throw new Error('PARENTAL_PIN_REQUIRED');
     this.cancelPrompt();
     return new Promise<boolean>(resolve => {
       const id = this.snapshot.revision + 1, epoch = this.lockEpoch;
       const abort = () => { if (this.prompt?.id === id) this.cancelPrompt(); };
       const finish = (allowed: boolean) => { signal?.removeEventListener('abort', abort); resolve(allowed); };
-      this.prompt = { id, key: 'adult-session', adult: false, unlockSession: true, epoch, finish };
+      this.prompt = { id, key: selectedKey || 'adult-session', adult: Boolean(selectedKey), unlockSession: true, epoch, finish };
       signal?.addEventListener('abort', abort, { once: true });
       this.snapshot.prompt = { id, reason: 'Acesso à área 18+. Informe o PIN do controle parental.' }; this.emit();
     });
@@ -267,6 +278,7 @@ export class ParentalControlStore {
       if (prompt.unlockSession) {
         if (prompt.epoch !== this.lockEpoch || !this.record?.policy.allowAdult || this.record.policy.maxAge !== 18) { this.cancelPrompt(); return false; }
         this.adultUntil = this.now() + 900000;
+        if (prompt.adult) this.grants.set(prompt.key, this.now() + 900000);
       } else {
         if (prompt.adult && !this.adultVisible()) { this.cancelPrompt(); return false; }
         this.grants.set(prompt.key, this.now() + 900000);

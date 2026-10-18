@@ -46,6 +46,7 @@ export function canShowParentalItem(item: CatalogItemViewModel): boolean {
   const state = parentalControl.getSnapshot();
   if (state.status === 'error') return false;
   if (isAdultView(item) && !parentalControl.adultVisible()) return false;
+  if (state.enabled === false) return true;
   const age = parentalItemAge(item);
   return state.status !== 'ready' || age === undefined || age <= state.policy.maxAge;
 }
@@ -64,8 +65,7 @@ export function canShowParentalLive(channel: LiveChannel, catalog: LiveCatalog):
   const state = parentalControl.getSnapshot(), rule = parentalControl.rule(parentalLiveKey(channel));
   if (state.status === 'error') return false;
   if ((isAdultLiveChannel(channel, catalog) || rule?.adult) && !parentalControl.adultVisible()) return false;
-  const age = parentalLiveAge(channel, catalog);
-  return state.status !== 'ready' || age === undefined || age <= state.policy.maxAge;
+  return true;
 }
 export function parentalLiveAge(channel: LiveChannel, catalog: LiveCatalog): number | undefined {
   const rule = parentalControl.rule(parentalLiveKey(channel));

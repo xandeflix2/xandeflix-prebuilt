@@ -185,3 +185,14 @@ exige prova vinculada ao PUK no aparelho, sem reset administrativo legado.
 PINs C155 sem recovery exigem PIN web atual para vincular recuperacao; nao
 prometer recuperacao retroativa sem essa preparacao. Bloqueio3h preservado.
 Nenhuma mudanca em fonte/vault/catalogo/busca/player/identidade/licenca/ativacao.
+
+## C160 — opcao local e excecao Live comum — 2026-10-18
+
+Pedido posterior autoriza a emenda limitada especificada antes do codigo em
+[C11_PARENTAL_DEVICE_SWITCH_AND_LIVE_PIN.md](C11_PARENTAL_DEVICE_SWITCH_AND_LIVE_PIN.md).
+Administracao autenticada pode suspender/restaurar restricoes comuns locais
+sem apagar PIN/PUK/preferencias/tentativas; legado permanece ativo. Canais
+comuns deixam de sofrer filtro/PIN por idade ou regra alwaysPin. Adultos
+explicitos continuam opt-in/18/PIN, com modal ao selecionar canal elegivel
+sem sessao e grant restrito ao canal apos sucesso. Sem backend/source/C9
+ou alteracao do PIN web; corrupcao e falhas continuam fechadas.

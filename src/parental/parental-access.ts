@@ -10,6 +10,7 @@ export async function authorizeParentalItem(item: CatalogItemViewModel, snapshot
   await parentalControl.load();
   if (signal?.aborted) return false;
   const localKey = parentalViewKey(item), key = `${snapshotId}:${localKey}`, rule = parentalControl.rule(localKey), adult = isAdultView(item);
+  if (!adult && parentalControl.getSnapshot().enabled === false) return parentalControl.authorize(key, undefined, false, rule?.alwaysPin, signal);
   if (parentalControl.getSnapshot().status === 'unconfigured') return parentalControl.authorize(key, undefined, adult, rule?.alwaysPin, signal);
   if (adult && !parentalControl.adultVisible()) return parentalControl.authorize(key, undefined, true);
   let age = parentalItemAge(item);
@@ -26,14 +27,19 @@ export async function authorizeParentalItem(item: CatalogItemViewModel, snapshot
   return parentalControl.authorize(key, age, isAdultView(item), parentalControl.rule(localKey)?.alwaysPin, signal);
 }
 export async function authorizeParentalLive(channel: LiveChannel, catalog: LiveCatalog): Promise<boolean> {
+  await parentalControl.load();
   const localKey = parentalLiveKey(channel), rule = parentalControl.rule(localKey);
-  return parentalControl.authorize(`${catalog.snapshotId}:${localKey}`, parentalLiveAge(channel, catalog),
-    isAdultLiveChannel(channel, catalog) || rule?.adult === true, rule?.alwaysPin);
+  if (parentalControl.getSnapshot().status === 'error') throw new Error('PARENTAL_STORAGE_UNAVAILABLE');
+  const adult = isAdultLiveChannel(channel, catalog) || rule?.adult === true;
+  if (!adult) return true;
+  const key = `${catalog.snapshotId}:${localKey}`;
+  if (!parentalControl.adultVisible()) return parentalControl.requestAdultSession(undefined, key);
+  return parentalControl.authorize(key, parentalLiveAge(channel, catalog), true, true);
 }
 export function parentalLiveNeedsPin(channel: LiveChannel, catalog: LiveCatalog): boolean {
-  const state = parentalControl.getSnapshot(), localKey = parentalLiveKey(channel), rule = parentalControl.rule(localKey), age = parentalLiveAge(channel, catalog);
+  const state = parentalControl.getSnapshot(), localKey = parentalLiveKey(channel), rule = parentalControl.rule(localKey);
   return state.status === 'ready' && !parentalControl.isGranted(`${catalog.snapshotId}:${localKey}`)
-    && (isAdultLiveChannel(channel, catalog) || rule?.adult === true || rule?.alwaysPin === true || age === undefined || age > state.policy.maxAge);
+    && (isAdultLiveChannel(channel, catalog) || rule?.adult === true);
 }
 export function parentalErrorMessage(error: unknown): string {
   const code = error instanceof Error ? error.message : '';

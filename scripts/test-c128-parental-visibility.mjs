@@ -42,10 +42,10 @@ await test('CLASSIFICATION_OVERLAY_BOUNDED512_NOT_SERIALIZED_IN_PIN_RECORD',()=>
  const before=raw;for(let n=0;n<513;n++)parentalControl.rememberAge(parentalContentKey('movie','bounded'+n),16);
  assert.equal(parentalControl.knownAge(parentalContentKey('movie','bounded0')),undefined);assert.equal(parentalControl.knownAge(parentalContentKey('movie','bounded512')),16);assert.equal(raw,before);
 });
-await test('LIVE_CHANNEL_AGE_FILTER_KNOWN_HIDDEN_UNKNOWN_VISIBLE_IMMUTABLE',async()=>{
+await test('COMMON_LIVE_CHANNELS_VISIBLE_WITH_ANY_OR_UNKNOWN_AGE_IMMUTABLE',async()=>{
  const channels=[0,12,16,undefined].map((age,n)=>({id:'c'+n,name:'Channel '+n,groupId:'g',groupName:'Abertos',metadata:age===undefined?{}:{age_rating:age},streamRef:{}}));
  const catalog={snapshotId:'live',groups:[{id:'g',name:'Abertos'}],channels,channelsByGroup:{g:channels}},before=JSON.stringify(catalog);
- assert.deepEqual(channels.map(c=>canShowParentalLive(c,catalog)),[true,true,false,true]);assert.deepEqual(parentalLiveCatalog(catalog).channels.map(c=>c.id),['c0','c1','c3']);assert.equal(JSON.stringify(catalog),before);
+ assert.deepEqual(channels.map(c=>canShowParentalLive(c,catalog)),[true,true,true,true]);assert.deepEqual(parentalLiveCatalog(catalog).channels.map(c=>c.id),['c0','c1','c2','c3']);assert.equal(JSON.stringify(catalog),before);
 });
 await test('EXPLICIT_ADULT_REMAINS_CLOSED_UNTIL_RESPONSIBLE_PIN_SESSION',async()=>{
  const card={...item(18,'movie','adult'),parental:{...item(18,'movie','adult').parental,adult:true}};assert.equal(canShowParentalItem(card),false);

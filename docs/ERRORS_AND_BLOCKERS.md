@@ -3278,3 +3278,17 @@ demais resultados, erro nao alterou arquivos. Leituras seguintes usaram
 src/web/web-media.ts e caminhos existentes. Saidas amplas foram truncadas;
 revisao focada posterior confirmou rotas relevantes. Nenhum erro de produto
 novo ou teste alterado. NEXT_GATE_STARTED=NAO.
+
+## C160 — correcao parental e verificacao — 2026-10-18
+
+Canal comum sem idade era tratado como VOD desconhecido; adulto selecionado
+sem sessao era negado antes do modal. Corrigidos helpers sem mudar licenca/C9.
+Novo switch preserva segredos/tentativas e falha fechado se persistencia falha.
+Testes/build finais PASS. Fixture Chrome inicialmente serializou elemento DOM
+com referencias React e CDP acusou cadeia longa; predicado boolean corrigiu
+somente helper. Fixture TV sem ancestral/reset CSS canonicos acusou overflow;
+incluidos wrapper/index.css e repetida verificacao visual, sem patch de layout.
+Leituras erradas src/player/LivePage e glob vite* foram corrigidas com inventario.
+Usuario relatou localhost HTTP e HTTPS funcionando: dado novo nao foi testado
+em comparacao controlada; dependencia real de producao continua aberta, sem
+reduzir seguranca ou contratar infraestrutura. NEXT_GATE_STARTED=NAO.
