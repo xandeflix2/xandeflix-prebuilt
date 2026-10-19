@@ -6,6 +6,8 @@ import { getSupabaseBrowserClient, createSupabaseManagerAuthClient } from '../in
 import { getSupabaseRuntimeConfig } from '../integrations/supabase/runtime-config.ts';
 import { SupabaseManagerRemoteControlPlaneAuthority, configureManagerRemoteControlPlaneAuthority } from '../control-plane/client/manager-remote-control-plane-authority.ts';
 import { resolveManagerPublicConfig } from './public-config.ts';
+import { PublicDeviceActivationPage } from '../ui/pages/PublicDeviceActivationPage.tsx';
+import { isPublicActivationLocation, consumePublicActivationHandoff } from '../ui/activation/public-activation-url.ts';
 
 /** Capture recovery intent before the Auth SDK consumes its URL fragment. */
 export function createManagerApplication(location: Pick<Location, 'pathname' | 'hash' | 'search'>): React.ReactElement {
@@ -13,11 +15,16 @@ export function createManagerApplication(location: Pick<Location, 'pathname' | '
   const hash = new URLSearchParams(location.hash.slice(1));
   const recoveryLink = hash.get('type') === 'recovery';
   const linkError = hash.has('error') || new URLSearchParams(location.search).has('error');
+  const handoff = !recovery && isPublicActivationLocation(location)
+    ? consumePublicActivationHandoff(location, typeof window !== 'undefined' ? window.history : undefined) : null;
   try {
     const config = getSupabaseRuntimeConfig();
     resolveManagerPublicConfig({ VITE_SUPABASE_URL: config?.url, VITE_SUPABASE_PUBLISHABLE_KEY: config?.key });
     const client = getSupabaseBrowserClient();
     if (!client) throw new Error('MANAGER_AUTH_UNAVAILABLE');
+    if (!recovery && isPublicActivationLocation(location)) {
+      return <PublicDeviceActivationPage handoff={handoff} onBack={() => window.location.assign('/')}/>;
+    }
     configureManagerRemoteControlPlaneAuthority(new SupabaseManagerRemoteControlPlaneAuthority(createSupabaseManagerAuthClient(client)));
     return recovery
       ? <ManagerPasswordRecovery client={client} recoveryLink={recoveryLink} linkError={linkError}/>

@@ -6,3 +6,4 @@
 .activation-handoff p { line-height: 1.5; color: #cbd5e1; }
 .activation-handoff button { min-height: 44px; padding: .75rem 1rem; }
 .activation-handoff .focusable-item:focus { outline: 2px solid #ff344e; outline-offset: 3px; box-shadow: 0 0 12px #ff183b88; }
+.activation-handoff.activation-handoff--embedded { padding: 0; margin: 1rem 0 0; background: transparent; border: 0; box-shadow: none; }

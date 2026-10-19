@@ -1,6 +1,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.116.0";
 import { ensureSignalIndex, signalFingerprint, signalVaultKey } from '../_shared/signal-policy.ts';
+import { validatePublicDeviceRegistration } from '../_shared/public-device-registration.ts';
 
 type RecordValue = Record<string, unknown>;
 
@@ -12,6 +13,7 @@ const corsHeaders = {
 };
 
 const SAFE_ERROR_CODES = new Set([
+  'CUSTOMER_FIRST_NAME_INVALID', 'INVALID_DEVICE_LABEL', 'INVALID_DEVICE_PLATFORM',
   'INITIAL_SCREEN_LIMIT', 'LICENSE_EDIT_REQUIRED', 'SECONDARY_SOURCE_SETUP_DENIED',
   'ADDITIONAL_DEVICE_REQUIRES_APPROVAL', 'SOURCE_POLICY_REQUIRED', 'SOURCE_POLICY_UNAVAILABLE', 'SOURCE_POLICY_PREPARING', 'SOURCE_POLICY_RETRY',
   "METHOD_NOT_ALLOWED",
@@ -48,7 +50,10 @@ const SAFE_ERROR_CODES = new Set([
 ]);
 
 const ERROR_MESSAGES: Record<string, string> = {
-  INITIAL_SCREEN_LIMIT: 'No cadastro inicial, escolha de uma a quatro telas.',
+  INITIAL_SCREEN_LIMIT: 'A ativação inicial permite somente este aparelho.',
+  CUSTOMER_FIRST_NAME_INVALID: 'Informe somente seu primeiro nome, com até 32 letras.',
+  INVALID_DEVICE_LABEL: 'Informe o Local/Tipo deste aparelho, com até 100 caracteres.',
+  INVALID_DEVICE_PLATFORM: 'Selecione a plataforma deste aparelho.',
   LICENSE_EDIT_REQUIRED: 'Os limites de uma conta já cadastrada devem ser alterados pelo gestor em Editar licença.',
   SECONDARY_SOURCE_SETUP_DENIED: 'Este aparelho é secundário. Peça ao gestor para alterar os dados da conta principal.',
   ADDITIONAL_DEVICE_REQUIRES_APPROVAL: 'Um aparelho adicional com esta fonte precisa ser vinculado pelo seu ADMIN ou MASTER. Acima de quatro telas, o gestor deve conferir o pagamento adicional.',
@@ -367,7 +372,9 @@ async function completeActivation(supabase: Awaited<ReturnType<typeof createSupa
   const displayCode = validateDisplayCode(body.displayCode);
   const sessionToken = validateSessionToken(body.sessionToken);
   const initialScreens = body.initialScreens ?? 1;
-  if (typeof initialScreens !== 'number' || !Number.isInteger(initialScreens) || initialScreens < 1 || initialScreens > 4) throw new ActivationError('INITIAL_SCREEN_LIMIT');
+  if (initialScreens !== 1) throw new ActivationError('INITIAL_SCREEN_LIMIT');
+  const registration = validatePublicDeviceRegistration(body);
+  if (!registration.success) throw new ActivationError(registration.code);
   const displayName = validateDisplayName(body.sourceName);
   const sourceType = validatePublicSourceType(body.sourceType);
   const sourceConfig = validatePublicSourceConfig(body, sourceType);
@@ -424,8 +431,11 @@ async function completeActivation(supabase: Awaited<ReturnType<typeof createSupa
   const nickname = `trial-${displayCode.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${randomHex(4)}`.slice(0, 32);
 
   try {
-    const { data, error } = await supabase.rpc("rpc_signal_public_complete_with_screens", {
+    const { data, error } = await supabase.rpc("rpc_public_complete_single_device", {
       p_initial_screens: initialScreens,
+      p_customer_first_name: registration.value.customerFirstName,
+      p_device_label: registration.value.deviceLabel,
+      p_platform: registration.value.platform,
       p_fingerprint: fingerprint,
       p_session_token_hash: sessionTokenHash,
       p_display_code: displayCode,
@@ -464,10 +474,21 @@ export async function handleDevicePublicActivation(request: Request): Promise<Re
   const body: unknown = await request.json();
   if (!isRecord(body)) throw new ActivationError("INVALID_REQUEST");
   const operation = body.operation;
-  if (operation !== "START" && operation !== "COMPLETE" && operation !== "REGISTER_KEY" && operation !== 'CHECK_POLICY') throw new ActivationError("INVALID_REQUEST");
+  if (operation !== "START" && operation !== "COMPLETE" && operation !== "REGISTER_KEY" && operation !== 'CHECK_POLICY' && operation !== 'RESUME') throw new ActivationError("INVALID_REQUEST");
   const supabase = await createSupabase();
   if (operation === "START") return startActivation(supabase, body);
   if (operation === "REGISTER_KEY") return registerPermanentKey(supabase, body);
+  if (operation === 'RESUME') {
+    const displayCode = validateDisplayCode(body.displayCode);
+    const sessionToken = validateSessionToken(body.sessionToken);
+    const { data, error } = await supabase.rpc('rpc_public_check_device_activation_session', {
+      p_session_token_hash: await sha256Hex(sessionToken), p_display_code: displayCode,
+    });
+    if (error || !isRecord(data) || data.success !== true || typeof data.sessionId !== 'string' || typeof data.expiresAt !== 'string') {
+      throw new ActivationError('ACTIVATION_SESSION_NOT_OPEN');
+    }
+    return response({ success: true, displayCode, sessionId: data.sessionId, expiresAt: data.expiresAt });
+  }
   if (operation === 'CHECK_POLICY') {
     const displayCode = validateDisplayCode(body.displayCode);
     const sessionToken = validateSessionToken(body.sessionToken);

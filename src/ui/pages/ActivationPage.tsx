@@ -48,6 +48,8 @@ import { activationDeadline } from '../../control-plane/client/activation-timeou
 import { getMultiDeviceContactService, whatsappContactUrl, type MultiDeviceContact } from '../../control-plane/client/multi-device-contact.service.ts';
 import { buildActivationDiagnostics } from '../activation/activation-diagnostics.ts';
 import { copyActivationText } from '../activation/activation-clipboard.ts';
+import { publicDeviceActivationUrl, publicActivationHandoffUrl } from '../activation/public-activation-url.ts';
+import { getPublicDeviceActivationService } from '../../control-plane/client/public-device-activation.service.ts';
 import './ActivationPage.css';
 import { ActivationHandoff } from '../components/ActivationHandoff.tsx';
 import { isPublicConsumerWeb } from '../../web-production/session-context.ts';
@@ -102,7 +104,8 @@ const NativeActivationPage: React.FC<ActivationPageProps> = ({
   const [activationAttempt, setActivationAttempt] = useState(0);
   const [isCheckingDeviceActivation, setIsCheckingDeviceActivation] = useState(false);
   const [deviceActivationFeedback, setDeviceActivationFeedback] = useState<string | null>(null);
-  const [keyCopyFeedback, setKeyCopyFeedback] = useState<string | null>(null);
+  const [isOpeningActivation, setIsOpeningActivation] = useState(false);
+  const openingActivationRef = useRef(false);
   const [multiDeviceContact, setMultiDeviceContact] = useState<MultiDeviceContact | null>(null);
   const [contactState, setContactState] = useState<'LOADING' | 'READY' | 'ERROR'>('LOADING');
   const [contactAttempt, setContactAttempt] = useState(0);
@@ -360,28 +363,29 @@ const NativeActivationPage: React.FC<ActivationPageProps> = ({
     }
   }, [deviceId, deliverManagedSource, runAuthPreflight]);
 
-  const openExternalActivationPage = useCallback(async () => {
-    const runtimeEnv = (import.meta as ImportMeta & {
+  const publicActivationUrl = publicDeviceActivationUrl((import.meta as ImportMeta & {
       env?: { VITE_PUBLIC_ACTIVATION_URL?: string };
-    }).env;
-    const configuredUrl = typeof runtimeEnv?.VITE_PUBLIC_ACTIVATION_URL === 'string'
-      ? runtimeEnv.VITE_PUBLIC_ACTIVATION_URL.trim()
-      : '';
-    const baseUrl = configuredUrl || (
-      typeof window !== 'undefined' && /^https?:$/.test(window.location.protocol)
-        ? window.location.origin
-        : ''
-    );
-    if (!baseUrl) {
-      setDeviceActivationFeedback('A URL pública de ativação não está configurada para este aplicativo.');
-      return;
-    }
+    }).env?.VITE_PUBLIC_ACTIVATION_URL);
+  const openExternalActivationPage = useCallback(async () => {
+    if (openingActivationRef.current || localKeyState !== 'READY' || !deviceActivationKey) return;
+    openingActivationRef.current = true;
+    setIsOpeningActivation(true);
+    setDeviceActivationFeedback(null);
     try {
-      await Browser.open({ url: `${baseUrl.replace(/\/$/, '')}/#/activate-device` });
+      const session = await getPublicDeviceActivationService().start(displayCode, deviceActivationKey);
+      if ('success' in session) {
+        setDeviceActivationFeedback(session.message || 'Não foi possível validar o aparelho. Tente novamente.');
+        return;
+      }
+      if (session.displayCode !== displayCode) throw new Error('ACTIVATION_HANDOFF_INVALID');
+      await Browser.open({ url: publicActivationHandoffUrl(publicActivationUrl, session) });
     } catch {
-      setDeviceActivationFeedback('Não foi possível abrir o navegador externo de ativação.');
+      setDeviceActivationFeedback('Não foi possível abrir o navegador. Abra o endereço de ativação em outro celular ou computador.');
+    } finally {
+      openingActivationRef.current = false;
+      setIsOpeningActivation(false);
     }
-  }, []);
+  }, [publicActivationUrl, localKeyState, deviceActivationKey, displayCode]);
 
   useEffect(() => {
     if (status === 'AUTHORIZED' && mode) {
@@ -818,11 +822,9 @@ const NativeActivationPage: React.FC<ActivationPageProps> = ({
               </span>
             </div>
           </div>
-        </div>
-
-        {/* Chave local permanente: disponível antes e depois da autorização. */}
+        {/* Chave e compartilhamento pertencem ao mesmo card do código. */}
         <div
-          style={{ backgroundColor: '#101624', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '1.5rem', marginBottom: '1.5rem' }}
+          className="activation-page__credentials"
         >
           <span style={{ fontSize: '0.72rem', color: '#94a3b8', display: 'block', fontWeight: 600 }}>
             CHAVE PERMANENTE DO DISPOSITIVO
@@ -831,30 +833,16 @@ const NativeActivationPage: React.FC<ActivationPageProps> = ({
             {localKeyState === 'READY' ? deviceActivationKey
               : localKeyState === 'ERROR' ? 'Falha ao preparar a chave local.' : 'Gerando chave...'}
           </code>
-          <button
-            type="button"
-            className="focusable-item"
-            onClick={() => {
-              if (localKeyState === 'READY' && deviceActivationKey) {
-                void copyActivationText(deviceActivationKey)
-                  .then(() => setKeyCopyFeedback('Chave copiada.'))
-                  .catch(() => setKeyCopyFeedback('Não foi possível copiar. Anote a chave exibida.'));
-              }
-            }}
-            disabled={localKeyState !== 'READY'}
-            style={{ marginTop: '0.75rem', padding: '0.65rem 1rem', backgroundColor: '#7e22ce', color: '#fff', border: 'none', borderRadius: '5px', cursor: deviceActivationKey ? 'pointer' : 'not-allowed', fontWeight: 700 }}
-          >
-            Copiar chave
-          </button>
-          {keyCopyFeedback && (
-            <div role="status" style={{ marginTop: '0.75rem', fontSize: '0.8rem', color: '#cbd5e1' }}>
-              {keyCopyFeedback}
-            </div>
-          )}
         </div>
-
-        <ActivationHandoff displayCode={displayCode} activationKey={deviceActivationKey}
-          ready={localKeyState === 'READY'} pending={authUiState !== 'AUTHORIZED'} />
+          <ActivationHandoff displayCode={displayCode} activationKey={deviceActivationKey}
+            ready={localKeyState === 'READY'} pending={authUiState !== 'AUTHORIZED'} embedded />
+          {authUiState !== 'AUTHORIZED' && <button type="button" className="focusable-item activation-page__open"
+            disabled={localKeyState !== 'READY' || isOpeningActivation}
+            onClick={() => { void openExternalActivationPage(); }}>
+            {isOpeningActivation ? 'Validando aparelho…' : 'Abrir página de ativação'}
+          </button>}
+          {deviceActivationFeedback && <p role="status">{deviceActivationFeedback}</p>}
+        </div>
         <section className="activation-page__contact" aria-labelledby="activation-multi-title">
           <h2 id="activation-multi-title">Quer utilizar uma única licença em vários dispositivos?</h2>
           <p>Fale com o gerente de múltiplos acessos pelo WhatsApp.</p>
@@ -868,16 +856,6 @@ const NativeActivationPage: React.FC<ActivationPageProps> = ({
         </section>
 
         <section className="activation-page__support">
-          {authUiState !== 'AUTHORIZED' && (
-            <section style={{ padding: '1rem', marginBottom: '1rem', background: '#101624', borderRadius: 10 }}>
-              <h2 style={{ fontSize: '1.1rem' }}>Ative seu dispositivo</h2>
-              <p>Abra a página pública e informe o Código ID e a Chave de 6 dígitos exibidos aqui. Após validar, cadastre sua fonte. A sincronização começa neste aparelho quando a ativação for confirmada.</p>
-              <button type="button" className="focusable-item" onClick={() => { void openExternalActivationPage(); }}
-                style={{ padding: '.75rem 1rem', background: '#2563eb', color: 'white', border: 0, borderRadius: 6 }}>
-                Abrir página de ativação
-              </button>
-            </section>
-          )}
           <button type="button" className="focusable-item activation-page__support-toggle" aria-expanded={isSupportOpen}
             aria-controls="activation-support-details" onClick={() => { setIsSupportOpen(open => !open); setDiagnosticCopyFeedback(null); }}>
             Informações para suporte <span aria-hidden="true">{isSupportOpen ? '−' : '+'}</span>

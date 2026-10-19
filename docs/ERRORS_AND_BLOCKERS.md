@@ -3341,3 +3341,209 @@ memorias append-only e diff --check deve passar antes da entrega.
 Git de versionamento/registro autorizado no escopo em curso; PR=NAO.
 Comparacao localhost/producao anterior continua pendente; APK nao certifica
 compatibilidade da fonte com navegador publico. NEXT_GATE_STARTED=NAO.
+
+## Investigacao da reproducao localhost — 2026-10-18
+
+Novo Console comprova HTTP404 em dois filmes e API com404/CORS; usuario
+relata falha geral apos atualizacao. Nao inferir codec pelo MediaError4 nem
+build antigo pelo APP_VERSION1.0 literal. Fonte declarada HTTP com prefixo
+editado para HTTPS nao certifica TLS de todos os recursos.64 suites/casos
+sinteticos passaram e lock PASS, mas reproducao real permanece sem correcao
+confirmada. Teste da mesma requisicao em nova aba pendente, sem novos pedidos
+de credenciais. Nenhuma fonte real foi consultada, alterada ou persistida.
+
+Duas buscas usaram diretorios inexistentes src/import e src/control-plane/
+manager; corrigidas por inventario de arquivos e leitura de caminhos reais.
+Falhas de busca nao sao regressao do produto. Nenhum teste falhou neste ciclo.
+
+Auditoria documental inicial comparou bytes Git normalizados com memoria
+local de terminadores mistos e acusou falso erro append-only. Comparacao por
+hash do prefixo com baseline local confirmou preservacao integral; corrigir
+o auditor, sem reescrever memorias ou relaxar verificacao de conteudo.
+
+Novo envio repetiu Console do aplicativo, nao informou resultado da nova aba.
+Mais um filme HTTP404; aviso React de chave duplicada em recomendacoes tambem
+observado, sem evidenciar causa do404 de midia. Nao corrigir aviso incidental
+como se fosse reparo da reproducao; confirmacao comparativa continua pendente.
+
+Capturas seguintes: filme HTTP404 com respostaHTML no app; nova aba mostra
+HTTPS404. Nao ignorar diferenca de protocolo ou atribuir a falha ao player
+isoladamente. Referencia oficial da playlist necessaria para distinguir URI
+montada incorretamente, catalogo desatualizado e recusa do servidor. Caminho
+local de M3U original solicitado, sem URL/senha/conteudo; pendente. Nenhum
+novo teste falhou, nenhum reparo funcional ou deploy feito por essas capturas.
+
+
+## Localhost restabelecido por troca de fonte ? 2026-10-18
+
+Usuario confirmou que a fonte anterior estava sem sinal ativo e que, ao
+atualizar/trocar por fonte HTTP, o sistema voltou a funcionar. Confirmacao
+fisica e relato do titular; nao e reproducao instrumentada pelo agente.
+Investigacao localhost encerrada por restabelecimento externo, sem defeito
+de runtime confirmado ou patch funcional. Comparacao com arquivo M3U deixa
+de ser necessaria; nao solicitar caminho/arquivo/credenciais adicionais.
+Isso nao certifica playback HTTP a partir da Vercel HTTPS, todos os itens
+do catalogo ou dispositivos Android. Sem novos testes/build/APK/deploy,
+backend ou alteracao de fonte pelo agente. NEXT_GATE_STARTED=NAO.
+
+## Verificacao de Live na producao atual - 2026-10-18
+
+Novo diagnostico LiveFAILED/HTTPS/MPEGTS/MPEGTS/NETWORK/status0/MediaError0.
+Autorizacao/binding/catalogo prontos. Bloqueio inicial HTTPS_REQUIRED fica
+descartado para ESSA tentativa; nao atribuir NETWORK a CORS, TLS ou redirect
+sem mensagem atual do browser. ProtocolHTTPS do suporte e inicial, nao final.
+Arquivos publicados e rotas dos dois aliases passaram verificacao exata,
+sem CSP no HTML; sem defeito de deploy identificado. Erro da fonte anterior
+nao serve como prova da nova. Console sanitizado pendente; midia real ainda
+nao validada pelo agente. Nenhum teste falhou ou alteracao funcional aplicada.
+
+
+## Live em producao: bloqueio de transporte confirmado - 2026-10-18
+
+Console novo confirmou Mixed Content durante tentativa LiveMPEGTS, recurso
+HTTP bloqueado sob blobHTTPS apos C9/preview. URI inicialHTTPS preservada;
+salto/destino exato nao identificado sem cadeia de rede. Diagnostico desse
+bloqueio concluido, reproducao de producao NAO corrigida. Imagens possuem
+erros separados CORS/certificado. Assets e rotas dos dois aliases passaram
+verificacao exata. Fornecedor precisaHTTPS valido em todo caminho do canal;
+sem estrategia de banda/bypass ou alteracao funcional/deploy/backend/APK.
+
+Patch documental inicial usou contexto inexistente na memoria de erros e foi
+rejeitado na validacao; reaplicado por append verificado. Nenhum arquivo de
+runtime nem teste foi alterado. Falha do patch nao e regressao do produto.
+
+
+## C161 - Erros de verificacao e limite fisico
+
+- Fixture inicial pausava Canvas antes de playing; falha de contagem de
+  transporte corrigida aguardando playing real. Nenhum patch runtime para isso.
+- Auditoria via stdin PowerShell corrompeu caractere Unicode no comparador;
+  falso FAIL corrigido com comparacao ASCII/arquivo UTF-8. Auditoria final PASS.
+- Invocacoes rg com caminhos/globs posicionais inexistentes no Windows foram
+  descartadas; inventario/arquivos explicitos usados. Sem mudanca por esses erros.
+- Suite antiga de continuidade sem storage parental de teste retornou false no
+  primeiro play apos evolucao C160. C161 fornece storage local vazio isolado,
+  sem relaxar checks/asserts ou alterar producao; suite completa PASS.
+- Regressao real: Chrome Enter trusted em botao Proximo canal focado gerava
+  keydown/keyup, zero click e zero evento. Corrigida confirmacao Enter/Espaco
+  com preventDefault/repeat/disabled; teste real posterior e C136 PASS. Mesmo
+  caminho Proximo episodio verificado com substituicao correlacionada.
+- Build avisa chunk maior que500kB e Git avisa LF/CRLF; nao sao falhas. Nao
+  refatorado bundle fora do escopo. Build/lock/diff-check finais PASS.
+- ADB vazio. Nao foi reproduzida fisicamente falha OK do Fire Stick relatada
+  pelo usuario. Testes Java usam adapters; correcao web nao certifica causa
+  nativa. APK1.0.33 entregue para reteste, sem afirmar QA em todos os aparelhos.
+
+Registro final: log PowerShell UTF-16 foi inicialmente lido como UTF-8, gerando falso assert do marcador de lock. Leitura corrigida por BOM; nenhuma memoria fora escrita antes do assert. Primeiro patch do helper nao encontrou linha esperada; nenhuma alteracao parcial ocorreu. Lock/checks intactos.
+
+Conferencia com override core.autocrlf=false classificou CRLF historico dos
+documentos como whitespace novo; descartar esse comando com configuracao
+divergente. Repetir diff-check com configuracao canonica do repositorio,
+preservando os bytes dos prefixos documentais. Nenhum arquivo normalizado.
+
+
+## C162 - Limites e verificacoes - 2026-10-19
+
+Usuario corrigiu falha da fonte que impedia episodios; nao atribuir esse
+relato ao player nem mudar catalogo/source por ele. Diferenca visual VOD
+confirmada: botao antigo e titulo17sp/override20sp TV; padronizados com Live.
+Sem falha nova de teste/compilacao nesta rodada. Warnings herdados flatDir,
+node:fs externalizado e chunk maior500kB nao sao falhas; sem refactor fora
+do escopo. Browser sintetico, testes nativos e auditoria passaram. Nao houve
+teste fisico no Fire/tablet/telefone; APK1.0.34 disponivel para reteste.
+
+
+## C163 - Ativacao localhost e publicacao pendente - 2026-10-19
+
+Causa confirmada: fallback window.origin do Capacitor e entrada administrativa
+sem pagina publica. Corrigido localmente com helper e rota exata; publicacao
+ainda necessaria. Vercel MCP lista somente xandeflix4, proibido operar; sem
+CLI/projeto local vinculado. Reconexao para xandeflix2 solicitada. Nao solicitar
+segredos nem publicar em outra equipe. Supabase MCP exige link_id ausente;
+nenhuma alteracao backend necessaria. Negativo HTTP400/DISPLAY_CODE_INVALID
+real nao fez RPC/ativacao; positivos da pagina usaram adaptador sintetico.
+
+Busca inicial com nomes/globs de caminhos inexistentes corrigida pelo
+inventario. Leitura web de changelog .md nao suportada, corrigida via fetch
+Node200. Teste C163 inicial usou indice de estado incorreto; ajustada fixture
+para sessao=null e campos de fonte vazios, sem modificar producao. Primeiro
+site:build falhou somente em whitelist C154 que esperava7 rotas; spec emendada
+antes da expectativa exata8, mantendo todos os asserts, rerun completo PASS.
+Warnings herdados flatDir, node:fs externalizado e chunk500k nao sao falhas.
+Sem teste fisico nem ativacao real de cliente; APK1.0.35 verificado. APK sozinho
+nao basta enquanto /activate-device nao for publicado na equipe correta.
+
+
+## C163 - Conexao recuperada e publicacao verificada - 2026-10-19
+
+Pendencia Vercel superada usando nova conexao com link_id explicito; metadados
+so renovaram apos reinicio. Sem argumento novo ferramentas rejeitaram duas
+chamadas; corrigido a partir do schema. Nova conta listava zero equipes e
+slug xandeflix2 retornava403, porem escopo default permitiu projeto/dominio
+exatos. Nao repetir reconexao nem inferir conta errada apenas desse inventario.
+
+Preview target literal preview recebeu400; omissao documentada criou preview
+READY. Preview HTTP protegido e bypass autenticado403; protecao preservada.
+Producao com mesmos23 assets e config pronta ficouREADY; dominio publico
+validado por hash/status/headers e navegador real sem escritas. Busca isolada
+com glob posicional falhou sem alterar arquivos; inventario/paths explicitos
+utilizados. Nenhum bloqueio restante de publicacao C163. Permanecem limites
+de teste: sem ativacao positiva real, fonte real ou aparelho fisico. APK1.0.35
+ja gerado e verificado; instalacao cabe ao usuario. Sem Git writes.
+
+
+## C164 - Diagnostico, correcoes de fixtures e limites - 2026-10-19
+
+Codigo anterior permitia1-4 telas, nome trial-* no gestor e nao negava trial
+com deadline nulo; corrigidos dentro da spec. Edge remota comparada ao local
+aparentava divergencia, investigacao read-only mostrou somente newline final.
+Primeiro typecheck acusou import ausente do service no NativeActivationPage;
+corrigido e builds completos PASS. Fixture SQL inicial omitia app_version
+obrigatoria; ajustada e integracao real PASS com rollback sem residuos.
+Teste key-visibility legado selecionava wrapper em vez do NativeActivationPage;
+fixture corrigida, expectativas obsoletas de copiar chave/telas adaptadas ao
+pedido, invariantes mantidas. Testes restantes e lock PASS.
+
+Runner Chrome isolado precisou normalizar matcher Windows, isolar service
+de pedido ao gestor, aguardar document.body, converter DOM em boolean antes
+de serializar CDP e usar novas cargas documentais para cenarios com hash
+diferente. Seletor de codigo com aspas corrigido. Falhas restritas a fixture,
+nenhum bypass de produto. Rerun final6perfils/fluxo positivo/falha/expiracao
+PASS. Leituras de path/glob inexistente corrigidas por inventario/paths
+explicitos. Binding de Node ausente apos retomada reinicializado para salvar
+metadados, sem perda do deployment. git diff --check PASS; avisos CRLF
+herdados nao motivam normalizacao. Advisories Supabase5 antes/depois, zero
+novo. Sem teste fisico, ativacao positiva real de cliente ou pagamento
+automatico; os positivos reais de banco usam transacoes revertidas.
+Publicacao concluida e APK1.0.36 verificado; nenhum bloqueio tecnico C164
+restante. Sem Git writes/instalacao/reset. NEXT_GATE_STARTED=NAO.
+
+
+## C165 - Rota de configuracoes retida apos ativacao - 2026-10-19
+
+Confirmacao ja chegava ao App, mas so alterava authorizationGate; settings e
+activation continuavam como rota atual. Patch restrito de transicao e close
+Browser aplicado. Negativos provam que PENDING/save rejeitado nao disparam
+fluxo; falha no close nao trava e leitura antiga nao desfaz autorizacao.
+
+Primeiro build da fixture C165 omitia web/validation, declaracao adicionada.
+Primeiro teste de novo acesso settings usava hash que nao e rota de acao
+do listener; passou a acionar botao real do Header. Suite C111 herdada nao
+declarava parental store/AdultPage/web-validation de ciclos anteriores;
+emenda previa permitiu declarar esses ports, sem remover asserts. Reruns
+C16510/C1119 PASS. Warnings herdados flatDir/chunk500k e CRLF nao motivaram
+refactor/normalizacao. Nenhum erro runtime/build restante. APK1.0.37
+verificado com assets finais apos cap copy; sem teste fisico ou cliente real.
+Sem backend/Vercel/Git/instalacao/reset. NEXT_GATE_STARTED=NAO.
+
+
+## C166 - Publicacao Git autorizada - 2026-10-19
+
+GitHub permanecia510e18a enquanto os ciclos C161-C165 estavam locais; deploy
+manual/APK nao atualizam Git. Usuario autorizou commit/push agora. Preflight
+confirma clone/origin/main e baselines conhecidos; site:build PASS, sem
+falha nova de compilacao. Consulta .github ausente nao alterou estado;
+inventario local usado. Ausencia de core.hooksPath e configuracao normal.
+Warnings CRLF/chunk herdados mantidos, sem normalizar arquivos. Nao incluir
+segredos, APKs, .env.local ou caches. Evidencia remota apos push deve distinguir
+Git sincronizado de deploy/instalacao fisica. NEXT_GATE_STARTED=NAO.

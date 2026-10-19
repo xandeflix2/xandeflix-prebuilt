@@ -2,19 +2,22 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@id/exo_controls_background"
     android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/player_controls_scrim"
     android:padding="16dp">
-    <LinearLayout android:layout_width="match_parent" android:layout_height="56dp" android:gravity="center_vertical" android:paddingRight="64dp">
-        <Button android:id="@+id/live_back" android:layout_width="56dp" android:layout_height="48dp" android:text="←" android:textSize="24sp" android:contentDescription="Sair da tela cheia" android:background="@drawable/player_control_focus" android:textColor="#FFFFFF"/>
+    <LinearLayout android:id="@+id/live_header" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_gravity="top|start" android:gravity="top" android:paddingRight="64dp">
+        <ImageButton android:id="@+id/live_back" android:layout_width="48dp" android:layout_height="48dp" android:padding="12dp" android:src="@drawable/live_back_icon" android:contentDescription="Voltar para os canais" android:background="@drawable/live_back_focus"/>
         <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginLeft="12dp">
-            <TextView android:id="@+id/live_player_title" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="18sp" android:textStyle="bold" android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"/>
-            <TextView android:id="@+id/live_player_group" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="13sp" android:textColor="#DDDDDD" android:maxLines="1" android:ellipsize="end"/>
+            <TextView android:id="@+id/live_player_title" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="26sp" android:textStyle="bold" android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"/>
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:gravity="center_vertical">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="AO VIVO" android:textSize="12sp" android:textStyle="bold" android:textColor="#FFFFFF" android:background="@drawable/live_on_air_badge" android:paddingLeft="10dp" android:paddingRight="10dp" android:paddingTop="3dp" android:paddingBottom="3dp"/>
+                <TextView android:id="@+id/live_player_group" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:layout_marginLeft="10dp" android:textSize="13sp" android:textColor="#DDDDDD" android:maxLines="1" android:ellipsize="end"/>
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
     <LinearLayout android:layout_width="wrap_content" android:layout_height="72dp" android:layout_gravity="center" android:gravity="center_vertical">
-        <Button android:id="@+id/live_previous" android:layout_width="88dp" android:layout_height="56dp" android:layout_marginRight="20dp" android:text="❮ Canal" android:textAllCaps="false" android:textSize="14sp" android:contentDescription="Canal anterior" android:background="@drawable/player_control_focus" android:textColor="#FFFFFF"/>
+        <Button android:id="@+id/live_previous" android:layout_width="128dp" android:layout_weight="1" android:minWidth="0dp" android:layout_height="56dp" android:layout_marginRight="16dp" android:paddingLeft="10dp" android:paddingRight="10dp" android:maxLines="2" android:text="Canal anterior" android:textAllCaps="false" android:textSize="14sp" android:contentDescription="Canal anterior" android:background="@drawable/player_control_focus" android:textColor="#FFFFFF"/>
         <ImageButton android:id="@id/exo_play_pause" android:layout_width="72dp" android:layout_height="72dp" android:background="@drawable/player_control_focus" android:padding="14dp" android:src="@drawable/exo_styled_controls_play" android:contentDescription="Reproduzir ou pausar"/>
-        <Button android:id="@+id/live_next" android:layout_width="88dp" android:layout_height="56dp" android:layout_marginLeft="20dp" android:text="Canal ❯" android:textAllCaps="false" android:textSize="14sp" android:contentDescription="Próximo canal" android:background="@drawable/player_control_focus" android:textColor="#FFFFFF"/>
+        <Button android:id="@+id/live_next" android:layout_width="128dp" android:layout_weight="1" android:minWidth="0dp" android:layout_height="56dp" android:layout_marginLeft="16dp" android:paddingLeft="10dp" android:paddingRight="10dp" android:maxLines="2" android:text="Próximo canal" android:textAllCaps="false" android:textSize="14sp" android:contentDescription="Próximo canal" android:background="@drawable/player_control_focus" android:textColor="#FFFFFF"/>
     </LinearLayout>
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_gravity="bottom" android:orientation="vertical">
+    <LinearLayout android:id="@+id/live_footer" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_gravity="bottom" android:orientation="vertical">
         <TextView android:id="@+id/live_player_status" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:textColor="#FFFFFF" android:textSize="14sp" android:maxLines="2" android:layout_marginBottom="8dp"/>
         <HorizontalScrollView android:layout_width="match_parent" android:layout_height="56dp" android:fillViewport="true" android:scrollbars="none">
             <LinearLayout android:layout_width="wrap_content" android:layout_height="match_parent" android:gravity="center">

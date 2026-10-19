@@ -145,3 +145,15 @@ nativo, fonte ou resposta de autorizacao. Nao mudar prazo/revogacao/licenca,
 C9, namespace de clientes, APK ou exigencia de primeiro login real. Sair
 remove prova e revoga; pagehide interrompe midia sem revogar por recarga.
 Nao autoriza proxy/relay, bypass HTTPS/CORS/TLS ou nova ativacao de navegador.
+
+## C164 - Autoativacao limitada ao proprio aparelho - 2026-10-19
+
+Pedido posterior limita cadastro publico a um aparelho/uma sessao e trial
+server-side de sete dias, sem renovacao automatica ou planos enquanto nao ha
+pagamento configurado. Formulario e composicao de ativacao em
+[C11_SINGLE_DEVICE_SELF_ACTIVATION.md](C11_SINGLE_DEVICE_SELF_ACTIVATION.md).
+Botao valida codigo/chave existentes e passa somente capability curta ao
+navegador, consumida/retirada do fragmento antes do SDK. Nao transmite chave
+permanente na URL nem cria identidade do navegador. Dados pessoais minimos
+e apresentacao do proprio aparelho nao concedem acesso de gestor. Preservar
+cofres, fonte direta, C9, licencas gerenciadas/pagas, identidade e lock.

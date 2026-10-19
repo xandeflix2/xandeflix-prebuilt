@@ -3430,3 +3430,153 @@ memorias append-only e diff --check deve passar antes da entrega.
 Git de versionamento/registro autorizado no escopo em curso; PR=NAO.
 Comparacao localhost/producao anterior continua pendente; APK nao certifica
 compatibilidade da fonte com navegador publico. NEXT_GATE_STARTED=NAO.
+
+## Investigacao da reproducao localhost — 2026-10-18
+
+Relato novo invalida a antiga afirmacao de localhost funcionando. Origem dos
+HTTP404/CORS ainda exige comparacao real; nao atribuir ao controle parental,
+codec ou fornecedor sem distinguir montagem da URI e resposta da fonte.
+Revisao do clone servido, URI original, geracao de catalogo e diff recente
+sem defeito reproduzido. C15814+C13610+C16012+C10528=64 PASS; lock completo
+PASS. Fixtures nao substituem reproducao real. Solicitada mesma requisicao
+de filme em nova aba, sem endereco/segredos compartilhados. Nenhum reparo
+de runtime, deploy, reset ou nova versao APK neste diagnostico. Artefato
+1.0.32 anterior reconferido. Detalhes no diagnostico HTTPS existente.
+
+Captura de MP4HTTP mostra404/text-html; nova abaHTTPS tambem404. Diferenca
+de protocolo registrada e impede tratar as duas requisicoes como identicas.
+Proxima comparacao exige referencia oficial da M3U, sem concluir ainda erro
+de montagem, catalogo ou recusa do fornecedor. Solicitado apenas caminho
+local do arquivo original; nenhuma leitura/consulta real ou reparo realizado.
+
+
+## Localhost restabelecido por troca de fonte ? 2026-10-18
+
+Usuario confirmou que a fonte anterior estava sem sinal ativo e que, ao
+atualizar/trocar por fonte HTTP, o sistema voltou a funcionar. Confirmacao
+fisica e relato do titular; nao e reproducao instrumentada pelo agente.
+Investigacao localhost encerrada por restabelecimento externo, sem defeito
+de runtime confirmado ou patch funcional. Comparacao com arquivo M3U deixa
+de ser necessaria; nao solicitar caminho/arquivo/credenciais adicionais.
+Isso nao certifica playback HTTP a partir da Vercel HTTPS, todos os itens
+do catalogo ou dispositivos Android. Sem novos testes/build/APK/deploy,
+backend ou alteracao de fonte pelo agente. NEXT_GATE_STARTED=NAO.
+
+## Verificacao de Live na producao atual - 2026-10-18
+
+Verificador publico existente preservado, apenas nova saida privada: ambos
+aliases PASS,14assets por alias identicos ao build, mainC160 atual. Nenhum
+defeito de distribuicao encontrado. CUA sem aba disponivel, teste de fonte
+real depende de observacao do titular. Novo diagnostico HTTPS/MPEGTS/NETWORK
+com status0 identifica falha no transporte, depois da validacao inicial;
+nao certificar origem/destino final ou CORS sem Console. Tipo de erro atual
+solicitado, sem URL/credenciais. Nenhum reparo funcional ou deploy feito.
+
+
+## Live em producao: bloqueio de transporte confirmado - 2026-10-18
+
+Console novo confirmou Mixed Content durante tentativa LiveMPEGTS, recurso
+HTTP bloqueado sob blobHTTPS apos C9/preview. URI inicialHTTPS preservada;
+salto/destino exato nao identificado sem cadeia de rede. Diagnostico desse
+bloqueio concluido, reproducao de producao NAO corrigida. Imagens possuem
+erros separados CORS/certificado. Assets e rotas dos dois aliases passaram
+verificacao exata. Fornecedor precisaHTTPS valido em todo caminho do canal;
+sem estrategia de banda/bypass ou alteracao funcional/deploy/backend/APK.
+
+
+## C161 - Apresentacao fullscreen e confirmacao dos botoes
+
+Pedidos incrementais formalizados antes de cada patch: header Live e nomes dos
+controles; listas Android laterais e Guia acima do rodape; verificar Proximo
+episodio/canal e gerar APK (supersede apenas a proibicao inicial de APK).
+Chrome trusted Enter com foco em Proximo canal reproduziu ausencia de click;
+confirmacao explicita com repeat/disabled e preventDefault corrigiu web sem
+trocar handlers. Java nativo e sequencia/C9 passaram; relato Fire continua
+pendente de teste fisico. 206 JVM/35 suites, C13611, demais suites
+parental/Live/continuidade/diagnostico e Chrome6/18 PASS. APK1.0.33/code33
+verificado, mesma assinatura anterior e 8 assets iguais ao
+build. Hash c9ae534d9062c2ab0f709859054a9cb4666d29c00cc9c265ab6627476ddf8367. Preservada copia versionada1.0.32; nenhuma instalacao,
+Git/deploy/backend ou mudanca de source/identidade. Evidencia C161 arquivada.
+
+
+## C162 - Apresentacao do player de filmes e series - 2026-10-19
+
+Pedido aplicou cabecalho Live tambem ao VOD: ImageButton48dp com mesmos
+recursos, titulo26sp e remocao de override20sp TV; header comporta duas linhas.
+Browser reutiliza SVG/rotulo e estilo VOD responsivo22-36px. Mesmos callbacks
+e controles inferiores, sem interferir na fonte/episodios corrigidos pelo
+usuario. Validacao206 testes JVM, C13611/C161, Chrome6/12 fluxos e capturas,
+lock/build/APK/assinatura/8assets/auditoria passam. APK1.0.34/code34 gerado,
+1.0.33 preservado; sem instalacao, Git, deploy ou backend. Evidencia C162.
+
+
+## C163 - Autoativacao sem gestor: URL e entrada publica - 2026-10-19
+
+Reparada origem externa do botao em Capacitor e entrada publica na aplicacao
+administrativa. Helper HTTPS canonico, normalizacao/validacao de config,
+orientacao para outro aparelho e rewrite exato preservam validacoes de
+codigo/chave, sessao curta, fonte e licenca existentes. Nenhuma alteracao
+no formulario/service/Edge/banco ou source delivery. C151/C163 e site:build,
+Chrome real isolado com sucesso/falha sinteticos, negativo real400 antes de
+RPC, build nativo/lock/APK e auditoria1251 arquivos passam. APK1.0.35 gerado
+e anteriores preservados. Integracao mostra somente equipe Vercel proibida
+xandeflix4; publicacao para xandeflix2 pendente. Sem Git writes, instalacao,
+backend ou proximo Gate. Evidencia C11_PUBLIC_SELF_ACTIVATION_ENTRY.md.
+
+
+## C163 - Autoativacao publicada - 2026-10-19
+
+Conexao correta passou a ser enderecavel por link_id apos reinicio. Projeto
+e dominio confirmados por ID, publicacao estaticos aprovados via API no
+proprio projeto, sem commit/push ou persistir mudanca de framework/dashboard.
+PreviewREADY permaneceu protegido; producaoREADY dpl_6roc9JY3GpSiDDNz2EEiQc1mETZB
+validada no dominio publico:8 rotas/headers,23 arquivos identicos e Chrome
+real desktop/mobile/legado/admin PASS. Formulario publico independe de gestor
+e exige codigo/chave antes da fonte. Nenhuma ativacao de cliente ou alteracao
+backend feita. APK1.0.35 existente tem mesmo hash. Pendencia de publicacao
+superada; repositorio continua sem Git writes. NEXT_GATE_STARTED=NAO.
+
+
+## C164 - Cadastro publico de um aparelho - 2026-10-19
+
+Requisito do usuario aplicado na UI, service, Edge e RPC atomica: propria
+capability define o aparelho,1/1, primeiro nome Unicode e metadados minimos
+no gestor. RPC antiga tambem rejeita >1; entitlement nega prazo ausente ou
+vencido e limita trial ao inicio+7dias; replay nao renova. Licencas existentes
+pagas/gerenciadas, App/C9/player/polling/source delivery preservados.
+Codigo/chave/share agrupados, retirada copia isolada/bloco sem gestor; START
+nativo e RESUME publico via fragmento curto removido antes do SDK.
+Transacoes reais sinteticas com rollback provam fronteira exata7dias, outro
+dispositivo negado e metadados; Edge HTTP negativo e Chrome6 perfis com
+OK/Enter PASS. Site/native/Gradle, lock, assinatura/assets/auditoria PASS.
+Publicados Supabase migration20261019051832/Edgev12 e VercelC164 no projeto
+correto; hashes dos23 arquivos e8 rotas200, navegador publico/admin intacto.
+APK1.0.36 gerado e anteriores preservados. Pagamento/planos nao implementados,
+sem ativacao real, teste fisico, instalacao, Git writes ou proximo Gate.
+
+
+## C165 - Confirmacao de ativacao retorna ao carregamento - 2026-10-19
+
+Corrigida transicao de UI apos evento de ativacao previamente verificada.
+App troca rota por home/historico vazio, limpa hash e fecha Browser por API
+existente, sem recarregar/resetar dados; carregamento da fonte reutiliza boot
+e loading consolidados. Configuracoes somente por nova acao apos Home.
+Callback antigo de leitura inicial nao reverte a confirmacao. Dez casos com
+App/rotas/loading/service reais e portas controladas PASS em Chrome isolado,
+mais nove grupos C111 e lock canonico sem alteracao. Emenda de fixture C111
+so declara imports anteriores; criterios mantidos. Build e APK1.0.37 mesma
+assinatura/assets verificados, anteriores preservados. Auditoria1261 PASS;
+service/backend/identidade/fonte/C9/player/trial intactos. Sem instalacao,
+Git, ativacao real/fisica, deploy web ou novo Gate.
+
+
+## C166 - Preparacao da publicacao Git - 2026-10-19
+
+Pedido explicito do usuario sucede ausencia de autorizacao Git dos ciclos
+anteriores. Consolidacao C161-C165 inclui controles/player, ativacao publica
+e individual com sete dias, formulario e retorno ao carregamento, testes,
+migration C164 aplicada e documentacao. Manifesto53 arquivos conferido;
+site:build atualizado completo PASS e registros de validacoes anteriores
+preservados. Sem alteracao funcional/backend/instalacao neste ciclo. Push
+normal main:main no origin correto, seguido de comparacao dos hashes remoto
+e local; confirmacao sera registrada apos a operacao. Sem PR/force/novo Gate.

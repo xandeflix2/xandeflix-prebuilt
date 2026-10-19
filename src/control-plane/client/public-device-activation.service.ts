@@ -1,6 +1,7 @@
 import { getSupabaseBrowserClient, parseSanitizedFunctionError } from '../../integrations/supabase/client.ts';
 import type { LicenseStatus } from '../control-plane.types.ts';
 import { activationDeadline } from './activation-timeout.ts';
+import { validatePublicDeviceRegistration, type PublicDeviceRegistration } from '../../../supabase/functions/_shared/public-device-registration.ts';
 
 export interface PublicDeviceActivationSession {
   sessionToken: string;
@@ -65,9 +66,9 @@ export class PublicDeviceActivationService {
     if (!client) return { success: false, code: 'CLIENT_UNAVAILABLE', message: 'Serviço de ativação indisponível.' };
 
     try {
-      const { data, error } = await client.functions.invoke('device-public-activation', {
-        body: { operation: 'START', displayCode, activationKey },
-      });
+      const { data, error } = await activationDeadline(signal => client.functions.invoke('device-public-activation', {
+        body: { operation: 'START', displayCode, activationKey }, signal,
+      }));
       if (error) {
         const parsed = await parseSanitizedFunctionError(error);
         return { success: false, code: parsed.code || 'REMOTE_ERROR', message: parsed.message };
@@ -86,6 +87,27 @@ export class PublicDeviceActivationService {
     }
   }
 
+  async resume(displayCode: string, sessionToken: string): Promise<PublicDeviceActivationSession | PublicDeviceActivationResult> {
+    const client = getSupabaseBrowserClient();
+    if (!client) return { success: false, code: 'CLIENT_UNAVAILABLE', message: 'Serviço de ativação indisponível.' };
+    try {
+      const { data, error } = await activationDeadline(signal => client.functions.invoke('device-public-activation', {
+        body: { operation: 'RESUME', displayCode, sessionToken }, signal,
+      }));
+      if (error) {
+        const parsed = await parseSanitizedFunctionError(error);
+        return { success: false, code: parsed.code || 'REMOTE_ERROR', message: parsed.message };
+      }
+      if (!isRecord(data) || data.success !== true || data.displayCode !== displayCode
+        || typeof data.sessionId !== 'string' || typeof data.expiresAt !== 'string') {
+        return { success: false, code: 'ACTIVATION_SESSION_NOT_OPEN', message: 'A abertura expirou. Abra novamente a página pelo aplicativo.' };
+      }
+      return { displayCode, sessionToken, sessionId: data.sessionId, expiresAt: data.expiresAt };
+    } catch {
+      return { success: false, code: 'NETWORK_ERROR', message: 'Não foi possível validar o aparelho. Abra novamente a página pelo aplicativo.' };
+    }
+  }
+
   async complete(params: {
     displayCode: string;
     sessionToken: string;
@@ -96,14 +118,19 @@ export class PublicDeviceActivationService {
     epgUrl?: string;
     username?: string;
     password?: string;
-  }): Promise<PublicDeviceActivationResult> {
-    if (!Number.isInteger(params.initialScreens ?? 1) || (params.initialScreens ?? 1) < 1 || (params.initialScreens ?? 1) > 4) return { success: false, code: 'INITIAL_SCREEN_LIMIT', message: 'No cadastro inicial, escolha de uma a quatro telas.' };
+  } & PublicDeviceRegistration): Promise<PublicDeviceActivationResult> {
+    if ((params.initialScreens ?? 1) !== 1) return { success: false, code: 'INITIAL_SCREEN_LIMIT', message: 'A ativação inicial permite somente este aparelho.' };
+    const registration = validatePublicDeviceRegistration(params);
+    if (!registration.success) return { success: false, code: registration.code, message: 'Informe seu primeiro nome, o Local/Tipo e a plataforma do aparelho.' };
     const client = getSupabaseBrowserClient();
     if (!client) return { success: false, code: 'CLIENT_UNAVAILABLE', message: 'Serviço de ativação indisponível.' };
 
     try {
       const { data, error } = await client.functions.invoke('device-public-activation', {
-        body: { operation: 'COMPLETE', ...params, sourceType: params.sourceType ?? 'M3U' },
+        body: { operation: 'COMPLETE', displayCode: params.displayCode, sessionToken: params.sessionToken,
+          sourceName: params.sourceName, sourceType: params.sourceType ?? 'M3U', initialScreens: 1,
+          sourceUrl: params.sourceUrl, epgUrl: params.epgUrl, username: params.username, password: params.password,
+          ...registration.value },
       });
       if (error) {
         const parsed = await parseSanitizedFunctionError(error);

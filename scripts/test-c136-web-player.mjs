@@ -16,7 +16,9 @@ class Element extends EventTarget{
 }
 class Video extends Element{constructor(){super('video');this.currentTime=0;this.duration=100;this.volume=.5;this.playbackRate=1;this.paused=true;this.ended=false}pause(){this.paused=true;this.dispatchEvent(new Event('pause'))}async play(){this.paused=false;this.dispatchEvent(new Event('play'));this.dispatchEvent(new Event('playing'))}load(){if(!this.src)this.release?.()}canPlayType(){return''}}
 class Input extends Element{constructor(){super('input')}}
+class Button extends Element{constructor(){super('button')}}
 const win=new EventTarget();globalThis.window=win;globalThis.HTMLElement=Element;globalThis.HTMLInputElement=Input;globalThis.document={body:new Element('body'),activeElement:null,createElement:t=>t==='video'?new Video():t==='input'?new Input():new Element(t),querySelector:s=>s==='.parental-dialog[open]'?null:document.body.querySelector(s)};globalThis.location=new URL('http://localhost:3987');
+globalThis.HTMLButtonElement=Button;const create=document.createElement;document.createElement=t=>t==='button'?new Button():create(t);
 let timeoutId=0;const timers=new Map();globalThis.setTimeout=fn=>{timers.set(++timeoutId,fn);return timeoutId};globalThis.clearTimeout=id=>timers.delete(id);
 let active=0,maxActive=0,latestFailure;
 globalThis.__mediaFixture={normalize:()=>{},tracks:undefined,attach:async(video,request,signal,failure)=>{await Promise.resolve();if(signal.aborted)throw Error('WEB_MEDIA_CANCELLED');active++;maxActive=Math.max(maxActive,active);latestFailure=failure;video.src=request.uri;video.requestHeaders=request.headers;let closed=false;const release=()=>{if(!closed){closed=true;active--}};video.release=release;release.tracks=()=>__mediaFixture.tracks||{audio:[],subtitles:[]};return release}};
@@ -53,5 +55,14 @@ await test('EXPOSED_TRACK_SELECTION_AND_EPISODES_KEEP_AUTHORIZED_EVENT_CONTRACT'
  button('Episódios').click();assert.equal(button('✓ T1:E1 · Pilot').disabled,true);button('T1:E2 · Next').click();assert.equal(events.episodeNavigation.at(-1).reason,'select');assert.equal(events.episodeNavigation.at(-1).episodeId,'2');assert.equal(events.episodeNavigation.at(-1).playbackId,'ep1');assert.equal(active,0,'old transport released before episode authorization handoff');
  await player.stopPlayback();__mediaFixture.tracks=undefined;
  const preview=await player.startPreview({uri:'https://fixture.invalid/live.ts',kind:'live'});await tick();await player.enterPreviewFullscreen({previewId:preview.previewId});assert.ok(!document.body.querySelectorAll('button').some(b=>b.textContent==='Áudio e legendas'));await player.stopPreview({previewId:preview.previewId});
+});
+await test('FOCUSED_NEXT_ENTER_SPACE_REPEAT_AND_DISABLED_USE_THE_BUTTON_ACTION',async()=>{
+ const confirm=(target,key,repeat=false)=>{const event=new Event('keydown',{cancelable:true});for(const[name,value]of Object.entries({target,key,repeat}))Object.defineProperty(event,name,{value});window.dispatchEvent(event);assert.equal(event.defaultPrevented,true);};
+ const preview=await player.startPreview({uri:'https://fixture.invalid/live.ts',kind:'live',liveContext:{channelId:'live-key'}});await tick();await player.enterPreviewFullscreen({previewId:preview.previewId});
+ const next=button('Próximo canal'),count=events.nativeLiveAction.length,video=document.body.querySelector('video');next.focus();
+ confirm(next,'Enter');assert.equal(events.nativeLiveAction.length,count+1);assert.equal(events.nativeLiveAction.at(-1).action,'next');assert.equal(events.nativeLiveAction.at(-1).channelId,'live-key');
+ confirm(next,'Enter',true);assert.equal(events.nativeLiveAction.length,count+1);confirm(next,' ');assert.equal(events.nativeLiveAction.length,count+2);
+ next.disabled=true;confirm(next,'Enter');assert.equal(events.nativeLiveAction.length,count+2);assert.equal(document.body.querySelector('video'),video);await player.stopPreview({previewId:preview.previewId});
+ for(const key of ['Enter',' ']){await player.open({uri,kind:'series',playbackId:'next-key',episodeContext:{currentEpisodeId:'one',hasNext:true,episodes:[]}});await tick();const count=events.episodeNavigation.length,next=button('Próximo episódio');next.focus();confirm(next,key);confirm(next,key,true);assert.equal(events.episodeNavigation.length,count+1);assert.equal(events.episodeNavigation.at(-1).reason,'next');assert.equal(events.episodeNavigation.at(-1).playbackId,'next-key');assert.equal(active,0);await player.stopPlayback();}
 });
 assert.equal(active,0);assert.equal(timers.size,0);fs.writeFileSync(dir+'/player-tests.json',JSON.stringify({result:'PASS',tests,realWebPluginLifecycle:true,domAndMediaPortsSynthetic:true,maxMediaTransports:maxActive,realSourceDecodeNotTested:true},null,2));

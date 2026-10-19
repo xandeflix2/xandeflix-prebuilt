@@ -92,13 +92,13 @@ const mocks = {
   './control-plane/client/device-activation-sync.service.ts': 'export const ensurePendingDeviceActivationRequest=async()=>{},syncPendingDeviceActivation=async()=>{}',
   './ui/layout/viewport-metrics.ts': 'export const installViewportMetricsDiagnostic=()=>{}',
 };
-for (const name of ['HomePage','MoviesPage','SeriesPage','SearchPage','MovieDetailPage','SeriesDetailPage','LocalSourceProvisioningPage','ActivationPage','SettingsPage','PublicDeviceActivationPage','LiveTvPage']) mocks['./ui/pages/' + name + '.tsx'] = page(name);
+for (const name of ['HomePage','MoviesPage','SeriesPage','SearchPage','MovieDetailPage','SeriesDetailPage','LocalSourceProvisioningPage','ActivationPage','SettingsPage','PublicDeviceActivationPage','LiveTvPage','AdultPage']) mocks['./ui/pages/' + name + '.tsx'] = page(name);
 mocks['./debug/manager/ManagerPanelPage.tsx'] = page('ManagerPanelPage');
 mocks['./ui/portal/CustomerPortalPage.tsx'] = page('CustomerPortalPage');
 const entry = `import React from'react';import{createRoot}from'react-dom/client';import App from'${appPath}';import{qa}from'fixture-state';import{offerStartupPoster}from'${root}/src/artwork/startup-catalog-preview.ts';
 qa.posters=()=>{for(let n=0;n<6;n++)offerStartupPoster({id:'movie:'+n,title:['HORIZONTE','ÚLTIMA SESSÃO','A TRAVESSIA','NOITE URBANA','MAR ABERTO','UM NOVO DIA'][n],posterUri:location.origin+'/poster/'+n+'.svg',category:n%2?'Filmes | Cinema':'Filmes | Lançamentos'})};
 createRoot(document.getElementById('root')).render(<App/>);`;
-const kept = new Set(['./ui/navigation/route-state.ts','./ui/hooks/useDpadNavigation.ts','./ui/components/AppShell.tsx','./ui/components/StartupLoadingScreen.tsx','./ui/components/FirstRealSyncState.tsx']);
+const kept = new Set(['./ui/navigation/route-state.ts','./ui/hooks/useDpadNavigation.ts','./ui/components/AppShell.tsx','./ui/components/StartupLoadingScreen.tsx','./ui/components/FirstRealSyncState.tsx','./parental/parental-control.store.ts','./web/validation.ts']);
 const result = await build({ stdin: { contents: entry, loader: 'tsx', resolveDir: process.cwd() }, bundle: true, write: false, format: 'iife', outdir: dir + '/browser-build',
   define: { __XANDEFLIX_DEBUG_BUILD__: 'false', 'process.env.NODE_ENV': '"development"', 'import.meta.env': '{}' }, plugins: [{ name: 'isolate-authorities-only', setup(builder) {
     builder.onResolve({filter:/hero-artwork\.service\.ts$/},()=>({path:'horizontal-hero-fixture',namespace:'fixture'}));

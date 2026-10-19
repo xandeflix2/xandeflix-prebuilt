@@ -14,6 +14,7 @@
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Capacitor } from '@capacitor/core';
+import { Browser } from '@capacitor/browser';
 import { useActiveCatalog } from './ui/hooks/useActiveCatalog.ts';
 import { useDpadNavigation } from './ui/hooks/useDpadNavigation.ts';
 import { useCatalogReturnNavigation } from './ui/hooks/useCatalogReturnNavigation.ts';
@@ -135,15 +136,26 @@ export default function App(): React.JSX.Element {
 
   useEffect(() => {
     let disposed = false;
+    let activationUpdated = false;
     const reconcileAuthorization = async () => {
       const state = await DeviceIdentityService.loadActivationState();
-      if (!disposed) {
+      if (!disposed && !activationUpdated) {
         setAuthorizationGate(state?.status === 'AUTHORIZED' ? 'AUTHORIZED' : 'UNAUTHORIZED');
       }
     };
     void reconcileAuthorization();
     const handleActivationUpdated = () => {
-      if (!disposed) setAuthorizationGate('AUTHORIZED');
+      if (disposed) return;
+      activationUpdated = true;
+      if (Capacitor.isNativePlatform()) {
+        ++navigationIntentRef.current;
+        setRouteState({ current: { view: 'home' }, history: [] });
+        try {
+          window.history.replaceState(null, '', window.location.pathname + window.location.search);
+        } catch { /* Route state still owns the return from activation. */ }
+        void Browser.close().catch(() => { /* Loading also works after manual browser return. */ });
+      }
+      setAuthorizationGate('AUTHORIZED');
     };
     window.addEventListener('xandeflix:activation-updated', handleActivationUpdated);
     return () => {

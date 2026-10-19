@@ -16,7 +16,7 @@ const parse = text => ts.createSourceFile('ActivationPage.tsx', text, ts.ScriptT
 function pageBody(file) {
   let body;
   function visit(node) {
-    if (ts.isVariableDeclaration(node) && node.name.getText(file) === 'ActivationPage') body = node.initializer.body;
+    if (ts.isVariableDeclaration(node) && node.name.getText(file) === 'NativeActivationPage') body = node.initializer.body;
     ts.forEachChild(node, visit);
   }
   visit(file);
@@ -36,10 +36,10 @@ const compile = text => ts.transpileModule(text.replaceAll('import.meta', '({ en
   module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022,
   jsx: ts.JsxEmit.React, esModuleInterop: true,
 } }).outputText;
-const output = compile(source);
+const output = compile(source+'\nexport { NativeActivationPage };'.replace('\\n','\n'));
 function pureHelper(name, navigatorFixture) {
   const helper = {};
-  vm.runInNewContext(compile(readFileSync(path.resolve(root, 'src/ui/activation', name), 'utf8')), { exports: helper, navigator: navigatorFixture });
+  vm.runInNewContext(compile(readFileSync(path.resolve(root, 'src/ui/activation', name), 'utf8')), { exports: helper, navigator: navigatorFixture, URL, URLSearchParams });
   return helper;
 }
 
@@ -73,6 +73,7 @@ function createHarness(react, loadPage, names, overrides, navigatorFixture, onCh
     if (name.endsWith('/ActivationHandoff.tsx')) return { ActivationHandoff: () => null };
     if (name.endsWith('/authorized-device-reactivation.service.ts')) return { AuthorizedDeviceReactivationService: class {} };
     if (name.endsWith('/activation-clipboard.ts')) return pureHelper('activation-clipboard.ts', navigatorFixture);
+    if (name.endsWith('/public-activation-url.ts')) return pureHelper('public-activation-url.ts', navigatorFixture);
     if (name.endsWith('/activation-diagnostics.ts')) return pureHelper('activation-diagnostics.ts', navigatorFixture);
     if (name.endsWith('/multi-device-contact.service.ts')) return { whatsappContactUrl: contact => contact && /^[1-9][0-9]{7,14}$/.test(contact.whatsapp) ? 'https://wa.me/' + contact.whatsapp : null };
     return services;
@@ -98,7 +99,7 @@ function fixture(overrides = {}, navigatorFixture = { clipboard: { writeText: as
   return createHarness(React, (require, navigator) => {
     const exports = {};
     vm.runInNewContext(code, { exports, require, navigator });
-    return exports.ActivationPage;
+    return exports.NativeActivationPage;
   }, names, { ...defaults, ...overrides }, navigatorFixture);
 }
 function nodes(tree, predicate) {
@@ -114,10 +115,9 @@ function nodes(tree, predicate) {
 }
 const textOf = node => !node ? '' : Array.isArray(node) ? node.map(textOf).join('')
   : typeof node === 'object' ? textOf(node.props?.children) : String(node);
-const copyButton = tree => {
-  const buttons = nodes(tree, node => node.type === 'button' && textOf(node) === 'Copiar chave');
-  assert.equal(buttons.length, 1, 'single real copy button');
-  return buttons[0];
+const handoff = tree => {
+  const elements=nodes(tree,node=>node.props?.embedded===true&&Object.hasOwn(node.props,'activationKey'));
+  assert.equal(elements.length,1,'one combined credential handoff');return elements[0];
 };
 const htmlOf = f => renderToStaticMarkup(f.render());
 const flush = () => new Promise(resolve => setImmediate(resolve));
@@ -131,7 +131,7 @@ for (const status of ['UNREGISTERED', 'PENDING_MANAGER_APPROVAL', 'AUTHORIZED'])
       const html = htmlOf(f);
       assert.equal((html.match(/CHAVE PERMANENTE DO DISPOSITIVO/g) || []).length, 1);
       assert.equal((html.match(/123456/g) || []).length, 1, 'same synthetic key, never duplicate');
-      assert.equal(copyButton(f.render()).props.disabled, false);
+      assert.equal(handoff(f.render()).props.ready,true);assert.equal(handoff(f.render()).props.activationKey,'123456');assert.doesNotMatch(html,/Copiar chave|Ativar sem gestor/);
       assert.equal(html.includes('ATIVAÇÃO NOVA (A1)'), false, 'support initially collapsed');
       assert.equal(html.includes('Verificar ativação'), false, 'manual operations stay in support');
       f.set({ isSupportOpen: true });
@@ -148,7 +148,7 @@ for (const localKeyState of ['LOADING', 'ERROR']) {
       const html = htmlOf(f);
       assert.doesNotMatch(html, /123456/);
       assert.match(html, localKeyState === 'LOADING' ? /Gerando chave/ : /Falha ao preparar a chave local/);
-      assert.equal(copyButton(f.render()).props.disabled, true);
+      assert.equal(handoff(f.render()).props.ready,false);assert.doesNotMatch(html,/Copiar chave/);
       assert.equal(f.blockedCalls(), 0);
     });
   }
@@ -171,35 +171,6 @@ await test('REMOTE_AUTH_MISMATCH_STILL_FAILS_CLOSED_WITH_LOCAL_KEY_VISIBLE', () 
   f.set({ isSupportOpen: true });
   assert.match(htmlOf(f), /ATIVAÇÃO NOVA/);
   assert.doesNotMatch(html, /✓ Dispositivo Autorizado/);
-});
-for (const status of ['UNREGISTERED', 'AUTHORIZED']) {
-  await test(`REAL_CLIPBOARD_SUCCESS_LOCAL_ONLY_${status}`, async () => {
-    const copies = [];
-    const f = fixture({ status, deviceActivationFeedback: 'Fluxo A1 preservado.' }, {
-      clipboard: { writeText: async value => { copies.push(value); } },
-    });
-    copyButton(f.render()).props.onClick();
-    await flush();
-    assert.deepEqual(copies, ['123456']);
-    assert.equal(f.state.keyCopyFeedback, 'Chave copiada.');
-    assert.equal(f.state.deviceActivationFeedback, 'Fluxo A1 preservado.');
-    assert.match(htmlOf(f), /role="status"/);
-    assert.match(htmlOf(f), /Chave copiada/);
-    assert.equal(f.blockedCalls(), 0);
-  });
-}
-await test('CLIPBOARD_REJECTION_NO_SECRET_OR_RAW_ERROR_IN_FEEDBACK', async () => {
-  const f = fixture({}, { clipboard: { writeText: async () => { throw new Error('synthetic-private-error'); } } });
-  copyButton(f.render()).props.onClick();
-  await flush();
-  assert.equal(f.state.keyCopyFeedback, 'Não foi possível copiar. Anote a chave exibida.');
-  assert.doesNotMatch(htmlOf(f), /synthetic-private-error/);
-  assert.equal(f.blockedCalls(), 0);
-});
-await test('LEGACY_CLIPBOARD_ABSENT_HAS_NO_CRASH_OR_EXTERNAL_CALL', () => {
-  const f = fixture({}, {});
-  assert.doesNotThrow(() => copyButton(f.render()).props.onClick());
-  assert.equal(f.blockedCalls(), 0);
 });
 await test('DEFAULT_UI_ONLY_CODE_KEY_CONTACT_AND_CLOSED_SUPPORT', () => {
   for (const status of ['UNREGISTERED', 'PENDING_MANAGER_APPROVAL', 'AUTHORIZED']) {
@@ -277,7 +248,7 @@ if (process.argv.includes('--serve')) {
   const browserCode = `
     import React from 'react';
     import {createRoot} from 'react-dom/client';
-    const helperCodes = ${JSON.stringify(Object.fromEntries(['activation-clipboard.ts', 'activation-diagnostics.ts'].map(name => [name, compile(readFileSync(path.resolve(root, 'src/ui/activation', name), 'utf8'))])))};
+    const helperCodes = ${JSON.stringify(Object.fromEntries(['activation-clipboard.ts', 'activation-diagnostics.ts', 'public-activation-url.ts'].map(name => [name, compile(readFileSync(path.resolve(root, 'src/ui/activation', name), 'utf8'))])))};
     function pureHelper(name, navigatorFixture) {
       const exports = {};
       new Function('exports', 'navigator', 'document', helperCodes[name])(exports, navigatorFixture, undefined);
@@ -305,7 +276,7 @@ if (process.argv.includes('--serve')) {
     const harness = createHarness(React, (require, navigator) => {
       const exports = {};
       new Function('exports', 'require', 'navigator', code)(exports, require, navigator);
-      return exports.ActivationPage;
+      return exports.NativeActivationPage;
     }, names, defaults, navigatorFixture, () => queueMicrotask(render));
     function render() { root.render(harness.render()); }
     window.__KEY_VISIBILITY_FIXTURE__ = {

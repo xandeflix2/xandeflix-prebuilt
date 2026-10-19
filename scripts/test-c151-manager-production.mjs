@@ -18,6 +18,7 @@ function compile(file, ports = {}) {
   return module.exports;
 }
 const { resolveManagerPublicConfig } = compile('src/manager/public-config.ts');
+const { isPublicActivationLocation, consumePublicActivationHandoff } = compile('src/ui/activation/public-activation-url.ts');
 const fixture = { url: 'https://cujbmyhitgomlgwfkaat.supabase.co', key: 'sb_publishable_synthetic_test_only' };
 await test('CANONICAL_PUBLIC_ENV_ONLY_NO_SECRET_OR_OTHER_PROJECT', () => {
   assert.deepEqual(resolveManagerPublicConfig({ VITE_SUPABASE_URL: fixture.url, VITE_SUPABASE_PUBLISHABLE_KEY: fixture.key }), fixture);
@@ -32,9 +33,12 @@ function harness({ config = fixture, client = {}, error } = {}) {
   const events = [], authorities = [];
   const Panel = () => React.createElement('main', null, 'manager');
   const Recovery = () => null;
+  const Activation = () => null;
   const { createManagerApplication } = compile('src/manager/ManagerApplication.tsx', {
     '../debug/manager/ManagerPanelPage.tsx': { ManagerPanelPage: Panel },
     '../debug/manager/ManagerPasswordRecovery.tsx': { ManagerPasswordRecovery: Recovery },
+    '../ui/pages/PublicDeviceActivationPage.tsx': { PublicDeviceActivationPage: Activation },
+    '../ui/activation/public-activation-url.ts': { isPublicActivationLocation, consumePublicActivationHandoff },
     '../debug/manager/manager-password-recovery.ts': { isManagerRecoveryLocation: location => {
       events.push('intent'); return location.pathname === '/manager-reset-password' || new URLSearchParams(location.hash.slice(1)).get('type') === 'recovery';
     } },
@@ -48,12 +52,23 @@ function harness({ config = fixture, client = {}, error } = {}) {
     './public-config.ts': { resolveManagerPublicConfig },
   });
   const location = { pathname: '/', hash: '', search: '' };
-  return { run: override => createManagerApplication({ ...location, ...override }), Panel, Recovery, authorities, events };
+  return { run: override => createManagerApplication({ ...location, ...override }), Panel, Recovery, Activation, authorities, events };
 }
 await test('DEDICATED_MANAGER_BOOTSTRAPS_REMOTE_AUTH_WITHOUT_DEVICE_OR_CATALOG', () => {
   const h = harness(), node = h.run(); assert.equal(node.type, h.Panel);
   assert.equal(h.authorities.length, 1); assert.equal(h.authorities[0].client.auth, 'synthetic');
   assert.deepEqual(h.events, ['intent', 'sdk']);
+});
+await test('PUBLIC_ACTIVATION_PATH_AND_LEGACY_HASH_NEVER_INITIALIZE_MANAGER_AUTHORITY', () => {
+  for (const route of [{ pathname: '/activate-device' }, { hash: '#/activate-device' }]) {
+    const h = harness(), node = h.run(route); assert.equal(node.type, h.Activation);
+    assert.deepEqual(h.authorities, []); assert.deepEqual(h.events, ['intent', 'sdk']);
+  }
+  for (const route of [{ pathname: '/admin', hash: '#/activate-device' }, { pathname: '/activate-device-other' }]) {
+    const h = harness(); assert.equal(h.run(route).type, h.Panel); assert.equal(h.authorities.length, 1);
+  }
+  const recovery = harness(); assert.equal(recovery.run({ pathname: '/activate-device', hash: '#type=recovery' }).type, recovery.Recovery);
+  const invalid = harness({ config: null }); assert.equal(invalid.run({ pathname: '/activate-device' }).type, 'main'); assert.deepEqual(invalid.authorities, [undefined]);
 });
 await test('MISSING_WRONG_PROJECT_SECRET_AND_CLIENT_FAILURE_FAIL_CLOSED', () => {
   for (const options of [{ config: null }, { config: { ...fixture, url: 'https://wrong.supabase.co' } },
@@ -104,9 +119,9 @@ await test('VERCEL_ROUTES_BUILD_AND_ARTIFACT_BOUNDARY', () => {
   const config = JSON.parse(fs.readFileSync('vercel.json', 'utf8'));
   assert.equal(config.buildCommand, 'npm run site:build');
   assert.equal(config.outputDirectory, 'tmp/c154-web-production/site'); assert.equal(Object.hasOwn(config, 'public'), false);
-  assert.deepEqual(config.rewrites.map(rule => rule.source), ['/', '/admin', '/master', '/manager', '/manager-reset-password', '/app', '/app/']);
-  assert.ok(config.rewrites.slice(0, 5).every(rule => rule.destination === '/manager.html'));
-  assert.ok(config.rewrites.slice(5).every(rule => rule.destination === '/app/app.html'));
+  assert.deepEqual(config.rewrites.map(rule => rule.source), ['/', '/admin', '/master', '/manager', '/manager-reset-password', '/activate-device', '/app', '/app/']);
+  assert.ok(config.rewrites.slice(0, 6).every(rule => rule.destination === '/manager.html'));
+  assert.ok(config.rewrites.slice(6).every(rule => rule.destination === '/app/app.html'));
   assert.ok(!config.rewrites.some(rule => rule.source.includes('*')));
   const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
   assert.match(pkg.scripts['manager:build'], /^npm run c11:new-device:lock && tsc && vite build --config vite.manager.config.ts$/);
@@ -123,4 +138,5 @@ await test('BUILD_ENV_IS_EXPLICIT_AND_APP_DEBUG_ENTRY_NOT_IMPORTED', () => {
   const source = fs.readFileSync('src/manager/main.tsx', 'utf8') + fs.readFileSync('src/manager/ManagerApplication.tsx', 'utf8');
   assert.doesNotMatch(source, /from ['"].*App['"]|DevicePresentationGate|startNonBlockingSync|configureDeviceSourceDelivery|bootTelemetry/);
 });
+await import('./test-c163-public-activation-entry.mjs');
 console.log(JSON.stringify({ result: 'PASS', tests, remoteWrites: 0, physicalBrowser: false }));

@@ -49,7 +49,6 @@ final class PlayerControls {
         view.findViewById(R.id.player_lock).setVisibility(mobile?View.VISIBLE:View.GONE);
         view.findViewById(R.id.player_brightness).setVisibility(mobile?View.VISIBLE:View.GONE);
         if(!mobile) {
-            ((TextView)view.findViewById(R.id.player_title)).setTextSize(20);
             for(int id:new int[]{R.id.player_resize,R.id.player_speed,R.id.player_episodes,R.id.player_tracks,R.id.player_next})((Button)view.findViewById(id)).setTextSize(14);
         }
         view.findViewById(R.id.player_lock).setOnClickListener(v -> setLocked(!locked));

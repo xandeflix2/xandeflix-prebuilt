@@ -3001,3 +3001,143 @@ memorias append-only e diff --check deve passar antes da entrega.
 Git de versionamento/registro autorizado no escopo em curso; PR=NAO.
 Comparacao localhost/producao anterior continua pendente; APK nao certifica
 compatibilidade da fonte com navegador publico. NEXT_GATE_STARTED=NAO.
+
+## Investigacao da reproducao localhost — 2026-10-18
+
+HEAD510e18a limpo no preflight, clone/main/origin corretos; mesmo diagnostico
+web, sem novo Gate. Relato novo de nenhum conteudo reproduzivel prevalece.
+Console real: filmes HTTP404, API HTTP404+CORS; nao prova falha de codec.
+Vite3000 referencia o clone atual; modulo publico preserva URI. Revisao da
+troca de geracao e diff C160 nao reproduziu regressao de URL.64 testes
+sinteticos de player/catalogo/episodios/parental e lock PASS; fonte real nao
+testada. Comparacao da mesma requisicao em nova aba pendente. Correcao NAO
+CONCLUIDA; nenhuma mudanca funcional/reset/deploy/fonte. APK1.0.32 anterior
+conferido, sem novo build/instalacao. NEXT_GATE_STARTED=NAO.
+
+Capturas posteriores confirmam MP4 HTTP404/text/html no app e pagina404 em
+HTTPS na nova aba; protocolos diferentes, sem presumir cadeia de redirect.
+Comparacao com referencia oficial da playlist ainda pendente; solicitado
+somente caminho local de M3U original, sem URL/conteudo/credenciais. Sem
+leitura de fonte/arquivo real nem alteracao funcional. Nao declarar corrigido.
+
+
+## Localhost restabelecido por troca de fonte ? 2026-10-18
+
+Usuario confirmou que a fonte anterior estava sem sinal ativo e que, ao
+atualizar/trocar por fonte HTTP, o sistema voltou a funcionar. Confirmacao
+fisica e relato do titular; nao e reproducao instrumentada pelo agente.
+Investigacao localhost encerrada por restabelecimento externo, sem defeito
+de runtime confirmado ou patch funcional. Comparacao com arquivo M3U deixa
+de ser necessaria; nao solicitar caminho/arquivo/credenciais adicionais.
+Isso nao certifica playback HTTP a partir da Vercel HTTPS, todos os itens
+do catalogo ou dispositivos Android. Sem novos testes/build/APK/deploy,
+backend ou alteracao de fonte pelo agente. NEXT_GATE_STARTED=NAO.
+
+## Verificacao de Live na producao atual - 2026-10-18
+
+Pedido novo de verificacao; mesmos quatro registros locais autorizados,
+sem Gate novo. Ambos aliases: rotas200,14assets identicos ao build local,
+headers e endpoints sensiveis corretos. HTTP308->HTTPS, sem CSP no HTML.
+Novo diagnostico do usuario: autorizacao/binding/catalogo prontos; canal
+inicialHTTPS chegou ao MPEGTS e falhouNETWORK/status0. Nao e rejeicao inicial
+WEB_MEDIA_HTTPS_REQUIRED nessa tentativa. Tipo Console atual solicitado;
+CORS/TLS/redirect ainda nao distinguidos. Sem fonte consultada pelo agente,
+alteracao funcional/deploy/backend/APK. Verificacao de midia nao concluida.
+
+
+## Live em producao: bloqueio de transporte confirmado - 2026-10-18
+
+Console novo confirmou Mixed Content durante tentativa LiveMPEGTS, recurso
+HTTP bloqueado sob blobHTTPS apos C9/preview. URI inicialHTTPS preservada;
+salto/destino exato nao identificado sem cadeia de rede. Diagnostico desse
+bloqueio concluido, reproducao de producao NAO corrigida. Imagens possuem
+erros separados CORS/certificado. Assets e rotas dos dois aliases passaram
+verificacao exata. Fornecedor precisaHTTPS valido em todo caminho do canal;
+sem estrategia de banda/bypass ou alteracao funcional/deploy/backend/APK.
+
+
+## C161 - Fullscreen Live e navegacao - APK1.0.33
+
+Ciclo local autorizado concluido: header/controles Live, paineis Android laterais
+e Guia inferior; Enter/Espaco web corrigidos apos reproducao real. Proximo
+episodio/canal passam nos testes automatizados de UI/servico/Java, nao sao
+homologacao fisica. 206 testes nativos, 6 perfis Chrome/18 paineis,
+build/lock/assinatura/assets PASS. APK1.0.33/code33: c9ae534d9062c2ab0f709859054a9cb4666d29c00cc9c265ab6627476ddf8367.
+Usuario Fire relata OK sem resposta; ADB vazio, causa nativa fisica nao
+reproduzida. Reteste no Fire pendente. Sem instalacao/Git/deploy/backend.
+Spec/evidencia C11_LIVE_FULLSCREEN_PRESENTATION.md. NEXT_GATE_STARTED=NAO.
+
+
+## C162 - Cabecalho VOD padronizado - 2026-10-19
+
+Filmes/series agora usam Voltar circular/chevron e titulo maior como Live em
+Android/Fire/TV e codigo web. Fonte dos episodios corrigida pelo usuario;
+nenhum patch de carregamento. C136/C161, 206 JVM/35 suites, Chrome6/12 fluxos,
+build/lock/assinatura/assets/auditoria PASS. APK1.0.34/code34: fd137dd6f707c679937faa9e025c57ee5fe18ce2c9baab2169f16c40005c4f72.
+Evidencia C11_VOD_PLAYER_HEADER.md. Sem instalacao/Git/deploy/backend/reset.
+NEXT_GATE_STARTED=NAO.
+
+
+## C163 - Entrada publica de ativacao preparada - 2026-10-19
+
+Botao nativo deixa de derivar localhost e usa pagina publica canonica.
+Rota exata/legado abrem formulario de autoativacao sem autoridade de gestor,
+com codigo/chave e fonte propria; politica/licenca/identidade preservadas.
+C1518+C1636, Chrome real com API sintetica, API real negativa sem RPC,
+site/native build, lock, assinatura/assets/auditoria PASS. APK1.0.35/code35:
+12e308ee729d028621a2b21e94c609c32081615964ae29c1397da858963c34a7. Evidencia C11_PUBLIC_SELF_ACTIVATION_ENTRY.md.
+Publicacao PENDENTE: Vercel disponivel apenas xandeflix4; nao operada.
+APK sozinho nao publica a pagina. Sem Git/deploy/backend/instalacao/reset.
+NEXT_GATE_STARTED=NAO.
+
+
+## C163 - Publicacao confirmada no dominio correto - 2026-10-19
+
+Pendencia anterior resolvida apos nova conexao Vercel e reinicio. Projeto
+xandeflix-prebuilt-nm3x/prj_OJcEZDNVPI3NV8Z1GfHOB02v20TF do proprietario
+team_gHZGQz2zRhEWsyK2jfOLLD5t confirmado com dominio xandeflix.vercel.app.
+Deploy production dpl_6roc9JY3GpSiDDNz2EEiQc1mETZB READY/alias sem erro.
+/activate-device publico200; oito rotas/headers e23 arquivos SHA-256 iguais
+ao site testado. Chrome real direto/legado/mobile e login admin PASS, zero
+escritas. APK1.0.35 anterior preservado. Sem Git/backend/instalacao/reset.
+Ativacao real/fisica nao realizada. Evidencia C11_PUBLIC_SELF_ACTIVATION_ENTRY.md.
+NEXT_GATE_STARTED=NAO.
+
+
+## C164 - Autoativacao individual publicada - 2026-10-19
+
+Um aparelho/uma sessao, trial limitado pelo servidor a sete dias, sem renovacao
+automatica; pagamento ainda nao integrado. Codigo/chave/compartilhamento no
+mesmo card; Abrir pagina valida prova e abre cadastro direto com capability
+curta, sem chave permanente na URL. Formulario com primeiro nome/Local/Tipo/
+plataforma/playlist/EPG, sem telas adicionais; nome salvo na coluna Cliente.
+Migration20261019051832 e Edgev12 implantadas no Supabase correto; fixtures
+reais com ROLLBACK, negativos HTTP, suites/builds/lock/auditoria1256 PASS.
+Vercel dpl_3C3EGi59Uxc2C2vyvUgAmh6HqVa1 READY;8 rotas/23 arquivos e Chrome
+publico PASS. APK1.0.36/code36:84912cf347957be42cc1065bf5a5578201b5e34aa500e7cd0ac5690d43196dcb. Mesma assinatura/8assets
+verificados, sem instalacao/teste fisico/ativacao real de cliente/Git.
+Evidencia C11_SINGLE_DEVICE_SELF_ACTIVATION.md. NEXT_GATE_STARTED=NAO.
+
+
+## C165 - Retorno a abertura apos ativacao - 2026-10-19
+
+Confirmacao nativa agora limpa rota/historico/hash de configuracoes e retorna
+a home/primeira sincronizacao exclusiva, solicitando fechamento do Browser.
+Home pronta exige novo acesso para ajustar configuracoes; Back nao restaura
+o fluxo anterior. Leitura inicial atrasada protegida; erro/offline/retry,
+web e boot local-first existentes preservados. C16510/C1119, lock/typecheck/
+build/cap/Gradle/assinatura/assets/auditoria PASS. APK1.0.37/code37:
+34a5c808878c99923695aecff746c128c451684ea57d447687ad697f3aed7441. Sem instalacao/teste fisico/ativacao real/backend/Vercel/Git.
+Evidencia C11_POST_ACTIVATION_STARTUP.md. NEXT_GATE_STARTED=NAO.
+
+
+## C166 - Commit e push autorizados - 2026-10-19
+
+Usuario autorizou expressamente publicar no GitHub os ajustes C161-C165.
+GIT_COMMIT_AUTHORIZED=SIM; GIT_PUSH_AUTHORIZED=SIM; PR_AUTHORIZED=NAO.
+Preflight/remote/main/HEAD510e18a confirmados;53 arquivos conhecidos, sem
+.env.local/APKs/builds/tmp. Auditoria C1651261 PASS antes desta rotina e
+site:build completo com lock/C151-C160 PASS. Sem novo patch funcional.
+Stage/commit/push e confirmacao remota seguem o procedimento registrado
+em evidence/C11_C161_C165_GIT_PUBLICATION.md; este registro e anterior ao
+envio. NEXT_GATE_STARTED=NAO.

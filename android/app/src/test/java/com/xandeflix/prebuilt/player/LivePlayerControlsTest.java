@@ -4,6 +4,20 @@ import android.view.KeyEvent;
 import static org.junit.Assert.*;
 
 public class LivePlayerControlsTest {
+    @Test public void fullscreenPanelsReserveHeaderAndFooterAcrossScreenSizes() {
+        for(int[] screen:new int[][]{{1920,1080,2},{1280,800,1},{960,540,1},{844,390,1},{390,844,1},{2400,1080,3}}){
+            int width=screen[0],height=screen[1],density=screen[2],header=68*density,footer=64*density;
+            for(boolean guide:new boolean[]{false,true}){
+                int[] bounds=LivePlayerControls.panelBounds(width,height,density,header,footer,guide);
+                assertTrue(bounds[0]>=0);assertTrue(bounds[1]>=header);
+                assertTrue(bounds[2]>0);assertTrue(bounds[3]>0);
+                assertTrue(bounds[0]+bounds[2]<=width);
+                assertTrue(bounds[1]+bounds[3]<=height-footer);
+                if(guide){assertTrue(bounds[2]>=width-24*density);assertTrue(bounds[3]<=232*density);}
+                else {assertTrue(bounds[0]>0);assertTrue(bounds[2]<=400*density);}
+            }
+        }
+    }
     @Test public void channelKeysAreExplicitAndDoNotStealDpadMediaOrBack() {
         assertTrue(LivePlayerControls.isChannelKey(KeyEvent.KEYCODE_CHANNEL_UP));
         assertTrue(LivePlayerControls.isChannelKey(KeyEvent.KEYCODE_CHANNEL_DOWN));

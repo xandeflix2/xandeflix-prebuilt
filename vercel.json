@@ -10,6 +10,7 @@
     { "source": "/master", "destination": "/manager.html" },
     { "source": "/manager", "destination": "/manager.html" },
     { "source": "/manager-reset-password", "destination": "/manager.html" },
+    { "source": "/activate-device", "destination": "/manager.html" },
     { "source": "/app", "destination": "/app/app.html" },
     { "source": "/app/", "destination": "/app/app.html" }
   ],

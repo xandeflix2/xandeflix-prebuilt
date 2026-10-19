@@ -101,7 +101,7 @@ await test('PUBLIC_RUNTIME_PRESERVES_LOCAL_CATALOG_FETCH_AND_SEARCH_INPUT_WITHOU
 await test('MANAGER_ROUTES_REMAIN_EXACT_AND_APP_DOES_NOT_CAPTURE_OTHER_PATHS', () => {
   const config = JSON.parse(read('vercel.json'));
   assert.equal(config.buildCommand, 'npm run site:build');
-  assert.deepEqual(config.rewrites, ['/', '/admin', '/master', '/manager', '/manager-reset-password', '/app', '/app/'].map((source, index) => ({ source, destination: index < 5 ? '/manager.html' : '/app/app.html' })));
+  assert.deepEqual(config.rewrites, ['/', '/admin', '/master', '/manager', '/manager-reset-password', '/activate-device', '/app', '/app/'].map((source, index) => ({ source, destination: index < 6 ? '/manager.html' : '/app/app.html' })));
   assert.equal(config.headers[0].headers.find((row) => row.key === 'X-Frame-Options').value, 'DENY');
   assert.ok(!config.rewrites.some((row) => /api|DATA|\*/.test(row.source)));
   const scripts = JSON.parse(read('package.json')).scripts;

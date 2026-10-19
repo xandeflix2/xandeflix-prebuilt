@@ -109,3 +109,37 @@ html[data-web-validation="true"] #root .app-shell--side-nav > .app-header {
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
+
+/* C161: fullscreen Live presentation */
+.web-player-top--live { align-items: flex-start; gap: 16px; padding: 20px 24px; background: linear-gradient(#000b, #0000); }
+.web-player-top--live .web-player-back { display: grid; place-items: center; flex: 0 0 48px; width: 48px; height: 48px; padding: 12px; border-radius: 50%; background: #141922b3; }
+.web-player-back svg { display: block; width: 24px; height: 24px; }
+.web-player-live-heading { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+.web-player-live-heading strong { flex: none; width: 100%; font-size: clamp(22px, 2.6vw, 36px); line-height: 1.15; }
+.web-player-live-badge { display: inline-flex; align-items: center; padding: 5px 10px; border-radius: 4px; background: #e50914; color: #fff; font-size: 12px; line-height: 1; font-weight: 800; letter-spacing: .06em; white-space: nowrap; }
+.web-player-center--live { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); width: min(560px, calc(100% - 32px)); gap: clamp(12px, 4vw, 40px); }
+.web-player-center--live .web-player-channel-step { min-width: 0; min-height: 56px; padding: 10px 12px; border-radius: 12px; background: #141922b3; font-size: clamp(13px, 1.5vw, 18px); line-height: 1.3; white-space: normal; }
+.web-player-center--live .web-player-play { background: #ffffff1a; border-color: #ffffff35; }
+.web-player-host--live .web-player-panel { top: 112px; }
+.web-player-host--live .web-player-panel--guide { top: auto; left: 20px; right: 20px; bottom: var(--live-footer-reserve, 84px); width: auto; max-height: min(240px, calc(100% - var(--live-footer-reserve, 84px) - 112px)); }
+.web-player-panel--guide > strong { display: block; padding: 8px 0; font-size: 18px; color: #fff; }
+.web-player-panel--guide > p { margin: 8px 0 0; padding: 12px; border-radius: 8px; background: #10111a; color: #fff; }
+@media (max-width: 600px) {
+  .web-player-top--live { padding: 12px; gap: 10px; }
+  .web-player-top--live .web-player-back { flex-basis: 44px; width: 44px; height: 44px; padding: 10px; }
+  .web-player-live-heading strong { font-size: 22px; }
+  .web-player-top--live .web-player-lock { padding-inline: 10px; }
+  .web-player-host--live .web-player-panel { top: 100px; }
+  .web-player-host--live .web-player-panel--guide { top: auto; left: 10px; right: 10px; max-height: min(240px, calc(100% - var(--live-footer-reserve, 160px) - 100px)); }
+}
+
+/* C162: movie and series headers share the Live back button and title scale. */
+.web-player-top--vod { align-items: flex-start; padding: 20px 24px; background: linear-gradient(#000b, #0000); }
+.web-player-top--vod .web-player-back { display: grid; place-items: center; flex: 0 0 48px; width: 48px; height: 48px; padding: 12px; border-radius: 50%; background: #141922b3; }
+.web-player-top--vod > strong { min-width: 0; font-size: clamp(22px, 2.6vw, 36px); line-height: 1.15; }
+@media (max-width: 600px) {
+  .web-player-top--vod { padding: 12px; gap: 10px; }
+  .web-player-top--vod .web-player-back { flex-basis: 44px; width: 44px; height: 44px; padding: 10px; }
+  .web-player-top--vod > strong { font-size: 22px; }
+  .web-player-top--vod .web-player-lock { padding-inline: 10px; }
+}

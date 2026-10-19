@@ -30,6 +30,12 @@ export class WebPlayer extends WebPlugin {
       const index = controls.indexOf(document.activeElement as HTMLElement);
       event.preventDefault(); event.stopImmediatePropagation(); controls[(index + (event.shiftKey ? -1 : 1) + controls.length) % controls.length]?.focus(); return;
     }
+    const button = event.target instanceof HTMLElement ? event.target.closest('button') : null;
+    if (button instanceof HTMLButtonElement && surface.host.contains(button) && (event.key === 'Enter' || event.key === ' ')) {
+      event.preventDefault();
+      if (!event.repeat && !button.disabled) button.click();
+      return;
+    }
     if (surface.locked) return;
     if (event.target instanceof HTMLElement && event.target.closest('button') && ['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)) {
       const index = controls.indexOf(document.activeElement as HTMLElement), step = event.key === 'ArrowLeft' || event.key === 'ArrowUp' ? -1 : 1;
@@ -145,12 +151,27 @@ export class WebPlayer extends WebPlugin {
     const top = document.createElement('div'); top.className = 'web-player-top';
     const title = document.createElement('strong'); title.textContent = surface.context?.name || surface.request.title || 'Xandeflix';
     const lock = this.button(surface.locked ? 'Desbloquear' : 'Bloquear', () => { surface.locked = !surface.locked; this.controls(surface); this.reveal(surface); surface.tools.querySelector<HTMLElement>('.web-player-lock')?.focus(); }); lock.classList.add('web-player-lock');
-    top.append(this.button('← Voltar', () => surface.preview ? this.fullscreen(surface, false) : this.closeVod()), title, lock); tools.append(top);
+    const back = this.button('← Voltar', () => surface.preview ? this.fullscreen(surface, false) : this.closeVod());
+    back.classList.add('web-player-back'); back.title = 'Voltar'; back.setAttribute('aria-label', surface.preview ? 'Voltar para os canais' : 'Voltar');
+    back.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg>';
+    if (surface.preview) {
+      top.classList.add('web-player-top--live');
+      const heading = document.createElement('div'); heading.className = 'web-player-live-heading';
+      const badge = document.createElement('span'); badge.className = 'web-player-live-badge'; badge.textContent = 'AO VIVO';
+      heading.append(title, badge); top.append(back, heading, lock);
+    } else { top.classList.add('web-player-top--vod'); top.append(back, title, lock); }
+    tools.append(top);
     const center = document.createElement('div'); center.className = 'web-player-center';
     const play = this.button('▶', () => this.togglePlayback(surface)); play.classList.add('web-player-play');
     const seek = (delta: number) => { if (Number.isFinite(video.duration)) video.currentTime = Math.max(0, Math.min(video.duration, video.currentTime + delta)); this.refresh(surface); };
-    if (!surface.preview) center.append(this.button('↶ −10s', () => seek(-10)));
-    center.append(play); if (!surface.preview) center.append(this.button('+10s ↷', () => seek(10))); tools.append(center);
+    if (surface.preview) {
+      center.classList.add('web-player-center--live');
+      const previous = this.button('Canal anterior', () => this.action(surface, 'previous'));
+      const next = this.button('Próximo canal', () => this.action(surface, 'next'));
+      previous.classList.add('web-player-channel-step'); next.classList.add('web-player-channel-step');
+      center.append(previous, play, next);
+    } else center.append(this.button('↶ −10s', () => seek(-10)), play, this.button('+10s ↷', () => seek(10)));
+    tools.append(center);
     const bottom = document.createElement('div'); bottom.className = 'web-player-bottom';
     surface.ui = { play };
     if (!surface.preview) {
@@ -162,8 +183,7 @@ export class WebPlayer extends WebPlugin {
     const actions = document.createElement('div'); actions.className = 'web-player-actions';
     actions.append(this.button(video.style.objectFit === 'cover' ? 'Ajustar tela' : 'Preencher tela', () => { video.style.objectFit = video.style.objectFit === 'cover' ? 'contain' : 'cover'; this.controls(surface); this.reveal(surface); }));
     if (surface.preview) {
-      actions.append(this.button('◀ Canal', () => this.action(surface, 'previous')), this.button('Canal ▶', () => this.action(surface, 'next')),
-        this.button(surface.context?.favorite ? '★' : '☆', () => this.action(surface, 'favorite')),
+      actions.append(this.button(surface.context?.favorite ? '★' : '☆', () => this.action(surface, 'favorite')),
         this.button('Canais', () => { this.action(surface, 'channels'); void this.openLivePanel({ previewId: surface.id, panel: 'channels' }); }),
         this.button('Categorias', () => { this.action(surface, 'categories'); void this.openLivePanel({ previewId: surface.id, panel: 'categories' }); }),
         this.button('Guia', () => { this.action(surface, 'guide'); void this.openLivePanel({ previewId: surface.id, panel: 'guide' }); }));
@@ -203,7 +223,7 @@ export class WebPlayer extends WebPlugin {
     catch (error) { markWebPlayback(diagnostic, 'FAILED', webMediaException(error, 'VALIDATION')); throw error; }
     this.drop();
     const host = document.createElement('div'), video = document.createElement('video'), status = document.createElement('p'), tools = document.createElement('div');
-    host.className = 'web-player-host player-overlay'; video.controls = false; video.style.objectFit = 'contain'; video.playsInline = true; video.preload = 'metadata'; video.setAttribute('aria-label', request.title || 'Player de vídeo');
+    host.className = 'web-player-host player-overlay' + (preview ? ' web-player-host--live' : ''); video.controls = false; video.style.objectFit = 'contain'; video.playsInline = true; video.preload = 'metadata'; video.setAttribute('aria-label', request.title || 'Player de vídeo');
     status.className = 'web-player-status'; status.setAttribute('role','status'); tools.className = 'web-player-tools';
     host.append(video, tools, status); document.body.append(host);
     const surface: Surface = { id: 'web-preview-' + (++this.sequence), host, video, status, tools, preview, obscured: false, full: !preview,
@@ -275,10 +295,13 @@ export class WebPlayer extends WebPlugin {
   async setLiveControls({ previewId, context }: { previewId: string; context: NativeLiveContext }) { const surface = this.requirePreview(previewId); surface.context = context; this.controls(surface); return { accepted: true }; }
   async openLivePanel({ previewId, panel }: { previewId: string; panel: 'channels' | 'categories' | 'guide' | 'favorites' }) {
     const surface = this.requirePreview(previewId); if (surface.obscured || !surface.full) throw new Error('INVALID_REQUEST');
-    surface.host.querySelector('.web-player-panel')?.remove(); const list = document.createElement('div'); list.className = 'web-player-panel';
+    surface.host.querySelector('.web-player-panel')?.remove(); const list = document.createElement('div'); list.className = 'web-player-panel' + (panel === 'guide' ? ' web-player-panel--guide' : '');
     list.append(this.button('Fechar lista', () => list.remove()));
     const context = surface.context;
     if (panel === 'guide') {
+      const footer = surface.tools.querySelector('.web-player-bottom');
+      if (footer) list.style.setProperty('--live-footer-reserve', Math.ceil(surface.host.getBoundingClientRect().bottom - footer.getBoundingClientRect().top + 12) + 'px');
+      const heading = document.createElement('strong'); heading.textContent = 'Guia de programação'; list.append(heading);
       for (const program of context?.epg.programs || []) { const text = document.createElement('p'); text.textContent = new Date(program.start).toLocaleTimeString('pt-BR', { hour:'2-digit',minute:'2-digit' }) + ' · ' + program.title; list.append(text); }
       if (!context?.epg.programs.length) { const text = document.createElement('p'); text.textContent = context?.epg.message || 'Programação indisponível.'; list.append(text); }
     } else {
