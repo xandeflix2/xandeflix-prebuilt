@@ -3141,3 +3141,11 @@ site:build completo com lock/C151-C160 PASS. Sem novo patch funcional.
 Stage/commit/push e confirmacao remota seguem o procedimento registrado
 em evidence/C11_C161_C165_GIT_PUBLICATION.md; este registro e anterior ao
 envio. NEXT_GATE_STARTED=NAO.
+
+
+### C166 - Envio confirmado
+
+Commit funcional efa99a4b4a678ea08dc0b991be88b77a5ee8c21b enviado a main do GitHub;
+ls-remote confirma o mesmo hash e status limpo apos primeiro push. Site:build
+PASS,53 arquivos revisados. Recibo/documentacao encerrados em commit separado,
+sem alteracao funcional ou novo Gate.

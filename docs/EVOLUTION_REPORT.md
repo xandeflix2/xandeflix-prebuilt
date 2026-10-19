@@ -3580,3 +3580,11 @@ site:build atualizado completo PASS e registros de validacoes anteriores
 preservados. Sem alteracao funcional/backend/instalacao neste ciclo. Push
 normal main:main no origin correto, seguido de comparacao dos hashes remoto
 e local; confirmacao sera registrada apos a operacao. Sem PR/force/novo Gate.
+
+
+### C166 - Resultado da publicacao
+
+GitHub main recebeu efa99a4b4a678ea08dc0b991be88b77a5ee8c21b por push normal,
+com todos os53 arquivos C161-C165 revisados. HEAD remoto/local iguais e
+worktree limpo apos envio. Este registro fecha a evidencia documental;
+sem PR/force, backend, instalacao ou nova validacao fisica.

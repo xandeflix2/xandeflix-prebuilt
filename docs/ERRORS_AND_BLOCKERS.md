@@ -3547,3 +3547,13 @@ inventario local usado. Ausencia de core.hooksPath e configuracao normal.
 Warnings CRLF/chunk herdados mantidos, sem normalizar arquivos. Nao incluir
 segredos, APKs, .env.local ou caches. Evidencia remota apos push deve distinguir
 Git sincronizado de deploy/instalacao fisica. NEXT_GATE_STARTED=NAO.
+
+
+### C166 - Pendencia de Git resolvida
+
+Commit efa99a4b4a678ea08dc0b991be88b77a5ee8c21b e push main:main concluidos;
+GitHub confirmou o hash por ls-remote. Nenhuma rejeicao de commit/push e
+nenhum bloqueio restante. Stage53 arquivos PASS e site:build PASS; nenhum
+segredo/APK/.env.local/caches incluido. Recibo documental separado preserva
+o resultado; deploy automatizado e aparelho fisico nao sao certificados
+apenas pelo push.

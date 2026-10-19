@@ -40,3 +40,14 @@ C165, incluindo lock canonico/prebuild, typecheck, builds manager/app e suites
 C151-C160/C163/C164. Evidencias C161-C165 de UI/Android/APKs preservadas;
 nenhum teste fisico novo ou escrita de backend realizada nesta rotina.
 Validacao do stage e envio serao registrados apos execucao.
+
+## Commit e primeiro push confirmados
+
+Commit funcional efa99a4b4a678ea08dc0b991be88b77a5ee8c21b,53 arquivos,2526 insercoes/188 remocoes.
+Push normal origin main:main concluiu510e18a -> efa99a4.
+Consulta git ls-remote confirmou main remoto igual ao HEAD local;
+git status limpo apos esse envio. Stage conferido:53 arquivos exatos,
+nenhum achado nas regras de segredo de alta confianca, .env.local ignorado,
+APKs/builds/tmp excluidos. Sem PR/force/backend/instalacao.
+Este recibo e acrescentado em fechamento documental separado; hash e status
+finais desse fechamento ficam no registro local tmp/c166-git-publication.
