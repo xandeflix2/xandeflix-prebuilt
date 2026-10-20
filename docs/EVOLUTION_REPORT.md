@@ -3679,3 +3679,5 @@ Variaveis publicas de build ausentes no GitHub sao pendencia explicita; nao ha
 fallback nem secret de producao. Novo CI ainda NOT_RUN, sem commit/push/deploy.
 A2 (artefato verificado, permissao de publicar e promocao) depende de nova
 instrucao nominal. App1.0.37/code37 e dados mantidos. CHAT_MASTER_REVIEW=PENDING.
+
+CANON-01 / A2.1: CANON-01-VERCEL-A2-ARTIFACT local artifact verifier and tests added; authorization append-only; PREBUILT_REAL_VERIFIED=NAO; DEPLOY=NAO.

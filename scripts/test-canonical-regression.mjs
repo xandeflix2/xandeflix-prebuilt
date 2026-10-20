@@ -3,7 +3,7 @@ import path from 'node:path';
 import assert from 'node:assert/strict';
 import {spawnSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
-import {collectSnapshot,verifyCanonical,verifySiteBuildWorkflow,blobHash,CanonError,REFERENCE,PHASED,PHYSICAL,AUTHORIZATION,LEGACY_AUTHORIZATION,HARDENING_GATE,HARDENING_AUTHORIZATION,AUTHORIZATION_DIRECTORY,SUITES,SITE_BUILD_GATE,SITE_BUILD_AUTHORIZATION,SITE_BUILD_WORKFLOW,SITE_BUILD_TEST} from './verify-canonical-contract.mjs';
+import {collectSnapshot,verifyCanonical,verifySiteBuildWorkflow,blobHash,CanonError,REFERENCE,PHASED,PHYSICAL,AUTHORIZATION,LEGACY_AUTHORIZATION,HARDENING_GATE,HARDENING_AUTHORIZATION,AUTHORIZATION_DIRECTORY,SUITES,SITE_BUILD_GATE,SITE_BUILD_AUTHORIZATION,SITE_BUILD_WORKFLOW,SITE_BUILD_TEST,A2_ARTIFACT_GATE,A2_ARTIFACT_AUTHORIZATION,A2_ARTIFACT_SCRIPT,A2_ARTIFACT_TEST} from './verify-canonical-contract.mjs';
 
 const root=fileURLToPath(new URL('..',import.meta.url)),dir=path.join(root,'tmp/canon-01');
 fs.mkdirSync(dir,{recursive:true});const original=collectSnapshot(root);
@@ -100,7 +100,7 @@ for(const[name,args,env,expected]of [['MISSING_GIT_FAILS_CLI',[],{...process.env
 }
 // Hardening additions preserve the 72 preceding named controls and all suites.
 for(const file of [AUTHORIZATION,LEGACY_AUTHORIZATION])assert.deepEqual(overlay(approved).read(file),original.read(file));
-assert.deepEqual(future.authorizedAmendments,['CANON-01-G10FIX','CANON-01-LEGACYTESTS',HARDENING_GATE,SITE_BUILD_GATE,'ANDROID-38']);pass('FUTURE_38_PRESERVES_BOTH_HISTORICAL_RECEIPTS');
+assert.deepEqual(future.authorizedAmendments,['CANON-01-G10FIX','CANON-01-LEGACYTESTS',HARDENING_GATE,SITE_BUILD_GATE,A2_ARTIFACT_GATE,'ANDROID-38']);pass('FUTURE_38_PRESERVES_BOTH_HISTORICAL_RECEIPTS');
 rejects('G10_IDENTITY_SWAP_TO_ANDROID_38_BLOCKS','CANON_HISTORICAL_AUTHORIZATION_IDENTITY',overlay({...approved,[AUTHORIZATION]:JSON.stringify({...primary,gate:'ANDROID-38',evidence:approval.evidence})}));
 rejects('LEGACY_IDENTITY_SWAP_TO_ANDROID_38_BLOCKS','CANON_LEGACY_AUTHORIZATION_IDENTITY',overlay({...approved,[LEGACY_AUTHORIZATION]:JSON.stringify({...legacy,gate:'ANDROID-38',evidence:approval.evidence})}));
 rejects('G10_IDENTITY_SWAP_TO_LEGACY_BLOCKS','CANON_HISTORICAL_AUTHORIZATION_IDENTITY',editReceipt(AUTHORIZATION,a=>{a.gate=legacy.gate;a.evidence=legacy.evidence}));
@@ -121,7 +121,7 @@ for(const file of ['scripts/verify-canonical-contract.mjs','scripts/test-canonic
  rejects('GOVERNANCE_SILENT_CHANGE_BLOCKS_'+path.basename(file),'CANON_PROTECTED_CONTENT_CHANGED',overlay({[file]:current(file)+'\n// unapproved governance change\n'}));
 }
 const governance='scripts/verify-canonical-contract.mjs',governanceNext=current(governance)+'\n// synthetic reviewed governance evolution\n';
-const governanceApproval={...approval,gate:'GOVERNANCE-02',testChangesReviewed:true,supersedes:{[governance]:SITE_BUILD_GATE},evidence:'docs/evidence/SYNTHETIC_GOVERNANCE_02.md',changes:[{path:governance,before:blobHash(governance,current(governance)),after:blobHash(governance,governanceNext)}]};
+const governanceApproval={...approval,gate:'GOVERNANCE-02',testChangesReviewed:true,supersedes:{[governance]:A2_ARTIFACT_GATE},evidence:'docs/evidence/SYNTHETIC_GOVERNANCE_02.md',changes:[{path:governance,before:blobHash(governance,current(governance)),after:blobHash(governance,governanceNext)}]};
 assert.equal(verifyCanonical(overlay(additionalAuthorization(governanceApproval,{[governance]:governanceNext},'GOVERNANCE-02'))).result,'PASS');pass('GOVERNANCE_EVOLUTION_REQUIRES_NEW_LINKED_REVIEWED_RECEIPT');
 rejects('GOVERNANCE_CHAIN_CANNOT_INHERIT_TEST_REVIEW','CANON_TEST_WEAKENING_REVIEW_REQUIRED',overlay(additionalAuthorization({...governanceApproval,testChangesReviewed:false},{[governance]:governanceNext},'GOVERNANCE-02')));
 rejects('GOVERNANCE_CHAIN_PREDECESSOR_REQUIRED','CANON_AUTHORIZATION_CHAIN_INVALID',overlay(additionalAuthorization({...governanceApproval,supersedes:{}},{[governance]:governanceNext},'GOVERNANCE-02')));
@@ -151,8 +151,17 @@ for(const[name,from,to]of [
 const deploymentWorkflow=current(SITE_BUILD_WORKFLOW).replace('npm run site:build','vercel deploy --prebuilt');
 const deploymentApproval={...approval,gate:'SITE-WORKFLOW-NEGATIVE',testChangesReviewed:true,supersedes:{[SITE_BUILD_WORKFLOW]:SITE_BUILD_GATE},changes:[{path:SITE_BUILD_WORKFLOW,before:blobHash(SITE_BUILD_WORKFLOW,current(SITE_BUILD_WORKFLOW)),after:blobHash(SITE_BUILD_WORKFLOW,deploymentWorkflow)}]};
 rejects('SITE_BUILD_HASH_GRANT_CANNOT_AUTHORIZE_DEPLOY','CANON_SITE_BUILD_WORKFLOW_INVALID',overlay(additionalAuthorization(deploymentApproval,{[SITE_BUILD_WORKFLOW]:deploymentWorkflow},deploymentApproval.gate)));
+// A2.1 preserves all previous A1 controls prior to new named regressions.
+assert.equal(cases.length,108,'PREVIOUS_108_CONTROLS_MUST_RUN');
+for(const file of [A2_ARTIFACT_SCRIPT,A2_ARTIFACT_TEST]){
+ rejects('A2_REQUIRED_'+path.basename(file),'CANON_REQUIRED_FILE_MISSING',overlay({[file]:null}));
+ rejects('A2_SILENT_MUTATION_'+path.basename(file),'CANON_PROTECTED_CONTENT_CHANGED',overlay({[file]:current(file)+'\n// unauthorized\n'}));
+}
+rejects('A2_RECEIPT_REQUIRED','CANON_REQUIRED_FILE_MISSING',overlay({[A2_ARTIFACT_AUTHORIZATION]:null}));
+rejects('A2_RECEIPT_MUTATION','CANON_REGISTERED_RECEIPT_CHANGED',overlay({[A2_ARTIFACT_AUTHORIZATION]:current(A2_ARTIFACT_AUTHORIZATION)+'\n'}));
+rejects('A2_REGISTRATION_REQUIRED','CANON_A2_AUTHORIZATION_REQUIRED',overlay({[PHASED]:current(PHASED).replace(/<!-- CANON-01:AUTHORIZATION -->\s*```json\s*\{\s*"schema": 1,\s*"gate": "CANON-01-VERCEL-A2-ARTIFACT"[\s\S]*?```\s*/,'')}));
 const results=[];
-const suites=[...SUITES,['scripts/test-g10-delta-extensions-regression.mjs','G10_DELTA_EXTENSIONS_REGRESSION=PASS'],[SITE_BUILD_TEST,'SITE_BUILD_CONTRACT=PASS']];
+const suites=[...SUITES,['scripts/test-g10-delta-extensions-regression.mjs','G10_DELTA_EXTENSIONS_REGRESSION=PASS'],[SITE_BUILD_TEST,'SITE_BUILD_CONTRACT=PASS'],[A2_ARTIFACT_TEST,'A2_ARTIFACT_CONTRACT=PASS']];
 for(const[file,marker]of suites){
  const run=spawnSync(process.execPath,[path.join(root,file)],{cwd:root,encoding:'utf8',timeout:180000,maxBuffer:8*1024*1024});
  fs.writeFileSync(path.join(dir,path.basename(file)+'.log'),(run.stdout||'')+(run.stderr||''));

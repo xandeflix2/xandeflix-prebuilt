@@ -16,6 +16,10 @@ export const SITE_BUILD_GATE='CANON-01-VERCEL-BUILD-A1';
 export const SITE_BUILD_AUTHORIZATION=AUTHORIZATION_DIRECTORY+SITE_BUILD_GATE+'.json';
 export const SITE_BUILD_WORKFLOW='.github/workflows/site-build-validation.yml';
 export const SITE_BUILD_TEST='scripts/test-site-build-contract.mjs';
+export const A2_ARTIFACT_GATE='CANON-01-VERCEL-A2-ARTIFACT';
+export const A2_ARTIFACT_AUTHORIZATION=AUTHORIZATION_DIRECTORY+A2_ARTIFACT_GATE+'.json';
+export const A2_ARTIFACT_SCRIPT='scripts/verify-vercel-artifact.mjs';
+export const A2_ARTIFACT_TEST='scripts/test-vercel-artifact-contract.mjs';
 const SITE_BUILD_WORKFLOW_TEXT=[
  'name: Site build validation','',
  'on:','  push:','  pull_request:','',
@@ -103,7 +107,7 @@ export function verifyCanonical(snapshot){
  const required=file=>{const b=read(file);ensure(b!==null&&b!==undefined,'CANON_REQUIRED_FILE_MISSING',file);return text(b)};
  ensure(snapshot.nodeMajor>=24,'CANON_NODE_24_REQUIRED');
  for(const file of ['node_modules/typescript/package.json','node_modules/vite/package.json','node_modules/jszip/package.json','node_modules/react/package.json'])ensure(read(file),'CANON_DEPENDENCY_MISSING',file);
- for(const f of [...APPEND_ONLY,PHASED,PHYSICAL,BOUNDARY,'docs/architecture/C11_NEW_DEVICE_ACTIVATION_LOCK.md','docs/evidence/CANON_01_EXECUTION.md',...CANON_FILES,C11,'.github/workflows/canonical-regression.yml',SITE_BUILD_WORKFLOW,SITE_BUILD_TEST,...SUITES.map(x=>x[0])])required(f);
+ for(const f of [...APPEND_ONLY,PHASED,PHYSICAL,BOUNDARY,'docs/architecture/C11_NEW_DEVICE_ACTIVATION_LOCK.md','docs/evidence/CANON_01_EXECUTION.md',...CANON_FILES,C11,'.github/workflows/canonical-regression.yml',SITE_BUILD_WORKFLOW,SITE_BUILD_TEST,A2_ARTIFACT_SCRIPT,A2_ARTIFACT_TEST,...SUITES.map(x=>x[0])])required(f);
  for(const f of APPEND_ONLY)ensure(required(f).startsWith(text(baselineText.get(f))),'CANON_HISTORY_REWRITTEN',f);
  for(const f of APPEND_ONLY.slice(0,4)){const doc=required(f);ensure(doc.includes('XANDEFLIX_PREBUILT_PHASED_EXPANSION')&&doc.includes('canon:check')&&doc.includes('canon:test'),'CANON_NORMATIVE_REFERENCE_MISSING',f)}
  const contract=required(PHASED),blocks=Array.from(contract.matchAll(/<!-- CANON-01:POLICY -->\s*```json\s*([\s\S]*?)```/g));
@@ -119,6 +123,7 @@ export function verifyCanonical(snapshot){
  const registrations=Array.from(contract.matchAll(/<!-- CANON-01:AUTHORIZATION -->\s*```json\s*([\s\S]*?)```/g),m=>json(m[1],'CANON_AUTHORIZATION_REGISTRY_INVALID'));
  ensure(registrations.length>0&&registrations[0].gate===HARDENING_GATE&&registrations[0].path===HARDENING_AUTHORIZATION,'CANON_HARDENING_REGISTRATION_REQUIRED');
  ensure(registrations.some(r=>r.gate===SITE_BUILD_GATE&&r.path===SITE_BUILD_AUTHORIZATION),'CANON_SITE_BUILD_AUTHORIZATION_REQUIRED');
+  ensure(registrations.some(r=>r.gate===A2_ARTIFACT_GATE&&r.path===A2_ARTIFACT_AUTHORIZATION),'CANON_A2_AUTHORIZATION_REQUIRED');
  const registeredPaths=new Set(),registeredGates=new Set(HISTORICAL_RECEIPTS.map(r=>r[1]));
  for(const entry of registrations){
   ensure(same(Object.keys(entry).sort(),['gate','hash','path','schema'])&&entry.schema===1&&/^[A-Z][A-Z0-9_-]{2,64}$/.test(entry.gate||'')&&entry.gate!=='CANON-01'&&/^[a-f0-9]{40}$/.test(entry.hash||''),'CANON_AUTHORIZATION_REGISTRY_INVALID');
@@ -157,6 +162,12 @@ export function verifyCanonical(snapshot){
    const scope=[...CANON_FILES,SITE_BUILD_WORKFLOW,SITE_BUILD_TEST];
    ensure(authorization.changes.length===scope.length&&authorization.changes.every(item=>scope.includes(item.path)),'CANON_SITE_BUILD_AUTHORIZATION_SCOPE');
    ensure(authorization.gitCommitAuthorized===false&&authorization.gitPushAuthorized===false&&authorization.androidBuildAuthorized===false&&authorization.supabaseWriteAuthorized===false&&authorization.nextGateStarted===false,'CANON_SITE_BUILD_AUTHORIZATION_RESTRICTIONS');
+  }
+  if(receipt===A2_ARTIFACT_AUTHORIZATION){
+   ensure(authorization.parentGate==='CANON-01'&&authorization.amendment===A2_ARTIFACT_GATE&&authorization.testChangesReviewed===true,'CANON_A2_AUTHORIZATION_REQUIRED');
+   const scope=[...CANON_FILES,A2_ARTIFACT_SCRIPT,A2_ARTIFACT_TEST];
+   ensure(authorization.changes.length===scope.length&&authorization.changes.every(item=>scope.includes(item.path)),'CANON_A2_AUTHORIZATION_SCOPE');
+   ensure(authorization.gitCommitAuthorized===false&&authorization.gitPushAuthorized===false&&authorization.androidBuildAuthorized===false&&authorization.supabaseWriteAuthorized===false&&authorization.nextGateStarted===false,'CANON_A2_RESTRICTIONS');
   }
   const supersedes=authorization.supersedes??{};
   ensure(typeof supersedes==='object'&&supersedes!==null&&!Array.isArray(supersedes)&&Object.keys(supersedes).every(f=>authorization.changes.some(c=>c.path===f)),'CANON_AUTHORIZATION_CHAIN_INVALID');

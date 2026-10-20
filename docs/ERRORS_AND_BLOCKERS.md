@@ -3693,3 +3693,5 @@ dez comandos exit0. A falha inicial foi de desenvolvimento e esta resolvida.
 Permanece pendente a configuracao publica do futuro CI e sua execucao remota;
 os deployments Vercel anteriores nao foram corrigidos ou reclassificados.
 Nenhum bypass/secret/deploy foi introduzido. CHAT_MASTER_REVIEW=PENDING.
+
+CANON-01 / A2.1: CANON-01-VERCEL-A2-ARTIFACT local artifact verifier and tests added; authorization append-only; PREBUILT_REAL_VERIFIED=NAO; DEPLOY=NAO.

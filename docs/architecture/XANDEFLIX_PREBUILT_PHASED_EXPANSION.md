@@ -479,3 +479,20 @@ CHAT_MASTER_REVIEW=PENDING; SOURCE_FORMAT_01_STARTED=NAO; NEXT_GATE_STARTED=NAO.
   "hash": "7edaa32c4b13c8295fc0daa64abed1ef7a4b0c2d"
 }
 ```
+
+## CANON-01 VERCEL A2.1 — local-only artifact verifier
+
+Operator authorized local implementation by PowerShell. Preserve CANON-01 and A1.
+A2.1 checks deterministic SHA-256 file integrity, identity claims, routes and headers.
+No manifest or fixture is a trusted GitHub attestation; actual Vercel prebuilt NOT verified.
+No deploy or Git writes authorized. Publishing requires separate A2.2 gate.
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-VERCEL-A2-ARTIFACT",
+  "path": "docs/governance/authorizations/CANON-01-VERCEL-A2-ARTIFACT.json",
+  "hash": "fb613a143676e3e32267ebacb3bec81123791823"
+}
+```

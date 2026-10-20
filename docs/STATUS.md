@@ -3244,3 +3244,5 @@ Resultado PASS e local; novo workflow remoto NOT_RUN. Cadastrar/revisar as
 vars publicas VITE_SUPABASE_URL e VITE_SUPABASE_PUBLISHABLE_KEY exige decisao
 posterior antes de publicar o workflow. Sem secrets ou fallback ficticio.
 Evidencia CANON_01_VERCEL_BUILD_A1.md; CHAT_MASTER_REVIEW=PENDING; A2 NAO iniciado.
+
+CANON-01 / A2.1: CANON-01-VERCEL-A2-ARTIFACT local artifact verifier and tests added; authorization append-only; PREBUILT_REAL_VERIFIED=NAO; DEPLOY=NAO.
