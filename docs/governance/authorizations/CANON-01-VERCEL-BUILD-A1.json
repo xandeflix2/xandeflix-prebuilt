@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "gate": "CANON-01-VERCEL-BUILD-A1",
+  "parentGate": "CANON-01",
+  "amendment": "CANON-01-VERCEL-BUILD-A1",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "USER_ATTACHMENT_CHAT_MESTRE_CANON_01_VERCEL_BUILD_VALIDATION",
+  "authorizationRequestSha256": "89fa9dbf8a83b6662c0ef4e5d5de4cdc36930e9cd0a0b2558538bfb4b49b1b86",
+  "reason": "Add full validation-only site build CI on Windows and Linux with exact workflow and test integrity, preserving all historical controls and receipts; no Vercel publication is authorized.",
+  "physicalImpact": "NOT_REQUIRED_JUSTIFIED",
+  "physicalImpactJustification": "Governance, workflow and local test changes only; no product runtime, Android, backend, source data or device changes.",
+  "testChangesReviewed": true,
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c105-complete-root-search.mjs",
+    "scripts/test-c107-catalog-return-navigation.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c11-landscape-navigation.mjs",
+    "scripts/validate-direct-playback.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock",
+    "npm run typecheck",
+    "npm run update:check",
+    "npm run security:check",
+    "npm run playback:check",
+    "npm run build",
+    "npm run site:build",
+    "node scripts/test-site-build-contract.mjs"
+  ],
+  "evidence": "docs/evidence/CANON_01_VERCEL_BUILD_A1.md",
+  "compatibilityRisk": "Exact workflow changes require a new governance amendment. A1 does not repair the existing Vercel source builds or authorize deployment; A2 remains pending.",
+  "restrictions": [
+    "Preserve canonical-regression.yml, package.json, vercel.json and .vercelignore byte for byte.",
+    "Preserve G10FIX, LEGACYTESTS and AUTHORIZATION-HARDENING receipts and the previous 95 controls and 11 suites.",
+    "No secrets, publication APIs, Vercel token, deploy workflow, commit, push, merge, PR update, main change or infrastructure change.",
+    "No Android build/install/version change, Supabase write, migrations, source data change or SOURCE-FORMAT-01."
+  ],
+  "supersedes": {
+    "scripts/verify-canonical-contract.mjs": "CANON-01-AUTHORIZATION-HARDENING",
+    "scripts/test-canonical-regression.mjs": "CANON-01-AUTHORIZATION-HARDENING"
+  },
+  "changes": [
+    {
+      "path": "scripts/verify-canonical-contract.mjs",
+      "before": "04e8825fa9f34f392d9844f72b750ea92bb25be1",
+      "after": "bf99d655897772c04635a7624fb5dbdbb4c57c54"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "144fb238f5dee26d10b43e19cb36a7c865a7a045",
+      "after": "ab9c771133c84282bbf9c7a7d2091e5d0dd0f1a6"
+    },
+    {
+      "path": ".github/workflows/site-build-validation.yml",
+      "before": null,
+      "after": "a05751fb8e3d0d9a8bad7615d7a3f1be9b66228c"
+    },
+    {
+      "path": "scripts/test-site-build-contract.mjs",
+      "before": null,
+      "after": "b9b51c29cbadefb07525cb75d652cea80d8bb57c"
+    }
+  ],
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": false,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false
+}

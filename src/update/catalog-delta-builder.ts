@@ -109,6 +109,7 @@ export class CatalogDeltaBuilder {
       baseCatalogVersion: baseCatalog.metadata.catalogVersion,
       targetCatalogVersion: targetCatalog.metadata.catalogVersion,
       targetMetadata: targetCatalog.metadata,
+      ...(targetCatalog.extensions !== undefined ? { targetExtensions: targetCatalog.extensions } : {}),
       categories,
       genres,
       movies,
