@@ -62,3 +62,19 @@ FINAL_HANDOFF
 - Coleta e apresenta evidencias rastreaveis e verificaveis;
 - **Nao adjudica** PASS arquitetural definitivo nem homologa percentual de progresso;
 - **Nao inicia** o Gate seguinte sob nenhuma hipotese (`NEXT_GATE_STARTED=NAO`).
+
+## 4. CANON-01 - Consolidacao e revisao por branch
+
+Norma complementar:
+[XANDEFLIX_PREBUILT_PHASED_EXPANSION](../architecture/XANDEFLIX_PREBUILT_PHASED_EXPANSION.md).
+Comandos obrigatorios `npm run canon:check` e `npm run canon:test`, mantendo
+o lock C11 e todos os negativos/suites existentes. Executor deste Gate: Codex;
+o papel historico Antigravity acima nao muda a autoridade final do Chat Mestre.
+Evidencias fisicas recebidas do operador devem ser identificadas como tal.
+Nenhum agente aprova o proprio Gate, futuro produto ou nova baseline sozinho.
+
+Depois das verificacoes, criar governance/canon-01-hardening a partir da
+baseline validada; branch existente/conflito desconhecido exige parada.
+Commit/push somente dos artefatos da allowlist nessa branch. Sem main push,
+force, merge, PR, ruleset ou release. Relatorio deve comparar HEAD local/remoto.
+CHAT_MASTER_REVIEW=PENDING; NEXT_GATE_STARTED=NAO.

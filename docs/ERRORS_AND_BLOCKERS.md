@@ -3557,3 +3557,111 @@ nenhum bloqueio restante. Stage53 arquivos PASS e site:build PASS; nenhum
 segredo/APK/.env.local/caches incluido. Recibo documental separado preserva
 o resultado; deploy automatizado e aparelho fisico nao sao certificados
 apenas pelo push.
+
+
+## CANON-01 - Bloqueio G10 e diagnostico do verificador - 2026-10-19
+
+Bloqueio obrigatorio: validate-security-recovery.mjs3.4 rejeita DeltaV1
+assinado com TARGET_CATALOG_HASH_MISMATCH_REJECTED; hash calculado diverge
+do manifest. Reproduzido com suite e src/update/src/security identicos
+a baseline b3fc8d1; causa fixture/runtime ainda nao adjudicada. Nao alterar
+assercoes/validacao de hash nem retirar suite para passar. Regression FAIL;
+branch/commit/push/build apos falha nao realizados. C11/typecheck PASS.
+
+Falso positivo inicial do checker por normalizar LF apenas no candidato
+foi corrigido comparando ambos os lados Git/local; controle LF/CRLF PASS.
+Nenhum arquivo antigo normalizado. Helper REPL sem process corrigido por
+leitura direta de bytes. Falha real G10 permanece, registrada no recibo
+regression-result.json com exit1; demais suites restantes NOT_RUN.
+14 arquivos permitidos preservados localmente e140 APKs imutaveis; sem
+Supabase write, dispositivos/dados/runtime/versao novos. Evidencia completa
+CANON_01_EXECUTION.md. CHAT_MASTER_REVIEW=PENDING; NEXT_GATE_STARTED=NAO.
+
+### CANON-01 - Causa G10 isolada; proposta nao aplicada - 2026-10-20
+
+Delta builder/types/applier nao transportam extensions.categoryProvenance
+produzido pela ingestao. Unica diferenca estrutural da fixture G10 e
+$.extensions ausente; recoloca-lo em copia restaura exatamente o hash target.
+Hash/assinatura nao devem ser relaxados. Proposta de3 modulos e1 schema
+(4 arquivos) em tmp/canon-01/g10-proposed-fix.patch, sem tocar produto.
+G9/G10 antigos e11 casos adicionais PASS somente sob loader diagnostico RAM.
+Regressao oficial continua FAIL no G10; nenhuma publicacao permitida.
+Checker canonico ampliado para schemas/:867 arquivos/43 controles PASS,
+5 suites PASS antes do bloqueio. Emenda nominal de escopo ainda necessaria.
+Evidencia CANON_01_EXECUTION.md. CHAT_MASTER_REVIEW=PENDING.
+
+Helper de auditoria desta continuacao leu artifact.hash, mas o inventario
+usa artifact.sha256; comparacao com undefined falhou antes do recibo. Campo
+corrigido no helper tmp e auditoria repetida; nao era alteracao do APK.
+
+### CANON-01-G10FIX - G10 resolvido; bloqueios legados restantes - 2026-10-20
+
+Emenda expressa aplicada somente a types/builder/applier/schema e novo teste.
+G9/G10 oficiais PASS; hash/assinatura preservados. Compatibilidade antiga
+testada com rejeicao segura e importacao explicita de FullV1/V2 assinado;
+nao existe fallback automatico certificado. Checker868/43 controles PASS.
+
+canon:test agora chega ao teste phone-ui-orientation e falha na linha51:
+regex exige atributos XML adjacentes, mas supportsPictureInPicture ja existe
+entre name e exported. Manifest e teste sao identicos a baseline. Nao alterar
+Android nem relaxar criterio neste escopo; precisa de emenda para o teste.
+playback:check legado G8 falha na linha278: fixture Node sem armazenamento
+parental retorna NATIVE_PLAYER_ERROR/protecao local indisponivel. Guard
+permanece fail-closed, player/parental/suite intactos; diagnostico nao prova
+falha fisica. Adaptacao da fixture e portas exige revisao fora desta allowlist.
+
+Regressao agregada FAIL, builds NOT_RUN, commit/push proibidos. C11 lock,
+typecheck, novo teste, contrato, busca e landscape PASS. Nenhuma suite removida
+ou assercao antiga modificada. Relatorio CANON_01_G10_FIX_EVIDENCE.md.
+CHAT_MASTER_REVIEW=PENDING; NEXT_GATE_STARTED=NAO.
+
+### CANON-01-LEGACYTESTS - causas e incidentes de validacao - 2026-10-20
+
+Emenda expressa permite corrigir somente os dois testes legados e ampliar a
+governanca. Orientacao: assercao dependia da ordem/adjacencia dos atributos;
+substituida por leitura dos atributos com unicidade e valores obrigatorios.
+G8: localStorage ausente em Node causava load parental error corretamente;
+fixture existente nao configurada agora e instalada antes da primeira leitura.
+Armazenamento ausente/corrompido/negado e erro cacheado continuam bloqueando;
+nao houve alteracao no controle parental, player, Android ou licenciamento.
+
+Primeira regressao da emenda: novo negativo LEGACY_CANNOT_REPLACE_G10 foi
+rejeitado antes pela divergencia da evidencia nominal, enquanto esperava
+codigo de identidade. Entrada sintetica passou a incluir evidencia do Gate
+que tentava imitar; a identidade continua rejeitada pela regra especifica.
+Primeiro FAIL/exit1 preservado em attempt-1-results.json e attempt-1-regression.log.
+Nenhum build foi iniciado com essa falha obrigatoria pendente. Segunda
+execucao real:72 controles/11 suites PASS, incluindo os43 controles antigos.
+
+Preparacao auxiliar do recibo em stdin misturou require e top-level await,
+falhando antes de gravar o arquivo. Corrigido para imports ESM; recibo criado
+somente depois. Leitor auxiliar de log tambem confundiu UTF16LE do PowerShell
+com UTF8 e reportou marcador ausente; corrigido por BOM, preservando log e
+exit0 confirmado da execucao real. Incidentes auxiliares nao eram defeitos
+do produto nem autorizavam ignorar testes. Resultado final no relatorio
+CANON_01_LEGACY_TESTS_EVIDENCE.md; homologacao do Chat Mestre continua pendente.
+
+### CANON-01 AUTHORIZATION HARDENING - substituicao historica resolvida - 2026-10-20
+
+Diagnostico posterior do Chat Mestre identificou risco real de governanca:
+ANDROID-38 substituia CANON_CHANGE_AUTHORIZATION.json na fixture, e o pin
+de hash dependia de authorization.gate. Novo identificador podia evitar
+a checagem da imutabilidade G10. O PASS anterior LEGACYTESTS nao comprova
+essa propriedade incondicional; essa inferencia fica invalidada.
+
+Emenda expressa corrige somente checker/runner. G10 e Legacy sao obrigatorios
+por path e identidade, com pins incondicionais. Futuro usa novo recibo e
+entrada append-only, nunca o path historico. Checker/runner nao sao mais
+ignorados no loop de hash.95 controles/11 suites PASS incluindo troca de
+identidade, substituicao antiga, ausencia/adulteracao, governanca silenciosa
+e revisao/predecessor/hash de cadeia;72 cenarios anteriores preservados.
+Todos os nove comandos oficiais PASS/exit0, sem falha inesperada neste ciclo.
+
+Limite explicito: pins/recibos nao autenticam a aprovacao humana contra
+reescrita coordenada de toda a raiz de confianca por um ator com escrita
+irrestrita. Revisao independente/ancoragem Git/CI e protecao de branch sao
+complementos externos, nao configurados nem alegados aqui. Nao existe campo,
+flag ou caminho de execucao aprovado que dispense os historicos. Workflow
+nao cobre site:build atualmente; inclusao justificada requer autorizacao
+adicional. Nenhum runtime, Android, Supabase ou dado foi alterado.
+Relatorio CANON_01_AUTHORIZATION_HARDENING.md; CHAT_MASTER_REVIEW=PENDING.

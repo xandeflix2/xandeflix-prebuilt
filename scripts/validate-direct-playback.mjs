@@ -14,6 +14,11 @@
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
+import { installUnconfiguredParentalFixture } from './lib/parental-fixture-bindings.mjs';
+import { parentalStorage } from '../src/parental/parental-storage.ts';
+import { parentalControl } from '../src/parental/parental-control.store.ts';
 
 // Importa módulos da aplicação via Type Stripping do Node
 import { CatalogReadModel } from '../src/catalog/catalog-read-model.ts';
@@ -32,6 +37,105 @@ import {
   sanitizeHeadersForLog,
 } from '../src/playback/playback-redaction.ts';
 import { PlaybackError } from '../src/playback/playback-errors.ts';
+
+// ESM dependencies are evaluated first; none may have loaded the singleton yet.
+assert.equal(parentalControl.getSnapshot().status, 'loading', 'PARENTAL_FIXTURE_INSTALLED_TOO_LATE');
+if (process.argv[2] === '--parental-state') {
+  await verifyIsolatedParentalState(process.argv[3]);
+  console.log('G8_PARENTAL_STATE=PASS_' + process.argv[3]);
+  process.exit(0);
+}
+assert.equal(process.argv.length, 2, 'UNEXPECTED_G8_ARGUMENT');
+installUnconfiguredParentalFixture();
+assert.equal(await import('../src/parental/parental-control.store.ts').then(m => m.parentalControl), parentalControl, 'ESM_SINGLETON_IDENTITY');
+
+async function verifyIsolatedParentalState(state) {
+  const allowed = ['missing', 'corrupt', 'unavailable', 'cached-error', 'unconfigured', 'pin-cancel', 'persistent-block', 'blocked-restart', 'license'];
+  assert.ok(allowed.includes(state), 'UNKNOWN_PARENTAL_STATE');
+  globalThis.fetch = async () => { throw new Error('UNEXPECTED_NETWORK_IN_G8_FIXTURE'); };
+  let raw = null, writes = 0, acquired = 0, resolved = 0, launched = 0;
+  if (state === 'missing' || state === 'cached-error') delete globalThis.localStorage;
+  else if (state === 'corrupt') {
+    parentalStorage.read = async () => '{}';
+    parentalStorage.write = async () => { writes++; throw new Error('FORBIDDEN_WRITE'); };
+  } else if (state === 'unavailable') {
+    parentalStorage.read = async () => { throw new Error('DENIED_STORAGE'); };
+    parentalStorage.write = async () => { writes++; throw new Error('FORBIDDEN_WRITE'); };
+  } else if (state === 'unconfigured' || state === 'license') installUnconfiguredParentalFixture();
+  else {
+    raw = state === 'blocked-restart' ? readFileSync(0, 'utf8') : null;
+    parentalStorage.read = async () => raw;
+    parentalStorage.write = async value => { raw = value; writes++; };
+  }
+  const model = new CatalogReadModel({ metadata: { snapshotId: 'g8-parental-fixture', counts: {} },
+    categories: [], genres: [], artworks: [], series: [], seasons: [], episodes: [],
+    movies: [{ id: 'normal', title: 'Synthetic normal', ageRating: 0, categoryIds: [], genreIds: [], artworkIds: [], streamIds: ['stream'] }],
+    streams: [{ id: 'stream', sourceItemId: 'normal', contentKind: 'movie', containerExtension: 'mp4' }] });
+  const service = new PlaybackService({
+    sessionGuard: { acquireSession: async () => { acquired++; return { allowed: false, code: 'LICENSE_ACCESS_DENIED' }; }, releaseSession: async () => {} },
+    resolver: { resolve: async () => { resolved++; throw new Error('FORBIDDEN_RESOLUTION'); } },
+    playerAdapter: { launch: async () => { launched++; throw new Error('FORBIDDEN_LAUNCH'); } },
+  });
+  try {
+    if (['missing', 'corrupt', 'unavailable', 'cached-error'].includes(state)) {
+      await parentalControl.load();
+      assert.equal(parentalControl.getSnapshot().status, 'error');
+      if (state === 'cached-error') installUnconfiguredParentalFixture();
+      await assert.rejects(parentalControl.authorize('normal', 0, false), /PARENTAL_STORAGE_UNAVAILABLE/);
+      const result = await service.playMovie('normal', model);
+      assert.equal(result.success, false); assert.equal(result.state, 'NATIVE_PLAYER_ERROR');
+      assert.equal(parentalControl.getSnapshot().status, 'error');
+      assert.equal(acquired, 0); assert.equal(writes, 0);
+      if (state === 'corrupt') assert.equal(await parentalStorage.read(), '{}');
+    } else if (state === 'unconfigured') {
+      await parentalControl.load(); assert.equal(parentalControl.getSnapshot().status, 'unconfigured');
+      assert.equal(await parentalControl.authorize('normal', 0, false), true);
+      await assert.rejects(parentalControl.authorize('adult', 18, true), /PARENTAL_SETUP_REQUIRED/);
+      await assert.rejects(parentalStorage.write('unexpected'), /UNEXPECTED_PARENTAL_CONFIGURATION_WRITE/);
+      assert.equal(parentalControl.adultVisible(), false);
+    } else if (state === 'license') {
+      const result = await service.playMovie('normal', model);
+      assert.equal(result.success, false); assert.equal(service.getCurrentSession().errorCategory, 'LICENSE_ACCESS_DENIED');
+      assert.equal(acquired, 1);
+    } else {
+      const pin = '135790', puk = 'Synthetic-G8-PUK-Only-2026';
+      if (state === 'blocked-restart') {
+        await parentalControl.load(); const before = raw;
+        await assert.rejects(parentalControl.authenticate(pin), /PARENTAL_COOLDOWN/);
+        assert.equal(parentalControl.getSnapshot().admin, false); assert.equal(parentalControl.adultVisible(), false);
+        assert.ok(JSON.parse(before).failures >= 6);
+      } else {
+        await parentalControl.configure(pin, puk, { maxAge: 18, allowAdult: false });
+        parentalControl.lock();
+        if (state === 'pin-cancel') {
+          const unsub = parentalControl.subscribe(() => {});
+          const pending = parentalControl.authorize('restricted', undefined, false, true);
+          await new Promise(r => setTimeout(r, 0));
+          const id = parentalControl.getSnapshot().prompt.id;
+          assert.equal(await parentalControl.submitPrompt(id, '000001'), false);
+          assert.equal(parentalControl.isGranted('restricted'), false);
+          parentalControl.cancelPrompt(); assert.equal(await pending, false);
+          assert.equal(parentalControl.getSnapshot().prompt, null); unsub();
+          await assert.rejects(parentalControl.authorize('adult', 18, true), /PARENTAL_ADULT_DISABLED/);
+        } else {
+          for (let i = 0; i < 5; i++) assert.equal(await parentalControl.authenticate('000001'), false);
+          await assert.rejects(parentalControl.authenticate('000001'), /PARENTAL_COOLDOWN/);
+          await assert.rejects(parentalControl.authenticate(pin), /PARENTAL_COOLDOWN/);
+          await assert.rejects(parentalControl.recoverPin(puk, '246801'), /PARENTAL_COOLDOWN/);
+          runParentalChild('blocked-restart', raw);
+        }
+      }
+    }
+    assert.equal(resolved, 0); assert.equal(launched, 0);
+  } finally { parentalControl.lock(); }
+}
+function runParentalChild(state, input = '') {
+  const run = spawnSync(process.execPath, [fileURLToPath(import.meta.url), '--parental-state', state],
+    { cwd: process.cwd(), input, encoding: 'utf8', timeout: 30000, maxBuffer: 1024 * 1024 });
+  assert.ifError(run.error); assert.equal(run.signal, null);
+  assert.equal(run.status, 0, 'ISOLATED_PARENTAL_FAILURE_' + state + '\n' + run.stdout + run.stderr);
+  assert.ok(run.stdout.includes('G8_PARENTAL_STATE=PASS_' + state));
+}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = resolve(__filename, '..');
@@ -397,6 +501,13 @@ console.log('  ✓ INTERMEDIATE_SUPABASE_HOST = NONE');
 console.log('  ✓ INTERMEDIATE_VERCEL_HOST = NONE');
 console.log('  ✓ PROXY_IMPLEMENTATION = NONE');
 console.log('  -> NO_CENTRAL_PROXY = PASS');
+
+// Additional controls never share the positive fixture's cached load promise.
+for (const state of ['missing', 'corrupt', 'unavailable', 'cached-error', 'unconfigured', 'pin-cancel', 'persistent-block', 'license']) {
+  runParentalChild(state);
+  console.log('PASS G8_ISOLATED_PARENTAL_' + state);
+}
+console.log('G8_PARENTAL_ISOLATION=PASS_8_PROCESSES_AND_BLOCKED_RESTART');
 
 // ============================================================================
 // RESUMO DE PERFORMANCE

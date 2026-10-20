@@ -86,3 +86,20 @@ Nao remover/contornar prebuild nem relaxar testes para aceitar regressao sem
 autorizacao expressa do usuario e emenda canonica. Falha bloqueia entrega.
 Ativacao/catalogo consolidados nao certificam playback: diagnosticar essa
 fronteira separadamente, sem rotacionar identidade/chave ou relaxar licenca.
+
+## 6. Consolidacao e anti-regressao - CANON-01
+
+Antes de alterar fronteiras consolidadas, ler integralmente
+`docs/architecture/XANDEFLIX_PREBUILT_PHASED_EXPANSION.md` e executar
+`npm run canon:check` e `npm run canon:test`, preservando tambem o lock C11.
+Homologacao historica em `docs/evidence/ANDROID_V1_0_37_PHYSICAL_HOMOLOGATION.md`;
+nao e teto permanente de versionName/versionCode. Evolucao exige Gate nominal,
+impacto/testes e revisao conforme contrato; nunca enfraquecer testes para passar.
+
+CURRENT_GATE=CANON-01; CHAT_MASTER_REVIEW=PENDING; NEXT_GATE_STARTED=NAO.
+DEFAULT_INTEGRATION_BRANCH=main; a EXPECTED_BRANCH acima identifica a baseline
+normal. Excecao nominal deste Gate: branch de revisao
+`governance/canon-01-hardening`, criada da baseline validada apos verificacoes;
+commit/push somente nela. MAIN_PUSH_AUTHORIZED=NAO; merge/PR/force/ruleset/release
+nao autorizados. Nao escrever Supabase, instalar/resetar dados, gerar APK/AAB
+ou iniciar Tizen/webOS. Allowlist fechada no contrato de expansao por fases.

@@ -3149,3 +3149,84 @@ Commit funcional efa99a4b4a678ea08dc0b991be88b77a5ee8c21b enviado a main do GitH
 ls-remote confirma o mesmo hash e status limpo apos primeiro push. Site:build
 PASS,53 arquivos revisados. Recibo/documentacao encerrados em commit separado,
 sem alteracao funcional ou novo Gate.
+
+
+## CANON-01 - Consolidacao preparada; regressao bloqueada - 2026-10-19
+
+Contrato de fases/homologacao recebida do operador e referencias normativas
+registrados; verificador861 arquivos,42 controles e5 suites PASS. C11 lock
+antes/depois e typecheck PASS. Suite G10 falha no positivo DeltaV1 assinado
+com TARGET_CATALOG_HASH_MISMATCH_REJECTED; mesma suite/runtime da baseline.
+RESULT=FAIL; REGRESSION_LOCK=FAIL. Nenhum runtime/versao1.0.37/140 APKs
+alterado. CI preparado localmente, sem build posterior ou publicacao.
+Etapa8 bloqueada: branch/commit/push NONE, main permanece b3fc8d1.
+Google Play/AndroidTV/piloto60 pendentes, Tizen/webOS futuros. Evidencia
+CANON_01_EXECUTION.md. CHAT_MASTER_REVIEW=PENDING; NEXT_GATE_STARTED=NAO.
+
+### CANON-01 - Diagnostico complementar - 2026-10-20
+
+Causa G10 confirmada: delta omite extensions do catalogo target. Proposta
+de4 arquivos preparada somente em tmp; G9/G10 e11 casos passam com copias
+em RAM. Produto e suites existentes inalterados; resultado oficial FAIL.
+Protecao canonica agora inclui schemas/:867 arquivos/43 controles PASS,
+5 suites PASS antes do mesmo bloqueio. Aplicacao depende de emenda nominal
+de escopo; sem branch/commit/push/build/APK. Evidencia CANON_01_EXECUTION.md.
+CHAT_MASTER_REVIEW=PENDING; NEXT_GATE_STARTED=NAO.
+
+### CANON-01-G10FIX - Correcao aplicada; Gate ainda bloqueado - 2026-10-20
+
+G10 transporta extensions fielmente; G9/G10 oficiais e novo teste PASS.
+Recibo nominal aprovado, checker868 arquivos/43 controles PASS,14 arquivos
+anteriores preservados. Compatibilidade validada com fallback EXPLICITO por
+pacote completo assinado; sem negociacao/download automatico ou entrega.
+Regressao FAIL em orientacao legada (regex/atributo PiP); G8 adicional FAIL
+por fixture Node/parental. Fora da allowlist, sem modificar testes ou guardas.
+C11 antes/depois/typecheck/contrato/busca/landscape PASS; builds NOT_RUN.
+Sem Git write, APK, versao nova, backend ou dispositivos. Evidencia completa
+CANON_01_G10_FIX_EVIDENCE.md. CHAT_MASTER_REVIEW=PENDING; NEXT_GATE_STARTED=NAO.
+
+### CANON-01-LEGACYTESTS - criterios tecnicos aprovados - 2026-10-20
+
+Emenda expressa executada sem reiniciar CANON-01/G10FIX. Orientacao agora
+valida atributos XML independentemente da ordem, preservando5 negativos;
+G8 prepara somente fixture parental nao configurada e preserva12 blocos.
+Processos novos comprovam storage ausente/corrompido/negado, cache de erro,
+PIN/cancelamento/adulto/cooldown persistente e licenca recusada bloqueados.
+Dois recibos independentes; G10 byte a byte preservado, revisao por grant,
+escopo Legacy limitado a dois testes, hashes e negativos bloqueantes.
+
+Orientacao/G8/C126/C11-C9/VOD/G9/G10/Delta/contrato/busca/C11 lock/typecheck
+PASS; canon:check868 arquivos PASS; canon:test72 controles/11 suites PASS,
+incluindo43 controles anteriores integrais. npm run build e site:build PASS,
+somente locais. Primeiro negativo novo com entrada inadequada foi corrigido;
+FAIL anterior e exit codes preservados, sem relaxar regra ou omitir suite.
+
+21 arquivos anteriores preservados:14 identicos,5 append documentais e2
+ajustes de governanca autorizados.11 arquivos nesta emenda,25 acumulados.
+140 artefatos Android, runtime/G10/helper/package/CI/HEAD/index inalterados.
+Sem Git write, APK/AAB novo, instalacao/reset, backend/dados ou proxima fase.
+RESULT=PASS tecnico DA EMENDA, sem homologacao final CANON-01/publicacao.
+Relatorio: docs/evidence/CANON_01_LEGACY_TESTS_EVIDENCE.md.
+CHAT_MASTER_REVIEW=PENDING; NEXT_GATE_STARTED=NAO.
+
+### CANON-01 AUTHORIZATION HARDENING - criterios tecnicos PASS - 2026-10-20
+
+Diagnostico do Chat Mestre confirmado e corrigido somente na governanca.
+Pins G10FIX/LEGACYTESTS agora incondicionais por path e identidade obrigatoria.
+Evolucao usa recibo NOVO e registro append-only; o teste sintetico1.0.38
+nao substitui nenhum historico. Checker/runner entram na protecao por hash,
+sem isencao generica, mantendo revisao por grant e cadeia nominal explicita.
+
+95 controles/11 suites PASS, preservando os72 cenarios anteriores. Os nove
+comandos solicitados PASS/exit0: canon:check/test, C11, typecheck, G9, G10,
+G8 e ambos builds web locais. Checker protege870 arquivos. CI/workflow
+intacto; inclusao futura de site:build recomendada com justificativa, sem
+implantacao dessa recomendacao. Sem execucao remota ou teste fisico novo.
+
+25 arquivos anteriores preservados:18 bytes identicos,5 append documentais,
+2 scripts de governanca revisados.9 arquivos nesta emenda;27 acumulados.
+Recibos G10/Legacy e140 APK/AAB intactos; HEAD/index/main/versao inalterados.
+Sem runtime/Android/parental/catalogo/player/Supabase/dados/Git write/deploy.
+SOURCE-FORMAT-01 e proxima fase nao iniciados. Evidencia e plano em
+docs/evidence/CANON_01_AUTHORIZATION_HARDENING.md. PASS tecnico da emenda,
+sem homologacao final/publicacao: CHAT_MASTER_REVIEW=PENDING.

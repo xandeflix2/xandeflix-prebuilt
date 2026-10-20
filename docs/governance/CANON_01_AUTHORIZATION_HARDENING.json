@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "gate": "CANON-01-AUTHORIZATION-HARDENING",
+  "parentGate": "CANON-01",
+  "amendment": "CANON-01-AUTHORIZATION-HARDENING",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "USER_MESSAGE_2026_10_20_CHAT_MESTRE_CANON_01_AUTHORIZATION_HARDENING",
+  "reason": "Make both historical authorization receipts immutable independently of their identifiers; use separate append-registered receipts for future evolution and protect the governance scripts by exact hashes.",
+  "physicalImpact": "NOT_REQUIRED_JUSTIFIED",
+  "physicalImpactJustification": "Executable governance and synthetic authorization fixtures only. Runtime, Android, source data and physical devices remain unchanged.",
+  "testChangesReviewed": true,
+  "previousGovernanceHashes": {
+    "scripts/verify-canonical-contract.mjs": "6e50851dd36becd0ccf90e827c23d144b4bfcebe",
+    "scripts/test-canonical-regression.mjs": "01e43c3e2fec97378b60bae9298712c208147c37"
+  },
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c105-complete-root-search.mjs",
+    "scripts/test-c107-catalog-return-navigation.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c11-landscape-navigation.mjs",
+    "scripts/validate-direct-playback.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock",
+    "npm run typecheck",
+    "npm run update:check",
+    "npm run security:check",
+    "npm run playback:check",
+    "npm run build",
+    "npm run site:build"
+  ],
+  "evidence": "docs/evidence/CANON_01_AUTHORIZATION_HARDENING.md",
+  "restrictions": [
+    "Only two executable governance files; related documentation append only.",
+    "Do not replace G10FIX or LEGACYTESTS receipts.",
+    "Future authorizations require new receipts and append registrations; no authorization for Android 1.0.38 is issued here.",
+    "No runtime, Android, Supabase, data, package or workflow changes.",
+    "No Git writes, publication, APK/AAB build, installation or new Gate."
+  ],
+  "changes": [
+    {
+      "path": "scripts/verify-canonical-contract.mjs",
+      "before": null,
+      "after": "04e8825fa9f34f392d9844f72b750ea92bb25be1"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": null,
+      "after": "144fb238f5dee26d10b43e19cb36a7c865a7a045"
+    }
+  ],
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": false,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false
+}
