@@ -583,3 +583,32 @@ Offline .vercel/.env.preview.local is blocked: cannot persist potentially privat
 No vercel pull/env pull; actual CLI Preview build remains unproven and potentially blocked without an approved credential-safe configuration mechanism.
 GitHub workflow_dispatch still needs default-branch registration; main unchanged and remote execution not authorized.
 A2.2A-R1: local corrective implementation only. Existing receipts unchanged; new A22 receipt and registry rehashed.
+
+## CANON-01-A22A-CI-DIAG — diagnostico fail-closed Windows CI — 2026-10-20
+
+Autorizacao de implementacao LOCAL de diagnostico apos falha do job Windows
+no commit 2d430d2aae64118ca7e92824c794e32549024ece. Ubuntu PASS, Windows FAIL na suite
+scripts/test-vercel-prebuilt-contract.mjs; Windows local PASS 111 controles.
+Objetivo exclusivo: emitir ultimo controle PASS e categorias codificadas da
+falha na regressao; jamais imprimir stdout/stderr bruto, credenciais ou URL.
+Falha continua bloqueando o job, sem continue-on-error ou bypass.
+
+Allowlist fechada: scripts/test-canonical-regression.mjs, este documento
+(append-only), docs/evidence/CANON_01_A22A_CI_DIAG.md e
+docs/governance/authorizations/CANON-01-A22A-CI-DIAG.json.
+Registro SHA de recibo e grant exato para o runner; antecessor nominal
+CANON-01-VERCEL-A22A. Todos os 125 controles e 14 suites anteriores
+continuam obrigatorios, mais tres controles negativos de diagnostico.
+Nenhum recibo historico, workflow, Android, Supabase, Vercel ou runtime
+foi modificado. Commit/push e reteste remoto exigem autorizacao separada.
+A execucao local nao representa sucesso do Windows CI nem assinatura GitHub.
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-A22A-CI-DIAG",
+  "path": "docs/governance/authorizations/CANON-01-A22A-CI-DIAG.json",
+  "hash": "7d89451bf23a05fa1ba819b72b99b28025aa7a66"
+}
+```

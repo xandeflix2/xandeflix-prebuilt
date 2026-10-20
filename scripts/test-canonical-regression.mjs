@@ -102,7 +102,7 @@ for(const[name,args,env,expected]of [['MISSING_GIT_FAILS_CLI',[],{...process.env
 }
 // Hardening additions preserve the 72 preceding named controls and all suites.
 for(const file of [AUTHORIZATION,LEGACY_AUTHORIZATION])assert.deepEqual(overlay(approved).read(file),original.read(file));
-assert.deepEqual(future.authorizedAmendments,['CANON-01-G10FIX','CANON-01-LEGACYTESTS',HARDENING_GATE,SITE_BUILD_GATE,A2_ARTIFACT_GATE,PREBUILT_GATE,'ANDROID-38']);pass('FUTURE_38_PRESERVES_BOTH_HISTORICAL_RECEIPTS');
+assert.deepEqual(future.authorizedAmendments,['CANON-01-G10FIX','CANON-01-LEGACYTESTS',HARDENING_GATE,SITE_BUILD_GATE,A2_ARTIFACT_GATE,PREBUILT_GATE,'CANON-01-A22A-CI-DIAG','ANDROID-38']);pass('FUTURE_38_PRESERVES_BOTH_HISTORICAL_RECEIPTS');
 rejects('G10_IDENTITY_SWAP_TO_ANDROID_38_BLOCKS','CANON_HISTORICAL_AUTHORIZATION_IDENTITY',overlay({...approved,[AUTHORIZATION]:JSON.stringify({...primary,gate:'ANDROID-38',evidence:approval.evidence})}));
 rejects('LEGACY_IDENTITY_SWAP_TO_ANDROID_38_BLOCKS','CANON_LEGACY_AUTHORIZATION_IDENTITY',overlay({...approved,[LEGACY_AUTHORIZATION]:JSON.stringify({...legacy,gate:'ANDROID-38',evidence:approval.evidence})}));
 rejects('G10_IDENTITY_SWAP_TO_LEGACY_BLOCKS','CANON_HISTORICAL_AUTHORIZATION_IDENTITY',editReceipt(AUTHORIZATION,a=>{a.gate=legacy.gate;a.evidence=legacy.evidence}));
@@ -174,6 +174,12 @@ rejects('A22_REGISTRATION_REQUIRED','CANON_A22_AUTHORIZATION_REQUIRED',overlay({
 const unsafePrebuilt=current(PREBUILT_WORKFLOW).replace('node scripts/vercel-prebuilt-contract.mjs build','vercel deploy --prebuilt');
 const unsafeApproval={...approval,gate:'A22-NEGATIVE',testChangesReviewed:true,supersedes:{[PREBUILT_WORKFLOW]:PREBUILT_GATE},changes:[{path:PREBUILT_WORKFLOW,before:blobHash(PREBUILT_WORKFLOW,current(PREBUILT_WORKFLOW)),after:blobHash(PREBUILT_WORKFLOW,unsafePrebuilt)}]};
 rejects('A22_HASH_GRANT_CANNOT_AUTHORIZE_DEPLOY','CANON_A22_WORKFLOW_INVALID',overlay(additionalAuthorization(unsafeApproval,{[PREBUILT_WORKFLOW]:unsafePrebuilt},unsafeApproval.gate)));
+// CANON-01 diagnostic grant is immutable; keep the preceding 125 controls.
+assert.equal(cases.length,125,'PREVIOUS_125_CONTROLS_MUST_RUN');
+const ciDiagnosticReceipt='docs/governance/authorizations/CANON-01-A22A-CI-DIAG.json';
+rejects('CI_DIAG_RECEIPT_REQUIRED','CANON_REQUIRED_FILE_MISSING',overlay({[ciDiagnosticReceipt]:null}));
+rejects('CI_DIAG_RECEIPT_IMMUTABLE','CANON_REGISTERED_RECEIPT_CHANGED',overlay({[ciDiagnosticReceipt]:current(ciDiagnosticReceipt)+'\n'}));
+rejects('CI_DIAG_RUNNER_SILENT_CHANGE','CANON_PROTECTED_CONTENT_CHANGED',overlay({'scripts/test-canonical-regression.mjs':current('scripts/test-canonical-regression.mjs')+'\n// unapproved logging change\n'}));
 const results=[];
 const suites=[...SUITES,['scripts/test-g10-delta-extensions-regression.mjs','G10_DELTA_EXTENSIONS_REGRESSION=PASS'],[SITE_BUILD_TEST,'SITE_BUILD_CONTRACT=PASS'],[A2_ARTIFACT_TEST,'A2_ARTIFACT_CONTRACT=PASS'],[PREBUILT_TEST,'A22_PREBUILT_CONTRACT=PASS']];
 for(const[file,marker]of suites){
@@ -181,6 +187,16 @@ for(const[file,marker]of suites){
  fs.writeFileSync(path.join(dir,path.basename(file)+'.log'),(run.stdout||'')+(run.stderr||''));
  if(run.error||run.signal||run.status!==0||!run.stdout?.includes(marker)){
   fs.writeFileSync(path.join(dir,'regression-result.json'),JSON.stringify({result:'FAIL',controls:cases,suites:results,failedSuite:file,exitCode:run.status,signal:run.signal,remainingSuites:suites.slice(results.length+1).map(x=>({file:x[0],result:'NOT_RUN'})),physicalTestPerformed:false,remoteWrites:0},null,2));console.error('REGRESSION_LOCK=FAIL '+file);
+  // Safe CI telemetry: no arbitrary child stdout/stderr, tokens, source URLs or private values.
+  const lastPassed=(run.stdout||'').split(/\r?\n/).filter(line=>/^PASS [A-Z][A-Z0-9_]*$/.test(line)).slice(-12);
+  const errorCodes=[...new Set(((run.stderr||'')+'\n'+(run.stdout||'')).match(/\b(?:A22|CANON|ERR|GH)_[A-Z0-9_]+\b/g)||[])].slice(0,12);
+  const errorKinds=[...new Set((run.stderr||'').match(/\b(?:AssertionError|TypeError|RangeError|ReferenceError|SyntaxError|ENOENT|EPERM|EACCES|ETIMEDOUT|ENOTDIR)\b/g)||[])].slice(0,8);
+  console.error('CI_DIAG_FAILED_SUITE='+file);
+  console.error('CI_DIAG_EXIT_CODE='+(Number.isInteger(run.status)?run.status:'NONE'));
+  console.error('CI_DIAG_SIGNAL='+(run.signal||'NONE'));
+  console.error('CI_DIAG_LAST_PASS='+lastPassed.join('|'));
+  console.error('CI_DIAG_ERROR_CODES='+errorCodes.join('|'));
+  console.error('CI_DIAG_ERROR_KINDS='+errorKinds.join('|'));
  }
  assert.ifError(run.error);assert.equal(run.signal,null,'SUITE_TIMEOUT '+file);assert.equal(run.status,0,'SUITE_FAILED '+file);assert(run.stdout.includes(marker),'SUITE_MARKER_MISSING '+file);results.push({file,result:'PASS'});console.log('SUITE_PASS '+file);
 }
