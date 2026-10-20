@@ -3665,3 +3665,17 @@ workflow atual nao foi alterado. Nova evidencia e recibo especificos,
 artefatos Android intactos. Sem nova versao, runtime/backend/dados/aparelhos,
 Git write ou SOURCE-FORMAT-01. Relatorio CANON_01_AUTHORIZATION_HARDENING.md.
 RESULT=PASS tecnico; CHAT_MASTER_REVIEW=PENDING; NEXT_GATE_STARTED=NAO.
+
+## CANON-01-VERCEL-BUILD-A1 - build completo em CI separado - 2026-10-20
+
+Implementada somente A1 da alternativa A: workflow independente de validacao,
+protegido nominalmente por hashes e contrato exato. Novo recibo append-registrado
+com supersedes dos dois scripts de governanca para AUTHORIZATION-HARDENING,
+sem substituir G10FIX, LEGACYTESTS ou hardening. Os95 cenarios anteriores e
+11 suites foram preservados; total108 controles/12 suites e32 controles dedicados.
+Canonico/C11/typecheck/update/security/playback/build/site:build/contrato dedicado
+passaram localmente. Sem alteracao de package, hooks, Vercel config ou runtime.
+Variaveis publicas de build ausentes no GitHub sao pendencia explicita; nao ha
+fallback nem secret de producao. Novo CI ainda NOT_RUN, sem commit/push/deploy.
+A2 (artefato verificado, permissao de publicar e promocao) depende de nova
+instrucao nominal. App1.0.37/code37 e dados mantidos. CHAT_MASTER_REVIEW=PENDING.

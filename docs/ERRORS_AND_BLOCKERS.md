@@ -3665,3 +3665,31 @@ flag ou caminho de execucao aprovado que dispense os historicos. Workflow
 nao cobre site:build atualmente; inclusao justificada requer autorizacao
 adicional. Nenhum runtime, Android, Supabase ou dado foi alterado.
 Relatorio CANON_01_AUTHORIZATION_HARDENING.md; CHAT_MASTER_REVIEW=PENDING.
+
+## CANON-01-VERCEL-BUILD-A1 — fixture Windows corrigida — 2026-10-20
+
+Na verificacao de desenvolvimento do novo teste, BASELINE_OBJECT_UNAVAILABLE
+recebeu CANON_WORKSPACE_MISMATCH antes de chegar a baseline ausente. Diagnostico
+confirmado: TEMP usava alias Windows 8.3 ALEXAN~1; Git retornava Alexandre.
+Apenas a fixture passa a usar fs.realpathSync.native(os.tmpdir()), expandindo
+seu caminho antes do Git. O checker nao foi relaxado. Nova execucao do teste
+dedicado: 29 controles PASS, incluindo ausencia real de .git e baseline.
+O primeiro exit 1 foi de desenvolvimento; validacao oficial completa segue
+obrigatoria. Nao houve mudanca de runtime, Android, Vercel ou Supabase.
+
+## CANON-01-VERCEL-BUILD-A1 - configuracao publica CI pendente - 2026-10-20
+
+O build completo requer dois parametros publicos VITE_SUPABASE_URL e
+VITE_SUPABASE_PUBLISHABLE_KEY. Consulta apenas dos nomes retornou zero vars
+no GitHub; .env.example contem placeholder. Workflow referencia vars sem
+secrets e sem fallback falso. Cadastrar/revisar configuracao exige autorizacao
+posterior; nenhum valor/secret foi consultado, copiado ou publicado. Um build
+remoto sem esses parametros deve falhar; PASS local nao e PASS remoto.
+
+## CANON-01-VERCEL-BUILD-A1 - resultado local final - 2026-10-20
+
+Fixture8.3 corrigida sem relaxar o checker; ultima validacao integral com os
+dez comandos exit0. A falha inicial foi de desenvolvimento e esta resolvida.
+Permanece pendente a configuracao publica do futuro CI e sua execucao remota;
+os deployments Vercel anteriores nao foram corrigidos ou reclassificados.
+Nenhum bypass/secret/deploy foi introduzido. CHAT_MASTER_REVIEW=PENDING.

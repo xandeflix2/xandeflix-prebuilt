@@ -411,3 +411,71 @@ demais Gates nao iniciados. Adjudicacao/publicacao continuam pendentes.
   "hash": "766db763ee98aeeb33230c2828f050a8527555b7"
 }
 ```
+
+## CANON-01-VERCEL-BUILD-A1 — especificacao aprovada antes do codigo — 2026-10-20
+
+GATE=CANON-01; AMENDMENT=CANON-01-VERCEL-BUILD-A1.
+Autorizacao nominal no anexo CHAT MESTRE — CANON-01 VERCEL BUILD VALIDATION,
+SHA-256 89fa9dbf8a83b6662c0ef4e5d5de4cdc36930e9cd0a0b2558538bfb4b49b1b86.
+Workspace C11, branch governance/canon-01-hardening, HEAD
+3a418ac42bf0794624efc9aef2d41e5f6162fa71. Main permanece b3fc8d1;
+PR #1 OPEN_DRAFT e CI canonico Windows/Linux PASS no preflight.
+Arvore/index inicialmente limpos; 1278 arquivos rastreados, 28 arquivos
+revisados e 140 artefatos Android capturados antes da alteracao.
+canon:check, canon:test (95 controles/11 suites) e lock C11 passaram antes.
+
+Allowlist FECHADA desta emenda:
+- Novos: .github/workflows/site-build-validation.yml;
+  scripts/test-site-build-contract.mjs;
+  docs/governance/authorizations/CANON-01-VERCEL-BUILD-A1.json;
+  docs/evidence/CANON_01_VERCEL_BUILD_A1.md.
+- Alteracoes controladas: scripts/verify-canonical-contract.mjs e
+  scripts/test-canonical-regression.mjs.
+- Somente append: este documento, docs/STATUS.md, docs/EVOLUTION_REPORT.md
+  e docs/ERRORS_AND_BLOCKERS.md.
+Saidas usuais de testes/build/auditoria ficam em tmp ignorado pelo Git.
+
+Workflow independente, pull_request e push, matriz ubuntu-latest/windows-latest,
+Node 24, contents: read, actions oficiais fixadas nos mesmos SHAs revisados do
+CI existente, checkout fetch-depth: 0 e persist-credentials: false.
+Sequencia obrigatoria: npm ci; npm run canon:check; npm run canon:test;
+npm run c11:new-device:lock; npm run typecheck; npm run site:build.
+O passo site:build recebe somente vars.VITE_SUPABASE_URL e
+vars.VITE_SUPABASE_PUBLISHABLE_KEY, configuracao intencionalmente publica do
+cliente. Nenhum valor e incluido nesta emenda, nenhuma variavel e cadastrada
+remotamente e nao ha fallback sintetico. Ausencia/invalidez deve bloquear o
+build real; referencias secrets ou valores fixos alternativos sao rejeitados.
+Sem condicoes de skip, continue-on-error, secrets, deploy, APIs de publicacao,
+tokens Vercel, permissoes de escrita, workflow reutilizavel ou release.
+canonical-regression.yml permanece byte a byte igual ao HEAD recebido.
+Contrato exato do novo workflow, tolerando apenas LF/CRLF, e verificado
+independentemente do hash autorizado; revisao futura exige emenda de governanca.
+
+Novo workflow e teste dedicado sao obrigatorios e protegidos nominalmente por
+hash. Recibo novo append-registrado, before/after exatos e supersedes dos dois
+scripts apontando para CANON-01-AUTHORIZATION-HARDENING. Nao substituir recibos
+G10FIX, LEGACYTESTS ou AUTHORIZATION-HARDENING. Preservar os 95 controles e
+11 suites; ajustar somente fixtures sinteticas para carregar a nova emenda
+ativa e seu predecessor real. Acrescentar contrato dedicado executado como
+suite adicional e negativos de remocao de checks, shallow checkout, secrets,
+deploy, falta de site:build, mutacao silenciosa, recibos e baseline ausente.
+Fixtures negativas exercitam o verificador real; nao substituem testes oficiais.
+
+Aceitacao: os nove comandos obrigatorios mais o teste dedicado com exit 0,
+95 controles anteriores identificados e 11 suites preservadas, diff restrito,
+prefixos documentais/recibos/Android/Supabase intactos e auditoria de segredos.
+Sem commit/push/merge/PR write, deploy/redeploy, alteracao de Vercel/dominos,
+package.json/vercel.json/.vercelignore, runtime/Android/versao, dados ou migrations.
+A1 valida build; nao corrige nem declara PASS dos deployments Vercel existentes.
+A2, publicacao, protecao remota da main e demais Gates exigem nova autorizacao.
+CHAT_MASTER_REVIEW=PENDING; SOURCE_FORMAT_01_STARTED=NAO; NEXT_GATE_STARTED=NAO.
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-VERCEL-BUILD-A1",
+  "path": "docs/governance/authorizations/CANON-01-VERCEL-BUILD-A1.json",
+  "hash": "7edaa32c4b13c8295fc0daa64abed1ef7a4b0c2d"
+}
+```

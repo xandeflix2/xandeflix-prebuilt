@@ -12,6 +12,28 @@ export const LEGACY_AUTHORIZATION='docs/governance/CANON_01_LEGACY_TESTS_AUTHORI
 export const HARDENING_GATE='CANON-01-AUTHORIZATION-HARDENING';
 export const HARDENING_AUTHORIZATION='docs/governance/CANON_01_AUTHORIZATION_HARDENING.json';
 export const AUTHORIZATION_DIRECTORY='docs/governance/authorizations/';
+export const SITE_BUILD_GATE='CANON-01-VERCEL-BUILD-A1';
+export const SITE_BUILD_AUTHORIZATION=AUTHORIZATION_DIRECTORY+SITE_BUILD_GATE+'.json';
+export const SITE_BUILD_WORKFLOW='.github/workflows/site-build-validation.yml';
+export const SITE_BUILD_TEST='scripts/test-site-build-contract.mjs';
+const SITE_BUILD_WORKFLOW_TEXT=[
+ 'name: Site build validation','',
+ 'on:','  push:','  pull_request:','',
+ 'permissions:','  contents: read','',
+ 'jobs:','  site-build:','    strategy:','      fail-fast: false',
+ '      matrix:','        os: [ubuntu-latest, windows-latest]',
+ '    runs-on: ${{ matrix.os }}','    timeout-minutes: 30','    steps:',
+ '      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6',
+ '        with:','          fetch-depth: 0','          persist-credentials: false',
+ '      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6',
+ "        with:","          node-version: '24'",'          cache: npm',
+ '      - run: npm ci','      - run: npm run canon:check',
+ '      - run: npm run canon:test','      - run: npm run c11:new-device:lock',
+ '      - run: npm run typecheck','      - run: npm run site:build',
+ '        env:',
+ '          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}',
+ '          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}','',
+].join('\n');
 const HISTORICAL_RECEIPTS=[
  [AUTHORIZATION,'CANON-01-G10FIX','e73152f228cbb625c508062d70ef810e8342059a'],
  [LEGACY_AUTHORIZATION,'CANON-01-LEGACYTESTS','e59e2d328db3d0dfd8c1d873b154e2e3f7900a0c'],
@@ -47,10 +69,16 @@ export class CanonError extends Error {constructor(code,file=''){super(code+(fil
 const ensure=(condition,code,file)=>{if(!condition)throw new CanonError(code,file)};
 const text=bytes=>Buffer.from(bytes).toString('utf8').replaceAll('\r\n','\n');
 export function blobHash(file,bytes){let b=Buffer.from(bytes);if(/\.(?:[cm]?[jt]sx?|json|xml|java|css|md|gradle|properties|rules|ya?ml|html|txt)$/.test(file))b=Buffer.from(text(b));return crypto.createHash('sha1').update('blob '+b.length+'\0').update(b).digest('hex');}
-const protectedFile=file=>ROOTS.some(r=>file.startsWith(r))||SPECIAL.includes(file);
+const protectedFile=file=>ROOTS.some(r=>file.startsWith(r))||SPECIAL.includes(file)||file===SITE_BUILD_WORKFLOW;
 const safeFile=file=>typeof file==='string'&&file.length>0&&!file.startsWith('/')&&!file.includes('\\')&&!file.split('/').some(p=>p==='..'||p==='.'||!p)&&!file.includes(':');
 const json=(value,code)=>{try{return JSON.parse(value)}catch{throw new CanonError(code)}};
 const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
+
+// Exact approved validation-only workflow. Hash grants cannot add execution paths.
+export function verifySiteBuildWorkflow(bytes){
+ ensure(text(bytes)===SITE_BUILD_WORKFLOW_TEXT,'CANON_SITE_BUILD_WORKFLOW_INVALID',SITE_BUILD_WORKFLOW);
+ return{result:'PASS',workflow:SITE_BUILD_WORKFLOW};
+}
 
 /** Real CLI adapter: no environment flag, fake baseline, skip switch or remote write. */
 export function collectSnapshot(root){
@@ -75,7 +103,7 @@ export function verifyCanonical(snapshot){
  const required=file=>{const b=read(file);ensure(b!==null&&b!==undefined,'CANON_REQUIRED_FILE_MISSING',file);return text(b)};
  ensure(snapshot.nodeMajor>=24,'CANON_NODE_24_REQUIRED');
  for(const file of ['node_modules/typescript/package.json','node_modules/vite/package.json','node_modules/jszip/package.json','node_modules/react/package.json'])ensure(read(file),'CANON_DEPENDENCY_MISSING',file);
- for(const f of [...APPEND_ONLY,PHASED,PHYSICAL,BOUNDARY,'docs/architecture/C11_NEW_DEVICE_ACTIVATION_LOCK.md','docs/evidence/CANON_01_EXECUTION.md',...CANON_FILES,C11,'.github/workflows/canonical-regression.yml',...SUITES.map(x=>x[0])])required(f);
+ for(const f of [...APPEND_ONLY,PHASED,PHYSICAL,BOUNDARY,'docs/architecture/C11_NEW_DEVICE_ACTIVATION_LOCK.md','docs/evidence/CANON_01_EXECUTION.md',...CANON_FILES,C11,'.github/workflows/canonical-regression.yml',SITE_BUILD_WORKFLOW,SITE_BUILD_TEST,...SUITES.map(x=>x[0])])required(f);
  for(const f of APPEND_ONLY)ensure(required(f).startsWith(text(baselineText.get(f))),'CANON_HISTORY_REWRITTEN',f);
  for(const f of APPEND_ONLY.slice(0,4)){const doc=required(f);ensure(doc.includes('XANDEFLIX_PREBUILT_PHASED_EXPANSION')&&doc.includes('canon:check')&&doc.includes('canon:test'),'CANON_NORMATIVE_REFERENCE_MISSING',f)}
  const contract=required(PHASED),blocks=Array.from(contract.matchAll(/<!-- CANON-01:POLICY -->\s*```json\s*([\s\S]*?)```/g));
@@ -90,6 +118,7 @@ export function verifyCanonical(snapshot){
  // Registrations are appended to the contract; historical paths never enter this registry.
  const registrations=Array.from(contract.matchAll(/<!-- CANON-01:AUTHORIZATION -->\s*```json\s*([\s\S]*?)```/g),m=>json(m[1],'CANON_AUTHORIZATION_REGISTRY_INVALID'));
  ensure(registrations.length>0&&registrations[0].gate===HARDENING_GATE&&registrations[0].path===HARDENING_AUTHORIZATION,'CANON_HARDENING_REGISTRATION_REQUIRED');
+ ensure(registrations.some(r=>r.gate===SITE_BUILD_GATE&&r.path===SITE_BUILD_AUTHORIZATION),'CANON_SITE_BUILD_AUTHORIZATION_REQUIRED');
  const registeredPaths=new Set(),registeredGates=new Set(HISTORICAL_RECEIPTS.map(r=>r[1]));
  for(const entry of registrations){
   ensure(same(Object.keys(entry).sort(),['gate','hash','path','schema'])&&entry.schema===1&&/^[A-Z][A-Z0-9_-]{2,64}$/.test(entry.gate||'')&&entry.gate!=='CANON-01'&&/^[a-f0-9]{40}$/.test(entry.hash||''),'CANON_AUTHORIZATION_REGISTRY_INVALID');
@@ -122,6 +151,12 @@ export function verifyCanonical(snapshot){
    ensure(authorization.parentGate==='CANON-01'&&authorization.amendment===HARDENING_GATE&&authorization.testChangesReviewed===true&&same(authorization.previousGovernanceHashes,GOVERNANCE_BEFORE),'CANON_HARDENING_AUTHORIZATION_REQUIRED');
    ensure(authorization.changes.length===CANON_FILES.length&&authorization.changes.every(item=>CANON_FILES.includes(item.path)&&item.before===null),'CANON_HARDENING_AUTHORIZATION_SCOPE');
    ensure(authorization.gitCommitAuthorized===false&&authorization.gitPushAuthorized===false&&authorization.androidBuildAuthorized===false&&authorization.supabaseWriteAuthorized===false&&authorization.nextGateStarted===false,'CANON_HARDENING_AUTHORIZATION_RESTRICTIONS');
+  }
+  if(receipt===SITE_BUILD_AUTHORIZATION){
+   ensure(authorization.parentGate==='CANON-01'&&authorization.amendment===SITE_BUILD_GATE&&authorization.testChangesReviewed===true,'CANON_SITE_BUILD_AUTHORIZATION_REQUIRED');
+   const scope=[...CANON_FILES,SITE_BUILD_WORKFLOW,SITE_BUILD_TEST];
+   ensure(authorization.changes.length===scope.length&&authorization.changes.every(item=>scope.includes(item.path)),'CANON_SITE_BUILD_AUTHORIZATION_SCOPE');
+   ensure(authorization.gitCommitAuthorized===false&&authorization.gitPushAuthorized===false&&authorization.androidBuildAuthorized===false&&authorization.supabaseWriteAuthorized===false&&authorization.nextGateStarted===false,'CANON_SITE_BUILD_AUTHORIZATION_RESTRICTIONS');
   }
   const supersedes=authorization.supersedes??{};
   ensure(typeof supersedes==='object'&&supersedes!==null&&!Array.isArray(supersedes)&&Object.keys(supersedes).every(f=>authorization.changes.some(c=>c.path===f)),'CANON_AUTHORIZATION_CHAIN_INVALID');
@@ -159,6 +194,7 @@ export function verifyCanonical(snapshot){
  const actions=Array.from(workflow.matchAll(/^      - uses: ([a-zA-Z0-9_/-]+@[a-f0-9]{40})(?:\s+#.*)?$/gm),m=>m[1]);
  ensure(same(actions,['actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803','actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38']),'CANON_CI_ACTION_CHANGED');
  ensure(!/^\s*(?:if|continue-on-error|working-directory|shell|env|defaults|container|services|environment|needs|exclude):/m.test(workflow)&&!/\|\|\s*true|pull_request_target|supabase\s+(?:db|functions)|gradlew|cap\s+(?:copy|sync)|git\s+push/.test(workflow),'CANON_CI_UNSAFE_OR_WEAKENED');
+ verifySiteBuildWorkflow(required(SITE_BUILD_WORKFLOW));
  return{result:'PASS',referenceCommit:REFERENCE,protectedFiles:protectedCount,canonicalContract:'PASS',protectedIntegrity:'PASS',packageId:PACKAGE_ID,currentVersion:actualVersion,historicalVersion:{code:37,name:'1.0.37'},authorizedEvolution:authorizations[0].gate,authorizedAmendments:authorizations.map(a=>a.gate),physicalEvidenceOrigin:'OPERATOR_REPORT',physicalRetestPerformed:false};
 }
 

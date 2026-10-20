@@ -3230,3 +3230,17 @@ Sem runtime/Android/parental/catalogo/player/Supabase/dados/Git write/deploy.
 SOURCE-FORMAT-01 e proxima fase nao iniciados. Evidencia e plano em
 docs/evidence/CANON_01_AUTHORIZATION_HARDENING.md. PASS tecnico da emenda,
 sem homologacao final/publicacao: CHAT_MASTER_REVIEW=PENDING.
+
+## CANON-01-VERCEL-BUILD-A1 - validacao local concluida - 2026-10-20
+
+Workflow site-build-validation.yml implementado localmente para push/PR,
+Windows/Linux, Node24, historico completo, actions oficiais fixadas por SHA e
+contents:read. CI canonico original e recibos historicos preservados.
+Dez comandos oficiais exit0; regressao108 controles/12 suites, preservando
+95 controles/11 suites anteriores, mais32 controles do contrato dedicado.
+HEAD3a418ac42bf0794624efc9aef2d41e5f6162fa71/main b3fc8d1 preservados.
+Sem commit/push/PR write, publicacao, Vercel, Android ou Supabase write.
+Resultado PASS e local; novo workflow remoto NOT_RUN. Cadastrar/revisar as
+vars publicas VITE_SUPABASE_URL e VITE_SUPABASE_PUBLISHABLE_KEY exige decisao
+posterior antes de publicar o workflow. Sem secrets ou fallback ficticio.
+Evidencia CANON_01_VERCEL_BUILD_A1.md; CHAT_MASTER_REVIEW=PENDING; A2 NAO iniciado.
