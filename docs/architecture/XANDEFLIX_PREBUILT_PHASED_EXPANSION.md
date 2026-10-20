@@ -496,3 +496,90 @@ No deploy or Git writes authorized. Publishing requires separate A2.2 gate.
   "hash": "fb613a143676e3e32267ebacb3bec81123791823"
 }
 ```
+
+
+## CANON-01-VERCEL-A22A - Vercel Prebuilt attested build-only - 2026-10-20
+
+Authorization: latest express Chat Mestre A2.2A request, local implementation only.
+Required branch governance/canon-01-hardening; received HEAD
+a27d7cd4a74bd447221bba2851ee0af033d0a2fd. Main remains b3fc8d1.
+Preflight clean; canonical check, 115 controls/13 suites and C11 passed.
+
+Closed allowlist, defined BEFORE implementation:
+- .github/workflows/vercel-prebuilt-attested.yml (new manual workflow);
+- scripts/vercel-prebuilt-contract.mjs (new build/output/provenance boundary);
+- scripts/test-vercel-prebuilt-contract.mjs (new executable negative suite);
+- scripts/verify-canonical-contract.mjs and scripts/test-canonical-regression.mjs;
+- docs/governance/authorizations/CANON-01-VERCEL-A22A.json (new receipt);
+- docs/evidence/CANON_01_VERCEL_A22A.md (new evidence);
+- append-only: this architecture document, docs/STATUS.md,
+  docs/EVOLUTION_REPORT.md and docs/ERRORS_AND_BLOCKERS.md.
+Existing A2.1 scripts, historical receipts, workflows, package.json, lockfile,
+vercel.json, runtime, Android and Supabase remain unchanged. Audit/build logs
+are confined to ignored tmp/canon-01-a22a and existing ignored build outputs.
+
+Architecture and acceptance:
+Manual workflow_dispatch only, immutable input SHA equal to GitHub event SHA,
+review branch only, full Git history, baseline and received HEAD ancestry,
+clean tracked source, exact repository and workflow identity. Node 24/npm ci;
+all nine official canonical/C11/type/update/security/playback/web commands
+plus existing site/A2 tests and the new dedicated suite, without skips.
+Separate build and signing jobs on GitHub-hosted Ubuntu. Build has contents
+read only; Vercel token is scoped to authenticated read-only project inspection.
+CLI vercel@64.7.0, no deploy/redeploy/production invocation. Explicit local
+link only to existing project prj_OJcEZDNVPI3NV8Z1GfHOB02v20TF,
+team_gHZGQz2zRhEWsyK2jfOLLD5t (xandeflix-prebuilt-nm3x), Preview.
+No environment pull: inspect settings in memory, validate canonical settings,
+write only whitelisted local project settings. Build receives public client
+variables only. Missing/invalid token, public vars, settings or permissions
+blocks; never create a project or modify a remote integration.
+
+Only the real CLI build creates .vercel/output. Inspect actual config.json
+(version 3) and static payload, byte hashes, exact generated route/header
+contract, file types and absence of private credentials/symlinks/maps.
+CLI diagnostics and builds.json are NOT Build Output API payload and are
+excluded explicitly; no output config/static content is fabricated or patched.
+Package deterministic regular-file-only TAR with exact file list and manifest
+(repository/SHA/baseline/workflow/run/attempt/project/team/Preview/CLI).
+Signing job needs successful build, authenticates same-run staging artifact,
+rechecks manifest/output before actions/attest with pinned SHA, then invokes
+gh attestation verify with exact repo/workflow/source/signer digest/ref/issuer
+and hosted-runner policy. Verify certificate-bound run ID/attempt and subject
+digest before uploading the final artifact and Sigstore bundle. No manifest
+or fixture grants trusted provenance; no deploy authorization is implemented.
+
+New receipt supersedes only the two governance grants from
+CANON-01-VERCEL-A2-ARTIFACT, preserving every historical receipt and control.
+New workflow is protected both by grant hash and exact execution template.
+Negatives cover identity changes, no Git/baseline, dirty source, missing
+credentials/permissions, wrong settings, route/header changes, sensitive
+files, archive traversal/links/duplicates, adulterated bytes, invalid/missing
+signature, untrusted issuer/runner/workflow/run/repository and missing evidence.
+Synthetic policy fixtures are not real signed GitHub attestations.
+
+Remote execution is NOT authorized here. Workflow dispatch availability
+requires the workflow on the default branch, plus later publication/approval;
+this step does not change main, trigger Actions or configure secrets.
+Real .vercel/output and GitHub attestation remain pending remote execution
+when local authorized credentials are absent. No fake positive substitution.
+All CI actions are pinned to reviewed official SHAs. No merge, commit, push,
+PR readiness, Vercel publication or SOURCE-FORMAT-01.
+CHAT_MASTER_REVIEW=PENDING; NEXT_GATE_STARTED=NAO.
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-VERCEL-A22A",
+  "path": "docs/governance/authorizations/CANON-01-VERCEL-A22A.json",
+  "hash": "c698fec429f4058118d4701a7f5208ece9a0b0d1"
+}
+```
+
+## A2.2A-R1 - local compatibility amendment - 2026-10-20
+Reviewed actions/attest@v4 requires artifact-metadata: write in attest job.
+Pinned vercel build target changed to --target=preview; no --prod/deploy.
+Offline .vercel/.env.preview.local is blocked: cannot persist potentially private Preview variables under this authorization.
+No vercel pull/env pull; actual CLI Preview build remains unproven and potentially blocked without an approved credential-safe configuration mechanism.
+GitHub workflow_dispatch still needs default-branch registration; main unchanged and remote execution not authorized.
+A2.2A-R1: local corrective implementation only. Existing receipts unchanged; new A22 receipt and registry rehashed.

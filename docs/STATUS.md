@@ -3246,3 +3246,30 @@ posterior antes de publicar o workflow. Sem secrets ou fallback ficticio.
 Evidencia CANON_01_VERCEL_BUILD_A1.md; CHAT_MASTER_REVIEW=PENDING; A2 NAO iniciado.
 
 CANON-01 / A2.1: CANON-01-VERCEL-A2-ARTIFACT local artifact verifier and tests added; authorization append-only; PREBUILT_REAL_VERIFIED=NAO; DEPLOY=NAO.
+
+
+## CANON-01 A2.2A - 2026-10-20 - local implementation
+
+Nominal amendment CANON-01-VERCEL-A22A: manual real Vercel Prebuilt build-only
+workflow and signed-origin verification implemented locally on a27d7cd4.
+Canonical check PASS; regression PASS with 125 controls and 14 suites, keeping
+all previous 115 controls and 13 suites. Dedicated contract: 109 checks PASS.
+Remaining official checks/builds running; final evidence will follow.
+No commit, push, main change, Vercel deploy, backend or Android change.
+Real Prebuilt and GitHub attestation: PENDING_REMOTE_EXECUTION.
+CHAT_MASTER_REVIEW=PENDING; SOURCE_FORMAT_01_STARTED=NAO.
+
+A2.2A final local evidence: all 13 mandatory commands PASS/exit 0; npm ci PASS.
+Canonical 125 controls/14 suites; A22 109 checks; 11 files allowlisted.
+140 Android hashes and all five prior receipts preserved. Local syntax issue
+resolved; remaining blockers are remote prerequisites only. Actual Prebuilt
+and GitHub attestation PENDING_REMOTE_EXECUTION; no remote changes.
+Evidence: docs/evidence/CANON_01_VERCEL_A22A.md. CHAT_MASTER_REVIEW=PENDING.
+
+## A2.2A-R1 - local compatibility amendment - 2026-10-20
+Reviewed actions/attest@v4 requires artifact-metadata: write in attest job.
+Pinned vercel build target changed to --target=preview; no --prod/deploy.
+Offline .vercel/.env.preview.local is blocked: cannot persist potentially private Preview variables under this authorization.
+No vercel pull/env pull; actual CLI Preview build remains unproven and potentially blocked without an approved credential-safe configuration mechanism.
+GitHub workflow_dispatch still needs default-branch registration; main unchanged and remote execution not authorized.
+A2.2A-R1: local corrective implementation only. Existing receipts unchanged; new A22 receipt and registry rehashed.

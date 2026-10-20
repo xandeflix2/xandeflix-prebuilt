@@ -3681,3 +3681,34 @@ A2 (artefato verificado, permissao de publicar e promocao) depende de nova
 instrucao nominal. App1.0.37/code37 e dados mantidos. CHAT_MASTER_REVIEW=PENDING.
 
 CANON-01 / A2.1: CANON-01-VERCEL-A2-ARTIFACT local artifact verifier and tests added; authorization append-only; PREBUILT_REAL_VERIFIED=NAO; DEPLOY=NAO.
+
+
+## CANON-01 A2.2A - 2026-10-20 - attested build design
+
+New nominal receipt chains the governance grants to CANON-01-VERCEL-A2-ARTIFACT.
+Historical receipts and existing workflows remain untouched. Separate manual
+build and signing jobs preserve full Git history and canonical lifecycle.
+Pinned Vercel CLI 64.7.0 builds Preview for the existing nm3x project; no deploy
+entry point exists. Exact route/header, SHA-256, regular TAR and sensitive-file
+checks precede native GitHub OIDC attestation. gh verification pins certificate
+repository, workflow, SHA, run/attempt, issuer and hosted runner. Manifest-only
+and synthetic fixture checks never grant remote trust or publication.
+No package.json/vercel.json/dependency-lock modification; new helper/test and
+workflow protected by nominal grants, plus a fixed workflow execution digest.
+109 dedicated controls and 125 canonical controls/14 suites PASS locally.
+Final checks and audits pending; no physical or remote attestation claim.
+
+A2.2A final local evidence: all 13 mandatory commands PASS/exit 0; npm ci PASS.
+Canonical 125 controls/14 suites; A22 109 checks; 11 files allowlisted.
+140 Android hashes and all five prior receipts preserved. Local syntax issue
+resolved; remaining blockers are remote prerequisites only. Actual Prebuilt
+and GitHub attestation PENDING_REMOTE_EXECUTION; no remote changes.
+Evidence: docs/evidence/CANON_01_VERCEL_A22A.md. CHAT_MASTER_REVIEW=PENDING.
+
+## A2.2A-R1 - local compatibility amendment - 2026-10-20
+Reviewed actions/attest@v4 requires artifact-metadata: write in attest job.
+Pinned vercel build target changed to --target=preview; no --prod/deploy.
+Offline .vercel/.env.preview.local is blocked: cannot persist potentially private Preview variables under this authorization.
+No vercel pull/env pull; actual CLI Preview build remains unproven and potentially blocked without an approved credential-safe configuration mechanism.
+GitHub workflow_dispatch still needs default-branch registration; main unchanged and remote execution not authorized.
+A2.2A-R1: local corrective implementation only. Existing receipts unchanged; new A22 receipt and registry rehashed.

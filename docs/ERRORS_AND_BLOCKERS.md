@@ -3695,3 +3695,41 @@ os deployments Vercel anteriores nao foram corrigidos ou reclassificados.
 Nenhum bypass/secret/deploy foi introduzido. CHAT_MASTER_REVIEW=PENDING.
 
 CANON-01 / A2.1: CANON-01-VERCEL-A2-ARTIFACT local artifact verifier and tests added; authorization append-only; PREBUILT_REAL_VERIFIED=NAO; DEPLOY=NAO.
+
+
+## CANON-01 A2.2A - 2026-10-20 - implementation findings
+
+Resolved locally: the first new regression run hit a syntax error in the new
+A22 registration-removal overlay. Fixed only that new line; all previous
+controls stayed intact. Re-execution passed 125 controls and 14 suites.
+No historical failure evidence was overwritten; logs remain in ignored tmp.
+Pinned CLI routing inspection showed mandatory rewrite check=true, inert
+framework metadata and empty crons. The verifier explicitly checks those
+reviewed forms; no catch-all, scheduled work or server output is authorized.
+The CLI project-inspect JSON omits accountId/Git link: the future link step
+performs an additional authenticated GET of the fixed existing project, keeps
+only whitelisted settings and never pulls or saves private environment values.
+Remote blockers: no VERCEL_BUILD_READ_TOKEN repository secret name was found;
+no local VERCEL_TOKEN is set. No secret was created or requested. Both public
+repository-variable names exist; their values were not printed or changed.
+The workflow_dispatch file must exist on the default branch before manual
+dispatch is available. Publication, default-branch registration, provisioning
+of scoped read credentials and remote execution need later express approval.
+Real .vercel/output, native signature and verification remain pending; the
+compiler-only proof and policy fixtures are not substitutes. Current Vercel
+integrations and deployment statuses have not been changed.
+
+A2.2A final local evidence: all 13 mandatory commands PASS/exit 0; npm ci PASS.
+Canonical 125 controls/14 suites; A22 109 checks; 11 files allowlisted.
+140 Android hashes and all five prior receipts preserved. Local syntax issue
+resolved; remaining blockers are remote prerequisites only. Actual Prebuilt
+and GitHub attestation PENDING_REMOTE_EXECUTION; no remote changes.
+Evidence: docs/evidence/CANON_01_VERCEL_A22A.md. CHAT_MASTER_REVIEW=PENDING.
+
+## A2.2A-R1 - local compatibility amendment - 2026-10-20
+Reviewed actions/attest@v4 requires artifact-metadata: write in attest job.
+Pinned vercel build target changed to --target=preview; no --prod/deploy.
+Offline .vercel/.env.preview.local is blocked: cannot persist potentially private Preview variables under this authorization.
+No vercel pull/env pull; actual CLI Preview build remains unproven and potentially blocked without an approved credential-safe configuration mechanism.
+GitHub workflow_dispatch still needs default-branch registration; main unchanged and remote execution not authorized.
+A2.2A-R1: local corrective implementation only. Existing receipts unchanged; new A22 receipt and registry rehashed.
