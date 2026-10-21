@@ -67,7 +67,14 @@ try{
   for(const[key,value,code]of [['id','prj_Wrong','A22_PROJECT_MISMATCH'],['accountId','team_Wrong','A22_PROJECT_MISMATCH'],['name','other-project','A22_PROJECT_MISMATCH'],['link',{},'A22_PROJECT_REPOSITORY_MISMATCH'],['buildCommand','echo PASS','A22_PROJECT_SETTINGS_MISMATCH'],['outputDirectory','dist','A22_PROJECT_SETTINGS_MISMATCH'],['rootDirectory','other','A22_PROJECT_SETTINGS_MISMATCH'],['nodeVersion','22.x','A22_PROJECT_SETTINGS_MISMATCH']])reject('PROJECT_REJECTS_'+key,code,()=>selectProjectSettings({...project,[key]:value}));
   const workflow=fs.readFileSync(path.join(repoRoot,PREBUILT_WORKFLOW),'utf8');
   pass('REVIEWED_WORKFLOW_REQUIRED',()=>verifyPrebuiltWorkflow(workflow));
-  pass('WORKFLOW_CRLF_EQUIVALENT',()=>verifyPrebuiltWorkflow(workflow.replaceAll('\n','\r\n')));
+  const asCrlf=text=>text.replaceAll('\r\n','\n').replaceAll('\n','\r\n');
+  pass('WORKFLOW_CRLF_EQUIVALENT',()=>verifyPrebuiltWorkflow(asCrlf(workflow)));
+  const lfWorkflow=workflow.replaceAll('\r\n','\n');
+  pass('WORKFLOW_LF_INPUT',()=>verifyPrebuiltWorkflow(asCrlf(lfWorkflow)));
+  pass('WORKFLOW_ALREADY_CRLF_INPUT',()=>verifyPrebuiltWorkflow(asCrlf(asCrlf(lfWorkflow))));
+  pass('WORKFLOW_MIXED_EOL_INPUT',()=>verifyPrebuiltWorkflow(asCrlf(lfWorkflow.replace('\n','\r\n'))));
+  pass('WORKFLOW_CRLF_CONVERSION_IDEMPOTENT',()=>assert.equal(asCrlf(asCrlf(lfWorkflow)),asCrlf(lfWorkflow)));
+  reject('WORKFLOW_CRCRLF_STAYS_INVALID','A22_WORKFLOW_CHANGED',()=>verifyPrebuiltWorkflow(asCrlf(lfWorkflow).replaceAll('\n','\r\n')));
   for(const[name,from,to]of [
     ['SHA_INPUT','ref: ${{ github.sha }}','ref: main'],['HISTORY','fetch-depth: 0','fetch-depth: 1'],
     ['MANUAL_ONLY','workflow_dispatch:','pull_request_target:'],['NO_SKIP','needs: build','needs: build\n    if: false'],

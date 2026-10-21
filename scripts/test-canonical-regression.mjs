@@ -102,7 +102,7 @@ for(const[name,args,env,expected]of [['MISSING_GIT_FAILS_CLI',[],{...process.env
 }
 // Hardening additions preserve the 72 preceding named controls and all suites.
 for(const file of [AUTHORIZATION,LEGACY_AUTHORIZATION])assert.deepEqual(overlay(approved).read(file),original.read(file));
-assert.deepEqual(future.authorizedAmendments,['CANON-01-G10FIX','CANON-01-LEGACYTESTS',HARDENING_GATE,SITE_BUILD_GATE,A2_ARTIFACT_GATE,PREBUILT_GATE,'CANON-01-A22A-CI-DIAG','ANDROID-38']);pass('FUTURE_38_PRESERVES_BOTH_HISTORICAL_RECEIPTS');
+assert.deepEqual(future.authorizedAmendments,['CANON-01-G10FIX','CANON-01-LEGACYTESTS',HARDENING_GATE,SITE_BUILD_GATE,A2_ARTIFACT_GATE,PREBUILT_GATE,'CANON-01-A22A-CI-DIAG','CANON-01-A22A-WINDOWS-EOL','ANDROID-38']);pass('FUTURE_38_PRESERVES_BOTH_HISTORICAL_RECEIPTS');
 rejects('G10_IDENTITY_SWAP_TO_ANDROID_38_BLOCKS','CANON_HISTORICAL_AUTHORIZATION_IDENTITY',overlay({...approved,[AUTHORIZATION]:JSON.stringify({...primary,gate:'ANDROID-38',evidence:approval.evidence})}));
 rejects('LEGACY_IDENTITY_SWAP_TO_ANDROID_38_BLOCKS','CANON_LEGACY_AUTHORIZATION_IDENTITY',overlay({...approved,[LEGACY_AUTHORIZATION]:JSON.stringify({...legacy,gate:'ANDROID-38',evidence:approval.evidence})}));
 rejects('G10_IDENTITY_SWAP_TO_LEGACY_BLOCKS','CANON_HISTORICAL_AUTHORIZATION_IDENTITY',editReceipt(AUTHORIZATION,a=>{a.gate=legacy.gate;a.evidence=legacy.evidence}));

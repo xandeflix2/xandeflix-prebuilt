@@ -612,3 +612,48 @@ A execucao local nao representa sucesso do Windows CI nem assinatura GitHub.
   "hash": "7d89451bf23a05fa1ba819b72b99b28025aa7a66"
 }
 ```
+
+
+## CANON-01-A22A-WINDOWS-EOL - approved autonomous correction - 2026-10-20
+
+Latest explicit user authorization (attachment SHA-256
+dc9feae1e4dddb0cc8950d1df1cb93d840d99bc8446f68897e7b91b9681bf854)
+authorizes technical decisions, isolated review-branch commits/push after tests,
+and local functional diagnosis without repeated Chat Mestre approval. Main,
+remote backend/integrations, release/deploy and Android artifacts stay protected.
+This stage is CI-only; functional recovery will have a separate branch/commit.
+Received clean HEAD 4a19e23da4aff7dc8e39ba789f22ffddff08a21e; PR #1 Draft.
+Pre-edit canon check, 128 controls/14 suites and C11 passed. Windows CI failed
+with A22_WORKFLOW_CHANGED immediately after REVIEWED_WORKFLOW_REQUIRED; pure
+in-memory reproduction confirms LF-to-CRLF on CRLF input creates CRCRLF.
+
+Closed allowlist before code: scripts/test-vercel-prebuilt-contract.mjs
+(idempotent test fixture plus positive/negative EOL cases),
+scripts/test-canonical-regression.mjs (only new amendment identity in future
+fixture), docs/governance/authorizations/CANON-01-A22A-WINDOWS-EOL.json (new),
+docs/evidence/CANON_01_A22A_WINDOWS_EOL.md (new), and append-only this document,
+docs/STATUS.md, docs/EVOLUTION_REPORT.md, docs/ERRORS_AND_BLOCKERS.md.
+Do not modify verifier, workflow, production code or old receipts. New grants
+chain test to CANON-01-VERCEL-A22A and runner to CANON-01-A22A-CI-DIAG.
+Keep exact workflow hash, all 128 existing controls/14 suites and 111 dedicated
+checks; add LF, already-CRLF, mixed and repeated conversion tests, retaining
+rejection of malformed CRCRLF. Run canonical/C11 and nine official checks,
+dedicated tests and real Windows/Linux remote checks when publication is safe.
+No remote PASS without confirmed jobs. No force/merge/main push, APK/AAB,
+Supabase or private-source access. Evidence in ignored tmp/codex-source-recovery.
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-A22A-WINDOWS-EOL",
+  "path": "docs/governance/authorizations/CANON-01-A22A-WINDOWS-EOL.json",
+  "hash": "73ffd5ed494cb87a7c0d22e4a8a3f94252cf321e"
+}
+```
+
+## CANON-01 - explicit test APK delivery authorization - 2026-10-20
+
+Subsequent explicit user request: generate an APK for tests directly on devices. This supersedes only prior prohibitions on local APK generation. Preserve Android 1.0.37 / versionCode 37, package com.xandeflix.prebuilt, historical APKs and all 140 inventoried Android artifacts. No source-code/configuration/version changes or device installation authorized by this request.
+
+Allowlist: append-only authorization here, ignored tmp/codex-source-recovery reports/build sandbox, ordinary ignored dist/TypeScript output, and a new separately named ignored APK. Run canonical checks, C11 lock, typecheck/build and native unit tests; package the verified dist in an isolated Android copy so historical outputs are not overwritten. Verify package, version, signature, assets and SHA-256. No commit/push/deploy/merge as part of APK delivery. Real provider and physical playback remain unverified until tested on the devices.

@@ -3733,3 +3733,8 @@ Offline .vercel/.env.preview.local is blocked: cannot persist potentially privat
 No vercel pull/env pull; actual CLI Preview build remains unproven and potentially blocked without an approved credential-safe configuration mechanism.
 GitHub workflow_dispatch still needs default-branch registration; main unchanged and remote execution not authorized.
 A2.2A-R1: local corrective implementation only. Existing receipts unchanged; new A22 receipt and registry rehashed.
+
+
+## CANON-01-A22A-WINDOWS-EOL - 2026-10-20
+
+Confirmed Windows-only fixture failure: converting already CRLF text creates CRCRLF. Local fixture correction and five EOL regression cases preserve exact workflow verification. New receipt/grants are append-only; prior receipts, runtime, Android version and main are unchanged. Full post-edit results are recorded in tmp/codex-source-recovery; remote Windows CI is not claimed PASS.
