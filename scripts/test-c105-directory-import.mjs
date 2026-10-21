@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { DIRECTORY_ROOTS_MODE, DIRECTORY_JSON_MAX_BYTES, deriveDirectoryRuntimeConfig, fetchDirectoryJson, buildDirectoryStreamUrl } from '../src/source/source-directory-api.ts';
 import { RealSourceImporterService } from '../src/source/real-source-importer.service.ts';
 import { InMemoryCatalogStorage } from '../src/bootstrap/storage/in-memory.storage.ts';
@@ -174,4 +175,118 @@ await test('DIRECTORY_LIVE_KEEPS_SOURCE_SELECTED_TS_OUTPUT', async () => {
   assert.ok(result.liveCatalog.channels[0].streamRef.directStreamUrl.endsWith('/1.ts'));
 });
 
+await test('OUTPUT_ALIASES_PRESERVE_ORIGINAL_URL_AND_VOD_SERIES_ARTWORK', async () => {
+  for (const [output, extension] of [
+    ['hls', 'm3u8'], ['mpegts', 'ts'], ['ts', 'ts'], ['TS', 'ts'],
+    ['MPEGTS', 'ts'], [' mpegts ', 'ts'], ['m3u8', 'm3u8'], ['unknown', 'm3u8'],
+  ]) {
+    const url = new URL(CONFIG.playlistUrl);
+    url.searchParams.set('output', output);
+    const config = deriveDirectoryRuntimeConfig({ ...CONFIG, playlistUrl: url.href });
+    const originalConfig = structuredClone(config);
+    const target = new ObservedStorage();
+    const result = await RealSourceImporterService.importXtream(config, {
+      directoryRoots: true, snapshotId: 'output-alias', provenance: PROVENANCE,
+      storage: target, fetchImpl: fixture(target),
+    });
+    assert.equal(result.success, true);
+    assert.deepEqual(config, originalConfig, 'Never rewrite the source configuration');
+    assert.equal(result.liveCatalog.channels[0].streamRef.containerExtension, extension, output);
+    assert.equal(result.liveCatalog.channels[0].streamRef.directStreamUrl,
+      buildDirectoryStreamUrl(config, 'live', '1', extension));
+    assert.deepEqual(result.catalog.movies, first.catalog.movies);
+    assert.deepEqual(result.catalog.series, first.catalog.series);
+    assert.deepEqual(result.catalog.artworks, first.catalog.artworks);
+    assert.deepEqual([result.metrics.rawMovieCount, result.metrics.rawSeriesCount, result.metrics.rawLiveCount], [2801, 503, 121]);
+    assert.equal(await target.readActivePointer(), null);
+  }
+});
+
+const mpegtsConfig = deriveDirectoryRuntimeConfig({ ...CONFIG, playlistUrl: CONFIG.playlistUrl + '&output=mpegts' });
+let repairedTs;
+await test('OLD_DIRECTORY_DIGEST_REBUILDS_TS_WITH_ATOMIC_PROMOTION', async () => {
+  const legacyHasher = createHash('sha256');
+  for (const list of [lists.get_live_categories, lists.get_live_streams, lists.get_vod_categories,
+    lists.get_vod_streams, lists.get_series_categories, lists.get_series]) {
+    legacyHasher.update('[');
+    for (const row of list) legacyHasher.update(JSON.stringify(row) + '\n');
+    legacyHasher.update(']');
+  }
+  const legacyDigest = legacyHasher.digest('hex');
+  assert.equal(first.contentDigest, legacyDigest, 'Existing HLS checkpoints remain compatible');
+  const active = await storage.readActivePointer();
+  storage.segmentWrites = 0;
+  repairedTs = await RealSourceImporterService.importXtream(mpegtsConfig, {
+    directoryRoots: true, unchangedContentDigest: legacyDigest, snapshotId: 'directory-ts-repaired',
+    provenance: PROVENANCE, storage, fetchImpl: fixture(storage),
+  });
+  assert.equal(repairedTs.success, true);
+  assert.notEqual(repairedTs.notModified, true, 'Old raw digest cannot retain the incorrect HLS channel');
+  assert.notEqual(repairedTs.contentDigest, legacyDigest);
+  assert.ok(storage.segmentWrites > 0);
+  assert.deepEqual(await storage.readActivePointer(), active, 'Candidate is not active before promotion');
+  const channels = await segmentRows(storage, repairedTs.segmentedStaging.manifest, 'live');
+  assert.ok(channels.every(channel => channel.streamRef.containerExtension === 'ts'));
+  assert.equal(channels[0].id, first.liveCatalog.channels[0].id);
+  await promote(storage, repairedTs);
+  assert.equal((await storage.readActivePointer()).snapshotId, 'directory-ts-repaired');
+});
+
+await test('REPAIRED_TS_DIGEST_SKIPS_UNCHANGED_IMPORT', async () => {
+  const active = await storage.readActivePointer();
+  storage.segmentWrites = 0;
+  const result = await RealSourceImporterService.importXtream(mpegtsConfig, {
+    directoryRoots: true, unchangedContentDigest: repairedTs.contentDigest, snapshotId: 'ts-still-current',
+    provenance: PROVENANCE, storage, fetchImpl: fixture(storage),
+  });
+  assert.equal(result.notModified, true);
+  assert.equal(storage.segmentWrites, 0);
+  assert.equal(await storage.readStaging('ts-still-current'), null);
+  assert.deepEqual(await storage.readActivePointer(), active);
+});
+
+await test('MPEGTS_PARTIAL_OR_UNAUTHORIZED_REFRESH_PRESERVES_ACTIVE', async () => {
+  const active = await storage.readActivePointer();
+  storage.segmentWrites = 0;
+  await assert.rejects(RealSourceImporterService.importXtream(mpegtsConfig, {
+    directoryRoots: true, unchangedContentDigest: repairedTs.contentDigest, snapshotId: 'ts-partial',
+    provenance: PROVENANCE, storage,
+    fetchImpl: fixture(storage, { get_series: new Response('unavailable', { status: 503 }) }),
+  }), /DIRECTORY_JSON_FETCH_FAILED/);
+  assert.equal(storage.segmentWrites, 0);
+  assert.deepEqual(await storage.readActivePointer(), active);
+  let calls = 0;
+  const denied = await RealSourceImporterService.importXtream(mpegtsConfig, {
+    directoryRoots: true, snapshotId: 'ts-denied', provenance: PROVENANCE, storage,
+    fetchImpl: async () => { calls++; return Response.json({ user_info: { auth: 0, status: 'Disabled' } }); },
+  });
+  assert.equal(denied.success, false);
+  assert.equal(denied.error, 'HANDSHAKE_AUTH_REJECTED');
+  assert.equal(calls, 1);
+  assert.equal(storage.segmentWrites, 0);
+  assert.deepEqual(await storage.readActivePointer(), active);
+});
+
+await test('DIRECT_M3U_HLS_AND_MPEGTS_KEEP_PLAYLIST_AND_MEDIA_URL_AUTHORITY', async () => {
+  for (const [output, extension] of [['hls', 'm3u8'], ['mpegts', 'ts']]) {
+    const config = { ...CONFIG, playlistUrl: CONFIG.playlistUrl + '&output=' + output };
+    const media = 'https://media.fixture.invalid/live/1.' + extension;
+    const target = new ObservedStorage();
+    let calls = 0;
+    const result = await RealSourceImporterService.importM3u(config, {
+      snapshotId: 'm3u-' + output, provenance: PROVENANCE, storage: target,
+      fetchImpl: async input => {
+        calls++;
+        assert.equal(String(input), config.playlistUrl);
+        return new Response('#EXTM3U\n#EXTINF:-1 group-title="Canais",Canal fixture\n' + media + '\n');
+      },
+    });
+    assert.equal(result.success, true);
+    assert.equal(calls, 1);
+    assert.equal(result.liveCatalog.channels[0].streamRef.directStreamUrl, media);
+    assert.equal(result.liveCatalog.channels[0].streamRef.containerExtension, extension);
+  }
+});
+
 console.log(`C105 directory import: ${passed} tests passed`);
+console.log('SOURCE_OUTPUT_FORMAT_REGRESSION=PASS');

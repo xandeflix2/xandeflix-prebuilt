@@ -267,7 +267,7 @@ export class RealSourceImporterService {
     const directoryConfig = options?.directoryRoots ? deriveDirectoryRuntimeConfig(config) : undefined;
     if (options?.directoryRoots && !directoryConfig) throw new Error('DIRECTORY_SOURCE_UNSUPPORTED');
     const directoryLiveOutput = directoryConfig?.playlistUrl && new URL(directoryConfig.playlistUrl).searchParams.get('output');
-    const directoryLiveExtension = directoryLiveOutput === 'ts' ? 'ts' : 'm3u8';
+    const directoryLiveExtension = /^(?:ts|mpegts)$/i.test(directoryLiveOutput?.trim() || '') ? 'ts' : 'm3u8';
     const apiConfig = directoryConfig || config;
     const host = this.normalizeHost(apiConfig.host!);
     const username = encodeURIComponent(apiConfig.username!.trim());
@@ -351,6 +351,8 @@ export class RealSourceImporterService {
     const seriesFetchMs = Math.round(performance.now() - tSeriesStart);
 
     const hasher = createSha256Stream(), encoder = new TextEncoder();
+    // Rebuild old TS directory checkpoints once; HLS/legacy digests stay compatible.
+    if (directoryConfig && directoryLiveExtension === 'ts') hasher.update(encoder.encode('[DIRECTORY_LIVE_TS_V1]'));
     for (const list of [liveCategories, liveStreams, vodCategories, vodStreams, seriesCategories, seriesStreams]) {
       hasher.update(encoder.encode('['));
       for (let i = 0; i < list.length; i++) {

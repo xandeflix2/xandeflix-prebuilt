@@ -657,3 +657,17 @@ Supabase or private-source access. Evidence in ignored tmp/codex-source-recovery
 Subsequent explicit user request: generate an APK for tests directly on devices. This supersedes only prior prohibitions on local APK generation. Preserve Android 1.0.37 / versionCode 37, package com.xandeflix.prebuilt, historical APKs and all 140 inventoried Android artifacts. No source-code/configuration/version changes or device installation authorized by this request.
 
 Allowlist: append-only authorization here, ignored tmp/codex-source-recovery reports/build sandbox, ordinary ignored dist/TypeScript output, and a new separately named ignored APK. Run canonical checks, C11 lock, typecheck/build and native unit tests; package the verified dist in an isolated Android copy so historical outputs are not overwritten. Verify package, version, signature, assets and SHA-256. No commit/push/deploy/merge as part of APK delivery. Real provider and physical playback remain unverified until tested on the devices.
+
+## CANON-01-SOURCE-OUTPUT - explicit functional recovery - 2026-10-20
+
+User-authorized separate functional branch fix/source-output-format-recovery. Pre-code specification, exact allowlist, confirmed mpegts-to-HLS mismatch, safe TS-checkpoint recovery and acceptance tests: docs/architecture/SOURCE_OUTPUT_FORMAT_RECOVERY.md. Preserve all previous receipts, Android 1.0.37, main and data. This repairs an existing format alias; SOURCE-FORMAT-01 is not started. No push/deploy/merge/backend changes.
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-SOURCE-OUTPUT",
+  "path": "docs/governance/authorizations/CANON-01-SOURCE-OUTPUT.json",
+  "hash": "a93d98a1022f99c0e0957dd8f4a2c7d078b8f588"
+}
+```

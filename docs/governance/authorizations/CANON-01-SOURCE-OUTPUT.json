@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "gate": "CANON-01-SOURCE-OUTPUT",
+  "parentGate": "CANON-01",
+  "amendment": "CANON-01-SOURCE-OUTPUT",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "EXPLICIT_AUTONOMOUS_USER_RECOVERY_AND_TEST_APK_REQUEST_WITH_OUTPUT_HLS_MPEGTS_TS_FACTS",
+  "authorizationRequestSha256": "dc9feae1e4dddb0cc8950d1df1cb93d840d99bc8446f68897e7b91b9681bf854",
+  "reason": "Repair the proven directory importer MPEG-TS alias mismatch and stale raw-digest reuse, preserving exact source URLs, all security guards and the valid active generation until atomic promotion.",
+  "physicalImpact": "REQUIRED",
+  "physicalImpactJustification": "Deliver a separately named test APK for user device testing; actual provider playback and physical homologation remain pending.",
+  "testChangesReviewed": true,
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c105-complete-root-search.mjs",
+    "scripts/test-c107-catalog-return-navigation.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c11-landscape-navigation.mjs",
+    "scripts/validate-direct-playback.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock",
+    "npm run typecheck",
+    "npm run update:check",
+    "npm run security:check",
+    "npm run playback:check",
+    "npm run build",
+    "npm run site:build",
+    "node scripts/test-vercel-prebuilt-contract.mjs",
+    "node scripts/test-c105-directory-import.mjs",
+    "node scripts/test-c105-directory-details.mjs",
+    "node scripts/test-c105-directory-orchestration.mjs",
+    "node scripts/test-c11-automatic-source-refresh.mjs"
+  ],
+  "evidence": "docs/evidence/SOURCE_OUTPUT_FORMAT_RECOVERY.md",
+  "compatibilityRisk": "Directory TS snapshots rebuild once through existing atomic promotion. HLS and non-directory digest behavior remain compatible. This does not establish the cause of unrelated VOD/series outages or bypass browser HTTPS/CORS/TLS.",
+  "restrictions": [
+    "Separate functional review branch fix/source-output-format-recovery; local commit allowed only after validation.",
+    "Do not push while it would automatically trigger Vercel deployments. No merge, release, main, backend, integration, credential or user-data changes.",
+    "No Android source/version, player, license, parental, identity, source binding or historical receipt edits. Preserve historical APKs and use separate test artifact.",
+    "Keep all 128 controls and 14 suites; add the directory import regression as suite 15. No SOURCE-FORMAT-01."
+  ],
+  "supersedes": {
+    "scripts/test-canonical-regression.mjs": "CANON-01-A22A-WINDOWS-EOL"
+  },
+  "changes": [
+    {
+      "path": "src/source/real-source-importer.service.ts",
+      "before": "ba0e82df2658b8807825e9eb242c540aec15ee96",
+      "after": "b3bdc54eefa1141dac417e21c8fda602c28b7842"
+    },
+    {
+      "path": "scripts/test-c105-directory-import.mjs",
+      "before": "c35ab5a36a335e0df0058d4e84964f164e6d082d",
+      "after": "504bb53c204afca4a659980d4d041e462351cf52"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "764a3bb68b46fada561c41c5ebb64f516d458b10",
+      "after": "5338e8fe66ec698fb7f50aa5d6e62f8fbe555ad6"
+    }
+  ],
+  "gitCommitAuthorized": true,
+  "gitPushAuthorized": true,
+  "androidBuildAuthorized": true,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false
+}

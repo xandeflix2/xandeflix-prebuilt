@@ -102,7 +102,7 @@ for(const[name,args,env,expected]of [['MISSING_GIT_FAILS_CLI',[],{...process.env
 }
 // Hardening additions preserve the 72 preceding named controls and all suites.
 for(const file of [AUTHORIZATION,LEGACY_AUTHORIZATION])assert.deepEqual(overlay(approved).read(file),original.read(file));
-assert.deepEqual(future.authorizedAmendments,['CANON-01-G10FIX','CANON-01-LEGACYTESTS',HARDENING_GATE,SITE_BUILD_GATE,A2_ARTIFACT_GATE,PREBUILT_GATE,'CANON-01-A22A-CI-DIAG','CANON-01-A22A-WINDOWS-EOL','ANDROID-38']);pass('FUTURE_38_PRESERVES_BOTH_HISTORICAL_RECEIPTS');
+assert.deepEqual(future.authorizedAmendments,['CANON-01-G10FIX','CANON-01-LEGACYTESTS',HARDENING_GATE,SITE_BUILD_GATE,A2_ARTIFACT_GATE,PREBUILT_GATE,'CANON-01-A22A-CI-DIAG','CANON-01-A22A-WINDOWS-EOL','CANON-01-SOURCE-OUTPUT','ANDROID-38']);pass('FUTURE_38_PRESERVES_BOTH_HISTORICAL_RECEIPTS');
 rejects('G10_IDENTITY_SWAP_TO_ANDROID_38_BLOCKS','CANON_HISTORICAL_AUTHORIZATION_IDENTITY',overlay({...approved,[AUTHORIZATION]:JSON.stringify({...primary,gate:'ANDROID-38',evidence:approval.evidence})}));
 rejects('LEGACY_IDENTITY_SWAP_TO_ANDROID_38_BLOCKS','CANON_LEGACY_AUTHORIZATION_IDENTITY',overlay({...approved,[LEGACY_AUTHORIZATION]:JSON.stringify({...legacy,gate:'ANDROID-38',evidence:approval.evidence})}));
 rejects('G10_IDENTITY_SWAP_TO_LEGACY_BLOCKS','CANON_HISTORICAL_AUTHORIZATION_IDENTITY',editReceipt(AUTHORIZATION,a=>{a.gate=legacy.gate;a.evidence=legacy.evidence}));
@@ -181,7 +181,7 @@ rejects('CI_DIAG_RECEIPT_REQUIRED','CANON_REQUIRED_FILE_MISSING',overlay({[ciDia
 rejects('CI_DIAG_RECEIPT_IMMUTABLE','CANON_REGISTERED_RECEIPT_CHANGED',overlay({[ciDiagnosticReceipt]:current(ciDiagnosticReceipt)+'\n'}));
 rejects('CI_DIAG_RUNNER_SILENT_CHANGE','CANON_PROTECTED_CONTENT_CHANGED',overlay({'scripts/test-canonical-regression.mjs':current('scripts/test-canonical-regression.mjs')+'\n// unapproved logging change\n'}));
 const results=[];
-const suites=[...SUITES,['scripts/test-g10-delta-extensions-regression.mjs','G10_DELTA_EXTENSIONS_REGRESSION=PASS'],[SITE_BUILD_TEST,'SITE_BUILD_CONTRACT=PASS'],[A2_ARTIFACT_TEST,'A2_ARTIFACT_CONTRACT=PASS'],[PREBUILT_TEST,'A22_PREBUILT_CONTRACT=PASS']];
+const suites=[...SUITES,['scripts/test-g10-delta-extensions-regression.mjs','G10_DELTA_EXTENSIONS_REGRESSION=PASS'],[SITE_BUILD_TEST,'SITE_BUILD_CONTRACT=PASS'],[A2_ARTIFACT_TEST,'A2_ARTIFACT_CONTRACT=PASS'],[PREBUILT_TEST,'A22_PREBUILT_CONTRACT=PASS'],['scripts/test-c105-directory-import.mjs','SOURCE_OUTPUT_FORMAT_REGRESSION=PASS']];
 for(const[file,marker]of suites){
  const run=spawnSync(process.execPath,[path.join(root,file)],{cwd:root,encoding:'utf8',timeout:180000,maxBuffer:8*1024*1024});
  fs.writeFileSync(path.join(dir,path.basename(file)+'.log'),(run.stdout||'')+(run.stderr||''));

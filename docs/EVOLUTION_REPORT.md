@@ -3717,3 +3717,14 @@ A2.2A-R1: local corrective implementation only. Existing receipts unchanged; new
 ## CANON-01-A22A-WINDOWS-EOL - 2026-10-20
 
 Confirmed Windows-only fixture failure: converting already CRLF text creates CRCRLF. Local fixture correction and five EOL regression cases preserve exact workflow verification. New receipt/grants are append-only; prior receipts, runtime, Android version and main are unchanged. Full post-edit results are recorded in tmp/codex-source-recovery; remote Windows CI is not claimed PASS.
+
+
+## CANON-01-SOURCE-OUTPUT - 2026-10-20
+
+User confirmed the new provider output values hls/mpegts and previous TS. Red/green synthetic reproduction confirms mpegts was incorrectly assigned m3u8 during directory import. Minimal alias normalization plus TS-only digest invalidation recovers existing wrong-format directory checkpoints using normal staging/atomic promotion; no local data reset. Twelve dedicated cases pass; full checks and revised test APK are pending in this entry and reported under tmp/codex-source-recovery. VOD/series outage causality and physical provider playback are not established.
+
+The first isolated Android build failed three tests because two referenced TypeScript files were omitted from the sandbox. Copying their exact real source bytes restored all 206 native tests; no runtime/test assertion was changed for that sandbox issue. All 140 historical Android artifacts and 1.0.37/code37 are preserved. No deploy, push, remote backend or production change.
+
+### CANON-01-SOURCE-OUTPUT - verified local delivery
+
+Nine official commands, 128 canonical controls/15 suites, 116 A22 controls, twelve directory/import cases, seven source suites and 206 native tests PASS. Separate APK 1.0.37 test-hls-mpegts generated, signature/assets/package verified; SHA-256 5d20b4663adb699e6c665e63fc510cfc5d865f420c23545e5918a2b025eb8f47. Final canonical/C11 checks PASS. Original 140 Android artifacts remain preserved. Actual device playback and the cause of any unrelated VOD/series outage remain PENDING; no automatic installation, push/deploy, main or backend change.
