@@ -3728,3 +3728,152 @@ The first isolated Android build failed three tests because two referenced TypeS
 ### CANON-01-SOURCE-OUTPUT - verified local delivery
 
 Nine official commands, 128 canonical controls/15 suites, 116 A22 controls, twelve directory/import cases, seven source suites and 206 native tests PASS. Separate APK 1.0.37 test-hls-mpegts generated, signature/assets/package verified; SHA-256 5d20b4663adb699e6c665e63fc510cfc5d865f420c23545e5918a2b025eb8f47. Final canonical/C11 checks PASS. Original 140 Android artifacts remain preserved. Actual device playback and the cause of any unrelated VOD/series outage remain PENDING; no automatic installation, push/deploy, main or backend change.
+
+
+## CANON-01-SOURCE-OUTPUT - physical catalog failure reported - 2026-10-20
+
+User confirms the revised test-hls-mpegts-20261020 APK still lists no movies or Live options after source update. Actual catalog recovery is FAIL (user report); local alias/unit/regression PASS does not certify source availability or device import/display. Exact source/import/promotion/UI failure stage remains UNKNOWN pending the refresh result message and last-import date. No authorized ADB device/browser surface is connected. Read-only investigation and a clearly synthetic empty-directory probe are preserved in tmp/codex-source-recovery/followup-empty-catalog/. No speculative runtime fix, data reset, backend write, new APK or Git publication was performed in this follow-up.
+
+
+## CANON-01-CATALOG-READ-DIAG - device evidence collection - 2026-10-20
+
+Screenshot confirms successful update, current import timestamp and same source generation; user reports no movies or Live entries and normal parental settings. Remaining physical cause UNKNOWN, recovery FAIL_USER_REPORTED. Add only a bounded read-only diagnostic under docs/architecture/CATALOG_LOCAL_READ_DIAGNOSTIC.md; preserve earlier observations and data. Eight diagnostic cases PASS; full validation/APK audit pending. No commit, push, deploy, backend or physical certification.
+
+
+Delivery verification completed 2026-10-21: all nine official commands exit 0, 128 controls / 16 suites, 116 dedicated A22 controls, eight diagnostic cases and source/parental follow-up tests PASS. Diagnostic APK generated with preserved package/version/signature; 206 native tests PASS. Physical content recovery remains FAIL_USER_REPORTED and its cause UNKNOWN. The explicit local read action is evidence collection, not a claimed repair. No commit/push/deploy/install/backend changes.
+
+
+## CANON-01-XUI-OPAQUE-RECOVERY - 2026-10-21
+
+Confirmed existing M3U opaque-link classification recovery, not a new format Gate. Source provides numeric xui-id; authenticated exact category/stream-ID lookup supplies type only when structural kind is unresolved. Original URLs and stable series IDs remain; unconfirmed candidates fail closed and preserve active data. Different sourceId can choose first-source inventory; same-source inventory IDs remain protected. Native update errors no longer masquerade as activity deferral. Specification/evidence in XUI_OPAQUE_M3U_RECOVERY.md; full local validation and separate APK delivery recorded under ignored tmp/codex-source-recovery/xui-recovery-20261021. Installed-app recovery/playback PENDING; no publication, install, backend or next Gate.
+
+
+## Complete physical dry-read validation - 2026-10-21
+
+Actual new resolver/parser/classifier code ran in tablet WebView with device-direct metadata, no staging or promotion. Read 95,258,686 bytes / 316,406 valid records, one malformed EXTINF header. Confirmed 43,933 movies, 2,034 Live channels and the same 270,261 episode records, with 178 unresolved records; all 81 metadata requests completed. Active pointer stayed byte-identical. Remaining records use four-digit episode numbers beyond the existing title-parser bound; do not relabel as movies/Live. Expanding episode parsing/IDs is not implemented in this amendment. Counts describe that observation, not an SLA or proof of installed-app restoration/playback. The user attachment and provider API can change independently; older attached rows missing membership remain unresolved.
+
+
+## CANON-01-CATALOG-PHYSICAL-FIXES - 2026-10-21
+
+Confirmed source-authoritative movie/chapter misclassification and protected-area I/O/header defects. Pre-code spec CATALOG_PHYSICAL_REFINEMENTS; eight new regression groups and five adult-reader groups pass, actual CSS/React fixture passes five viewports. Genuine IDs preserved. Nominal chained receipt added; all previous receipts unchanged. Official checks/APK/physical follow-up pending; no Git/backend/version/next Gate. Harness errors and correction recorded in evidence.
+
+
+## CANON-01-SERIES-POSTER-COMPOSITION - 2026-10-21
+
+Physical screenshot/source hashes prove unrelated series sharing generic movie/dance art; geometry audit25/29 horizontal. Actual Artwork red reproduced; bounded source-claim/independent TV fallback fix and dedicated suites now PASS. Two old fixture dependency failures repaired with isolated ports, no assertions removed. Actual TMDB HTTP200 and three TV matches confirmed. Official checks/new APK/physical cover retest pending; all old receipts and main preserved.
+
+
+## CANON-01 physical poster verification - 2026-10-21
+
+Closed the physical delivery of classification, adult-layout and series-poster
+refinements under the existing user authorization. Classification count and
+identity lineage agree on all3 devices. Latest separate same-signature APK
+SHA256 d3258397e9277bf99bcefa7f0221b62157fe3c651eff76cbfc20b83116907c8f
+is installed on all3. Independent official TV poster rendering was checked
+for4 works per device. Phone image failures were reproduced as DNS errors on
+the earlier connection and succeeded after the user's mobile-network change.
+No source secret, old receipt, native source, version, backend or Git history
+was modified. Unmatched/ambiguous artwork and physical playback stay explicit
+limitations; no next Gate or publication initiated.
+
+
+## CANON-01-TMDB-CONTEXT-IDENTITY - 2026-10-21
+
+Confirmed matcher context loss and Med Cezir/Medcezir word-boundary mismatch. Same-title Turkish/Brazilian works and Netflix Released/Planned entries were ambiguous; no movie reclassification from metadata. Dedicated red/green and8 real public API200 responses recover TV158339/61867/62668 with posters, overview and genres. Separate LoveSick [L] stays unqualified. Existing artwork/alias assertions retained. Official validation, separate APK and device retest pending; old receipts/main/data intact.
+
+
+## CANON-01-TMDB-CONTEXT-IDENTITY — local delivery and physical limits — 2026-10-21
+
+Local validation PASS: nine official commands plus the prebuilt contract test
+all exited0;12 additional mandatory suites exited0. Canonical128 controls/20
+suites; native206 tests/35 suites, no failures/errors/skips. Source-first,
+visible/alias recovery, parental, license, C11 and playback checks retained.
+The actual configured API probe recovered TV158339/61867/62668 with correct
+years, synopsis, genres and image200; this is a computer/API proof only.
+
+APK: Xandeflix-v1.0.37-capas-contexto-20261021.apk, SHA256
+0e529f8c96fe53d985751b7f6764884d694d8918801ca1e87c47bc6cfb15056f, 11797836 bytes, package/version/certificate unchanged.
+All8 web assets verified, public TMDB/Supabase configuration preserved. All14
+classes.dex/manifest/resources entries compared with the preceding poster APK
+are byte-identical; this amendment changes no native certificate/HTTP policy.
+
+Installation status: AFTSS and SM_X610 updated in place. APK hashes match;
+identity, activation/key, source vault, parental preferences and active catalog
+pointer were byte-identical before/after install, before normal app boot. The
+phone disappeared from ADB before the first install attempt; the strict3-device
+preflight stopped before changing any device. A separate explicitly targeted
+2-device attempt then passed. SM_S926B remains on the preceding APK; no current
+revision installation on the phone is claimed. User asked to reconnect it.
+
+Physical verification is BLOCKED/NOT CERTIFIED, superseding any pending/implied
+physical success for this revision. Fire actual new card checks did not pass;
+independent same-key public API requests in its WebView fail, and native API
+returns certificate trust failure. Network validation was absent in the sampled
+connectivity state. This identifies a real current transport failure, not its
+exact upstream cause. Tablet inspection lost its debug connection; normal
+process restart and targeted ADB transport reconnect did not complete a visual
+proof, and the last targeted query could not see the tablet. No data reset,
+certificate trust change, DNS bypass or new corrective production patch was
+applied in response. User action/device/network access is required to resume
+physical verification. No full-device rendering/playback PASS is declared.
+
+Known metadata limitation: separate LoveSick [L] under Legendadas stays
+unqualified; it is not assigned Netflix's show merely because its normalized
+title is similar. No film/series reclassification, importer or source URL
+change, catalog mutation, backend write, Git publication or next Gate.
+
+
+## CANON-01-TMDB-SUBTITLE-PREVIEW — 2026-10-21
+
+Recurring [L] screenshot reproduced. Provider normal/subtitle2014 entries have identical public poster/plot (RAM comparison); no arbitrary same-title sharing. Category preview discarded episode proof and old network-only lookup retained an unaired Planned homonym. New specification/receipt and red-green regression cover preview migration, narrow suffix normalization and bounded episodic disambiguation. Prior assertions preserved except explicitly superseded network-only eligibility; all access/parental/source/real-homonym guards retained. Final checks and actual separate APK tablet/Fire tests pending. Phone tests stopped per latest user steering. No Git/backend/native/version changes.
+
+
+## CANON-01-TMDB-SUBTITLE-PREVIEW — validated local delivery — 2026-10-21
+
+Nine official checks/prebuilt contract and128 controls/21 suites PASS;206 native tests PASS. New separate1.0.37 APK fed49d854b34b67837c18adad3f1bfcc84d008ccfc81f5f85e589b52bec157a9. Tablet/phone in-place updates preserve all nine private records; user explicitly reauthorized phone tests. Actual two-title search and three reported Home posters pass on both; tablet screenshot inspected. Optional preview migrated to version3 without changing active catalog counts. Fire is unavailable to ADB and remains on preceding APK; reconnection/IP requested, no full three-device or playback PASS. Initial metadata-timing/cache-path harness failure and evidence-header rejection retained with corrected rechecks; no verifier bypass. Old receipts/main/Android native/data/parental/backend preserved; no Git publication or next Gate.
+
+
+## CANON-01-TMDB-SUBTITLE-PREVIEW ? Fire follow-up ? 2026-10-21
+
+The authorized Fire AFTSS debug connection was recovered through an ephemeral USB-phone loopback ADB bridge. Streaming installation failed; explicit no-streaming in-place installation then passed. Installed APK SHA256 fed49d854b34b67837c18adad3f1bfcc84d008ccfc81f5f85e589b52bec157a9 verified; all nine private-state comparisons including active catalog and parental preferences are unchanged. Actual decoded own-WebView checks pass for Lovesick and LoveSick [L] and all three reported Home posters. Latest poster APK is therefore installed and poster-tested on all three devices. These checks do not certify video/next-navigation playback. Read-only storage audit independently found unbounded historical catalog generations; no catalog cleanup occurred during this poster amendment. Previous failed results retained. No Git/backend/native/version changes or next Gate.
+
+
+## CANON-01-CATALOG-RETENTION — 2026-10-21
+
+Real storage audit confirmed unbounded permanent catalog generations:14 Fire/25 tablet/17 phone. Explicit automatic-cleanup request authorizes this separate amendment, preserving active and recovery references, all private records and historical receipts. New29-scenario local retention suite and existing27 promotion tests pass; official validation and physical reclaimed space remain pending. Actor/cast requests and Fire flicker diagnosis are separate work. No Git/backend/native/version changes or next Gate.
+
+
+## Local validation checkpoint ? 2026-10-21
+
+All nine official commands and prebuilt contract exited0; canonical128 controls/22 suites, C11 and typecheck PASS. Dedicated retention29 scenarios and unchanged promotion27 tests PASS. No Android APK or device cleanup performed for this amendment yet. Latest explicit user priority pauses queued work for detail backdrops and transparent sidebar, then APK/device delivery. Retention implementation/receipt are frozen; no physical reclamation PASS claimed. Historical receipts unchanged; no Git/backend/native/version change.
+
+
+## CANON-01-DETAIL-BACKDROP-UI — 2026-10-21
+
+Pre-code scope follows the latest explicit detail-background/transparent-sidebar/TV-icon priority. Missing-primary red test reproduced discarded TMDB alternatives; new real-TSX/cache safety tests and both existing artwork integrations pass after controlled fixture import ports (initial loader errors preserved). TV glyphs16px with44px focus targets, no global scaling, phone/tablet dimensions unchanged. Official aggregate validation/APK/device results pending, not presumed. Preserve frozen retention and historical receipts; no Git/backend/native/version changes or next Gate.
+
+
+## CANON-01-DETAIL-BACKDROP-TYPES ? 2026-10-21
+
+Full canonical128 controls/23 suites and C11 passed. Typecheck blocked by TS6133 on the new component React import. Explicit return annotations fix the compile declaration only. New chained receipt preserves the UI receipt and all historical records. No bypass or runtime change. Revalidation/APK installation pending.
+
+
+## Latest installation scope restriction ? 2026-10-21
+
+User explicitly narrows delivery: install ONLY on Fire Stick; provide APK for manual installation on phone/tablet. This supersedes earlier three-device installation permission for this delivery. No new APK is installed on phone/tablet by the agent. Temporary CSS preview already observed earlier is not an APK installation. Fire-only helper enforces the target list; remaining physical tests are limited accordingly. Historical receipts preserved, no broader authorization inferred.
+
+
+## CANON-01-TV-SIDEBAR-COMPOSITION — 2026-10-21
+
+Continuation audit confirmed current installed ui-fundos APK by exact SHA, matching8 dist assets,10 previous commands exit0,77 incoming dirty paths and18 prior receipts. Visual regression remains: transparent header exposes dark ancestor;44px targets+2px gap keep46px pitch. Real Fire reversible preview extends page palette behind rail and compacts targets44x36/zero gap:252px group, pixel continuity delta0 in5 sampled rows. Source correction scoped to CSS/runner registration, preserving128 controls/23 suites. Full new checks/APK/Fire-only installation pending; phone/tablet manual. Clean-install storage savings are not automatic-retention evidence. No Git/backend/runtime/native/version/reset or new feature.
+
+
+## TV sidebar installed-APK acceptance — 2026-10-21
+
+All10 official commands exit0; canonical128 controls/23 suites, C11, typecheck, update, security, playback and both web builds PASS. Capacitor/Gradle exit0; native206 tests/35 suites, zero failures/errors/skips. Separate Xandeflix-v1.0.37-tv-menu-20261021.apk:11,800,536 bytes, SHA256a071e4f0bc9a9098d2f411e9a307ff4deb3c0c4e5d74fddeab7d82566a07ef07. Same package1.0.37/code37/certificate,8 web assets verified, standalone HTTPS, no private credential pattern.
+
+Installed ONLY on Fire AFTSS with in-place update; exact installed SHA confirmed. Ten identity/activation/source/parental/active/recovery files byte-identical during update. No uninstall/reset/restore. Actual packaged CSS, without preview injection: nav252px,44x36 targets,36px pitch,16px icons; transparent rail follows page palette. Native screenshot inspected; rail/page RGB delta0 at all5 sampled rows. Actual ADB D-pad Down traverses all6 subsequent controls with visible focus, without entering PIN or protected content. Phone/tablet APK installation remains manual; no new phone physical test claimed. Tablet temporary CSS dimensions unchanged.
+
+Preservation audit:1339 baseline files checked, only6 allowlisted existing paths changed;18 prior receipts and140 old APK/AAB artifacts unchanged. Build stage158 of159 files identical; only auto-generated capacitor.settings.gradle relocates4 module references to the same root node_modules during cap sync. Root native files unchanged;14 native APK entries (DEX/libraries/manifest/resources) identical to previous UI APK. Initial broad stage-equality diagnostic stopped on that generated relocation; exact content/real-path verification resolved it without modifying production or test assertions. Old UI APK preserved. HEAD/main/index unchanged; source branch unpublished. Evidence and report:tmp/codex-source-recovery/tv-sidebar-composition-20261021/.
+
+User now reports playback starts then stalls repeatedly on slow connections. Buffer policy is wired to full-screen and preview players, but this visual APK does not change it or certify a slow-network fix. Actual network/bitrate diagnosis remains pending; no player/backend/source/parental/license change. Before this update only2 snapshots existed (~555MB); automatic reclamation is not proven by this update, and earlier clean-install savings remain attributable to user uninstall. GIT_COMMIT=NAO; GIT_PUSH=NAO; SUPABASE_CHANGED=NAO; NEXT_GATE_STARTED=NAO.

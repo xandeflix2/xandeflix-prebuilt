@@ -9,7 +9,7 @@ import { normalizeArtworkUri } from '../artwork/artwork-uri.ts';
 import { isReleaseCategory } from './category-presentation.ts';
 
 const LIMIT = 20, MAX_CATEGORIES = 64, MAX_BYTES = 1024 * 1024;
-type Saved = { version: 2; snapshot: string; rows: Array<[string, CatalogItemViewModel[]]> };
+type Saved = { version: 2 | 3; snapshot: string; rows: Array<[string, CatalogItemViewModel[]]> };
 export interface PreviewRepository { read(kind: BrowseKind): Promise<unknown>; write(kind: BrowseKind, value: Saved): Promise<void>; }
 const bounded = async <T>(operation: Promise<T>): Promise<T> => {
   let timer: ReturnType<typeof setTimeout> | undefined;
@@ -51,6 +51,7 @@ class IndexedPreviewRepository implements PreviewRepository {
 
 function safeItem(item: CatalogItemViewModel): CatalogItemViewModel {
   return { id: item.id, kind: item.kind, title: item.title.slice(0, 200),
+    ...(item.kind === 'series' ? { hasEpisodes: item.hasEpisodes === true } : {}),
     externalIds: item.externalIds?.tmdbId ? { tmdbId: item.externalIds.tmdbId } : undefined,
     yearFormatted: item.yearFormatted, posterUri: normalizeArtworkUri(item.posterUri),
     genreLabels: item.genreLabels.slice(0, 10).map(label => label.slice(0, 100)),
@@ -95,10 +96,11 @@ export class CategoryPreviewIndex {
     const rows = new Map<string, CatalogItemViewModel[]>(); this.rows.set(kind, rows);
     try {
       const saved = await this.repository.read(kind) as Saved | undefined; this.check();
-      if (saved?.version === 2 && saved.snapshot === this.snapshot && Array.isArray(saved.rows) && saved.rows.length <= MAX_CATEGORIES
+      if ((saved?.version === 3 || (kind === 'movies' && saved?.version === 2)) && saved.snapshot === this.snapshot && Array.isArray(saved.rows) && saved.rows.length <= MAX_CATEGORIES
           && JSON.stringify(saved).length * 2 <= MAX_BYTES
           && saved.rows.every(([id, items]) => allowed.has(id) && Array.isArray(items) && items.length <= LIMIT
             && items.every(item => item?.kind === type && typeof item.id === 'string' && typeof item.title === 'string'
+              && (type !== 'series' || typeof item.hasEpisodes === 'boolean')
               && Array.isArray(item.genreLabels) && Array.isArray(item.categoryLabels) && persistable(item)))) {
         await this.manifest();
         for (const [id, items] of saved.rows) { rows.set(id, items.map(safeItem)); this.ready.add(`${kind}:${id}`); }
@@ -142,7 +144,7 @@ export class CategoryPreviewIndex {
     for (const category of categories) { if (!rows.has(category.id)) rows.set(category.id, []); this.ready.add(`${kind}:${category.id}`); }
     this.notify();
     // Query-bearing artwork URLs stay in RAM and never enter this optional cache.
-    const saved: Saved = { version: 2, snapshot: this.snapshot, rows: [...rows].filter(([, items]) => items.every(persistable)) };
+    const saved: Saved = { version: 3, snapshot: this.snapshot, rows: [...rows].filter(([, items]) => items.every(persistable)) };
     if (JSON.stringify(saved).length * 2 <= MAX_BYTES) await this.repository.write(kind, saved).catch(() => {});
   }
   async load(kind: BrowseKind, categoryId: string, signal?: AbortSignal): Promise<CatalogItemViewModel[]> {

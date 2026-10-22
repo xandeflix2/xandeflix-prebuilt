@@ -1,10 +1,11 @@
 import type { CatalogItemViewModel } from '../catalog/catalog-view-model.ts';
-import { artworkIdentityKey, chooseHeroPoster, tmdbMetadataService, tmdbPosterPath, type ArtworkMetadata } from './tmdb-metadata.service.ts';
+import { artworkIdentityKey, artworkCategoryContext, chooseHeroPoster, tmdbMetadataService, tmdbPosterPath, type ArtworkMetadata } from './tmdb-metadata.service.ts';
 import { loadImage, invalidateLoadedImage } from './image-load-queue.ts';
 
 export type HeroImageProfile = 'horizontal' | 'vertical';
 export function heroArtworkIdentity(item: CatalogItemViewModel) {
-  return { kind: item.kind, title: item.title, year: item.yearFormatted, tmdbId: item.externalIds?.tmdbId, posterPath: tmdbPosterPath(item.posterUri), sourcePosterUri: item.posterUri };
+  return { kind: item.kind, title: item.title, year: item.yearFormatted, tmdbId: item.externalIds?.tmdbId, posterPath: tmdbPosterPath(item.posterUri), sourcePosterUri: item.posterUri,
+    ...(item.kind === 'series' ? artworkCategoryContext(item.categoryLabels, item.hasEpisodes) : {}) };
 }
 export async function decodeHeroImage(uri: string, profile: HeroImageProfile = 'horizontal', priority: 'high' | 'normal' = 'high'): Promise<boolean> {
   const image=await loadImage(uri,priority === 'high');

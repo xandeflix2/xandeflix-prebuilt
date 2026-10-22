@@ -3,12 +3,12 @@ import {artworkIdentityKey,type ArtworkIdentity} from '../../artwork/tmdb-metada
 import {tmdbWatchProvidersService,type WatchAvailability} from '../../artwork/tmdb-watch-providers.service.ts';
 
 export function useWatchProviders(identity:ArtworkIdentity|undefined):WatchAvailability|null {
-  const key=identity?artworkIdentityKey(identity):'',{kind,title,year,tmdbId,posterPath,sourcePosterUri}=identity||{};
+  const key=identity?artworkIdentityKey(identity):'',{kind,title,year,tmdbId,posterPath,sourcePosterUri,originCountry,network,hasEpisodes}=identity||{};
   const[state,setState]=useState<{key:string;value:WatchAvailability|null}>();
   useEffect(()=>{if(!kind||!title)return;let active=true;
-    const timer=setTimeout(()=>{void tmdbWatchProvidersService.resolve({kind,title,year,tmdbId,posterPath,sourcePosterUri}).then(value=>{if(active)setState({key,value});},()=>{});},250);
+    const timer=setTimeout(()=>{void tmdbWatchProvidersService.resolve({kind,title,year,tmdbId,posterPath,sourcePosterUri,originCountry,network,hasEpisodes}).then(value=>{if(active)setState({key,value});},()=>{});},250);
     return()=>{active=false;clearTimeout(timer);};
-  },[key,kind,title,year,tmdbId,posterPath,sourcePosterUri]);
+  },[key,kind,title,year,tmdbId,posterPath,sourcePosterUri,originCountry,network,hasEpisodes]);
   return state?.key===key?state.value:tmdbWatchProvidersService.peek(identity);
 }
 export function usePlatformLogo(label:string):{uri:string|undefined;failed:()=>void} {

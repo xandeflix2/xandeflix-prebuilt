@@ -16,12 +16,12 @@ export function PhoneSeriesDetail({detail,identity,readModel,episodes,episodesLo
   const [tab,setTab]=useState<'episodes'|'related'>('episodes');
   const [state,setState]=useState<{key:string;data:SeriesPresentation|null}>();
   const key=artworkIdentityKey(identity);
-  const {title,year,tmdbId,posterPath,sourcePosterUri}=identity;
+  const {title,year,tmdbId,posterPath,sourcePosterUri,originCountry,network,hasEpisodes}=identity;
   useEffect(()=>{
     let active=true;
-    void resolveSeriesPresentation({kind:'series',title,year,tmdbId,posterPath,sourcePosterUri}).then(data=>{if(active)setState({key,data});},()=>{if(active)setState({key,data:null});});
+    void resolveSeriesPresentation({kind:'series',title,year,tmdbId,posterPath,sourcePosterUri,originCountry,network,hasEpisodes}).then(data=>{if(active)setState({key,data});},()=>{if(active)setState({key,data:null});});
     return()=>{active=false;};
-  },[key,title,year,tmdbId,posterPath,sourcePosterUri]);
+  },[key,title,year,tmdbId,posterPath,sourcePosterUri,originCountry,network,hasEpisodes]);
   const extra=state?.key===key?state.data:null;
   const loading=state?.key!==key;
   const source=readModel.seriesById.get(detail.id)!;

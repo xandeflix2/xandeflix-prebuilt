@@ -3132,6 +3132,13 @@ html, body {
 
 /* Configuracoes mobile: engrenagem no topo, quatro atalhos no rodape. */
 .header-settings-button { display: none; }
+@media (max-width: 599px) {
+  #root .app-shell--adult-page .app-header .header-nav { flex-shrink: 0; }
+  #root .app-shell--adult-page .app-header .header-nav .nav-link { min-width: 44px; flex-shrink: 0; }
+  #root .app-shell--adult-page .app-header .header-adult-button { width: 44px; min-width: 44px; flex-shrink: 0; }
+  #root .app-shell--adult-page .app-header .brand-container { min-width: 0; overflow: hidden; }
+  #root .app-shell--adult-page .app-header .brand-logo { font-size: clamp(0.75rem, 3vw, 1rem) !important; overflow: hidden; text-overflow: ellipsis; }
+}
 @media (max-width: 600px) {
   #root .app-shell--phone-header-back:not(.app-shell--tablet-portrait):not(.app-shell--side-nav) .brand-sub {
     display: none;
@@ -3535,6 +3542,45 @@ html, body {
 #root .detail-page--fire .detail-layout { min-height: 0 !important; align-items: flex-start; }
 #root .detail-page--fire .detail-poster-col { flex: 0 0 clamp(130px, 15vw, 240px) !important; width: clamp(130px, 15vw, 240px) !important; max-width: clamp(130px, 15vw, 240px) !important; }
 #root .detail-page--fire .detail-poster-img { width: 100% !important; height: auto !important; aspect-ratio: 2 / 3 !important; }
+
+/* Detail-only artwork: a decoded horizontal image replaces the same-work
+   poster composition. Empty loading surfaces must keep geometry for visibility. */
+.detail-artwork-surface { position: relative; width: 100%; height: 100%; overflow: hidden; pointer-events: none; }
+.detail-artwork-surface > :is(.detail-artwork-poster, .detail-artwork-horizontal) {
+  position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover;
+}
+.detail-artwork-surface > .detail-artwork-poster { filter: blur(12px); transform: scale(1.08); object-position: center 35%; }
+.detail-artwork-surface > .artwork-empty { background: transparent; }
+.detail-artwork-surface :is(.artwork-fallback-icon, .artwork-fallback-title) { display: none; }
+#root .detail-page--wide .detail-backdrop-img { opacity: .75; object-position: center top; }
+#root .detail-page--wide .detail-backdrop-gradient {
+  background: linear-gradient(90deg, rgba(8,12,20,.88), rgba(8,12,20,.30) 75%), linear-gradient(0deg, var(--bg-dark), transparent 45%);
+}
+
+/* Transparent side navigation; keep contrast only on focused/active controls.
+   TV remote targets are44px wide/36px high; touch layouts keep their sizes. */
+#root :is(.app-shell--tablet, .app-shell--television).app-shell--side-nav .app-header {
+  background: transparent; box-shadow: none; border-right: 0; backdrop-filter: none;
+}
+#root :is(.app-shell--television, .app-shell--fire-stick, .app-shell--android-tv).app-shell--side-nav:not(.app-shell--tablet):not(.app-shell--phone) {
+  --side-nav-width: 56px;
+  background-color: var(--bg-dark);
+}
+#root :is(.app-shell--television, .app-shell--fire-stick, .app-shell--android-tv).app-shell--side-nav:not(.app-shell--tablet):not(.app-shell--phone) .page-container.immersive-background {
+  position: relative;
+}
+#root :is(.app-shell--television, .app-shell--fire-stick, .app-shell--android-tv).app-shell--side-nav:not(.app-shell--tablet):not(.app-shell--phone) .page-container.immersive-background::before {
+  content: ''; position: absolute; inset: 0 100% 0 auto;
+  width: var(--side-nav-width, 56px); background: inherit; pointer-events: none;
+}
+#root :is(.app-shell--television, .app-shell--fire-stick, .app-shell--android-tv).app-shell--side-nav:not(.app-shell--tablet):not(.app-shell--phone) .app-header {
+  padding-left: max(5px, env(safe-area-inset-left, 0px)) !important; padding-right: 5px !important;
+}
+#root :is(.app-shell--television, .app-shell--fire-stick, .app-shell--android-tv).app-shell--side-nav:not(.app-shell--tablet):not(.app-shell--phone) .nav-link {
+  min-width: 44px; min-height: 36px !important; height: 36px; padding: 6px !important;
+}
+#root :is(.app-shell--television, .app-shell--fire-stick, .app-shell--android-tv).app-shell--side-nav:not(.app-shell--tablet):not(.app-shell--phone) .header-nav { gap: 0 !important; }
+#root :is(.app-shell--television, .app-shell--fire-stick, .app-shell--android-tv).app-shell--side-nav:not(.app-shell--tablet):not(.app-shell--phone) .app-header .nav-icon svg { width: 16px; height: 16px; }
 
 /* Tablet em retrato: menu global no topo e Live empilhado, sem barra inferior. */
 #root .app-shell--tablet-portrait { --live-bottom-space: env(safe-area-inset-bottom, 0px); padding-left: 0; }

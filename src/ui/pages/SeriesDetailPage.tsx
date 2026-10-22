@@ -12,8 +12,9 @@ import React, { useState, useCallback, useEffect } from 'react';
 import type { CatalogReadModel } from '../../catalog/catalog-read-model.ts';
 import { getSeriesDetail } from '../../catalog/catalog-selectors.ts';
 import { Artwork } from '../components/Artwork.tsx';
+import { DetailBackdrop } from '../components/DetailBackdrop.tsx';
 import { useArtworkMetadata } from '../hooks/useArtworkMetadata.ts';
-import { tmdbPosterPath } from '../../artwork/tmdb-metadata.service.ts';
+import { tmdbPosterPath, artworkCategoryContext } from '../../artwork/tmdb-metadata.service.ts';
 import { useImmersiveArtwork } from '../hooks/useImmersiveArtwork.ts';
 import { DetailTrailer } from '../components/DetailTrailer.tsx';
 import { SeriesDetailSections } from '../components/SeriesDetailSections.tsx';
@@ -46,6 +47,7 @@ export const SeriesDetailPage: React.FC<SeriesDetailPageProps> = ({
   const phone = usePhoneLayout();
   const sourceDetail = getSeriesDetail(readModel, seriesId);
   const identity = sourceDetail ? { kind: 'series' as const, title: sourceDetail.title,
+    ...artworkCategoryContext(sourceDetail.categoryLabels, sourceDetail.seasons.some(season => season.episodesCount > 0)),
     year: sourceDetail.yearFormatted, tmdbId: sourceDetail.externalIds?.tmdbId, posterPath: tmdbPosterPath(sourceDetail.posterUri), sourcePosterUri: sourceDetail.posterUri } : undefined;
   const sourceGenres = meaningfulDetailGenres(sourceDetail?.genreLabels || []);
   const metadata = useArtworkMetadata(identity, Boolean(sourceDetail && (!sourceDetail.overview || !sourceDetail.yearFormatted
@@ -249,15 +251,11 @@ export const SeriesDetailPage: React.FC<SeriesDetailPageProps> = ({
       <div className="detail-content">
         <div className="detail-hero-wide">
       <div className="detail-backdrop-wrapper">
-        <Artwork
-          uri={detail.backdropUri}
-          fallbackUri={detail.posterUri}
+        <DetailBackdrop
+          backdrop={detail.backdropUri}
+          poster={detail.posterUri}
           identity={identity}
-          priority="high"
-          tmdbBackdropOnly
-          immersiveArtwork="backdrop"
           title={detail.title}
-          kind="backdrop"
           className="detail-backdrop-img"
         />
         <div className="detail-backdrop-gradient" />

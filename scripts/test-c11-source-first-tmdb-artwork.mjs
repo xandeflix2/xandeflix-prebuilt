@@ -5,12 +5,14 @@ import ts from 'typescript';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { normalizeArtworkUri, chooseArtworkUri, displayArtworkUri } from '../src/artwork/artwork-uri.ts';
-import { TmdbMetadataService, normalizeArtworkIdentity, artworkIdentityKey, selectTmdbMatch, tmdbPosterPath, chooseHeroPoster } from '../src/artwork/tmdb-metadata.service.ts';
+import { TmdbMetadataService, normalizeArtworkIdentity, artworkIdentityKey, artworkCategoryContext, selectTmdbMatch, tmdbPosterPath, chooseHeroPoster } from '../src/artwork/tmdb-metadata.service.ts';
 import { RealSourceImporterService } from '../src/source/real-source-importer.service.ts';
 import { CatalogReadModel } from '../src/catalog/catalog-read-model.ts';
 import * as selectors from '../src/catalog/catalog-selectors.ts';
 import * as categoryPresentation from '../src/catalog/category-presentation.ts';
 import * as artworkPreload from '../src/artwork/artwork-preload.service.ts';
+import { seriesPosterClaims } from '../src/artwork/series-poster-claims.ts';
+import { chooseDetailBackdropUri, isHorizontalDetailBackdrop } from '../src/artwork/detail-backdrop.ts';
 
 const print = console.log.bind(console);
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -218,7 +220,7 @@ print('PASS_AUTH_COOLDOWN_RECOVERY_AND_CACHE_512_ENTRIES');
 const require = createRequire(import.meta.url);
 const overlay = { ...a, year: 2020 };
 const uriModule = { normalizeArtworkUri, chooseArtworkUri, displayArtworkUri };
-const providerModule = { artworkIdentityKey, tmdbPosterPath, chooseHeroPoster };
+const providerModule = { artworkIdentityKey, artworkCategoryContext, tmdbPosterPath, chooseHeroPoster };
 const hookModule = { useArtworkMetadata: () => overlay, useArtworkMetadataState: () => ({ metadata: overlay, pending: false }) };
 const compiled = new Map();
 function loadTsx(relative) {
@@ -229,6 +231,20 @@ function loadTsx(relative) {
   const mod = { exports: {} };
   new Function('require', 'module', 'exports', code)((name) => {
     if (name === 'react') return { ...React, useLayoutEffect: React.useEffect };
+    if (name.endsWith('series-poster-claims.ts')) return { seriesPosterClaims };
+    if (name.endsWith('useCatalogReturnNavigation.ts')) return { CATALOG_RETURN_EXPAND: 'xandeflix:catalog-return-expand', CATALOG_RETURN_END: 'xandeflix:catalog-return-end' };
+    if (name.endsWith('useDevicePresentation.ts')) return { useDevicePresentation: () => 'TABLET' };
+    if (name.endsWith('device-presentation.ts')) return { isTelevisionPresentation: () => false, isFireTvPresentation: () => false };
+    if (name.endsWith('useParentalControl.ts')) return { useParentalControl: () => ({ admin: false }) };
+    if (name.endsWith('useParentalClassification.ts')) return { useParentalClassification() {} };
+    if (name.endsWith('parental-content.ts')) return { canShowParentalItem: () => true };
+    if (name.endsWith('content-adult-policy.ts')) return { isAdultClassification: () => false };
+    if (name.endsWith('useCardGenres.ts')) return { useCardGenres: () => ({ ref() {}, genres: [], visible: false }) };
+    if (name.endsWith('WatchProviders.tsx')) return { WatchProviders: () => null };
+    if (name.endsWith('PlatformCategoryBadge.tsx')) return { PlatformCategoryLogo: () => null };
+    if (name.endsWith('detail-genres.ts')) return loadTsx('../src/ui/detail-genres.ts');
+    if (name.endsWith('web-playback-diagnostic.ts')) return { observeWebSeriesDetails() {} };
+    if (name.endsWith('web/validation.ts')) return { isWebValidation: () => false };
     if (name.endsWith('.css')) return {};
     if (name.endsWith('artwork-file-cache.ts')) return { invalidateCachedArtworkUri() {} };
     if (name.endsWith('artwork-visibility.ts')) return { observeArtwork: () => () => {} };
@@ -273,6 +289,8 @@ function loadTsx(relative) {
     if (name.endsWith('CategoryHero.tsx')) return loadTsx('../src/ui/components/CategoryHero.tsx');
     if (name.endsWith('RelatedTitles.tsx')) return {RelatedTitles:()=>null};
     if (name.endsWith('catalog-selectors.ts')) return selectors;
+    if (name.endsWith('detail-backdrop.ts')) return { chooseDetailBackdropUri, isHorizontalDetailBackdrop };
+    if (name.endsWith('DetailBackdrop.tsx')) return loadTsx('../src/ui/components/DetailBackdrop.tsx');
     if (name.endsWith('Artwork.tsx')) return loadTsx('../src/ui/components/Artwork.tsx');
     if (name.endsWith('Hero.tsx')) return loadTsx('../src/ui/components/Hero.tsx');
     if (name.endsWith('CatalogGrid.tsx')) return loadTsx('../src/ui/components/CatalogGrid.tsx');

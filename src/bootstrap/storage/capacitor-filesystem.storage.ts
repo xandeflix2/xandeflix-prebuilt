@@ -22,6 +22,10 @@ import type { LocalCatalogStorage, CatalogSegmentEntry } from './storage.interfa
 import { createActivePointer } from '../active-snapshot.ts';
 import type { RecoveryJournalData } from '../../recovery/recovery.types.ts';
 import { resolveSegmentRelativePath } from './segment-path-resolver.ts';
+import { collectObsoleteSnapshots, isSafeSnapshotId, snapshotOperations, type SnapshotRetentionResult } from './snapshot-retention.ts';
+import { calculateSha256, calculateSha256Async } from '../../provisioning/integrity.ts';
+
+let retentionTask: Promise<SnapshotRetentionResult> | undefined;
 
 const PREBUILT_DIR = 'prebuilt';
 const ACTIVE_POINTER_FILE = `${PREBUILT_DIR}/active.json`;
@@ -31,6 +35,92 @@ const SNAPSHOTS_DIR = `${PREBUILT_DIR}/snapshots`;
 
 export class CapacitorFilesystemStorage implements LocalCatalogStorage {
   private baseDir = Directory.Data;
+
+  // Keep permanent-generation reads, promotion/recovery writes and collection
+  // in one queue across storage instances. Staging remains independent.
+  writeActivePointer(pointer: ActivePointer) { return snapshotOperations.run(() => this.writeActivePointerUnlocked(pointer)); }
+  promoteStaging(id: string) { return snapshotOperations.run(() => this.promoteStagingUnlocked(id)); }
+  writeRecoveryJournal(journal: RecoveryJournalData) { return snapshotOperations.run(() => this.writeRecoveryJournalUnlocked(journal)); }
+  readActiveCatalog() { return snapshotOperations.run(() => this.readActiveCatalogUnlocked()); }
+  readActiveManifest() { return snapshotOperations.run(() => this.readActiveManifestUnlocked()); }
+  readActiveSearchIndex() { return snapshotOperations.run(() => this.readActiveSearchIndexUnlocked()); }
+  readActiveSearchIndexBuffer() { return snapshotOperations.run(() => this.readActiveSearchIndexBufferUnlocked()); }
+  readActiveSegment(path: string) { return snapshotOperations.run(() => this.readActiveSegmentUnlocked(path)); }
+  listActiveSegments() { return snapshotOperations.run(() => this.listActiveSegmentsUnlocked()); }
+  hasActiveCatalog() { return snapshotOperations.run(() => this.hasActiveCatalogUnlocked()); }
+  readSnapshot(id: string) { return snapshotOperations.run(() => this.readSnapshotUnlocked(id)); }
+  writeActiveSearchIndex(id: string, index: Buffer | Uint8Array) { return snapshotOperations.run(() => this.writeActiveSearchIndexUnlocked(id, index)); }
+
+  maintainCatalogSnapshots(): Promise<SnapshotRetentionResult> {
+    if (!retentionTask) {
+      retentionTask = collectObsoleteSnapshots({
+        exclusive: work => snapshotOperations.run(work),
+        state: async () => ({ pointer: await this.readActivePointer(), journal: await this.readRecoveryJournal() }),
+        list: async () => {
+          const entries = await Filesystem.readdir({ path: SNAPSHOTS_DIR, directory: this.baseDir });
+          return entries.files.map(entry => typeof entry === 'string'
+            ? { name: entry, type: 'unknown' } : { name: entry.name, type: entry.type });
+        },
+        validateKept: id => this.validateRetainedSnapshot(id),
+        remove: async id => {
+          if (!isSafeSnapshotId(id)) throw new Error('RETENTION_UNSAFE_ID');
+          const path = `${SNAPSHOTS_DIR}/${id}`;
+          const entry = await Filesystem.stat({ path, directory: this.baseDir });
+          if (entry.type !== 'directory') throw new Error('RETENTION_NOT_DIRECTORY');
+          await Filesystem.rmdir({ path, directory: this.baseDir, recursive: true });
+        },
+      }).finally(() => { retentionTask = undefined; });
+    }
+    return retentionTask;
+  }
+
+  private async validateRetainedSnapshot(id: string): Promise<boolean> {
+    try {
+      if (!isSafeSnapshotId(id)) return false;
+      const prefix = `${SNAPSHOTS_DIR}/${id}`;
+      for (const [file, limit] of [['manifest.json', 2 * 1024 * 1024], ['catalog.json', 8 * 1024 * 1024]] as const) {
+        const info = await snapshotOperations.run(() => Filesystem.stat({ path: `${prefix}/${file}`, directory: this.baseDir }));
+        if (info.type !== 'file' || info.size <= 0 || info.size > limit) return false;
+      }
+      const manifestText = await snapshotOperations.run(() => this.readTextFileSafely(`${prefix}/manifest.json`));
+      const catalogText = await snapshotOperations.run(() => this.readTextFileSafely(`${prefix}/catalog.json`));
+      if (!manifestText || !catalogText) return false;
+      const manifest = JSON.parse(manifestText), catalog = JSON.parse(catalogText);
+      if (manifest.snapshotId !== id || catalog.metadata?.snapshotId !== id ||
+          typeof manifest.catalogVersion !== 'string' || catalog.metadata?.catalogVersion !== manifest.catalogVersion ||
+          !/^[a-f0-9]{64}$/i.test(manifest.catalogSha256 || '')) return false;
+      const pointer = await this.readActivePointer();
+      if (pointer?.snapshotId === id && (manifest.catalogVersion !== pointer.catalogVersion ||
+          manifest.schemaVersion !== pointer.schemaVersion || manifest.packageContentHash !== pointer.packageContentHash)) return false;
+      const segments = manifest.segments;
+      if (segments !== undefined && !Array.isArray(segments)) return false;
+      if (!segments?.length) return calculateSha256(JSON.stringify(catalog, null, 2)) === manifest.catalogSha256;
+      if (segments.length > 4096 || manifest.packageContentHash !== manifest.catalogSha256) return false;
+      const paths = segments.map((segment: CatalogSegmentEntry) => resolveSegmentRelativePath(segment.fileName));
+      if (new Set(paths).size !== paths.length) return false;
+      // Read/hash one segment at a time per worker, not a whole catalog in RAM.
+      // Each read releases the shared queue before yielding to UI/readers.
+      let cursor = 0, valid = true;
+      await Promise.all(Array.from({ length: 2 }, async () => {
+        while (valid && cursor < segments.length) {
+          const index = cursor++, segment = segments[index];
+          if (!Number.isSafeInteger(segment.byteSize) || segment.byteSize < 0 || segment.byteSize > 16 * 1024 * 1024 ||
+              !/^[a-f0-9]{64}$/i.test(segment.sha256 || '')) { valid = false; continue; }
+          let checked = false;
+          try { checked = await snapshotOperations.run(async () => {
+            const path = `${prefix}/${paths[index]}`;
+            const info = await Filesystem.stat({ path, directory: this.baseDir });
+            if (info.type !== 'file' || info.size !== segment.byteSize) return false;
+            const text = await this.readTextFileSafely(path);
+            return text !== null && await calculateSha256Async(text) === segment.sha256;
+          }); } catch { valid = false; return; }
+          if (!checked) valid = false;
+          await new Promise<void>(resolve => setTimeout(resolve, 0));
+        }
+      }));
+      return valid;
+    } catch { return false; }
+  }
 
   private async ensureDir(path: string): Promise<void> {
     try {
@@ -62,7 +152,7 @@ export class CapacitorFilesystemStorage implements LocalCatalogStorage {
     }
   }
 
-  async writeActivePointer(pointer: ActivePointer): Promise<void> {
+  private async writeActivePointerUnlocked(pointer: ActivePointer): Promise<void> {
     await Filesystem.writeFile({
       path: ACTIVE_POINTER_FILE,
       data: JSON.stringify(pointer, null, 2),
@@ -335,14 +425,14 @@ export class CapacitorFilesystemStorage implements LocalCatalogStorage {
     return this.readTextFileSafely(`${STAGING_DIR}/${snapshotId}/${rel}`);
   }
 
-  async readActiveSegment(segmentPath: string): Promise<string | null> {
+  private async readActiveSegmentUnlocked(segmentPath: string): Promise<string | null> {
     const pointer = await this.readActivePointer();
     if (!pointer) return null;
     const rel = resolveSegmentRelativePath(segmentPath);
     return this.readTextFileSafely(`${SNAPSHOTS_DIR}/${pointer.snapshotId}/${rel}`);
   }
 
-  async listActiveSegments(): Promise<string[]> {
+  private async listActiveSegmentsUnlocked(): Promise<string[]> {
     const pointer = await this.readActivePointer();
     if (!pointer) return [];
     try {
@@ -356,7 +446,7 @@ export class CapacitorFilesystemStorage implements LocalCatalogStorage {
     }
   }
 
-    async promoteStaging(snapshotId: string): Promise<void> {
+  private async promoteStagingUnlocked(snapshotId: string): Promise<void> {
     const stagingSnapDir = `${STAGING_DIR}/${snapshotId}`;
     const targetSnapDir = `${SNAPSHOTS_DIR}/${snapshotId}`;
 
@@ -412,7 +502,7 @@ export class CapacitorFilesystemStorage implements LocalCatalogStorage {
       }
 
       // Atualização atômica do ponteiro para o snapshot promovido
-      await this.writeActivePointer(createActivePointer(manifest));
+      await this.writeActivePointerUnlocked(createActivePointer(manifest));
       console.log(`[STORAGE] staging_promoted: ${snapshotId}`);
 
       return;
@@ -480,7 +570,7 @@ export class CapacitorFilesystemStorage implements LocalCatalogStorage {
       }
 
       // Atualização atômica do ponteiro
-      await this.writeActivePointer(createActivePointer(manifest));
+      await this.writeActivePointerUnlocked(createActivePointer(manifest));
       console.log(`[STORAGE] staging_promoted: ${snapshotId}`);
     } catch (err) {
       try {
@@ -496,7 +586,7 @@ export class CapacitorFilesystemStorage implements LocalCatalogStorage {
     }
   }
 
-async readActiveCatalog(): Promise<PrebuiltCatalog | null> {
+  private async readActiveCatalogUnlocked(): Promise<PrebuiltCatalog | null> {
     const pointer = await this.readActivePointer();
     if (!pointer) return null;
 
@@ -531,7 +621,7 @@ async readActiveCatalog(): Promise<PrebuiltCatalog | null> {
     }
   }
 
-  async readActiveManifest(): Promise<ProvisioningManifest | null> {
+  private async readActiveManifestUnlocked(): Promise<ProvisioningManifest | null> {
     const pointer = await this.readActivePointer();
     if (!pointer) return null;
 
@@ -548,7 +638,7 @@ async readActiveCatalog(): Promise<PrebuiltCatalog | null> {
     }
   }
 
-  async readActiveSearchIndex(): Promise<PrebuiltSearchIndex | null> {
+  private async readActiveSearchIndexUnlocked(): Promise<PrebuiltSearchIndex | null> {
     const pointer = await this.readActivePointer();
     if (!pointer) return null;
 
@@ -565,7 +655,7 @@ async readActiveCatalog(): Promise<PrebuiltCatalog | null> {
     }
   }
 
-  async readActiveSearchIndexBuffer(): Promise<Buffer | Uint8Array | null> {
+  private async readActiveSearchIndexBufferUnlocked(): Promise<Buffer | Uint8Array | null> {
     const pointer = await this.readActivePointer();
     if (!pointer) return null;
     return this.readBinaryFileSafely(
@@ -573,7 +663,7 @@ async readActiveCatalog(): Promise<PrebuiltCatalog | null> {
     );
   }
 
-  async writeActiveSearchIndex(snapshotId: string, index: Buffer | Uint8Array): Promise<void> {
+  private async writeActiveSearchIndexUnlocked(snapshotId: string, index: Buffer | Uint8Array): Promise<void> {
     await this.ensureDir(`${SNAPSHOTS_DIR}/${snapshotId}`);
     await this.writeBinaryFile(`${SNAPSHOTS_DIR}/${snapshotId}/compact-search-index-v2.bin`, index);
   }
@@ -598,7 +688,7 @@ async readActiveCatalog(): Promise<PrebuiltCatalog | null> {
     }
   }
 
-  async hasActiveCatalog(): Promise<boolean> {
+  private async hasActiveCatalogUnlocked(): Promise<boolean> {
     const pointer = await this.readActivePointer();
     if (!pointer) return false;
     try {
@@ -647,7 +737,7 @@ async readActiveCatalog(): Promise<PrebuiltCatalog | null> {
     }
   }
 
-  async writeRecoveryJournal(journal: RecoveryJournalData): Promise<void> {
+  private async writeRecoveryJournalUnlocked(journal: RecoveryJournalData): Promise<void> {
     await Filesystem.writeFile({
       path: RECOVERY_JOURNAL_FILE,
       data: JSON.stringify(journal, null, 2),
@@ -657,7 +747,7 @@ async readActiveCatalog(): Promise<PrebuiltCatalog | null> {
     });
   }
 
-  async readSnapshot(snapshotId: string): Promise<{
+  private async readSnapshotUnlocked(snapshotId: string): Promise<{
     manifest: ProvisioningManifest;
     catalog: PrebuiltCatalog;
     searchIndex?: PrebuiltSearchIndex | null;

@@ -3,13 +3,19 @@ import { readFileSync } from 'node:fs';
 import ts from 'typescript';
 import React from 'react';
 import { displayArtworkUri, chooseArtworkUri } from '../src/artwork/artwork-uri.ts';
-import { artworkIdentityKey, tmdbPosterPath } from '../src/artwork/tmdb-metadata.service.ts';
+import { artworkIdentityKey, artworkCategoryContext, tmdbPosterPath } from '../src/artwork/tmdb-metadata.service.ts';
 import { SegmentedBrowseService } from '../src/catalog/segmented-browse.service.ts';
 import * as presentation from '../src/catalog/category-presentation.ts';
 import { CategoryPreviewIndex, categoryPreviewIndex } from '../src/catalog/category-preview-index.ts';
 import { CatalogReadModel } from '../src/catalog/catalog-read-model.ts';
+import { seriesPosterClaims } from '../src/artwork/series-poster-claims.ts';
+import { chooseDetailBackdropUri, isHorizontalDetailBackdrop } from '../src/artwork/detail-backdrop.ts';
 
 function load(file, imports) {
+  imports = { 'detail-backdrop': { chooseDetailBackdropUri, isHorizontalDetailBackdrop }, 'tmdb-metadata': { artworkIdentityKey, artworkCategoryContext, tmdbPosterPath }, 'series-poster-claims': { seriesPosterClaims }, useCardGenres: { useCardGenres: () => ({ ref() {}, genres: [], visible: false }) },
+    useParentalControl: { useParentalControl: () => ({ admin: false }) },
+    useParentalClassification: { useParentalClassification() {} },
+    'parental-content': { canShowParentalItem: () => true }, ...imports };
   const module = { exports: {} };
   new Function('require', 'module', 'exports', ts.transpileModule(readFileSync(new URL('../' + file, import.meta.url), 'utf8'), { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.React } }).outputText)(name => {
     for (const [key, value] of Object.entries(imports)) if (name.includes(key)) return value;
@@ -342,14 +348,14 @@ try {
   tree.ref({}); flush(); listener({ near: true, visible: true }); flush();
   assert.equal(jobs.length, 1); assert.equal(jobs[0].priority, true);
   listener({ near: false, visible: false }); flush(); assert.equal(jobs[0].signal.aborted, true);
-  jobs[0].resolve({ ok: true, src: 'https://localhost/stale' }); await tick(); flush(); assert.equal(tree.type, 'div');
+  jobs[0].resolve({ ok: true, width:342, height:513, src: 'https://localhost/stale' }); await tick(); flush(); assert.equal(tree.type, 'div');
   listener({ near: true, visible: true }); flush();
   metadata = { posterUri: 'https://image.tmdb.org/t/p/w342/provider.jpg' };
   jobs.at(-1).resolve({ ok: false }); await tick(); flush();
   assert.equal(metadataIdentity.posterPath, undefined, 'failed source filename must not exclude a valid conservative title match');
   assert.equal(metadataIdentity.title, 'Synthetic'); assert.equal(metadataIdentity.year, 2018); assert.equal(metadataIdentity.kind, 'series');
   assert.equal(jobs.at(-1).uri, metadata.posterUri);
-  jobs.at(-1).resolve({ ok: true, src: 'https://localhost/provider-cached' }); await tick(); flush();
+  jobs.at(-1).resolve({ ok: true, width:342, height:513, src: 'https://localhost/provider-cached' }); await tick(); flush();
   assert.equal(tree.type, 'img'); assert.equal(tree.props.src, 'https://localhost/provider-cached'); assert.equal(tree.props['data-artwork-ready'], true);
   assert.equal(jobs.length, 3, 'rendering the decoded local src must not request cache again');
   tree.props.onError(); flush(); assert.equal(invalidated, 2);
@@ -372,7 +378,7 @@ try {
   assert.equal(states[2].size, 0, 'source retry cannot compete with pending fallback');
   metadata = { posterUri: 'https://image.tmdb.org/t/p/w342/external-provider.jpg' }; pendingMetadata = false; flush();
   assert.equal(jobs.at(-1).uri, metadata.posterUri); assert.equal(states[2].size, 0);
-  jobs.at(-1).resolve({ ok: true, src: 'https://localhost/fallback' }); await tick(); flush();
+  jobs.at(-1).resolve({ ok: true, width:342, height:513, src: 'https://localhost/fallback' }); await tick(); flush();
   assert.equal(tree.props.src, 'https://localhost/fallback'); assert.equal(states[2].size, 0);
 } finally { for (const effect of effects) effect.cleanup?.(); globalThis.window = oldWindow; }
 states.length = effects.length = 0; jobs = []; pendingMetadata = false;
@@ -381,8 +387,59 @@ component = external.type; props = external.props;
 try {
   flush(); tree.ref({}); flush(); listener({ near: true, visible: true }); flush();
   assert.equal(jobs.at(-1).uri, props.uri, 'available metadata must retain source-first image selection');
-  jobs.at(-1).resolve({ ok: true, src: 'https://localhost/source' }); await tick(); flush();
+  jobs.at(-1).resolve({ ok: true, width:342, height:513, src: 'https://localhost/source' }); await tick(); flush();
   assert.equal(tree.props.src, 'https://localhost/source'); assert.equal(jobs.length, 1);
 } finally { for (const effect of effects) effect.cleanup?.(); globalThis.window = oldWindow; }
 console.log('PASS_EARLY_EXTERNAL_FALLBACK_SOURCE_FIRST_AND_NO_RETRY_WHILE_ALTERNATIVE_PENDING_OR_READY');
 console.log('PASS_C11_ARTWORK_VISIBLE_RECOVERY');
+
+// A decoded backdrop/logo is not a series poster. Its failed image hints must
+// not constrain the independent conservative TV title/year lookup.
+states.length = effects.length = 0; jobs = []; metadata = null; pendingMetadata = true;
+globalThis.window = { addEventListener() {}, removeEventListener() {} };
+const horizontal = Artwork.type({ uri: 'https://image.tmdb.org/t/p/original/horizontal.jpg', title: 'Series fixture', kind: 'poster', identity: { kind: 'series', title: 'Series fixture', year: 2020 } });
+component = horizontal.type; props = horizontal.props;
+try {
+  flush(); tree.ref({}); flush(); listener({ near: true, visible: true }); flush();
+  jobs.at(-1).resolve({ ok: true, width: 1920, height: 1080, src: 'https://localhost/horizontal' }); await tick(); flush();
+  assert.notEqual(tree.type, 'img', 'horizontal source cannot be accepted as a series poster');
+  assert.equal(metadataIdentity.kind, 'series'); assert.equal(metadataIdentity.year, 2020);
+  assert.equal(metadataIdentity.posterPath, undefined); assert.equal(metadataIdentity.sourcePosterUri, undefined);
+  metadata = { posterUri: 'https://image.tmdb.org/t/p/w342/official-series.jpg' }; pendingMetadata = false; flush();
+  jobs.at(-1).resolve({ ok: true, width: 342, height: 513, src: 'https://localhost/official-series' }); await tick(); flush();
+  assert.equal(tree.type, 'img'); assert.equal(tree.props.src, 'https://localhost/official-series');
+} finally { for (const effect of effects) effect.cleanup?.(); globalThis.window = oldWindow; }
+console.log('PASS_SERIES_HORIZONTAL_SOURCE_REJECTED_AND_INDEPENDENT_TV_POSTER_FALLBACK');
+
+states.length = effects.length = 0; jobs = []; metadata = null; pendingMetadata = true;
+globalThis.window = { addEventListener() {}, removeEventListener() {} };
+const genericUri = 'https://source.synthetic.invalid/generic-portrait.jpg';
+const stops = ['unrelated-a', 'unrelated-b'].map(key => seriesPosterClaims.watch(genericUri, key, () => {}));
+const generic = Artwork.type({ uri: genericUri, title: 'Third unrelated series', kind: 'poster', identity: { kind: 'series', title: 'Third unrelated series', year: 2021 } });
+component = generic.type; props = generic.props;
+try {
+  flush(); tree.ref({}); flush(); listener({ near: true, visible: true }); flush();
+  assert.notEqual(tree.type, 'img', 'known generic portrait must not be rendered as another series');
+  assert.ok(jobs.every(job => job.signal.aborted), 'a source request started before the shared-art notification must be cancelled');
+  assert.equal(metadataIdentity.sourcePosterUri, undefined); assert.equal(metadataIdentity.posterPath, undefined);
+  assert.equal(metadataIdentity.title, 'Third unrelated series'); assert.equal(metadataIdentity.kind, 'series');
+  metadata = { posterUri: 'https://image.tmdb.org/t/p/w342/third-series.jpg' }; pendingMetadata = false; flush();
+  jobs.at(-1).resolve({ ok: true, width: 342, height: 513, src: 'https://localhost/third-series' }); await tick(); flush();
+  assert.equal(tree.props.src, 'https://localhost/third-series');
+} finally { stops.forEach(stop => stop()); for (const effect of effects) effect.cleanup?.(); globalThis.window = oldWindow; }
+console.log('PASS_SHARED_GENERIC_PORTRAIT_LOOKS_UP_TV_TITLE_WITHOUT_REUSING_WRONG_SOURCE');
+
+states.length = effects.length = 0; jobs = []; pendingMetadata = false;
+globalThis.window = { addEventListener() {}, removeEventListener() {} };
+const validUri = 'https://image.tmdb.org/t/p/w342/official-shared.jpg';
+const aliases = ['alias-a', 'alias-b'].map(key => seriesPosterClaims.watch(validUri, key, () => {}));
+metadata = { posterUri: validUri };
+const valid = Artwork.type({ uri: validUri, title: 'Official alias', kind: 'poster', identity: { kind: 'series', title: 'Official alias', year: 2021 } });
+component = valid.type; props = valid.props;
+try {
+  flush(); tree.ref({}); flush(); listener({ near: true, visible: true }); flush();
+  assert.equal(jobs.at(-1).uri, validUri, 'officially confirmed shared source remains first');
+  jobs.at(-1).resolve({ ok: true, width: 342, height: 513, src: 'https://localhost/valid-shared' }); await tick(); flush();
+  assert.equal(tree.props.src, 'https://localhost/valid-shared');
+} finally { aliases.forEach(stop => stop()); for (const effect of effects) effect.cleanup?.(); globalThis.window = oldWindow; }
+console.log('PASS_CONFIRMED_OFFICIAL_SOURCE_RETAINED_FOR_LEGITIMATE_SHARED_ALIASES');

@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "gate": "CANON-01-CATALOG-READ-DIAG",
+  "parentGate": "CANON-01",
+  "amendment": "CANON-01-CATALOG-READ-DIAG",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "EXPLICIT_AUTONOMOUS_SOURCE_RECOVERY_WITH_USER_CONFIRMED_IMPORTED_BUT_INVISIBLE_CATALOG_AND_TEST_APK_REQUEST",
+  "authorizationRequestSha256": "dc9feae1e4dddb0cc8950d1df1cb93d840d99bc8446f68897e7b91b9681bf854",
+  "reason": "Obtain read-only counts and coded local-read evidence on the device without speculating about the cause or modifying source/catalog/security.",
+  "physicalImpact": "REQUIRED",
+  "physicalImpactJustification": "Separately named diagnostic APK for in-place user testing; preserve version, signature and all historical artifacts. No automatic install.",
+  "testChangesReviewed": true,
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c105-complete-root-search.mjs",
+    "scripts/test-c107-catalog-return-navigation.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c11-landscape-navigation.mjs",
+    "scripts/validate-direct-playback.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock",
+    "npm run typecheck",
+    "npm run update:check",
+    "npm run security:check",
+    "npm run playback:check",
+    "npm run build",
+    "npm run site:build",
+    "node scripts/test-vercel-prebuilt-contract.mjs",
+    "node scripts/test-c105-directory-import.mjs",
+    "node scripts/test-c105-directory-details.mjs",
+    "node scripts/test-c105-directory-orchestration.mjs",
+    "node scripts/test-c11-automatic-source-refresh.mjs",
+    "node scripts/test-catalog-read-diagnostic.mjs"
+  ],
+  "evidence": "docs/evidence/CATALOG_LOCAL_READ_DIAGNOSTIC.md",
+  "compatibilityRisk": "Only an explicit local diagnostic action in source settings; no automatic scan, authorization, data writes or content bypass. A readable sample does not certify the full catalog.",
+  "restrictions": [
+    "Preserve all historical receipts and the existing HLS/MPEG-TS production fix.",
+    "No source URL, importer, player, auth, parental, native Android, version, Supabase or user-data changes.",
+    "Preserve all 128 controls and 15 suites; append the diagnostic suite as suite 16.",
+    "No commit/push/deploy/merge/install/reset; preserve every previous APK. No SOURCE-FORMAT-01."
+  ],
+  "supersedes": {
+    "scripts/test-canonical-regression.mjs": "CANON-01-SOURCE-OUTPUT"
+  },
+  "changes": [
+    {
+      "path": "src/ui/settings/catalog-read-diagnostic.ts",
+      "before": null,
+      "after": "16f8303b09782d114cd52f83f46cef486bca49f6"
+    },
+    {
+      "path": "src/ui/components/ActiveSourceSettings.tsx",
+      "before": "5877f299fbce420cb7c75f06e672e329d8e7d4ce",
+      "after": "db9b04826113f6c4615362f513d828b3d762b238"
+    },
+    {
+      "path": "scripts/test-catalog-read-diagnostic.mjs",
+      "before": null,
+      "after": "b4ed782e4e52e85c45c8ba61157f3f918c94f7d7"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "5338e8fe66ec698fb7f50aa5d6e62f8fbe555ad6",
+      "after": "7ae5b7a3a78feddf116eb4a215f71e73d5302bf3"
+    }
+  ],
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": true,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false
+}

@@ -9,7 +9,7 @@
  */
 
 import React, { useEffect, useRef, useState } from 'react';
-import { artworkIdentityKey, chooseHeroPoster, tmdbPosterPath, type ArtworkMetadata } from '../../artwork/tmdb-metadata.service.ts';
+import { artworkIdentityKey, artworkCategoryContext, chooseHeroPoster, tmdbPosterPath, type ArtworkMetadata } from '../../artwork/tmdb-metadata.service.ts';
 import type { CatalogItemViewModel } from '../../catalog/catalog-view-model.ts';
 import { Artwork } from './Artwork.tsx';
 import { useArtworkMetadata } from '../hooks/useArtworkMetadata.ts';
@@ -72,7 +72,8 @@ export const Hero: React.FC<HeroProps> = ({ item, onSelect, onPlay, playbackBusy
   const immersive=useImmersiveArtwork(`${item.kind}:${item.id}:${artworkUri||''}`);
   const Title = headingLevel === 1 ? 'h1' : 'h2';
   const cached = useCachedArtwork(allowed ? artworkUri : undefined);
-  const identity = { kind: item.kind, title: item.title, year: item.yearFormatted, tmdbId: item.externalIds?.tmdbId, posterPath: tmdbPosterPath(item.posterUri), sourcePosterUri: item.posterUri };
+  const identity = { kind: item.kind, title: item.title, year: item.yearFormatted, tmdbId: item.externalIds?.tmdbId, posterPath: tmdbPosterPath(item.posterUri), sourcePosterUri: item.posterUri,
+    ...(item.kind === 'series' ? artworkCategoryContext(item.categoryLabels, item.hasEpisodes) : {}) };
   const metadata = useArtworkMetadata(identity, allowed && (mobilePoster || !item.overviewSnippet || !item.yearFormatted || !sourceGenres.length
     || (item.kind === 'movie' && !item.durationFormatted)), 'high');
   const year = mobilePoster ? metadata?.year || item.yearFormatted : item.yearFormatted || metadata?.year;

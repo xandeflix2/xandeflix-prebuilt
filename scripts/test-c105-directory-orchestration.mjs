@@ -79,10 +79,10 @@ await test('DIRECTORY_UNCHANGED_DIGEST_USES_EXISTING_CHECKPOINT', async () => {
   assert.equal(h.calls[0].options.unchangedContentDigest, 'a'.repeat(64));
 });
 
-function bootHarness(mode) {
+function bootHarness(mode, overrides = {}) {
   const pointer = mode === 'NONE' ? null : { snapshotId: 'active-fixture', catalogVersion: '1.0.0',
     schemaVersion: 1, packageContentHash: 'b'.repeat(64), promotedAt: '2026-10-14T00:00:00Z',
-    kind: 'REAL', sourceId, sourceVersion: 1 };
+    kind: 'REAL', sourceId: overrides.activeSourceId || sourceId, sourceVersion: overrides.activeVersion || 1 };
   const identity = { deviceId: 'device-fixture', displayCode: 'XF-TEST-TEST' };
   const activation = { ...identity, status: 'AUTHORIZED', deviceAuthToken: 'synthetic-token', licenseId: authority.licenseId,
     licenseStatus: 'ACTIVE', licenseMode: 'MANAGED' };
@@ -99,7 +99,7 @@ function bootHarness(mode) {
     stagingOrchestrator: { stageManagedSource: async (check, inventory) => { captured = { check, inventory };
       return { success: false, status: 'REJECTED', rawItemCount: 0, movieCount: 0, seriesCount: 0, liveCount: 0, unresolvedCount: 0 }; } },
   });
-  return { coordinator, captured: () => captured };
+  return { coordinator, captured: () => captured, pointer: () => pointer };
 }
 await test('BOOT_SELECTS_DIRECTORY_ONLY_FIRST_INSTALL_OR_PREVIOUS_DIRECTORY', async () => {
   for (const [mode, expected] of [['NONE', 'PREFER'], ['DIRECTORY', 'REQUIRE'], ['LEGACY', undefined]]) {
@@ -107,4 +107,20 @@ await test('BOOT_SELECTS_DIRECTORY_ONLY_FIRST_INSTALL_OR_PREVIOUS_DIRECTORY', as
     assert.equal(h.captured()?.inventory?.directoryRoots, expected, mode);
   }
 });
-console.log(`C105_DIRECTORY_ORCHESTRATION_TESTS=${passed}/9_PASS`);
+await test('DIFFERENT_SOURCE_MAY_PREFER_DIRECTORY_WITHOUT_INHERITING_OLD_INVENTORY', async () => {
+  for (const mode of ['DIRECTORY', 'LEGACY']) {
+    const h = bootHarness(mode, { activeSourceId: 'src_previousfixture' });
+    const result = await h.coordinator.coordinateBootSync({ checkContent: true });
+    assert.equal(h.captured()?.inventory?.directoryRoots, 'PREFER');
+    assert.equal(result.outcome, 'LOCAL_FIRST_ACTIVE_PRESERVED');
+    assert.equal(h.pointer().sourceId, 'src_previousfixture');
+  }
+});
+await test('SAME_SOURCE_VERSION_CHANGE_PRESERVES_DIRECTORY_AND_LEGACY_IDS', async () => {
+  for (const [mode, expected] of [['DIRECTORY', 'REQUIRE'], ['LEGACY', undefined]]) {
+    const h = bootHarness(mode, { activeVersion: 2 });
+    await h.coordinator.coordinateBootSync({ checkContent: true });
+    assert.equal(h.captured()?.inventory?.directoryRoots, expected);
+  }
+});
+console.log(`C105_DIRECTORY_ORCHESTRATION_TESTS=${passed}/11_PASS`);

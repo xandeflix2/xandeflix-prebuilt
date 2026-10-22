@@ -12,6 +12,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import type { CatalogReadModel } from '../../catalog/catalog-read-model.ts';
 import { getMovieDetail } from '../../catalog/catalog-selectors.ts';
 import { Artwork } from '../components/Artwork.tsx';
+import { DetailBackdrop } from '../components/DetailBackdrop.tsx';
 import { useArtworkMetadata } from '../hooks/useArtworkMetadata.ts';
 import { tmdbPosterPath } from '../../artwork/tmdb-metadata.service.ts';
 import { RelatedTitles } from '../components/RelatedTitles.tsx';
@@ -134,15 +135,11 @@ export const MovieDetailPage: React.FC<MovieDetailPageProps> = ({ movieId, readM
       <div className="detail-content">
         <div className="detail-hero-wide">
       <div className="detail-backdrop-wrapper">
-        <Artwork
-          uri={detail.backdropUri}
-          fallbackUri={detail.posterUri}
+        <DetailBackdrop
+          backdrop={detail.backdropUri}
+          poster={detail.posterUri}
           identity={identity}
-          priority="high"
-          tmdbBackdropOnly
-          immersiveArtwork="backdrop"
           title={detail.title}
-          kind="backdrop"
           className="detail-backdrop-img"
         />
         <div className="detail-backdrop-gradient" />

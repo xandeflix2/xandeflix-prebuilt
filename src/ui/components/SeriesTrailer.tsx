@@ -1,5 +1,5 @@
 import React,{useEffect,useRef,useState} from 'react';
-import { Artwork } from './Artwork.tsx';
+import { DetailBackdrop } from './DetailBackdrop.tsx';
 import type {ArtworkIdentity} from '../../artwork/tmdb-metadata.service.ts';
 import {PublicTrailer,hasPublicTrailer,type TrailerBounds} from '../../playback/public-trailer.bridge.ts';
 import type {SeriesPresentation} from '../../artwork/series-presentation.service.ts';
@@ -53,7 +53,7 @@ export function SeriesTrailer({title,identity,backdrop,poster,trailer,loading,pr
   return <section className="series-trailer" aria-label={`Trailer de ${title}`}>
     <div ref={root} className="series-trailer-frame" aria-busy={loading || Boolean(requested && !failed && videoId && !ready)}>
       {requested && !failed && videoId && !native ? <iframe ref={frame} title={`Trailer de ${title}`} src={`https://www.youtube.com/embed/${videoId}?autoplay=1&playsinline=1&enablejsapi=1&controls=0&rel=0&origin=${encodeURIComponent(location.origin)}`} allow="autoplay; encrypted-media; fullscreen; picture-in-picture" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen onLoad={()=>setReady(true)} onError={()=>setFailed(true)}/>
-        : <Artwork uri={backdrop} fallbackUri={poster} identity={identity} kind="backdrop" tmdbBackdropOnly priority="high" immersiveArtwork="backdrop" title={title} className="series-trailer-cover"/>}
+        : <DetailBackdrop backdrop={backdrop} poster={poster} identity={identity} title={title} className="series-trailer-cover"/>}
       {!requested && !failed && videoId && <div className="series-trailer-overlay">
         <button className="focusable-item series-trailer-play" type="button" onClick={start} aria-label={`Assistir trailer de ${title}`}><span aria-hidden="true">▶</span><span>Assistir trailer</span></button>
       </div>}

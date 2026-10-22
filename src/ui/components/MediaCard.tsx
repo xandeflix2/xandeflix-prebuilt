@@ -7,6 +7,7 @@ import { useContentBadge } from './NewContentProvider.tsx';
 import { useCardGenres } from '../hooks/useCardGenres.ts';
 import { useParentalControl } from '../hooks/useParentalControl.ts';
 import { canShowParentalItem } from '../../parental/parental-content.ts';
+import { artworkCategoryContext } from '../../artwork/tmdb-metadata.service.ts';
 import { useParentalClassification } from '../hooks/useParentalClassification.ts';
 
 interface MediaCardProps {
@@ -58,7 +59,8 @@ export const MediaCard = React.memo<MediaCardProps>(function MediaCard({
         <Artwork uri={posterUri} title={item.title} kind="poster" className="media-card-poster"
           prepare={prepareArtwork}
           startup={startupArtwork}
-          identity={{ kind: item.kind, title: item.title, year: item.yearFormatted, tmdbId: item.externalIds?.tmdbId }} />
+          identity={{ kind: item.kind, title: item.title, year: item.yearFormatted, tmdbId: item.externalIds?.tmdbId,
+            ...(item.kind === 'series' ? artworkCategoryContext(item.categoryLabels, item.hasEpisodes) : {}) }} />
         {item.yearFormatted && <div className={`media-card-year${badge ? ' media-card-year--with-new' : ''}`}>{item.yearFormatted}</div>}
         {badge && <span className="media-card-new-badge" aria-hidden="true">{badge}</span>}
       </div>

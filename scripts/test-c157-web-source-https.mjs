@@ -181,7 +181,7 @@ await test('TMDB_READ_KEY_OPTIONAL_EXACT_WHITELIST_REJECTS_PRIVATE_OR_INVALID_VA
     assert.equal(result.envPrefix.length, 0); assert.doesNotMatch(JSON.stringify(result), /never-public/);
   }
 });
-await test('WEB_PRESERVED_CATALOG_FAILURE_IS_NOT_CALLED_PLAYBACK_DEFERRAL_NATIVE_UNCHANGED', async () => {
+await test('PRESERVED_CATALOG_FAILURE_IS_FAILED_ON_WEB_AND_NATIVE_WITHOUT_FALSE_DEFERRAL', async () => {
   for (const web of [true, false]) {
     const h = harness({ web, overrides: {
       '../../bootstrap/client.ts': {}, '../../control-plane/client/authorized-source-resolver.ts': {},
@@ -189,7 +189,7 @@ await test('WEB_PRESERVED_CATALOG_FAILURE_IS_NOT_CALLED_PLAYBACK_DEFERRAL_NATIVE
     } });
     const settings = h.load('src/ui/settings/active-source-status.ts');
     const result = await settings.updateSourceCatalog({ canRun: async () => true, sync: async () => ({ outcome: 'LOCAL_FIRST_ACTIVE_PRESERVED', error: 'synthetic-private-failure' }) });
-    assert.equal(result, web ? 'failed' : 'deferred');
+    assert.equal(result, 'failed');
     const refresh = h.store.getWebCatalogRefresh();
     assert.equal(refresh.hadError, web); assert.doesNotMatch(JSON.stringify(refresh), /private-failure/);
     assert.equal(await settings.updateSourceCatalog({ canRun: async () => true, sync: async () => ({ outcome: 'LOCAL_FIRST_ACTIVE_PRESERVED' }) }), 'deferred');

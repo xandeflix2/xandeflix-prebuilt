@@ -627,7 +627,7 @@ export class BootSyncCoordinator {
     // Never replace IDs of an existing legacy snapshot with a different inventory.
     // Directory snapshots retain provider IDs on every subsequent refresh.
     let directoryRoots: 'PREFER' | 'REQUIRE' | undefined;
-    if (!isExistingReal) {
+    if (!isExistingReal || existingRealPointer?.sourceId !== expectedSourceId) {
       directoryRoots = 'PREFER';
     } else {
       const activeCatalog = await this.bootstrapService.getActiveCatalog().catch(() => null);

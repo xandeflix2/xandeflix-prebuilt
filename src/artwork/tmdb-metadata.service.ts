@@ -1,4 +1,5 @@
 /// <reference types="vite/client" />
+import { publicBackdropUri } from './detail-backdrop.ts';
 /** Optional device-local enrichment. Does not access snapshots or the control plane. */
 export interface ArtworkIdentity {
   kind: 'movie' | 'series';
@@ -9,6 +10,11 @@ export interface ArtworkIdentity {
   posterPath?: string;
   /** RAM-only source image reference; never sent to the metadata API. */
   sourcePosterUri?: string;
+  /** Presentation-only evidence from explicit source categories. */
+  originCountry?: string;
+  network?: 'Netflix';
+  /** Local catalog declares seasons; counts are not compared with TMDB edits. */
+  hasEpisodes?: boolean;
 }
 
 export interface ArtworkMetadata {
@@ -16,6 +22,7 @@ export interface ArtworkMetadata {
   tmdbId: number;
   posterUri?: string;
   backdropUri?: string;
+  backdropUris?: string[];
   heroPosterUris?: string[];
   originalTitle?: string;
   overview?: string;
@@ -43,6 +50,20 @@ const object = (value: unknown): JsonObject => value && typeof value === 'object
 const text = (value: unknown, max = 1200): string | undefined => typeof value === 'string' && value.trim() ? value.trim().slice(0, max) : undefined;
 const titleKey = (value: string): string => value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
 
+/** Narrow public metadata hints, never a change to catalog type or access. */
+export function artworkCategoryContext(labels: readonly string[] = [], hasEpisodes = false): Pick<ArtworkIdentity, 'originCountry' | 'network' | 'hasEpisodes'> {
+  const keys = labels.slice(0, 16).map(label => titleKey(label.slice(0, 120)));
+  const countries = new Set<string>();
+  for (const [code, pattern] of [
+    ['TR', /\b(?:turc[oa]s?|turquia|turkish)\b/], ['BR', /\b(?:brasileir[oa]s?|brazilian)\b/],
+    ['KR', /\b(?:sul corean[oa]s?|corean[oa]s?|korean)\b/], ['JP', /\b(?:japones[ae]s?|japanese)\b/],
+    ['CN', /\b(?:chines[ae]s?|chinese)\b/], ['TH', /\b(?:tailandes[ae]s?|thai)\b/],
+  ] as const) if (keys.some(key => pattern.test(key))) countries.add(code);
+  const originCountry = countries.size === 1 ? [...countries][0] : undefined;
+  const network = keys.some(key => /^(?:(?:series|novelas) )?netflix$/.test(key)) ? 'Netflix' as const : undefined;
+  return { ...(originCountry ? { originCountry } : {}), ...(network ? { network } : {}), ...(hasEpisodes ? { hasEpisodes: true } : {}) };
+}
+
 export function tmdbPosterPath(uri?: string): string | undefined {
   try {
     const url = new URL(uri || '');
@@ -57,7 +78,7 @@ export function tmdbPosterPath(uri?: string): string | undefined {
 
 export function normalizeArtworkIdentity(identity: ArtworkIdentity): ArtworkIdentity {
   // Provider subtitle suffix; preserve the catalog title and genuine letter L.
-  const title = identity.title.slice(0, 200).replace(/\s+\[L\](?=\s*(?:\((?:19|20)\d{2}\)|(?:19|20)\d{2})?\s*$)/i, '');
+  const title = identity.title.slice(0, 200).replace(/\s+(?:\[L\]|\(L\))(?=\s*(?:\((?:19|20)\d{2}\)|(?:19|20)\d{2})?\s*$)/i, '');
   const withoutQuality = title.replace(/\b(?:4k|8k|uhd|fhd|hd|sd|h265|h264|hevc|bluray|blu-ray|web-dl|dublado|legendado|dual audio)\b/gi, '').trim();
   const cleaned = withoutQuality.replace(/[\[\]()|]/g, ' ').replace(/\s+/g, ' ').trim();
   const parsedYear = cleaned.match(/\s(19\d{2}|20\d{2})$/);
@@ -69,13 +90,18 @@ export function normalizeArtworkIdentity(identity: ArtworkIdentity): ArtworkIden
     title: cleaned.replace(/\s(?:19\d{2}|20\d{2})$/, '').trim(),
     posterPath: /^\/[A-Za-z0-9_.-]+$/.test(identity.posterPath || '') ? identity.posterPath : undefined,
     sourcePosterUri: sourcePosterUri(identity.sourcePosterUri),
+    originCountry: identity.kind === 'series' && /^[A-Z]{2}$/.test(identity.originCountry || '') ? identity.originCountry : undefined,
+    network: identity.kind === 'series' && identity.network === 'Netflix' ? 'Netflix' : undefined,
+    hasEpisodes: identity.kind === 'series' && identity.hasEpisodes === true ? true : undefined,
   };
 }
 
 export function artworkIdentityKey(identity: ArtworkIdentity): string {
   const normalized = normalizeArtworkIdentity(identity);
-  return `${normalized.kind}:${normalized.tmdbId || titleKey(normalized.title)}:${normalized.year || ''}${!normalized.tmdbId ? ':match6'
-    + (normalized.posterPath ? ':poster=' + normalized.posterPath : normalized.sourcePosterUri ? ':source=' + opaqueImageKey(normalized.sourcePosterUri) : '') : ''}`;
+  const context = (normalized.originCountry ? ':country=' + normalized.originCountry : '')
+    + (normalized.network ? ':network=netflix' : '') + (normalized.hasEpisodes ? ':episodic=1' : '');
+  return `${normalized.kind}:${normalized.tmdbId || titleKey(normalized.title)}:${normalized.year || ''}${!normalized.tmdbId ? ':match7' + context
+    + (!normalized.originCountry && !normalized.network ? normalized.posterPath ? ':poster=' + normalized.posterPath : normalized.sourcePosterUri ? ':source=' + opaqueImageKey(normalized.sourcePosterUri) : '' : '') : ''}`;
 }
 
 function sourcePosterUri(value?: string): string | undefined {
@@ -92,7 +118,8 @@ function opaqueImageKey(value: string): string {
 function rankTmdbCandidates(identity: ArtworkIdentity, candidates: unknown[]) {
   const normalized = normalizeArtworkIdentity(identity);
   const wanted = titleKey(normalized.title);
-  const ranked = candidates.map(object).filter((candidate) => Number.isSafeInteger(candidate.id) && Number(candidate.id) > 0)
+  const ranked = candidates.map(object).filter((candidate) => Number.isSafeInteger(candidate.id) && Number(candidate.id) > 0
+    && (!normalized.originCountry || (Array.isArray(candidate.origin_country) && candidate.origin_country.includes(normalized.originCountry))))
     .map((candidate) => {
       const names = normalized.kind === 'movie' ? [candidate.title, candidate.original_title] : [candidate.name, candidate.original_name];
       let score = 0;
@@ -102,7 +129,9 @@ function rankTmdbCandidates(identity: ArtworkIdentity, candidates: unknown[]) {
         const a = new Set(wanted.split(' '));
         const b = new Set(key.split(' '));
         const common = [...a].filter((word) => b.has(word)).length;
-        score = Math.max(score, wanted === key ? 1 : 2 * common / (a.size + b.size));
+        const compact = wanted.replaceAll(' ', ''), candidateCompact = key.replaceAll(' ', '');
+        const exact = wanted === key || (compact.length >= 8 && compact === candidateCompact);
+        score = Math.max(score, exact ? 1 : 2 * common / (a.size + b.size));
       }
       const parts = normalized.title.split(/\s+[-–—]\s+/).map(titleKey);
       if (parts.length === 2 && parts.every(Boolean) && names.every(name => typeof name === 'string')
@@ -177,9 +206,19 @@ function toMetadata(identity: ArtworkIdentity, value: JsonObject): ArtworkMetada
   const date = identity.kind === 'movie' ? value.release_date : value.first_air_date;
   const year = typeof date === 'string' ? Number(date.slice(0, 4)) : 0;
   const minutes = Number(value.runtime);
+  const alternatives = Array.isArray(object(value.images).backdrops) ? (object(value.images).backdrops as unknown[]).slice(0, 128).map(object)
+    .filter(image => Number(image.width) >= 300 && Number(image.height) >= 150 && Number(image.width) / Number(image.height) >= 1.2
+      && Number(image.width) / Number(image.height) <= 3 && publicBackdropUri(imageUri(image.file_path, 'w1280')))
+    .sort((a, b) => {
+      const score = (image: JsonObject) => (image.iso_639_1 == null ? 300 : image.iso_639_1 === 'pt' ? 200 : image.iso_639_1 === 'en' ? 100 : 0)
+        + Math.min(Number(image.vote_average) || 0, 10);
+      return score(b) - score(a);
+    }).map(image => imageUri(image.file_path, 'w1280')!) : [];
+  const backdropUris = [...new Set([publicBackdropUri(imageUri(value.backdrop_path, 'w1280')), ...alternatives]
+    .filter((uri): uri is string => Boolean(uri)))].slice(0, 8);
   return {
     kind: identity.kind, tmdbId: Number(value.id),
-    posterUri: imageUri(value.poster_path, 'w342'), backdropUri: imageUri(value.backdrop_path, 'w1280'),
+    posterUri: imageUri(value.poster_path, 'w342'), backdropUri: backdropUris[0], backdropUris,
     heroPosterUris: tmdbHeroPosters(value.images),
     originalTitle: text(identity.kind === 'movie' ? value.original_title : value.original_name, 200),
     overview: text(value.overview), year: year >= 1880 && year <= 2100 ? year : undefined,
@@ -218,6 +257,8 @@ export class TmdbMetadataService {
               this.cache.set(entry[0], { expires: Number(stored.expires), value: {
                 kind: value.kind, tmdbId: Number(value.tmdbId),
                 posterUri: this.cachedImage(value.posterUri), backdropUri: this.cachedImage(value.backdropUri),
+                ...(Array.isArray(value.backdropUris) ? { backdropUris: value.backdropUris.slice(0, 8)
+                  .map(uri => publicBackdropUri(this.cachedImage(uri))).filter((uri): uri is string => Boolean(uri)) } : {}),
                 heroPosterUris: Array.isArray(value.heroPosterUris) ? value.heroPosterUris.slice(0, 8)
                   .map((uri) => this.cachedImage(uri)).filter((uri): uri is string => Boolean(uri)) : [],
                 originalTitle: text(value.originalTitle, 200), overview: text(value.overview),
@@ -246,9 +287,10 @@ export class TmdbMetadataService {
 
   private legacyPositive(identity: ArtworkIdentity, key: string): ArtworkMetadata | null {
     const normalized = normalizeArtworkIdentity(identity);
+    if (!normalized.tmdbId && (normalized.originCountry || normalized.network || normalized.hasEpisodes)) return null;
     if (normalized.sourcePosterUri && !normalized.posterPath && !normalized.tmdbId) return null;
-    const keys = [5, 4, 3].map(version => key.replace(':match6', ':match' + version));
-    if (!normalized.posterPath) keys.push(key.replace(':match6', ''));
+    const keys = [6, 5, 4, 3].map(version => key.replace(':match7', ':match' + version));
+    if (!normalized.posterPath) keys.push(key.replace(':match7', ''));
     for (const previous of keys) {
       const entry = this.cache.get(previous);
       if (entry?.value?.kind === identity.kind && entry.expires > this.now()) return entry.value;
@@ -257,10 +299,26 @@ export class TmdbMetadataService {
   }
 
   resolve(identity: ArtworkIdentity, priority: 'high' | 'normal' = 'normal'): Promise<ArtworkMetadata | null> {
-    const key = artworkIdentityKey(identity);
+    return this.resolvePurpose(identity, priority, false);
+  }
+
+  peekBackdrop(identity: ArtworkIdentity): ArtworkMetadata | null {
+    const normal = this.peek(identity);
+    if (normal && Array.isArray(normal.backdropUris)) return normal;
+    const entry = this.cache.get(artworkIdentityKey(identity) + ':backdrops1');
+    return entry && entry.expires > this.now() && entry.value?.kind === identity.kind ? entry.value : null;
+  }
+
+  resolveBackdrop(identity: ArtworkIdentity, priority: 'high' | 'normal' = 'normal'): Promise<ArtworkMetadata | null> {
+    const normal = this.peek(identity);
+    return normal && Array.isArray(normal.backdropUris) ? Promise.resolve(normal) : this.resolvePurpose(identity, priority, true);
+  }
+
+  private resolvePurpose(identity: ArtworkIdentity, priority: 'high' | 'normal', backdrop: boolean): Promise<ArtworkMetadata | null> {
+    const key = artworkIdentityKey(identity) + (backdrop ? ':backdrops1' : '');
     const cached = this.cache.get(key);
     if (cached && cached.expires > this.now() && (!cached.value || cached.value.kind === identity.kind)) return Promise.resolve(cached.value);
-    const legacy = this.legacyPositive(identity, key);
+    const legacy = backdrop ? null : this.legacyPositive(identity, key);
     if (legacy) return Promise.resolve(legacy);
     const pending = this.pending.get(key);
     if (pending) {
@@ -335,7 +393,10 @@ export class TmdbMetadataService {
   }
 
   private async lookup(raw: ArtworkIdentity): Promise<ArtworkMetadata | null> {
-    const identity = normalizeArtworkIdentity(raw);
+    const normalized = normalizeArtworkIdentity(raw);
+    const contextual = !normalized.tmdbId && Boolean(normalized.originCountry || normalized.network);
+    // An unrelated provider image cannot overrule independently confirmed context.
+    const identity = contextual ? { ...normalized, posterPath: undefined, sourcePosterUri: undefined } : normalized;
     if ((!identity.tmdbId && !titleKey(identity.title)) || /https?:\/\/|tvg-logo\s*=|group-title\s*=|[\r\n]/i.test(raw.title)) return null;
     const type = identity.kind === 'movie' ? 'movie' : 'tv';
     let candidate: JsonObject;
@@ -347,7 +408,22 @@ export class TmdbMetadataService {
       const params: Record<string, string> = { query: identity.title, include_adult: 'false' };
       if (identity.year) params[type === 'movie' ? 'primary_release_year' : 'first_air_date_year'] = String(identity.year);
       const results = await this.request(`search/${type}`, params);
-      const candidates = Array.isArray(results.results) ? results.results : [];
+      let candidates = Array.isArray(results.results) ? results.results : [];
+      const verified = new Map<number, JsonObject>();
+      let networkRequired = false;
+      if (identity.network || identity.hasEpisodes) {
+        const strong = [...new Map(rankTmdbCandidates(identity, candidates).map(({ candidate }) => [Number(candidate.id), candidate])).values()];
+        if (strong.length > 6) return null;
+        if (strong.length > 1) {
+          networkRequired = Boolean(identity.network);
+          for (const possible of strong) {
+            const details = await this.request(`${type}/${possible.id}`, imageParams);
+            if (details.id !== possible.id) return null;
+            if (this.matchesContext(identity, details, networkRequired)) verified.set(Number(details.id), details);
+          }
+          candidates = [...verified.values()];
+        }
+      }
       let match = selectTmdbMatch(identity, candidates);
       // Search considers aliases, while its response can expose only translated
       // and original titles. Confirm an exact official alias rather than guessing.
@@ -363,7 +439,7 @@ export class TmdbMetadataService {
         let exactFallback: JsonObject | undefined;
         for (const { candidate: possible } of ranked) {
           const details = await this.request(`${type}/${possible.id}`, imageParams);
-          if (details.id !== possible.id) continue;
+          if (details.id !== possible.id || !this.matchesContext(identity, details, networkRequired)) continue;
           const posters = object(details.images).posters;
           if (details.poster_path === identity.posterPath || (Array.isArray(posters) && posters.some(p => object(p).file_path === identity.posterPath))) {
             if (confirmed) return null;
@@ -389,7 +465,7 @@ export class TmdbMetadataService {
         const details: JsonObject[] = [];
         for (const possible of unique) {
           const value = await this.request(`${type}/${possible.id}`, imageParams);
-          if (value.id !== possible.id || !rankTmdbCandidates(identity, [value]).length) return null;
+          if (value.id !== possible.id || !rankTmdbCandidates(identity, [value]).length || !this.matchesContext(identity, value, networkRequired)) return null;
           details.push(value);
         }
         const matcher = this.options.matchPoster ?? (await import('./poster-identity.ts')).matchSourcePoster;
@@ -397,17 +473,27 @@ export class TmdbMetadataService {
         return confirmed && details.includes(confirmed) ? toMetadata(identity, confirmed) : null;
       }
       if (!match) return null;
-      const details = await this.request(`${type}/${match.id}`, imageParams);
-      if (details.id !== match.id) return null;
+      const details = verified.get(Number(match.id)) ?? await this.request(`${type}/${match.id}`, imageParams);
+      if (details.id !== match.id || ((contextual || identity.hasEpisodes) && !this.matchesContext(identity, details, networkRequired))) return null;
       candidate = details;
     }
     return toMetadata(identity, candidate);
   }
 
+  private matchesContext(identity: ArtworkIdentity, details: JsonObject, networkRequired = false): boolean {
+    if (identity.originCountry && (!Array.isArray(details.origin_country) || !details.origin_country.includes(identity.originCountry))) return false;
+    if (identity.network) {
+      if (networkRequired && (!Array.isArray(details.networks) || !details.networks.some(network => object(network).name === identity.network))) return false;
+    }
+    if (identity.hasEpisodes && details.status === 'Planned' && !text(details.first_air_date) && details.last_episode_to_air === null) return false;
+    return true;
+  }
+
   private async aliasMatch(identity: ArtworkIdentity, type: 'movie' | 'tv', candidates: unknown[]): Promise<JsonObject | null> {
     const unique = new Map<number, JsonObject>();
     for (const candidate of candidates.map(object)) {
-      if (Number.isSafeInteger(candidate.id) && Number(candidate.id) > 0) unique.set(Number(candidate.id), candidate);
+      if (Number.isSafeInteger(candidate.id) && Number(candidate.id) > 0
+        && (!identity.originCountry || (Array.isArray(candidate.origin_country) && candidate.origin_country.includes(identity.originCountry)))) unique.set(Number(candidate.id), candidate);
     }
     if (!unique.size || unique.size > 2) return null;
     const wanted = titleKey(identity.title);
