@@ -85,7 +85,7 @@ try{
     ['VERIFY_REQUIRED','node scripts/vercel-prebuilt-contract.mjs verify','echo PASS'],
     ['SIGNATURE_PERMISSION','attestations: write','attestations: read'],
   ]){const changed=workflow.replace(from,to);assert.notEqual(changed,workflow);reject('WORKFLOW_'+name,'A22_WORKFLOW_CHANGED',()=>verifyPrebuiltWorkflow(changed));}
-  pass('ATTEST_ARTIFACT_METADATA_PERMISSION',()=>assert.match(workflow,/      attestations: write\n      artifact-metadata: write\n/));
+  pass('ATTEST_ARTIFACT_METADATA_PERMISSION',()=>assert.match(lfWorkflow,/      attestations: write\n      artifact-metadata: write\n/));
   pass('PINNED_PREVIEW_TARGET_NO_PRIVATE_ENV_PULL',()=>{
     const source=fs.readFileSync(path.join(repoRoot,'scripts/vercel-prebuilt-contract.mjs'),'utf8');
     assert(source.includes("'build','--target=preview','--non-interactive'"));

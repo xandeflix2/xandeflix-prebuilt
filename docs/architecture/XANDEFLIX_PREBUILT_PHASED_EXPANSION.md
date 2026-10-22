@@ -852,3 +852,22 @@ Installed ONLY on Fire AFTSS with in-place update; exact installed SHA confirmed
 Preservation audit:1339 baseline files checked, only6 allowlisted existing paths changed;18 prior receipts and140 old APK/AAB artifacts unchanged. Build stage158 of159 files identical; only auto-generated capacitor.settings.gradle relocates4 module references to the same root node_modules during cap sync. Root native files unchanged;14 native APK entries (DEX/libraries/manifest/resources) identical to previous UI APK. Initial broad stage-equality diagnostic stopped on that generated relocation; exact content/real-path verification resolved it without modifying production or test assertions. Old UI APK preserved. HEAD/main/index unchanged; source branch unpublished. Evidence and report:tmp/codex-source-recovery/tv-sidebar-composition-20261021/.
 
 User now reports playback starts then stalls repeatedly on slow connections. Buffer policy is wired to full-screen and preview players, but this visual APK does not change it or certify a slow-network fix. Actual network/bitrate diagnosis remains pending; no player/backend/source/parental/license change. Before this update only2 snapshots existed (~555MB); automatic reclamation is not proven by this update, and earlier clean-install savings remain attributable to user uninstall. GIT_COMMIT=NAO; GIT_PUSH=NAO; SUPABASE_CHANGED=NAO; NEXT_GATE_STARTED=NAO.
+
+
+## CANON-01-A22A-WINDOWS-METADATA-EOL — Windows CI metadata EOL regex normalization — 2026-10-22
+
+Explicit autonomous user instruction authorizes controlled CI fix for Windows workflow failures in Canonical regression #13 and Site build validation #9. Root cause: scripts/test-vercel-prebuilt-contract.mjs asserted ATTEST_ARTIFACT_METADATA_PERMISSION using a multi-line LF regex against raw workflow string, which contains CRLF (\r\n) on Windows git checkouts, causing regex failure despite lfWorkflow already existing.
+
+Closed allowlist before code: scripts/test-vercel-prebuilt-contract.mjs (minimal patch: assert against lfWorkflow), scripts/test-canonical-regression.mjs (only new amendment identity in future fixture), docs/governance/authorizations/CANON-01-A22A-WINDOWS-METADATA-EOL.json (new receipt), docs/evidence/CANON_01_A22A_WINDOWS_METADATA_EOL.md (new evidence), and append-only this document, docs/STATUS.md, docs/EVOLUTION_REPORT.md, docs/ERRORS_AND_BLOCKERS.md.
+
+Chaining: supersedes scripts/test-vercel-prebuilt-contract.mjs from CANON-01-A22A-WINDOWS-EOL and scripts/test-canonical-regression.mjs from CANON-01-TV-SIDEBAR-COMPOSITION. All 19 historical/prior receipts, 128 canonical controls / 23 suites, Android 1.0.37 / versionCode 37, package com.xandeflix.prebuilt, signing certificate, Supabase, Vercel and production workflows remain strictly preserved. No git commit, push, PR or deployment.
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-A22A-WINDOWS-METADATA-EOL",
+  "path": "docs/governance/authorizations/CANON-01-A22A-WINDOWS-METADATA-EOL.json",
+  "hash": "90d7db4a18e84221afa6fa9dda40c82d6dad6121"
+}
+```
