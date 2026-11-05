@@ -13,3 +13,7 @@ Executadas em05/11/2026 no novo workspace e branch de revisão, com Git optional
 Todos os comandos acima terminaram exit0. A regressão original executou204 controles/45 suítes; conferir também o resultado do runner abaixo. Código funcional não alterado nesta publicação.
 
 [Resultado original desta execução](PUBLICATION_REGRESSION_RESULT.json):204 controles/45 suítesPASS, gerado no tmp/canon-01 desta cópia e conferido com os horários/exitcodes acima.
+
+## Resultado remoto posterior ao push
+
+Os dois workflows do commit6df7ef2 terminaram emFAIL. Ver[CI_NOTES.md](CI_NOTES.md). O PASS acima é local e anterior; não representa aprovação remota. Etapas remotas posteriores à falha não executaram.

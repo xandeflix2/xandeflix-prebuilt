@@ -353,6 +353,39 @@
       "evidence": "evidence/HTTP_TRANSPORT_RECOVERY_20261105/REPORT.md",
       "source": "docs/architecture/XANDEFLIX_PREBUILT_EXECUTION_CONTRACT.md",
       "nextValidation": "Preservar resultados comparáveis=false e erros originais; usar caminhos inventariados/encoding detectado e helpers emarquivo."
+    },
+    {
+      "id": "E33",
+      "priority": "P1",
+      "classification": "CONFIRMADO_CI_WINDOWS",
+      "status": "FAIL_CAUSA_EXATA_PENDENTE",
+      "title": "CI Windows falhou em test-app-intro-branding-07",
+      "description": "Os dois workflows Windows pararam nessa suíte com AssertionError. As cinco primeiras verificações da intro passaram. A próxima verificação contém um SHA-256 fixo dos bytes de src/main.tsx sem normalização. Conversão LF/CRLF altera esse hash, sendo hipótese concreta; os bytes reais do checkout remoto e a asserção interna não foram capturados, logo a causa exclusiva não está comprovada.",
+      "evidence": "CI_NOTES.md",
+      "source": "scripts/test-app-intro-branding-07.mjs",
+      "nextValidation": "Coletar a asserção interna e hash/EOL reais no runner em gate nominal. Não atualizar hash esperado, timeout ou negativos apenas para obter PASS."
+    },
+    {
+      "id": "E34",
+      "priority": "P1",
+      "classification": "CONFIRMADO_CI_UBUNTU_E_CODIGO",
+      "status": "FAIL_TESTE_NAO_PORTAVEL",
+      "title": "CI Ubuntu falhou em test-episode-general-identity com ENOENT",
+      "description": "O workflow Canonical regression avançou até essa suíte e registrou ENOENT. A etapa UI do teste executa literalmente C:/Program Files/Google/Chrome/Application/chrome.exe, sem descoberta Linux. Esse caminho é não portável e é compatível com o erro observado. Os casos unitários/localizados anteriores passaram; não houve execução Linux local nesta entrega.",
+      "evidence": "CI_NOTES.md",
+      "source": "scripts/test-episode-general-identity.mjs",
+      "nextValidation": "Revisar formalmente a descoberta do browser e o tratamento de erro de spawn para Linux/Windows, preservando a execução UI real e seus asserts; coletar o stack interno."
+    },
+    {
+      "id": "E35",
+      "priority": "P1",
+      "classification": "CONFIRMADO_CI_UBUNTU",
+      "status": "FAIL_CAUSA_NAO_EXPOSTA",
+      "title": "CI Ubuntu do Site build parou na suíte de retorno a episódios",
+      "description": "Site build validation falhou em scripts/test-series-episode-return.mjs, exit1, sem classe de erro interna nos campos sanitizados. O outro job Ubuntu ultrapassou essa suíte e só falhou depois em identidade de episódios. Não há fundamento para atribuir a falha atual especificamente a TIMEOUT_CHROME ou a uma regressão funcional de foco.",
+      "evidence": "CI_NOTES.md",
+      "source": "scripts/test-series-episode-return.mjs",
+      "nextValidation": "Preservar log focalizado da suíte em CI com sanitização e investigar browser/CDP/render/foco no contexto exato. Não pular suíte nem ampliar timeout para aceitar falha."
     }
   ]
 }

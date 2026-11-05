@@ -2,6 +2,8 @@
 
 Data: **05/11/2026, America/Sao_Paulo**. Horários dos recibos JSON estão em UTC; horário local=UTC−3. Publicação exclusiva para revisão independente. Estado operacional: **recuperação parcial; HTTP 403 de determinados títulos ainda aberto**. Não há homologação integral ou release de produção desta entrega.
 
+> **Atualização após o primeiro push:** os dois workflows remotos falharam em Windows/Ubuntu. A regressão local204/45PASS não é aprovação global. Consulte [CI_NOTES.md](CI_NOTES.md) e os novos achados E33–E35. Estado técnico de validação remota: **FAIL**, com publicação mantida somente para análise.
+
 ## 1. Conclusão executiva
 
 A versão 1.0.53 corrigiu o isolamento local da fonte e foi instalada inplace no tablet e no Fire USB, preservando os campos de identidade/chave/instalação/licença verificados. Catálogo fresco foi observado. Um filme produziu primeiro quadro e avanço real no tablet, inclusive após exclusão física/reimportação. Duas séries no tablet e uma tentativa de filme no Fire ainda receberam HTTP 403 na abertura da mídia.
@@ -84,6 +86,10 @@ Prioridades são triagem de revisão, não adjudicação canônica. CONFIRMADO_R
 | [E30](#e30) | P2 | Homologação física de áudio, catálogo inteiro e todos os aparelhos incompleta | PENDENTE |
 | [E31](#e31) | P2 | P2.50-R1 teve TIMEOUT_CHROME | BLOQUEIO_ANTIGO_PRESERVADO |
 | [E32](#e32) | P2 | Seletores, escapes, paths e parsing de logs falharam em auxiliares | REGISTRADOS_NAO_PRODUTO |
+
+| [E33](#e33) | P1 | CI Windows falhou em test-app-intro-branding-07 | FAIL_CAUSA_EXATA_PENDENTE |
+| [E34](#e34) | P1 | CI Ubuntu falhou em test-episode-general-identity com ENOENT | FAIL_TESTE_NAO_PORTAVEL |
+| [E35](#e35) | P1 | CI Ubuntu do Site build parou na suíte de retorno a episódios | FAIL_CAUSA_NAO_EXPOSTA |
 
 ### E01
 
@@ -405,6 +411,36 @@ Evidência: [evidence/HTTP_TRANSPORT_RECOVERY_20261105/REPORT.md](evidence/HTTP_
 
 Próxima verificação: Preservar resultados comparáveis=false e erros originais; usar caminhos inventariados/encoding detectado e helpers emarquivo.
 
+### E33
+
+**CI Windows falhou em test-app-intro-branding-07** — P1; FAIL_CAUSA_EXATA_PENDENTE.
+
+Os dois workflows Windows pararam nessa suíte com AssertionError. As cinco primeiras verificações da intro passaram. A próxima verificação contém um SHA-256 fixo dos bytes de src/main.tsx sem normalização. Conversão LF/CRLF altera esse hash, sendo hipótese concreta; os bytes reais do checkout remoto e a asserção interna não foram capturados, logo a causa exclusiva não está comprovada.
+
+Evidência: [CI_NOTES.md](CI_NOTES.md). Código: [scripts/test-app-intro-branding-07.mjs](../../../scripts/test-app-intro-branding-07.mjs).
+
+Próxima verificação: Coletar a asserção interna e hash/EOL reais no runner em gate nominal. Não atualizar hash esperado, timeout ou negativos apenas para obter PASS.
+
+### E34
+
+**CI Ubuntu falhou em test-episode-general-identity com ENOENT** — P1; FAIL_TESTE_NAO_PORTAVEL.
+
+O workflow Canonical regression avançou até essa suíte e registrou ENOENT. A etapa UI do teste executa literalmente C:/Program Files/Google/Chrome/Application/chrome.exe, sem descoberta Linux. Esse caminho é não portável e é compatível com o erro observado. Os casos unitários/localizados anteriores passaram; não houve execução Linux local nesta entrega.
+
+Evidência: [CI_NOTES.md](CI_NOTES.md). Código: [scripts/test-episode-general-identity.mjs](../../../scripts/test-episode-general-identity.mjs).
+
+Próxima verificação: Revisar formalmente a descoberta do browser e o tratamento de erro de spawn para Linux/Windows, preservando a execução UI real e seus asserts; coletar o stack interno.
+
+### E35
+
+**CI Ubuntu do Site build parou na suíte de retorno a episódios** — P1; FAIL_CAUSA_NAO_EXPOSTA.
+
+Site build validation falhou em scripts/test-series-episode-return.mjs, exit1, sem classe de erro interna nos campos sanitizados. O outro job Ubuntu ultrapassou essa suíte e só falhou depois em identidade de episódios. Não há fundamento para atribuir a falha atual especificamente a TIMEOUT_CHROME ou a uma regressão funcional de foco.
+
+Evidência: [CI_NOTES.md](CI_NOTES.md). Código: [scripts/test-series-episode-return.mjs](../../../scripts/test-series-episode-return.mjs).
+
+Próxima verificação: Preservar log focalizado da suíte em CI com sanitização e investigar browser/CDP/render/foco no contexto exato. Não pular suíte nem ampliar timeout para aceitar falha.
+
 ## 6. O que a correção53 efetivamente muda
 
 SourceReplacementLifecycle usa estado durável PREPARED/CLEANED/ACTIVE e epoch opaco local; fonte é comparada após autoridade remota/comercial. O primeiro uso legado exige importação limpa. Enquanto uma substituição está pendente, a UI não pode tratar snapshot anterior como a nova fonte. O fluxo fecha mídia por APIs existentes, reinicia runtime uma vez, remove cinco chaves de metadata/checkpoint e três IndexedDBs exclusivamente de apresentação, e promove só depois de revalidar fonte/snapshot. Falha mantém bloqueio de prontidão. Histórico/favoritos e artwork têm namespace de fonte para não reutilizar IDs/URLs entre ativações.
@@ -458,6 +494,8 @@ Para reproduzir a mídia real, o analista precisará de uma fonte e conta legiti
 7. Somente após acesso e matriz física satisfatórios, decidir gate próprio de distribuição/assinatura/homologação. Nenhum APK foi homologado para todos os aparelhos por este relatório.
 
 ## 10. Estado terminal desta publicação
+
+**CI remoto posterior: FAIL no commit inicial6df7ef2; E33–E35 documentados.** Não houve correção funcional para obter aprovação. O código desta revisão permanece o mesmo; a continuação é documental.
 
 Código de produto: snapshot governado1.0.53, sem novo patch funcional. ErroHTTP403:ABERTO. Relação exata da recusa com política/arquivo/conta/rede:NAO_PROVADA. Tablet: filme amostrado PASS, séries amostradas 403. Fire: playback NAO_HOMOLOGADO. Celular 53: ADIADO. Limpeza manual:CATALOGO_REIMPORTADO_COM_RESSALVAS. Revisão independente: PENDING. Main/roots/históricos preservados. Merge/PR/release/backend/dispositivos/novo gate:NAO_INICIADOS.
 
