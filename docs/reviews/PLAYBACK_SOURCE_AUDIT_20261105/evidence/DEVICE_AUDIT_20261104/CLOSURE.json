@@ -1,0 +1,274 @@
+{
+  "createdUTC": "2026-11-04T19:41:51.202Z",
+  "scope": "external audit artifacts only; does not retroactively prove historical workspace preservation",
+  "files": {
+    "APK_RESET_EVIDENCE.json": {
+      "sha256": "9cc9b20d6e4b38cc98d05f1543a69bffe97d10c2fc34364de1dbcc141d5eec5c",
+      "bytes": 32057
+    },
+    "CLEANUP_CHECK.json": {
+      "sha256": "4b40f6396dcc4fb4f31f69918acbe2d309997fedd86b8d9e6c18a58fc35cb1f9",
+      "bytes": 279
+    },
+    "CORRECTIVE_PLAN.md": {
+      "sha256": "60b78edb0c5471e5be9231fbfe5ec214d2bacf8e110da079c6a0373eac024109",
+      "bytes": 5521
+    },
+    "DEVICES_BEFORE.json": {
+      "sha256": "bdd69d452822e313d45aa4302abf7dd87869cc8f384515b4c3fe4e44f7fc651d",
+      "bytes": 2387
+    },
+    "DEVICES_FINAL.json": {
+      "sha256": "23ec49bf9af12f65d118941bee0a9cfd9326b253aa4af0ff038adf0402946aa5",
+      "bytes": 1280
+    },
+    "FUTURE_CREDITS_SPEC.md": {
+      "sha256": "72506ab9941bd1e6097ec44e494a6318f1d54adf9d1ff4bea60a79dd5ebb85d2",
+      "bytes": 6412
+    },
+    "G3_DIVERGENCE_REVIEW.json": {
+      "sha256": "f079667818930e6cad6591c8dc8f38819c5b139f9aa8fe108fb45fcf7735e088",
+      "bytes": 16954
+    },
+    "INCIDENTS.md": {
+      "sha256": "48a8dff63e4e7bb33bad492adc8cd1ec73bfeea6160c626d2cf6aceca2cb4c58",
+      "bytes": 1456
+    },
+    "INSTALL_SCOPE.md": {
+      "sha256": "8851f46d2e169765563863ae678a3502a6e8e7c3b5e251b1a9e9596c3725fce8",
+      "bytes": 1499
+    },
+    "REPORT.md": {
+      "sha256": "814943e24b31dc9e1cf2c918573f3065bf2cb8b229ab46447fcc8ef79a80ff80",
+      "bytes": 21828
+    },
+    "REPOSITORY_AUDIT.json": {
+      "sha256": "c176eab527c2793d8b196cd932444212c439ec9350908ba1d844a752c4e84b33",
+      "bytes": 62567
+    },
+    "RESULT.json": {
+      "sha256": "0d59af5ec20b181b9b4d8b54e36d206eaccad44cdf0febd8e96917aed6b35f1d",
+      "bytes": 1487
+    },
+    "SIGNATURES.json": {
+      "sha256": "f811c296f93c8ea9f11923f7c450f41a738846fc4c5102a672cebe2da20cdcd3",
+      "bytes": 321
+    },
+    "SPEC.md": {
+      "sha256": "84200ce091b41b20b18127be882eed54338e9a15b35a74938e72be23c665cfb4",
+      "bytes": 734
+    },
+    "build-map-probe.mjs": {
+      "sha256": "c087d1e3dec87a6af135feb95b67b1c393078f92bf9a69cf9e7569d82d21f91d",
+      "bytes": 2052
+    },
+    "candidate-20261103.apk": {
+      "sha256": "0146a2fc05d3e45f5670f4c5aba0fa0d0ba1cd25bd0086f7ac00de4cb6ab8c29",
+      "bytes": 22317875
+    },
+    "cdp.mjs": {
+      "sha256": "6aac1d4d7dcc3068fbf8f8ce4449ffd896f1e98dd02438739a2c819281c812fe",
+      "bytes": 1991
+    },
+    "cleanup-check.mjs": {
+      "sha256": "141ccc7391b07a80ae7f5e6272de7f2ba271c26d8a438f35eb2a8d66b6cdd959",
+      "bytes": 674
+    },
+    "divergence-review.mjs": {
+      "sha256": "e7bd4ad7e3ff2dc80e25c2c3545f5d67e39f551285f486feb454029005d8d49b",
+      "bytes": 2461
+    },
+    "finalize-audit.mjs": {
+      "sha256": "5435efc0779a17b5fc33e99793705f0c7e421ad645575dd209a91793b10edb83",
+      "bytes": 3237
+    },
+    "fire-initial.png": {
+      "sha256": "b529e33e4b1c25d66280b55dd8c360c5548647d4455eb32279e77b7ec3bcf59f",
+      "bytes": 2053900
+    },
+    "fire-installed-before.apk": {
+      "sha256": "f1eb668de79aebd0384424c67a289eea9c5206fa8db901020789f52a8a079358",
+      "bytes": 21051349
+    },
+    "fire-layout-runtime.json": {
+      "sha256": "7855e3a942160c22bc56ee162333529d096ca13740c7b602bacfa5e33c781bf3",
+      "bytes": 1230
+    },
+    "fire-silo-details.json": {
+      "sha256": "fa287c3880ec32eb9e566120ae71d84e45d24866ffd1de16548d5ef9c1089500",
+      "bytes": 735
+    },
+    "fire-silo-details.png": {
+      "sha256": "75a54c3fd83015b25c196d4ad5edc12bc18b364060bec2b990abfd85e370061f",
+      "bytes": 987618
+    },
+    "fire-silo-final.json": {
+      "sha256": "3d5fad182f1166c33a64c453914858e8d2177f20311d9272b80ee609f8d7572f",
+      "bytes": 2579
+    },
+    "fire-silo-playback.json": {
+      "sha256": "6410aae9069026bab24f0f3175cf783e71ee438ace98610274a36500be511678",
+      "bytes": 1374
+    },
+    "fire-update.mjs": {
+      "sha256": "08dfebe64b7af56b8289ad204f74fdb2c2a68123bb06d9cfa4f40808730947cd",
+      "bytes": 4797
+    },
+    "installed-final.mjs": {
+      "sha256": "8c0ccab9ceff4bdccb8b21339d7ce46e425d75119c82c3873bfc74b2fab95585",
+      "bytes": 1650
+    },
+    "layout-audit.mjs": {
+      "sha256": "813bdf4a2cf5286ae5d9f73e0afebdd707cb402cfc738a158635612a9818bcd6",
+      "bytes": 1268
+    },
+    "map-seasons-probe.mjs": {
+      "sha256": "71d3ad14edfcefc4414c386861f7e9b9cb90866b6c24821cb50136cf7860e05b",
+      "bytes": 17930
+    },
+    "phone-Ted_Lasso-scenario.json": {
+      "sha256": "444c1653fa62d885250b777a4584afc65189d43c5d0e50494b503082c7e7cd42",
+      "bytes": 1131
+    },
+    "phone-baseapi-network2.json": {
+      "sha256": "bf5fd94940f2a83b91b2fb5074183fc4298df796273c5944f3915a077fce168f",
+      "bytes": 102
+    },
+    "phone-httpstatus-network2.json": {
+      "sha256": "c61354cb7388c90661e93323485a3ed1eb0c33447168e0ce165e6e4d35f5c280",
+      "bytes": 125
+    },
+    "phone-installed-before.apk": {
+      "sha256": "0146a2fc05d3e45f5670f4c5aba0fa0d0ba1cd25bd0086f7ac00de4cb6ab8c29",
+      "bytes": 22317875
+    },
+    "phone-layout-runtime.json": {
+      "sha256": "7935457ba61f5e5d30053dbe15e4c079656ea73a200d4fb9a460eb7298f4cdd6",
+      "bytes": 1591
+    },
+    "phone-movie-checkpoints.json": {
+      "sha256": "3c4051e7960de8c80a6e92a70f52684debe2c6b6047fa8beea628cdb011530d7",
+      "bytes": 289
+    },
+    "phone-movie-errors.json": {
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2
+    },
+    "phone-movie-result.json": {
+      "sha256": "8d2287d46c8b84cb4ef4594659567f721e78c26403e8d647937794359c152320",
+      "bytes": 1854
+    },
+    "phone-movie-runtime.json": {
+      "sha256": "c35cb3e968a2f13489096a63146e04b321c9957dd12e973b2662125b85b72536",
+      "bytes": 498
+    },
+    "phone-silo-details.json": {
+      "sha256": "0cbfb2f1cfafba7013c13ab5c4ef19f926f2b30faa86919127f1d65f39597ccb",
+      "bytes": 861
+    },
+    "phone-silo-details.png": {
+      "sha256": "e2314b710cdeadedaae2bd18cc2a570a353df6975ce81c768f363a772ce0219c",
+      "bytes": 1048402
+    },
+    "phone-silo-diagnostic.json": {
+      "sha256": "f571b5a49c329ddbf007545197b55be306cb544dd4082b414dad12e32dea153c",
+      "bytes": 71
+    },
+    "phone-silo-final.json": {
+      "sha256": "5ae5c1357ad4d359d1c63852f058037a10dcbbf06edbc11cb7a5bc896ba69e6e",
+      "bytes": 701
+    },
+    "phone-transport-comparison.json": {
+      "sha256": "ec5ad8cb78d458bacf8ca83ccd5406667edd63589b967c46d91340d6f1bd42e3",
+      "bytes": 246
+    },
+    "phone-transport-diagnostic.json": {
+      "sha256": "d2bb5269d434b9aeb1c76f3ef1333d5e8e0a0d03844a7673e2a52058d6842cbd",
+      "bytes": 253
+    },
+    "phone_network2-Ted_Lasso-scenario.json": {
+      "sha256": "2a4014d4f2d4fccf9f578f9a85483b59f863c33d73ad4bd8c00eb82af5b6c139",
+      "bytes": 1129
+    },
+    "repository-audit.mjs": {
+      "sha256": "15a7438c9ccdeb20996a5d29eb62ca468be18c3ff56bd9e3ea2f159d96e72ca8",
+      "bytes": 2868
+    },
+    "series-scenario.mjs": {
+      "sha256": "615aaf169a328ca02632862a72bc368d2b1012d34466d5f6d87ba3205ad1f566",
+      "bytes": 2903
+    },
+    "tablet-Mat_ria_Escura-scenario.json": {
+      "sha256": "9807691a0e4abacb815577bd7ff13c137a9da9c97bd70a0550239214a84c8711",
+      "bytes": 1190
+    },
+    "tablet-Ted_Lasso-scenario.json": {
+      "sha256": "f1cf01584e6dd8060ac249c4f1fa0223e5bba0ef539e6cb600a96b046215a219",
+      "bytes": 1147
+    },
+    "tablet-base-api-diagnostic.json": {
+      "sha256": "ca8c0399a1cf19c0256acce9bf24d264431d67592b798569bf49e61f95d07b85",
+      "bytes": 340
+    },
+    "tablet-installed-before.apk": {
+      "sha256": "0146a2fc05d3e45f5670f4c5aba0fa0d0ba1cd25bd0086f7ac00de4cb6ab8c29",
+      "bytes": 22317875
+    },
+    "tablet-layout-runtime.json": {
+      "sha256": "12caa0be09a9a15f25af9a42e89f11e0aa6e8d5db8c5b10bf9b5907f8ab7a779",
+      "bytes": 2158
+    },
+    "tablet-silo-details.json": {
+      "sha256": "7fa8e73d5376cc30ba31e2da064ed9aaf275226b28f119dfda41770e15fa9ca5",
+      "bytes": 747
+    },
+    "tablet-silo-details.png": {
+      "sha256": "a2bdf6b30272b3f4a8ba9ed84117a8278d3b25abecbc5640e14da7e739e81c7c",
+      "bytes": 1863046
+    },
+    "tablet-silo-diagnostic.json": {
+      "sha256": "f571b5a49c329ddbf007545197b55be306cb544dd4082b414dad12e32dea153c",
+      "bytes": 71
+    },
+    "tablet-silo-final.json": {
+      "sha256": "91e8df928f289845fe24a197b8f469a11d5428d5c2b731b0bd6cb8037723f32b",
+      "bytes": 704
+    },
+    "tablet-transport-comparison.json": {
+      "sha256": "ec5ad8cb78d458bacf8ca83ccd5406667edd63589b967c46d91340d6f1bd42e3",
+      "bytes": 246
+    },
+    "tablet-transport-diagnostic.json": {
+      "sha256": "d2bb5269d434b9aeb1c76f3ef1333d5e8e0a0d03844a7673e2a52058d6842cbd",
+      "bytes": 253
+    },
+    "tablet_network2-Silo-scenario.json": {
+      "sha256": "78bca6abef0ddc478ff18461f34102ccba05c455d47c73d8c7cd748bdcd5bd0e",
+      "bytes": 1168
+    },
+    "validation-c11.log": {
+      "sha256": "fb7c492919126190103095a24ce32220bd91f55af26f762b79c05ad6f492bd57",
+      "bytes": 3832
+    },
+    "validation-canonical.log": {
+      "sha256": "333306b1454599f02a6fc3a0f99cc69bfd4dd43dce42ce5906580a6cd192e8a0",
+      "bytes": 2564
+    },
+    "validation-regression-result.json": {
+      "sha256": "ccefd69c642066fe3379b54a1f2d573e056eac74955548b9153984410504194c",
+      "bytes": 13185
+    },
+    "validation-regression.log": {
+      "sha256": "5591ff1ab09c960b7a4a3ecd187a02267487794ce883bea3e3de0afd73c6fb96",
+      "bytes": 10953
+    },
+    "validation-results.json": {
+      "sha256": "9015f362b396bdca9101cf541946cdca272dab59178182c4984479a5e4f1cf0c",
+      "bytes": 1197
+    },
+    "validation-typecheck.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  }
+}

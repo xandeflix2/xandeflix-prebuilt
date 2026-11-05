@@ -1,0 +1,23 @@
+{
+  "observedUTC": "2026-11-05T10:18:43.601Z",
+  "label": "FIRE_USB_5G",
+  "scope": "Current app PID recent log window; event order retained. Previous attempts in same PID may be included; correlate with observer timestamps.",
+  "events": [],
+  "audio": {
+    "dumpAvailable": true,
+    "standbyNo": false,
+    "standbyYes": true
+  },
+  "metrics": {
+    "available": true,
+    "codecTypes": [
+      "OMX.google.vorbis.decoder",
+      "audio/vorbis",
+      "OMX.MTK.VIDEO.DECODER.HEVC",
+      "OMX.MTK.VIDEO.DECODER.HEVC.secure",
+      "OMX.MTK.VIDEO.DECODER.AVC",
+      "OMX.MTK.VIDEO.DECODER.AVC.secure"
+    ],
+    "scope": "Device-wide codec type observations, not proof of audible output or current session attribution"
+  }
+}

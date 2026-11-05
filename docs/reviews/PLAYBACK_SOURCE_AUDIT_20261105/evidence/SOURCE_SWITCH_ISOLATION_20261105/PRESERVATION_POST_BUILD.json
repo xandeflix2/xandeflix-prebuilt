@@ -1,0 +1,82 @@
+{
+  "observedUTC": "2026-11-05T11:52:44.527Z",
+  "originalSource": {
+    "same": 1581,
+    "different": []
+  },
+  "originalGit": {
+    "same": 41,
+    "different": []
+  },
+  "candidateGit": {
+    "same": 30,
+    "different": []
+  },
+  "candidateSource": {
+    "same": 1554,
+    "authorizedChanges": [
+      "android/app/build.gradle",
+      "android/app/src/main/java/com/xandeflix/prebuilt/artwork/ArtworkCachePlugin.java",
+      "android/app/src/main/java/com/xandeflix/prebuilt/artwork/ArtworkDiskCache.java",
+      "docs/ERRORS_AND_BLOCKERS.md",
+      "docs/EVOLUTION_REPORT.md",
+      "docs/STATUS.md",
+      "docs/architecture/XANDEFLIX_PREBUILT_PHASED_EXPANSION.md",
+      "scripts/test-c11-artwork-visible-recovery.mjs",
+      "scripts/test-c11-new-content-badge.mjs",
+      "scripts/test-c11-page-artwork-preparation.mjs",
+      "scripts/test-canonical-regression.mjs",
+      "src/App.tsx",
+      "src/artwork/artwork-file-cache.ts",
+      "src/bootstrap/boot-sync-coordinator.ts",
+      "src/catalog/new-content-badge.ts",
+      "src/playback/last-live-channel.ts",
+      "src/playback/live-favorites.ts",
+      "src/playback/watch-history.ts",
+      "src/ui/series-personal.store.ts"
+    ],
+    "unexpected": [
+      "android/app/src/main/assets/public/assets/index-CaP1mZod.js",
+      "android/app/src/main/assets/public/assets/main-CvPs0nkG.js",
+      "android/app/src/main/assets/public/assets/parental-storage-B2We-MID.js",
+      "android/app/src/main/assets/public/assets/poster-identity-CcRU0_zO.js",
+      "android/app/src/main/assets/public/assets/web-B9IMg_bw.js",
+      "android/app/src/main/assets/public/assets/web-BSolGl22.js",
+      "android/app/src/main/assets/public/assets/web-CGH2gZSZ.js",
+      "android/app/src/main/assets/public/index.html"
+    ]
+  },
+  "dependencies": {
+    "same": 6732,
+    "different": [
+      "@capacitor/android/capacitor/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/layout_bridge_layout_main.xml.flat",
+      "@capacitor/android/capacitor/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/layout_capacitor_bridge_layout_main.xml.flat",
+      "@capacitor/android/capacitor/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/layout_no_webview.xml.flat",
+      "@capacitor/android/capacitor/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties",
+      "@capacitor/android/capacitor/build/intermediates/incremental/debug/packageDebugResources/merger.xml",
+      "@capacitor/android/capacitor/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml",
+      "@capacitor/android/capacitor/build/intermediates/incremental/mergeDebugShaders/merger.xml",
+      "@capacitor/android/capacitor/build/intermediates/incremental/packageDebugAssets/merger.xml",
+      "@capacitor/android/capacitor/build/outputs/logs/manifest-merger-debug-report.txt",
+      "@capacitor/browser/android/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties",
+      "@capacitor/browser/android/build/intermediates/incremental/debug/packageDebugResources/merger.xml",
+      "@capacitor/browser/android/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml",
+      "@capacitor/browser/android/build/intermediates/incremental/mergeDebugShaders/merger.xml",
+      "@capacitor/browser/android/build/intermediates/incremental/packageDebugAssets/merger.xml",
+      "@capacitor/browser/android/build/intermediates/manifest_merge_blame_file/debug/processDebugManifest/manifest-merger-blame-debug-report.txt",
+      "@capacitor/browser/android/build/outputs/logs/manifest-merger-debug-report.txt",
+      "@capacitor/filesystem/android/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties",
+      "@capacitor/filesystem/android/build/intermediates/incremental/debug/packageDebugResources/merger.xml",
+      "@capacitor/filesystem/android/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml",
+      "@capacitor/filesystem/android/build/intermediates/incremental/mergeDebugShaders/merger.xml",
+      "@capacitor/filesystem/android/build/intermediates/incremental/packageDebugAssets/merger.xml",
+      "@capacitor/filesystem/android/build/outputs/logs/manifest-merger-debug-report.txt",
+      "@capacitor/share/android/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties",
+      "@capacitor/share/android/build/intermediates/incremental/debug/packageDebugResources/merger.xml",
+      "@capacitor/share/android/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml",
+      "@capacitor/share/android/build/intermediates/incremental/mergeDebugShaders/merger.xml",
+      "@capacitor/share/android/build/intermediates/incremental/packageDebugAssets/merger.xml",
+      "@capacitor/share/android/build/outputs/logs/manifest-merger-debug-report.txt"
+    ]
+  }
+}

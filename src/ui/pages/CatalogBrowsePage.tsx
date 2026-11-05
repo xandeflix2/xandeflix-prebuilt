@@ -13,7 +13,9 @@ import { MediaRail } from '../components/MediaRail.tsx';
 import { CategoryHero } from '../components/CategoryHero.tsx';
 import { useHeroPlayback } from '../hooks/useHeroPlayback.ts';
 import { BrowseHero } from '../components/BrowseHero.tsx';
-import { CatalogGrid } from '../components/CatalogGrid.tsx';
+import { VirtualCatalogGrid } from '../components/VirtualCatalogGrid.tsx';
+import {CardExpansionHost} from '../components/CardExpansion.tsx';
+import {categoryGridSeed} from '../catalog-grid-window.ts';
 import { useCategoryPreviews } from '../hooks/useCategoryPreviews.ts';
 import type { HomeCollectionId } from './HomeCollectionPage.tsx';
 import { useSeriesHighlights } from '../hooks/useSeriesHighlights.ts';
@@ -47,7 +49,16 @@ export function CatalogBrowsePage({ kind, readModel, onSelectItem, categoryId, o
   const browse = useSegmentedBrowse(kind, categoryId, snapshot, initial, latestSourceFirst ? 'source-desc' : 'source');
   const toViewModel = useCallback((row: Movie | Series) => movie
     ? movieToViewModel(readModel, row as Movie) : seriesToViewModel(readModel, row as Series), [readModel, movie]);
-  const items = useMemo(() => orderCategoryItems(browse.items.map(toViewModel), heading, seed), [browse.items, toViewModel, heading, seed]);
+  const gridSeed=categoryGridSeed(snapshot,kind,categoryId);
+  const ordered = useMemo(() => orderCategoryItems(browse.items.map(toViewModel), heading, collection?gridSeed:seed), [browse.items, toViewModel, heading, seed, collection, gridSeed]);
+  const [seenOrder,setSeenOrder]=useState<{key:string;ids:string[]}>({key:'',ids:[]});
+  const orderKey=JSON.stringify([snapshot,kind,categoryId]);
+  const items=useMemo(()=>{
+    if(!collection||seenOrder.key!==orderKey)return ordered;
+    const byId=new Map(ordered.map(item=>[item.id,item])),retained=seenOrder.ids.filter(id=>byId.has(id)),known=new Set(retained);
+    return [...retained.map(id=>byId.get(id)!),...ordered.filter(item=>!known.has(item.id))];
+  },[ordered,collection,seenOrder,orderKey]);
+  useEffect(()=>{if(collection)setSeenOrder(previous=>previous.key===orderKey&&previous.ids.length===items.length&&previous.ids.every((id,index)=>id===items[index].id)?previous:{key:orderKey,ids:items.map(item=>item.id)});},[collection,items,orderKey]);
   const recentSeries = useSeriesHighlights();
   const heroItems = useMemo(() => movie ? items : prioritizeSeries(recentSeries, items, 48, category?.name), [movie, recentSeries, items, category?.name]);
   const railService = useMemo(() => new SegmentedBrowseService(getClientBootstrapService().getStorage(), snapshot), [snapshot]);
@@ -77,7 +88,7 @@ export function CatalogBrowsePage({ kind, readModel, onSelectItem, categoryId, o
   const renderRail = ({ category: cat, initialItems }: typeof rails[number]) => <AsyncCategoryRail key={`${snapshot}:${kind}:${cat.id}`}
     id={`browse-${kind}-${cat.id}`} title={cat.name} kind={kind} categoryId={cat.id} initialItems={initialItems}
     readModel={readModel} browseService={railService} queue={queue} maxItems={20} loadWhenVisible
-    previewIndex={previewIndex}
+    previewIndex={previewIndex} expansionContext={kind}
     onItemClick={onSelectItem} onViewAll={() => onSelectCategory(cat.id)} onViewAllFocus={() => warmCategory(cat.id)}/>;
   const warmCategory = useCallback((id: string) => {
     const signal = warming.current?.signal;
@@ -108,17 +119,18 @@ export function CatalogBrowsePage({ kind, readModel, onSelectItem, categoryId, o
     : items.length ? `${items.length} ${plural} carregados` : 'Carregando categoria…';
 
   return <main ref={root} tabIndex={-1} className={`page-container ${movie ? 'movies-page' : 'series-page'} ${collection ? `category-collection-page${category ? '' : ' category-collection-page--missing'}` : 'category-rails-page'}`}
-    data-browse-kind={kind} data-category-id={categoryId}>
+    data-card-expansion-page={!collection ? kind : undefined} data-browse-kind={kind} data-category-id={categoryId}>
+    {!collection && <CardExpansionHost view={kind}/>}
     <div className="page-header"><h1 className="page-title">{heading}</h1><p className="page-subtitle">{collection && !category ? 'Esta categoria não está disponível no catálogo ativo.' : subtitle}</p></div>
     {!collection ? <BrowseHero key={`${snapshot}:${kind}`} readModel={readModel} storage={getClientBootstrapService().getStorage()}
       contentKind={movie ? 'movie' : 'series'} onSelect={onSelectItem}/>
       : category && <CategoryHero key={`${snapshot}:${categoryId}`} items={heroItems} onSelect={onSelectItem} {...heroPlayback}/>}
-    {collection ? category && <CatalogGrid key={`${snapshot}:${kind}:${categoryId}`} items={items} onItemClick={onSelectItem}
+    {collection ? category && <VirtualCatalogGrid key={`${snapshot}:${kind}:${categoryId}`} items={items} onItemClick={onSelectItem}
       emptyMessage={browse.failed ? 'Não foi possível carregar esta categoria.' : browse.loading ? 'Preparando catálogo…' : `Nenhum ${noun} encontrado nesta categoria.`}
       hasMoreRemote={browse.hasMore} isLoadingRemote={browse.loading} onLoadMoreRemote={browse.loadNext} autoLoadMore loadMoreFailed={browse.failed}/>
       : <div className="category-rails-container">
         {movie && rails.filter(rail => isReleaseCategory(rail.category.name)).map(renderRail)}
-        {featured.length > 0 && <MediaRail id={`browse-featured-${kind}`} title={movie ? 'Filmes em Destaque' : 'Séries em Destaque'}
+        {featured.length > 0 && <MediaRail expansionContext={movie?'movies':'series'} id={`browse-featured-${kind}`} title={movie ? 'Filmes em Destaque' : 'Séries em Destaque'}
           items={featured} preserveOrder onItemClick={onSelectItem}
           onViewAll={onSelectCollection ? () => onSelectCollection(movie ? 'featured-movies' : 'featured-series') : undefined}/>}
         {rails.filter(rail => !movie || !isReleaseCategory(rail.category.name)).map(renderRail)}

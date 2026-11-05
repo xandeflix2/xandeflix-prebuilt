@@ -1,0 +1,86 @@
+{
+  "observedUTC": "2026-11-05T11:50:54.602Z",
+  "result": "PASS",
+  "packageId": "com.xandeflix.prebuilt",
+  "versionCode": 53,
+  "versionName": "1.0.53",
+  "certificateSha256": "b235c7117c9660e17cf0732cd6493600a812692af289e627454988ea096e848d",
+  "apkSha256": "d849a27e0106006b324ea86b320909b455b11c92c774967b1189b3f8900e1caa",
+  "apkBytes": 21056416,
+  "artifact": "C:/Xandeflix/Audits/SOURCE_SWITCH_ISOLATION_20261105/Xandeflix-v1.0.53-Source-Isolation-20261105.apk",
+  "assets": [
+    {
+      "path": "assets/index-CaKLtAjp.js",
+      "bytes": 10266,
+      "sha256": "d378b04597d1ea047cf71660b8f259c40bf526cf93240274f2e657b81ed72a38"
+    },
+    {
+      "path": "assets/index-DrzG8pmq.css",
+      "bytes": 114571,
+      "sha256": "2e0bf30f12aef06c16f0d50f2fabbb3ed6748221dfb3542948c784a1dad3cb2f"
+    },
+    {
+      "path": "assets/main-B8Sgg5pC.css",
+      "bytes": 92084,
+      "sha256": "3e4d822ddf2d58f0abab2552783e0fb08b8641e1fa1a73df5ed1e83dc55ea6ae"
+    },
+    {
+      "path": "assets/main-DWPqI29W.js",
+      "bytes": 1668001,
+      "sha256": "cd10169da74d9863af4d7af357477e620c0d7ce5668bd2f969534f0156e75818"
+    },
+    {
+      "path": "assets/parental-storage-07R_J1vJ.js",
+      "bytes": 848,
+      "sha256": "ece10394c3c69145a0ad9fcf60b73e930853fa08b42479c866def6950513e742"
+    },
+    {
+      "path": "assets/poster-identity-BUH_yg1s.js",
+      "bytes": 2803,
+      "sha256": "d235e27df17c341357c73947583580f423ffa4097a7eb2fbaa16c0ea10dbbb33"
+    },
+    {
+      "path": "assets/web-92URk_-o.js",
+      "bytes": 361,
+      "sha256": "ff834020bf51c41664000e50186b4d48c70232467c3e0e3e0e02562a5b36cbab"
+    },
+    {
+      "path": "assets/web-BPUmNbis.js",
+      "bytes": 8760,
+      "sha256": "71f59ae9a888262abe89585ec61cc94cebe8b618a92df18198b9acd8034b5736"
+    },
+    {
+      "path": "assets/web-DiJhNsc1.js",
+      "bytes": 379,
+      "sha256": "9f580fc76663347c5e1bca41e05636b3871dd0bf6a8213f3198eb8f35524682e"
+    },
+    {
+      "path": "assets/xandeflix-sidebar-logo-BY-DJlIm.png",
+      "bytes": 993793,
+      "sha256": "9095b46daa2ceb18aa2237ab4406a4fe1219036395da3de8cded07d9bb204d10"
+    },
+    {
+      "path": "assets/xandeflix-wordmark-transparent-Cw9y148q.png",
+      "bytes": 487929,
+      "sha256": "b1e075dd55678ac5b08a697b8fdebee077ac0f9a9b0a39769313e43128a9708b"
+    },
+    {
+      "path": "index.html",
+      "bytes": 600,
+      "sha256": "2c5360d4bd6bfb50e3d85ff24c8b2a7376747dce3aa01f2e7bcbccb574f1305e"
+    }
+  ],
+  "nativeUnitTests": {
+    "tests": 259,
+    "suites": 40,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0
+  },
+  "standaloneSourceArtworkTest": "PASS_FROM_REVIEW_11_TARGET_UI",
+  "permissionsUnchanged": true,
+  "privateFileNamesFound": 0,
+  "privilegedSecretPatternFound": 0,
+  "physicalPlayback": "PENDING",
+  "releaseHomologation": false
+}

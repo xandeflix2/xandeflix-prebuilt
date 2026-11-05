@@ -1,0 +1,9 @@
+{
+  "observedUTC": "2026-11-05T11:29:01.855Z",
+  "exitCode": 1,
+  "before": "59290d873947b0659e583f4f13c31b9698bab2161f9be1e63d81e60afa67c542",
+  "after": "59290d873947b0659e583f4f13c31b9698bab2161f9be1e63d81e60afa67c542",
+  "unchanged": true,
+  "failedDependency": "../hooks/useCardGenres.ts",
+  "sourceProductChange": false
+}

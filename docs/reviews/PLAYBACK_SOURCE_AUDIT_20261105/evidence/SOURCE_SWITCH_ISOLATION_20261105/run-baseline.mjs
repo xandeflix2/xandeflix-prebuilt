@@ -1,0 +1,6 @@
+import fs from'node:fs';import path from'node:path';import{spawn}from'node:child_process';const folder=path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/,'$1')),cwd=path.join(folder,'workspace'),results=[];
+for(const[name,script]of[['01_CANONICAL_BEFORE','scripts/verify-canonical-contract.mjs'],['02_C11_BEFORE','scripts/test-c11-new-device-activation-lock.mjs'],['03_REGRESSION_BEFORE','scripts/test-canonical-regression.mjs']]){
+ const startedUTC=new Date().toISOString(),log=fs.createWriteStream(path.join(folder,name+'.log'),{flags:'wx'});console.log(JSON.stringify({status:'STARTED',name,startedUTC}));
+ const code=await new Promise((resolve,reject)=>{const p=spawn(process.execPath,[script],{cwd,env:{...process.env,GIT_OPTIONAL_LOCKS:'0'},windowsHide:true,stdio:['ignore','pipe','pipe']});p.stdout.pipe(log,{end:false});p.stderr.pipe(log,{end:false});p.on('error',reject);p.on('close',resolve)});await new Promise(r=>log.end(r));
+ const row={name,script,startedUTC,finishedUTC:new Date().toISOString(),exitCode:code};results.push(row);fs.writeFileSync(path.join(folder,'BASELINE_VALIDATIONS.json'),JSON.stringify(results,null,2));console.log(JSON.stringify(row));if(code!==0){console.log(JSON.stringify({status:'STOP_ON_BASELINE_FAILURE',nextAction:'NO_PRODUCT_IMPLEMENTATION'}));process.exitCode=1;break;}
+}

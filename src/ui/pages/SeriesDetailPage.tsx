@@ -14,10 +14,12 @@ import { getSeriesDetail } from '../../catalog/catalog-selectors.ts';
 import { Artwork } from '../components/Artwork.tsx';
 import { DetailBackdrop } from '../components/DetailBackdrop.tsx';
 import { useArtworkMetadata } from '../hooks/useArtworkMetadata.ts';
-import { tmdbPosterPath, artworkCategoryContext } from '../../artwork/tmdb-metadata.service.ts';
+import { tmdbPosterPath, artworkCategoryContext, hasPosterYearCorrection } from '../../artwork/tmdb-metadata.service.ts';
 import { useImmersiveArtwork } from '../hooks/useImmersiveArtwork.ts';
 import { DetailTrailer } from '../components/DetailTrailer.tsx';
 import { SeriesDetailSections } from '../components/SeriesDetailSections.tsx';
+import { EpisodeListPresentation } from '../components/EpisodeListPresentation.tsx';
+import { EpisodeStill } from '../components/EpisodeStill.tsx';
 import { SeriesPersonalActions } from '../components/SeriesPersonalActions.tsx';
 import { watchFingerprint, watchHistory } from '../../playback/watch-history.ts';
 import { PhoneSeriesDetail } from '../components/PhoneSeriesDetail.tsx';
@@ -29,7 +31,16 @@ import { defaultPlaybackService } from '../../playback/playback.service.ts';
 import { meaningfulDetailGenres } from '../detail-genres.ts';
 import { observeWebSeriesDetails } from '../../web/web-playback-diagnostic.ts';
 
+/** Ephemeral UI position; owned by the current App route, never persisted. */
+export interface SeriesEpisodeReturnState {
+  seasonId?: string;
+  episodeId?: string;
+  pendingFocus?: boolean;
+  launchPending?: boolean;
+}
+
 interface SeriesDetailPageProps {
+  returnState?: SeriesEpisodeReturnState;
   seriesId: string;
   readModel: CatalogReadModel;
   onBack: () => void;
@@ -42,6 +53,7 @@ export const SeriesDetailPage: React.FC<SeriesDetailPageProps> = ({
   readModel,
   onBack,
   onSelectItem,
+  returnState,
 }) => {
   const immersive=useImmersiveArtwork(seriesId);
   const phone = usePhoneLayout();
@@ -52,29 +64,36 @@ export const SeriesDetailPage: React.FC<SeriesDetailPageProps> = ({
   const sourceGenres = meaningfulDetailGenres(sourceDetail?.genreLabels || []);
   const metadata = useArtworkMetadata(identity, Boolean(sourceDetail && (!sourceDetail.overview || !sourceDetail.yearFormatted
     || !sourceDetail.originalTitle || !sourceGenres.length)), 'high');
+  const corrected=hasPosterYearCorrection(identity,metadata);
   const detail = sourceDetail && { ...sourceDetail,
-    originalTitle: sourceDetail.originalTitle || metadata?.originalTitle,
-    yearFormatted: sourceDetail.yearFormatted || (metadata?.year ? String(metadata.year) : undefined),
-    overview: sourceDetail.overview || metadata?.overview,
-    genreLabels: sourceGenres.length ? sourceGenres : meaningfulDetailGenres(metadata?.genres || []),
+    ...(corrected&&metadata?.title?{title:metadata.title}:{}),
+    originalTitle: corrected?metadata?.originalTitle:sourceDetail.originalTitle || metadata?.originalTitle,
+    yearFormatted: corrected&&metadata?.year?String(metadata.year):sourceDetail.yearFormatted || (metadata?.year ? String(metadata.year) : undefined),
+    overview: corrected?metadata?.overview:sourceDetail.overview || metadata?.overview,
+    genreLabels: corrected?meaningfulDetailGenres(metadata?.genres||[]):sourceGenres.length ? sourceGenres : meaningfulDetailGenres(metadata?.genres || []),
   };
   const [detailLoading, setDetailLoading] = useState(!detail);
   const [detailFailed, setDetailFailed] = useState(false);
   const [detailAttempt, setDetailAttempt] = useState(0);
 
   const seasons = detail?.seasons || [];
-  const [selectedSeasonIndex, setSelectedSeasonIndex] = useState<number>(0);
+  const [localReturnState] = useState<SeriesEpisodeReturnState>(() => ({}));
+  const episodeReturn = returnState || localReturnState;
+  const [selectedSeasonId, setSelectedSeasonId] = useState<string | undefined>(() => episodeReturn.seasonId);
+  const selectedSeasonIndex = Math.max(0, seasons.findIndex(season => season.id === selectedSeasonId));
+  const [returningToEpisode] = useState(() => Boolean(episodeReturn.pendingFocus));
+  const [returnFocus] = useState(() => ({ onMount: Boolean(episodeReturn.pendingFocus), wasAway: false }));
   const [resolvingEpisodeId, setResolvingEpisodeId] = useState<string | null>(null);
     const [episodeStatusNotice, setEpisodeStatusNotice] = useState<string | null>(null);
   const [episodesLoading, setEpisodesLoading] = useState<boolean>(() => typeof readModel.loadEpisodesForSeries === 'function');
   const [episodesFailed, setEpisodesFailed] = useState(false);
   const [episodeLoadAttempt, setEpisodeLoadAttempt] = useState(0);
-  const [, setRefreshKey] = useState<number>(0);
-  const [selectedEpisodeId, setSelectedEpisodeId] = useState<string | null>(null);
-  useDetailInitialFocus(immersive,seriesId,Boolean(detail),phone);
+  const [refreshKey, setRefreshKey] = useState<number>(0);
+  const [selectedEpisodeId, setSelectedEpisodeId] = useState<string | null>(() => episodeReturn.episodeId || null);
+  useDetailInitialFocus(immersive,seriesId,Boolean(detail) && !returningToEpisode,phone);
 
   useEffect(() => {
-    setSelectedEpisodeId(null);
+    setSelectedEpisodeId(episodeReturn.episodeId || null);
     const unsubscribe=watchHistory.subscribe(()=>setRefreshKey(value=>value+1));
     void watchHistory.syncNativeProgress();
     return unsubscribe;
@@ -120,6 +139,14 @@ export const SeriesDetailPage: React.FC<SeriesDetailPageProps> = ({
 
   const handlePlayEpisode = useCallback(
     async (episodeId: string) => {
+      const season = seasons.find(value => value.episodes.some(episode => episode.id === episodeId));
+      episodeReturn.seasonId = season?.id;
+      episodeReturn.episodeId = episodeId;
+      episodeReturn.pendingFocus = true;
+      episodeReturn.launchPending = true;
+      returnFocus.onMount = false;
+      returnFocus.wasAway = false;
+      setSelectedEpisodeId(episodeId);
       setResolvingEpisodeId(episodeId);
       setEpisodeStatusNotice(null);
 
@@ -128,18 +155,61 @@ export const SeriesDetailPage: React.FC<SeriesDetailPageProps> = ({
         if (result.state === 'NATIVE_PLAYER_OPENED') {
           setEpisodeStatusNotice(null);
         } else if (result.state === 'NATIVE_PLAYER_UNAVAILABLE') {
+          episodeReturn.pendingFocus = false;
           setEpisodeStatusNotice('Player nativo Android indisponível no navegador web.');
         } else {
+          episodeReturn.pendingFocus = false;
           setEpisodeStatusNotice(result.errorMessage || 'Falha ao iniciar player nativo.');
         }
       } catch (err: unknown) {
+        episodeReturn.pendingFocus = false;
         setEpisodeStatusNotice(err instanceof Error ? err.message : 'Falha na resolução de stream.');
       } finally {
+        episodeReturn.launchPending = false;
         setResolvingEpisodeId(null);
       }
     },
-    [seriesId, readModel]
+    [seriesId, readModel, seasons, episodeReturn, returnFocus]
   );
+
+  useEffect(() => {
+    const page = immersive.current;
+    if (!page || !episodeReturn.pendingFocus) return;
+    let frame = 0;
+    if (document.hidden) returnFocus.wasAway = true;
+    const restore = () => {
+      frame = 0;
+      if (!episodeReturn.pendingFocus || episodeReturn.launchPending || document.hidden || (!returnFocus.onMount && !returnFocus.wasAway) || resolvingEpisodeId !== null
+        || document.querySelector('dialog[open], .playback-error-notice')) return;
+      const target = Array.from(page.querySelectorAll<HTMLButtonElement>('[data-series-episode-id]'))
+        .find(button => button.dataset.seriesEpisodeId === episodeReturn.episodeId && !button.disabled)
+          || (!episodesLoading ? page.querySelector<HTMLButtonElement|HTMLSelectElement>('.series-season-select, .season-tab.active')
+          || page.querySelector<HTMLButtonElement>('.series-detail-tabs button, .series-phone-tabs button') : null);
+      if (!target || !target.isConnected) return;
+      target.focus({ preventScroll: true });
+      if (document.activeElement !== target) return;
+      (target.closest('.episode-card') || target).scrollIntoView({ behavior: 'auto', block: 'center', inline: 'nearest' });
+      episodeReturn.pendingFocus = false;
+      returnFocus.onMount = false;
+      returnFocus.wasAway = false;
+    };
+    const schedule = () => {
+      if (document.hidden) { returnFocus.wasAway = true; return; }
+      if (frame) cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(restore);
+    };
+    const departed = () => { returnFocus.wasAway = true; };
+    document.addEventListener('visibilitychange', schedule);
+    window.addEventListener('blur', departed);
+    window.addEventListener('focus', schedule);
+    schedule();
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+      document.removeEventListener('visibilitychange', schedule);
+      window.removeEventListener('blur', departed);
+      window.removeEventListener('focus', schedule);
+    };
+  }, [immersive, episodeReturn, returnFocus, resolvingEpisodeId, episodesLoading, refreshKey, selectedSeasonId]);
 
   if (!detail && detailLoading) {
     return <main ref={immersive} className="page-container detail-page"><p>Carregando detalhes da série...</p></main>;
@@ -168,9 +238,14 @@ export const SeriesDetailPage: React.FC<SeriesDetailPageProps> = ({
   const publicId = Number(detail.externalIds?.tmdbId);
   const episodesSection = (
         <section className="seasons-section" aria-label="Temporadas e Episódios">
-          <h2 className="section-heading">Episódios</h2>
 
-          {seasons.length > 1 && (
+
+          {phone && seasons.length > 0 ? (
+            <select className="focusable-item series-season-select" aria-label="Selecionar temporada"
+              value={currentSeason?.id || ''} onChange={event => { episodeReturn.seasonId = event.target.value; setSelectedSeasonId(event.target.value); }}>
+              {seasons.map(season => <option key={season.id} value={season.id}>{season.title}</option>)}
+            </select>
+          ) : seasons.length > 1 ? (
             <div className="season-selector-tabs" role="tablist">
               {seasons.map((season, idx) => (
                 <button
@@ -179,13 +254,13 @@ export const SeriesDetailPage: React.FC<SeriesDetailPageProps> = ({
                   role="tab"
                   aria-selected={idx === selectedSeasonIndex}
                   className={`focusable-item season-tab ${idx === selectedSeasonIndex ? 'active' : ''}`}
-                  onClick={() => setSelectedSeasonIndex(idx)}
+                  onClick={() => { episodeReturn.seasonId = season.id; setSelectedSeasonId(season.id); }}
                 >
                   {season.title}
                 </button>
               ))}
             </div>
-          )}
+          ) : null}
 
           {episodeStatusNotice && (
             <div className="series-playback-status-banner">
@@ -194,17 +269,50 @@ export const SeriesDetailPage: React.FC<SeriesDetailPageProps> = ({
           )}
 
           {currentSeason && (
+            <EpisodeListPresentation key={`${seriesId}:${currentSeason.id}`} readModel={readModel} seriesId={seriesId} season={currentSeason} identity={identity} enabled={!episodesLoading}>
+            {(episodePresentation) => (
             <ul className="episodes-list" aria-label={`Episódios de ${currentSeason.title}`}>
               {episodesLoading && currentSeason.episodes.length === 0 ? (
                 <li className="loading-episodes" role="status" aria-live="polite"><span className="episode-loading-spinner" aria-hidden="true"/>Carregando episódios da temporada...</li>
               ) : currentSeason.episodes.length === 0 ? (
                 <li className="no-episodes">Nenhum episódio cadastrado para esta temporada.</li>
               ) : (
-                currentSeason.episodes.map((ep) => {
+                episodePresentation.map((ep) => {
                   const resumePosition = fingerprint ? watchHistory.savedPosition('series',seriesId,fingerprint,ep.id) : 0;
+                   const savedProgress = fingerprint ? watchHistory.savedProgress('series',seriesId,fingerprint,ep.id) : undefined;
+                   const progressPercent = savedProgress && savedProgress.durationMs > 0 && (savedProgress.positionMs > 0 || savedProgress.completed)
+                     ? Math.min(100, Math.max(0, savedProgress.completed ? 100 : 100 * savedProgress.positionMs / savedProgress.durationMs))
+                     : null;
                   return (
-                  <li key={ep.id} className={`episode-card${selectedEpisode===ep.id?' episode-card--selected':''}`}
+                  <li key={ep.id} className={`episode-card episode-card--metadata${selectedEpisode===ep.id?' episode-card--selected':''}`}
                     onFocusCapture={()=>setSelectedEpisodeId(ep.id)} onClickCapture={()=>setSelectedEpisodeId(ep.id)}>
+                    <div className="episode-visual">
+                      <EpisodeStill uri={ep.sceneUri} source={ep.sceneSource}/>
+                      {!phone && (
+                        <>
+                          <button
+                            type="button"
+                            data-series-episode-id={ep.id}
+                            aria-label={`${resolvingEpisodeId === ep.id ? 'Preparando' : resumePosition > 0 ? 'Continuar assistindo' : 'Assistir'} episódio ${ep.episodeNumber}: ${ep.title}`}
+                            className={`focusable-item episode-scene-action ${resolvingEpisodeId === ep.id ? 'btn-resolving' : ''}`}
+                            onClick={() => handlePlayEpisode(ep.id)}
+                            disabled={resolvingEpisodeId !== null}
+                          >
+                            <span className="episode-scene-action-label">
+                              {resolvingEpisodeId === ep.id ? 'Preparando...' : resumePosition > 0 ? '▶ Continuar' : '▶ Assistir'}
+                            </span>
+                          </button>
+                          {progressPercent !== null && (
+                            <progress
+                              className="episode-progress"
+                              value={progressPercent}
+                              max={100}
+                              aria-label={`Progresso do episódio ${ep.episodeNumber}`}
+                            />
+                          )}
+                        </>
+                      )}
+                    </div>
                     <div className="episode-info">
                       <div className="episode-header">
                         <h3 className="episode-title">
@@ -214,23 +322,29 @@ export const SeriesDetailPage: React.FC<SeriesDetailPageProps> = ({
                           <span className="episode-duration">{ep.durationFormatted}</span>
                         )}
                       </div>
-                      {ep.overview && <p className="episode-overview">{ep.overview}</p>}
-                      <div className="episode-playback-action">
+                      <p className="episode-overview">{ep.overview || ''}</p>
+                      {phone && (
+<div className="episode-playback-action">
                         {resumePosition>0 && <span className="episode-resume-notice">Continuar assistindo</span>}
                         <button
                           type="button"
+                          data-series-episode-id={ep.id}
+                          aria-label={`${resolvingEpisodeId === ep.id ? 'Preparando' : resumePosition>0 ? 'Continuar' : 'Assistir'} episódio ${ep.episodeNumber}: ${ep.title}`}
                           className={`focusable-item btn-primary btn-episode-play ${resolvingEpisodeId === ep.id ? 'btn-resolving' : ''}`}
                           onClick={() => handlePlayEpisode(ep.id)}
                           disabled={resolvingEpisodeId !== null}
                         >
-                          {resolvingEpisodeId === ep.id ? 'Preparando...' : resumePosition>0 ? '▶ Continuar' : '▶ Assistir'}
+                          <span className="episode-play-label">{resolvingEpisodeId === ep.id ? 'Preparando...' : resumePosition>0 ? '▶ Continuar' : '▶ Assistir'}</span>
                         </button>
                       </div>
+)}
                     </div>
                   </li>
                 );})
               )}
             </ul>
+            )}
+            </EpisodeListPresentation>
           )}
           {!currentSeason && episodesLoading && <p className="loading-episodes" role="status" aria-live="polite"><span className="episode-loading-spinner" aria-hidden="true"/>Carregando temporadas e episódios...</p>}
         </section>
@@ -317,7 +431,7 @@ export const SeriesDetailPage: React.FC<SeriesDetailPageProps> = ({
           </div>
         </div>
         </div>
-        <SeriesDetailSections key={seriesId} seriesId={seriesId}
+        <SeriesDetailSections key={seriesId} seriesId={seriesId} identity={identity}
           readModel={readModel} episodes={episodesSection} episodesFailed={episodesFailed}
           onRetryEpisodes={()=>setEpisodeLoadAttempt(value=>value+1)} onSelectItem={onSelectItem}/>
       </div>

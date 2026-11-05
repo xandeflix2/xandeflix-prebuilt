@@ -1,0 +1,44 @@
+{
+  "observedUTC": "2026-11-05T10:32:39.787Z",
+  "status": "FIRE_KNOWN_TITLE_SAMPLE",
+  "kind": "movie",
+  "startPositionMs": 0,
+  "events": [
+    {
+      "event": "OPEN",
+      "kind": "movie",
+      "scheme": "http:",
+      "typedPath": "movie",
+      "extension": "mp4",
+      "pathDepth": 4,
+      "hasQuery": false,
+      "headerNames": [
+        "User-Agent"
+      ],
+      "uaClass": "IPTV_SMARTERS_DEFAULT",
+      "observedUTC": "2026-11-05T10:32:26.187Z"
+    },
+    {
+      "event": "OPEN_RETURN",
+      "accepted": true,
+      "candidateCount": 1,
+      "observedUTC": "2026-11-05T10:32:26.345Z"
+    },
+    {
+      "event": "progress",
+      "positionMs": 0,
+      "durationMs": 0,
+      "ended": false,
+      "observedUTC": "2026-11-05T10:32:31.963Z"
+    },
+    {
+      "event": "progress",
+      "positionMs": 0,
+      "durationMs": 0,
+      "ended": false,
+      "observedUTC": "2026-11-05T10:32:36.982Z"
+    }
+  ],
+  "sameDisplayedTitle": true,
+  "scope": "Unique title selected by previous helper; different source credentials on Fire, URI/entitlement equivalence not presumed"
+}

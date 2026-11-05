@@ -1,3 +1,4 @@
+import {categoryGridSeed} from '../src/ui/catalog-grid-window.ts';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -5,7 +6,7 @@ import ts from 'typescript';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { normalizeArtworkUri, chooseArtworkUri, displayArtworkUri } from '../src/artwork/artwork-uri.ts';
-import { TmdbMetadataService, normalizeArtworkIdentity, artworkIdentityKey, artworkCategoryContext, selectTmdbMatch, tmdbPosterPath, chooseHeroPoster } from '../src/artwork/tmdb-metadata.service.ts';
+import { TmdbMetadataService, normalizeArtworkIdentity, artworkIdentityKey, artworkCategoryContext, selectTmdbMatch, tmdbPosterPath, chooseHeroPoster, hasPosterYearCorrection } from '../src/artwork/tmdb-metadata.service.ts';
 import { RealSourceImporterService } from '../src/source/real-source-importer.service.ts';
 import { CatalogReadModel } from '../src/catalog/catalog-read-model.ts';
 import * as selectors from '../src/catalog/catalog-selectors.ts';
@@ -220,7 +221,7 @@ print('PASS_AUTH_COOLDOWN_RECOVERY_AND_CACHE_512_ENTRIES');
 const require = createRequire(import.meta.url);
 const overlay = { ...a, year: 2020 };
 const uriModule = { normalizeArtworkUri, chooseArtworkUri, displayArtworkUri };
-const providerModule = { artworkIdentityKey, artworkCategoryContext, tmdbPosterPath, chooseHeroPoster };
+const providerModule = { normalizeArtworkIdentity, artworkIdentityKey, artworkCategoryContext, tmdbPosterPath, chooseHeroPoster, hasPosterYearCorrection };
 const hookModule = { useArtworkMetadata: () => overlay, useArtworkMetadataState: () => ({ metadata: overlay, pending: false }) };
 const compiled = new Map();
 function loadTsx(relative) {
@@ -231,6 +232,9 @@ function loadTsx(relative) {
   const mod = { exports: {} };
   new Function('require', 'module', 'exports', code)((name) => {
     if (name === 'react') return { ...React, useLayoutEffect: React.useEffect };
+    if(name.endsWith('CardExpansion.tsx'))return{CardExpansionHost:()=>null};
+    if(name.endsWith('catalog-grid-window.ts'))return{categoryGridSeed};
+    if(name.endsWith('VirtualCatalogGrid.tsx'))return{VirtualCatalogGrid:loadTsx('../src/ui/components/CatalogGrid.tsx').CatalogGrid};
     if (name.endsWith('series-poster-claims.ts')) return { seriesPosterClaims };
     if (name.endsWith('useCatalogReturnNavigation.ts')) return { CATALOG_RETURN_EXPAND: 'xandeflix:catalog-return-expand', CATALOG_RETURN_END: 'xandeflix:catalog-return-end' };
     if (name.endsWith('useDevicePresentation.ts')) return { useDevicePresentation: () => 'TABLET' };
@@ -240,6 +244,7 @@ function loadTsx(relative) {
     if (name.endsWith('parental-content.ts')) return { canShowParentalItem: () => true };
     if (name.endsWith('content-adult-policy.ts')) return { isAdultClassification: () => false };
     if (name.endsWith('useCardGenres.ts')) return { useCardGenres: () => ({ ref() {}, genres: [], visible: false }) };
+    if (name.endsWith('TitleCast.tsx')) return { TitleCast: () => null };
     if (name.endsWith('WatchProviders.tsx')) return { WatchProviders: () => null };
     if (name.endsWith('PlatformCategoryBadge.tsx')) return { PlatformCategoryLogo: () => null };
     if (name.endsWith('detail-genres.ts')) return loadTsx('../src/ui/detail-genres.ts');
@@ -249,6 +254,9 @@ function loadTsx(relative) {
     if (name.endsWith('artwork-file-cache.ts')) return { invalidateCachedArtworkUri() {} };
     if (name.endsWith('artwork-visibility.ts')) return { observeArtwork: () => () => {} };
     if (name.endsWith('NewContentProvider.tsx')) return { useContentBadge: () => undefined };
+  // Optional enrichment boundary: retain original episode values in this historical scope.
+  if(name.endsWith('EpisodeListPresentation.tsx'))return{EpisodeListPresentation:({season,children})=>children(season.episodes)};
+  if(name.endsWith('EpisodeStill.tsx'))return{EpisodeStill:()=>null};
     if (name.endsWith('SeriesPersonalActions.tsx')) return { SeriesPersonalActions: () => null };
     if (name.endsWith('SeriesDetailSections.tsx')) return { SeriesDetailSections: () => null };
     if (name.endsWith('DetailTrailer.tsx')) return { DetailTrailer: () => null };

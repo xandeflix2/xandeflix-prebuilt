@@ -1,3 +1,4 @@
+import {CardExpansionHost} from '../components/CardExpansion.tsx';
 /**
  * Xandeflix Prebuilt — HomePage Component (Pre-Gate B Dynamic Expansion)
  *
@@ -97,6 +98,7 @@ export const HomePage: React.FC<HomePageProps> = ({ readModel, onSelectItem, onS
         key={`${readModel.catalog.metadata.snapshotId}-cat-movie-${cat.id}`}
         id={`rail-cat-${cat.id}-movie`}
         title={cat.name}
+        expansionContext="home"
         kind="movies"
         categoryId={cat.id}
         initialItems={initial}
@@ -104,6 +106,7 @@ export const HomePage: React.FC<HomePageProps> = ({ readModel, onSelectItem, onS
         browseService={browseService}
         queue={queue}
         loadWhenVisible
+        progressive
         previewIndex={previewIndex}
         onItemClick={onSelectItem}
         onViewAll={() => onSelectCategory('movies', cat.id)}
@@ -125,7 +128,8 @@ export const HomePage: React.FC<HomePageProps> = ({ readModel, onSelectItem, onS
   }
 
   return (
-    <main ref={root} className="page-container home-page">
+    <main ref={root} className="page-container home-page" data-card-expansion-page="home">
+      <CardExpansionHost view="home"/>
       <StartupArtworkPreparation root={root} snapshot={readModel.catalog.metadata.snapshotId} posters={startupPosters} onPreparing={setPreparingArtwork}/>
       <HomeHero {...hero} {...heroPlayback} options={hero.candidates} onSelect={onSelectItem} />
 
@@ -138,7 +142,7 @@ export const HomePage: React.FC<HomePageProps> = ({ readModel, onSelectItem, onS
         <RecentTitles readModel={readModel} onViewAll={() => onSelectCollection('recent-watched')}/>
 
         {featuredMovies.length > 0 && (
-          <MediaRail
+          <MediaRail expansionContext="home"
             id="rail-movies"
             title="Filmes em Destaque"
             items={featuredMovies}
@@ -149,7 +153,7 @@ export const HomePage: React.FC<HomePageProps> = ({ readModel, onSelectItem, onS
         )}
 
         {featuredSeries.length > 0 && (
-          <MediaRail
+          <MediaRail expansionContext="home"
             id="rail-series"
             title="Séries em Destaque"
             items={featuredSeries}
@@ -176,6 +180,7 @@ export const HomePage: React.FC<HomePageProps> = ({ readModel, onSelectItem, onS
               key={`${readModel.catalog.metadata.snapshotId}-cat-series-${cat.id}`}
               id={`rail-cat-${cat.id}-series`}
               title={cat.name}
+              expansionContext="home"
               kind="series"
               categoryId={cat.id}
               initialItems={initial}
@@ -183,6 +188,7 @@ export const HomePage: React.FC<HomePageProps> = ({ readModel, onSelectItem, onS
               browseService={browseService}
               queue={queue}
               loadWhenVisible
+              progressive
               previewIndex={previewIndex}
               onItemClick={onSelectItem}
               onViewAll={() => onSelectCategory('series', cat.id)}

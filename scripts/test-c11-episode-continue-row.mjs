@@ -14,11 +14,19 @@ const episodes=[1,2,3].map(n=>({id:'episode-'+n,seriesId:series.id,seasonId:'sea
 const model=new CatalogReadModel({metadata:{snapshotId:'fixture'},series:[series],seasons:[{id:'season-fixture',seriesId:series.id,seasonNumber:1,episodeIds:episodes.map(e=>e.id)}],episodes,movies:[],streams:[],artworks:[],categories:[],genres:[]});
 const canonical=model.seriesById.get(series.id),fingerprint=watchFingerprint('series',canonical);
 let phone=false,played=[];
+const sourceEpisodePresentation=({season,children})=>children(season.episodes);
 const port={
+ '../components/EpisodeListPresentation.tsx':{EpisodeListPresentation:sourceEpisodePresentation},
+ '../components/EpisodeStill.tsx':{EpisodeStill:()=>null},
+ '../components/DetailBackdrop.tsx':{DetailBackdrop:()=>null},
+ '../components/WatchProviders.tsx':{WatchProviders:()=>null},
+ '../components/TitleCast.tsx':{TitleCast:()=>null},
+ '../detail-genres.ts':{meaningfulDetailGenres:values=>values},
+ '../../web/web-playback-diagnostic.ts':{observeWebSeriesDetails:fn=>fn()},
  '../../catalog/catalog-selectors.ts':{getSeriesDetail},
  '../components/Artwork.tsx':{Artwork:()=>null},
  '../hooks/useArtworkMetadata.ts':{useArtworkMetadata:()=>undefined},
- '../../artwork/tmdb-metadata.service.ts':{tmdbPosterPath:()=>undefined},
+ '../../artwork/tmdb-metadata.service.ts':{tmdbPosterPath:()=>undefined,artworkCategoryContext:()=>({})},
  '../hooks/useImmersiveArtwork.ts':{useImmersiveArtwork:()=>({current:null})},
  '../components/DetailTrailer.tsx':{DetailTrailer:()=>null},
  '../components/SeriesPersonalActions.tsx':{SeriesPersonalActions:()=>null},
@@ -38,7 +46,7 @@ function page(){
  new Function('require','module','exports',code)(require,module,module.exports);
  return {render(){cursor=0;return module.exports.SeriesDetailPage({seriesId:series.id,readModel:model,onBack:()=>{}});},effects(){while(pending.length)pending.shift()();},cleanup(){for(const e of effects.values())e.cleanup?.();effects.clear();},get updates(){return updates;}};
 }
-const walk=tree=>{const nodes=[];const visit=node=>{if(!React.isValidElement(node))return;nodes.push(node);React.Children.forEach(node.props.children,visit);if(node.props.episodes)visit(node.props.episodes);};visit(tree);return nodes;};
+const walk=tree=>{const nodes=[];const visit=node=>{if(!React.isValidElement(node))return;nodes.push(node);if(node.type===sourceEpisodePresentation)visit(sourceEpisodePresentation(node.props));else React.Children.forEach(node.props.children,visit);if(node.props.episodes)visit(node.props.episodes);};visit(tree);return nodes;};
 const rows=tree=>walk(tree).filter(n=>n.type==='li'&&n.props.className?.startsWith('episode-card'));
 const html=row=>renderToStaticMarkup(row);
 const tick=()=>new Promise(resolve=>setTimeout(resolve,0));

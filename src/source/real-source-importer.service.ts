@@ -36,6 +36,7 @@ import { isStartupPreviewObserved, offerStartupPoster, resetStartupCatalogPrevie
 import { yieldToEventLoop } from '../diagnostics/boot-telemetry.ts';
 import { createSha256Stream } from '../security/artifact-hash.ts';
 import { DIRECTORY_ROOTS_MODE, deriveDirectoryRuntimeConfig, fetchDirectoryJson, buildDirectoryStreamUrl } from './source-directory-api.ts';
+import { fetchStreamedVodInventory } from './source-streamed-vod-inventory.ts';
 import { XuiM3uKindResolver, XuiM3uResolutionError, opaqueXuiTransport } from './xui-m3u-kind-resolver.ts';
 import type {
   LocalCatalogStorage,
@@ -302,9 +303,21 @@ export class RealSourceImporterService {
     const sourceDetectionMs = Math.round(performance.now() - tDetectStart);
     const sourceConnectionMs = sourceDetectionMs;
 
+    let streamedVodInventory = false;
     const fetchJson = async (action: string) => {
       if (directoryConfig) {
-        const data = await fetchDirectoryJson(directoryConfig, action, undefined,
+        let data: unknown;
+        if (action === 'get_vod_streams') {
+          const inventory = await fetchStreamedVodInventory(directoryConfig,
+            { headers: requestHeaders, fetchImpl: options?.fetchImpl, nativeTransport: options?.nativeTransport })
+            .catch((error: unknown) => {
+              if (error instanceof Error && error.message === 'STREAMED_VOD_FETCH_FAILED') throw new Error('DIRECTORY_JSON_FETCH_FAILED');
+              throw error;
+            });
+          data = inventory.rows;
+          streamedVodInventory = inventory.usedProjection;
+          if (streamedVodInventory) console.info('DIRECTORY_STREAMED_VOD_VERIFIED', { records: inventory.rows.length, rawRows: inventory.rawRows, duplicateRows: inventory.duplicateRows, rawBytes: inventory.rawBytes, projectedBytes: inventory.projectedBytes });
+        } else data = await fetchDirectoryJson(directoryConfig, action, undefined,
           { headers: requestHeaders, fetchImpl: options?.fetchImpl });
         if (!Array.isArray(data)) throw new Error('XTREAM_LIST_INVALID');
         const categoryList = action.endsWith('_categories');
@@ -330,6 +343,22 @@ export class RealSourceImporterService {
       return data;
     };
 
+    let prefetchedVod: any[] | undefined, prefetchedSeries: any[] | undefined;
+    let vodPrefetchMs = 0, seriesPrefetchMs = 0;
+    if (directoryConfig) {
+      const started = performance.now();
+      // Only these two requests overlap. Drain both before error/fallback so no
+      // candidate download remains running alongside a legacy M3U import.
+      const roots = await Promise.allSettled([
+        fetchJson('get_vod_streams').then(rows => { vodPrefetchMs = Math.round(performance.now() - started); return rows; }),
+        fetchJson('get_series').then(rows => { seriesPrefetchMs = Math.round(performance.now() - started); return rows; }),
+      ]);
+      for (const result of roots) if (result.status === 'rejected') throw result.reason;
+      if (roots[0].status === 'fulfilled' && roots[1].status === 'fulfilled') {
+        prefetchedVod = roots[0].value; prefetchedSeries = roots[1].value;
+      }
+    }
+
     const tLiveStart = performance.now();
     const [liveCategories, liveStreams] = await Promise.all([
       fetchJson('get_live_categories'),
@@ -340,18 +369,19 @@ export class RealSourceImporterService {
     const tMoviesStart = performance.now();
     const [vodCategories, vodStreams] = await Promise.all([
       fetchJson('get_vod_categories'),
-      fetchJson('get_vod_streams'),
+      prefetchedVod || fetchJson('get_vod_streams'),
     ]);
-    const moviesFetchMs = Math.round(performance.now() - tMoviesStart);
+    const moviesFetchMs = vodPrefetchMs + Math.round(performance.now() - tMoviesStart);
 
     const tSeriesStart = performance.now();
     const [seriesCategories, seriesStreams] = await Promise.all([
       fetchJson('get_series_categories'),
-      fetchJson('get_series'),
+      prefetchedSeries || fetchJson('get_series'),
     ]);
-    const seriesFetchMs = Math.round(performance.now() - tSeriesStart);
+    const seriesFetchMs = seriesPrefetchMs + Math.round(performance.now() - tSeriesStart);
 
     const hasher = createSha256Stream(), encoder = new TextEncoder();
+    if (streamedVodInventory) hasher.update(encoder.encode('[DIRECTORY_STREAMED_VOD_V1]'));
     // Rebuild old TS directory checkpoints once; HLS/legacy digests stay compatible.
     if (directoryConfig && directoryLiveExtension === 'ts') hasher.update(encoder.encode('[DIRECTORY_LIVE_TS_V1]'));
     for (const list of [liveCategories, liveStreams, vodCategories, vodStreams, seriesCategories, seriesStreams]) {
@@ -408,6 +438,8 @@ export class RealSourceImporterService {
         const movieId = `movie:${m.stream_id}`;
         const title = String(m.name || 'Sem T�tulo').trim();
         const catId = `cat:vod:${m.category_id}`;
+        const movieCategoryIds = streamedVodInventory && Array.isArray(m.__directoryCategoryIds)
+          ? m.__directoryCategoryIds.map((id: string) => `cat:vod:${id}`) : [catId];
         const artworkId = `art:movie:${m.stream_id}`;
         const streamId = `str:movie:${m.stream_id}`;
 
@@ -430,7 +462,7 @@ export class RealSourceImporterService {
           title,
           year,
           genreIds: ['genre:1'],
-          categoryIds: [catId],
+          categoryIds: movieCategoryIds,
           artworkIds: m.stream_icon ? [artworkId] : [],
           streamIds: [streamId],
           externalIds: { sourceItemId: String(m.stream_id) },
@@ -440,7 +472,7 @@ export class RealSourceImporterService {
           (movieObj as any).posterUri = String(m.stream_icon);
           (movieObj as any).cover = String(m.stream_icon);
         }
-        if (isStartupPreviewObserved()) offerStartupPoster({ id: movieId, title, posterUri: m.stream_icon ? String(m.stream_icon) : undefined, category: movieCategoryNames.get(catId) });
+        if (isStartupPreviewObserved()) offerStartupPoster({ id: movieId, title, posterUri: m.stream_icon ? String(m.stream_icon) : undefined, category: movieCategoryIds.map((id: string) => movieCategoryNames.get(id)).filter(Boolean).join(' / ') });
         writer.addMovie(movieObj, stream);
         if (writer.shouldFlush()) await writer.flushBatch(countM);
       }

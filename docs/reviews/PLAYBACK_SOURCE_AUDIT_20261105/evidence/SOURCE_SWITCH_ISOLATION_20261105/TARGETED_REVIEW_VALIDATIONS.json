@@ -1,0 +1,20 @@
+[
+  {
+    "script": "test-source-replacement-bootstrap.mjs",
+    "startedUTC": "2026-11-05T11:29:32.847Z",
+    "finishedUTC": "2026-11-05T11:29:34.382Z",
+    "exitCode": 0
+  },
+  {
+    "script": "test-c11-new-content-badge.mjs",
+    "startedUTC": "2026-11-05T11:29:34.385Z",
+    "finishedUTC": "2026-11-05T11:29:35.738Z",
+    "exitCode": 0
+  },
+  {
+    "script": "test-c11-artwork-visible-recovery.mjs",
+    "startedUTC": "2026-11-05T11:29:35.739Z",
+    "finishedUTC": "2026-11-05T11:29:36.603Z",
+    "exitCode": 1
+  }
+]

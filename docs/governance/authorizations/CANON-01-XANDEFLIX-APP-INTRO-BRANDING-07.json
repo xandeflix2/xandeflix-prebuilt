@@ -1,0 +1,348 @@
+{
+  "schema": 1,
+  "gate": "CANON-01-XANDEFLIX-APP-INTRO-BRANDING-07",
+  "parentGate": "CANON-01",
+  "amendment": "CANON-01-XANDEFLIX-APP-INTRO-BRANDING-07",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "EXPLICIT_USER_ATTACHED_APP_INTRO_BRANDING_07_AND_LATEST_ATTACHED_PNG_CLARIFICATION_2026_10_26_AND_EXPLICIT_FINAL_TEST_APK_AMENDMENT",
+  "authorizationRequestSha256": "43b7e53495291945e38729cb514547bfedd214509dc3bd32c8fa001cbd6a42f2",
+  "reason": "Local native offline cinematic intro, bounded boot gate, lifecycle/skip/audio/fallback and exact official video assets; Android launcher/splash/Leanback derivatives from attached official PNG selected by latest explicit user clarification.",
+  "physicalImpact": "REQUIRED",
+  "physicalImpactJustification": "Test APK generation/audit authorized by later explicit instruction; installation remains unauthorized. Physical decoder/audio/splash/cold-start/resources and prior06 failures remain pending.",
+  "testChangesReviewed": true,
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c105-complete-root-search.mjs",
+    "scripts/test-c107-catalog-return-navigation.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c11-landscape-navigation.mjs",
+    "scripts/validate-direct-playback.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock",
+    "npm run typecheck",
+    "npm run update:check",
+    "npm run security:check",
+    "npm run playback:check",
+    "npm run build",
+    "npm run site:build",
+    "node scripts/test-site-build-contract.mjs",
+    "node scripts/test-vercel-artifact-contract.mjs",
+    "node scripts/verify-vercel-artifact.mjs inspect",
+    "node scripts/test-vercel-prebuilt-contract.mjs",
+    "node scripts/test-app-intro-branding-07.mjs",
+    "gradlew --offline testDebugUnitTest (no assemble/package)",
+    "C11 before test APK; official capacitor copy/registry; Gradle --offline assembleDebug; APK audit and final CANON/C11"
+  ],
+  "evidence": "docs/evidence/XANDEFLIX_APP_INTRO_BRANDING_07.md",
+  "compatibilityRisk": "Cold launcher admission and temporary orientation policy require device validation. Main application entry and all auth/source/catalog/player code remain byte-identical; only a prelude waits for native completion, with bounded failure fallback.",
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": true,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false,
+  "restrictions": [
+    "After local checks, explicitly authorized to generate/audit a test APK in this same gate; no installation, distribution/publication, device operations, AAB or production release. Preserve package/version/certificate and all closed candidates.",
+    "No changes to auth/license/source/storage/backup/C9/Live/VOD/PublicTrailer or cycle04; no backend/Git publishing.",
+    "Original input videos SHA76fb4e…/41741f8… and attached PNG cf422e99… unchanged. Latest user instruction selects actual attached PNG over the initial requested digest; ASSET_AUTHORITY_ADDENDUM.json and evidence retain both answers.",
+    "Existing196 controls/33 suites and37 receipts preserved. Runner data adds new receipt ID,5 negative controls and one suite, without assertion or timeout weakening.",
+    "Four normative documents are append-only; exact received03/04/05/06/root frozen. Physical performance not inferred from test/build."
+  ],
+  "previousGovernanceHashes": {
+    "docs/governance/CANON_CHANGE_AUTHORIZATION.json": "e73152f228cbb625c508062d70ef810e8342059a",
+    "docs/governance/CANON_01_LEGACY_TESTS_AUTHORIZATION.json": "e59e2d328db3d0dfd8c1d873b154e2e3f7900a0c",
+    "docs/governance/CANON_01_AUTHORIZATION_HARDENING.json": "766db763ee98aeeb33230c2828f050a8527555b7",
+    "docs/governance/authorizations/CANON-01-VERCEL-BUILD-A1.json": "7edaa32c4b13c8295fc0daa64abed1ef7a4b0c2d",
+    "docs/governance/authorizations/CANON-01-VERCEL-A2-ARTIFACT.json": "fb613a143676e3e32267ebacb3bec81123791823",
+    "docs/governance/authorizations/CANON-01-VERCEL-A22A.json": "c698fec429f4058118d4701a7f5208ece9a0b0d1",
+    "docs/governance/authorizations/CANON-01-A22A-CI-DIAG.json": "7d89451bf23a05fa1ba819b72b99b28025aa7a66",
+    "docs/governance/authorizations/CANON-01-A22A-WINDOWS-EOL.json": "73ffd5ed494cb87a7c0d22e4a8a3f94252cf321e",
+    "docs/governance/authorizations/CANON-01-SOURCE-OUTPUT.json": "a93d98a1022f99c0e0957dd8f4a2c7d078b8f588",
+    "docs/governance/authorizations/CANON-01-CATALOG-READ-DIAG.json": "169b19ee02a4c1cacbe575cded00ec02928fa3c7",
+    "docs/governance/authorizations/CANON-01-XUI-OPAQUE-RECOVERY.json": "cf4176d0007b4a04997bf2631558bd9d954fd6f7",
+    "docs/governance/authorizations/CANON-01-CATALOG-PHYSICAL-FIXES.json": "ea179b852518e2a14c7ee79b6c3c72e76c0df6a9",
+    "docs/governance/authorizations/CANON-01-SERIES-POSTER-COMPOSITION.json": "645dc8b2b5d4b822bc83d72e9f5ab9f4f4cb4347",
+    "docs/governance/authorizations/CANON-01-TMDB-CONTEXT-IDENTITY.json": "3ab236bab99175dcb5374047c2fc6565650d8945",
+    "docs/governance/authorizations/CANON-01-TMDB-SUBTITLE-PREVIEW.json": "5e50d1c29c33b5fe3455112818e978213d065e96",
+    "docs/governance/authorizations/CANON-01-CATALOG-RETENTION.json": "b3c18f01ba1e753597af3a162c2605669dcd4e6b",
+    "docs/governance/authorizations/CANON-01-DETAIL-BACKDROP-UI.json": "579097e952a7ddf142ba885aaf23e164c0241e54",
+    "docs/governance/authorizations/CANON-01-DETAIL-BACKDROP-TYPES.json": "da8c532e25e220040bba3c942bad41507d4b9245",
+    "docs/governance/authorizations/CANON-01-TV-SIDEBAR-COMPOSITION.json": "f5d43f845cd4e3fdb7947dc33e4f9b3df8669ab7",
+    "docs/governance/authorizations/CANON-01-A22A-WINDOWS-METADATA-EOL.json": "90d7db4a18e84221afa6fa9dda40c82d6dad6121",
+    "docs/governance/authorizations/CANON-01-VERCEL-PREBUILT-RECOVERY-01.json": "9cb685590481ba094ffbca2e2abe2f585aa3ae46",
+    "docs/governance/authorizations/CANON-01-OPAQUE-HLS-MIME-RECOVERY.json": "5a8c735b59f921a5d24be15f6c14f32541687719",
+    "docs/governance/authorizations/CANON-01-STREAMED-VOD-INVENTORY-RECOVERY.json": "a16dd131aa09b3027724ea94f49a6d841551a9cb",
+    "docs/governance/authorizations/CANON-01-TABLET-SIDEBAR-TRANSPARENCY.json": "ffcc5c6c6005e4fcd24ce40ba776950bf55a5dbe",
+    "docs/governance/authorizations/CANON-01-HERO-PLATFORM-COMPOSITION.json": "75f9ca539c1723ca1db6c2e8948a63a3a19d5264",
+    "docs/governance/authorizations/CANON-01-HERO-PLATFORM-ALIGNMENT.json": "66a112450541d8a038292d8b07d08cc5547ad51e",
+    "docs/governance/authorizations/CANON-01-LIVE-SINGLE-TRANSPORT.json": "039d22359310380cd79432efe17f9533c93fb6cb",
+    "docs/governance/authorizations/CANON-01-NETWORK-DIAGNOSTICS.json": "80a4d01348eb82b4a7cafd4836c3f221d97e02e5",
+    "docs/governance/authorizations/CANON-01-NETWORK-UI-POLISH.json": "2fc3ce79b3a78454e7ad15f1d06002a6bc69d594",
+    "docs/governance/authorizations/CANON-01-LIVE-NETWORK-ACTIONS.json": "e345e800a7a52d79241701cb5fd13f34bc699e01",
+    "docs/governance/authorizations/CANON-01-TV-CAST-SENDER-HIDDEN.json": "f1e466b249afac7a6dab2a62952dc83a4dd31540",
+    "docs/governance/authorizations/CANON-01-TMDB-RELEASE-TAGS.json": "30bcebd64ad85f8d981f09b320cbf3864b6bad7a",
+    "docs/governance/authorizations/CANON-01-VOD-DPAD-HIDDEN-CONTROLS.json": "f33a7c6510ca7fe14f22367d0da0344e285e754a",
+    "docs/governance/authorizations/CANON-01-DPAD-EXPANDED-CARDS-AUTOPREVIEW-01.json": "8d031488e5175dc1a0fbca3246345be638074fe7",
+    "docs/governance/authorizations/CANON-01-HOME-DPAD-CAROUSEL-PREVIEW-PAGINATION-02.json": "a91ff1c57b2c412e808fb79917fc00a1bfaa1e1e",
+    "docs/governance/authorizations/CANON-01-DPAD-CARD-SCOPE-SEEALL-GRID-01.json": "1be58b8db36f88a75e115fd1cb7bbb0d17f0bb71",
+    "docs/governance/authorizations/CANON-01-XANDEFLIX-UI-PERFORMANCE-RECOVERY-03.json": "88fa16477c0f94dad02f962d7a42e26dc19f2670"
+  },
+  "supersedes": {
+    "android/app/src/main/java/com/xandeflix/prebuilt/MainActivity.java": "CANON-01-NETWORK-DIAGNOSTICS",
+    "scripts/test-canonical-regression.mjs": "CANON-01-XANDEFLIX-UI-PERFORMANCE-RECOVERY-03"
+  },
+  "changes": [
+    {
+      "path": "android/app/src/main/java/com/xandeflix/prebuilt/MainActivity.java",
+      "before": "d008323ea666445b59e694b9a32ba2f6e1119204",
+      "after": "d2c4a8fbdb29b148e715fd45566270ec1ef57906"
+    },
+    {
+      "path": "android/app/src/main/java/com/xandeflix/prebuilt/intro/AppIntroPolicy.java",
+      "before": null,
+      "after": "e02b9fd1f1961d5d18aff3a2660d8c52dae72cfd"
+    },
+    {
+      "path": "android/app/src/main/java/com/xandeflix/prebuilt/intro/AppIntroController.java",
+      "before": null,
+      "after": "e1e87a1c09e11e60da71147010cefc735d4b3437"
+    },
+    {
+      "path": "android/app/src/main/java/com/xandeflix/prebuilt/intro/AppIntroPlugin.java",
+      "before": null,
+      "after": "6318973edf5a60d6d717e4ca59f817fb44fe369c"
+    },
+    {
+      "path": "src/intro-main.ts",
+      "before": null,
+      "after": "c2239a1cf7c4bf947dd570c2fc57c7c84c8ad951"
+    },
+    {
+      "path": "src/bootstrap/app-intro-gate.ts",
+      "before": null,
+      "after": "014f39743454c1fff3f488e9e7134d545528aa3c"
+    },
+    {
+      "path": "android/app/src/main/res/layout/app_intro.xml",
+      "before": null,
+      "after": "2d555802e8ed2d1439c5883b9f940949c144f5f9"
+    },
+    {
+      "path": "android/app/src/main/res/values/styles.xml",
+      "before": "8ed5af865f493f210d97e4f3accf742993bcdd5b",
+      "after": "172510334a59bbcda7ec0efad98a54a5bd3cb018"
+    },
+    {
+      "path": "android/app/src/main/res/values/strings.xml",
+      "before": "fb8ca44c8f375763372d5d6dec59a465f4143ebf",
+      "after": "cec66cbbc9c38552db2d920102281ce3ab6d72f0"
+    },
+    {
+      "path": "android/app/src/main/res/raw/intro_vertical.mp4",
+      "before": null,
+      "after": "2333e9ae4e98a03686dfe3417ca08fd7229c9d49"
+    },
+    {
+      "path": "android/app/src/main/res/raw/intro_horizontal.mp4",
+      "before": null,
+      "after": "836d45b1d749d6d15507d59aac2a9c39bb88cf7c"
+    },
+    {
+      "path": "android/app/src/main/res/drawable-nodpi/intro_brand.png",
+      "before": null,
+      "after": "00679811439988ecbb182ac4752aef9e61f7ef0a"
+    },
+    {
+      "path": "android/app/src/main/res/drawable-nodpi/intro_monochrome.png",
+      "before": null,
+      "after": "9df3d8c5c5f77238f86379bf5f77873a03c625a4"
+    },
+    {
+      "path": "android/app/src/main/res/drawable/splash.png",
+      "before": "f7a64923ea1a0565d25fa139c176d6bf42184e48",
+      "after": "ea8baa53d80b111e56a462f00f72652229cf1137"
+    },
+    {
+      "path": "android/app/src/main/res/drawable-land-hdpi/splash.png",
+      "before": "e31573b4fc93e60d171f4046c0220e1463075d9e",
+      "after": "1e9e0fe9244bdc69f51f994d7d20c1dfa3929339"
+    },
+    {
+      "path": "android/app/src/main/res/drawable-land-mdpi/splash.png",
+      "before": "f7a64923ea1a0565d25fa139c176d6bf42184e48",
+      "after": "ea8baa53d80b111e56a462f00f72652229cf1137"
+    },
+    {
+      "path": "android/app/src/main/res/drawable-land-xhdpi/splash.png",
+      "before": "807725501bdd92e94e51e7b2b0006f69e0083a0b",
+      "after": "95fe949061c0d25b8282476ade359f594cbb765b"
+    },
+    {
+      "path": "android/app/src/main/res/drawable-land-xxhdpi/splash.png",
+      "before": "14c6c8fe39fcd51a0414866ad28cbe8ff3acb060",
+      "after": "f2e11b4b79f2d8f9501d9f91d1f756001b01563a"
+    },
+    {
+      "path": "android/app/src/main/res/drawable-land-xxxhdpi/splash.png",
+      "before": "244ca2506dbe0fd8f6a05520ac7d1a629ea81438",
+      "after": "41a8d9649d4a427b1cca88fc9bcebea2869efc65"
+    },
+    {
+      "path": "android/app/src/main/res/drawable-port-hdpi/splash.png",
+      "before": "74faaa583c8221c27a8cb822c3fbe218bafa3299",
+      "after": "8b5a88e78f46ce8b2ed37c920ce39e6c28e79a4b"
+    },
+    {
+      "path": "android/app/src/main/res/drawable-port-mdpi/splash.png",
+      "before": "e944f4ad4e1ca1c8cf9a87b366acc01c4e5c1616",
+      "after": "bb747ff7634d8394de61f7c1ed7c2dcd5ab9b3c1"
+    },
+    {
+      "path": "android/app/src/main/res/drawable-port-xhdpi/splash.png",
+      "before": "564a82ff954aec267492467c0169a270c4e8fea9",
+      "after": "b50c754302dd6451144edf72b0a1b11f7581f291"
+    },
+    {
+      "path": "android/app/src/main/res/drawable-port-xxhdpi/splash.png",
+      "before": "bfabe6871a17a5e95b78fb30d49b7d2b4d2fe4c0",
+      "after": "5b555e515ee3b196ef8870f12312127345fab8d8"
+    },
+    {
+      "path": "android/app/src/main/res/drawable-port-xxxhdpi/splash.png",
+      "before": "6929071268eb03ee0f088142b6523566b78550e2",
+      "after": "b7bd8cc9dbb4ea0e1ccfc41c26128e2791e97a83"
+    },
+    {
+      "path": "android/app/src/main/res/drawable-v24/ic_launcher_foreground.xml",
+      "before": "0de8579d29bb1f678aa31371bc44452a1723a6d4",
+      "after": "21bbf6404ffa0dddedd7d48163b507e789c832d3"
+    },
+    {
+      "path": "android/app/src/main/res/drawable-xhdpi/xandeflix_tv_banner.png",
+      "before": "d32164676071968dad882897450e851a29996596",
+      "after": "74b30321e653a8946405c8e5fbdd3f76472d16ed"
+    },
+    {
+      "path": "android/app/src/main/res/mipmap-anydpi-v33/ic_launcher.xml",
+      "before": "5ed0a2df70488dcb1594ccf43cc7dd1d3f498275",
+      "after": "137cdccdd99262fff8ceed570d572f8125a549e0"
+    },
+    {
+      "path": "android/app/src/main/res/mipmap-anydpi-v33/ic_launcher_round.xml",
+      "before": "5ed0a2df70488dcb1594ccf43cc7dd1d3f498275",
+      "after": "137cdccdd99262fff8ceed570d572f8125a549e0"
+    },
+    {
+      "path": "android/app/src/main/res/mipmap-hdpi/ic_launcher.png",
+      "before": "ec53a02beebc3d15d3ac5709e4b1becb0a518ea1",
+      "after": "d5163041c2e2bc49477836d5f1044a5d20732975"
+    },
+    {
+      "path": "android/app/src/main/res/mipmap-hdpi/ic_launcher_foreground.png",
+      "before": "6aecf2712e649dffc1050d2e1710385624afec4d",
+      "after": "26f10c9ace74c0bf9575677f44ca3a53b0670be3"
+    },
+    {
+      "path": "android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png",
+      "before": "abb747c46064f9f3a90ebeb6a85d44da14710ed8",
+      "after": "4c8be4088ed6fa7cb422761257ac650502e25b8d"
+    },
+    {
+      "path": "android/app/src/main/res/mipmap-mdpi/ic_launcher.png",
+      "before": "2fdaa13d980b6f8650f1093205acd0657c4009a3",
+      "after": "584a467a038b8327a1538643ce111462cafa18e1"
+    },
+    {
+      "path": "android/app/src/main/res/mipmap-mdpi/ic_launcher_foreground.png",
+      "before": "22546cb8a22deaf800d65eaa97801d334dee3d29",
+      "after": "154fa06b5c32a9889292cffec43e06151085d23e"
+    },
+    {
+      "path": "android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png",
+      "before": "e39d427127d220c2808fdf0368845cf08bc7c817",
+      "after": "4a301037cf969151ae48ff1be268d2ab90afae15"
+    },
+    {
+      "path": "android/app/src/main/res/mipmap-television-xhdpi/ic_launcher.png",
+      "before": "bc9e1fcea9f2307aa195b16b25837f15086259b3",
+      "after": "b099e01e5ea222d542435b389ae427a85c8e50ee"
+    },
+    {
+      "path": "android/app/src/main/res/mipmap-television-xhdpi/ic_launcher_round.png",
+      "before": "68e77bb2ebec440ea170efcdd29545112001d8c9",
+      "after": "fe22497f6af3f33e847559d007035534c17675fe"
+    },
+    {
+      "path": "android/app/src/main/res/mipmap-xhdpi/ic_launcher.png",
+      "before": "bc9e1fcea9f2307aa195b16b25837f15086259b3",
+      "after": "b099e01e5ea222d542435b389ae427a85c8e50ee"
+    },
+    {
+      "path": "android/app/src/main/res/mipmap-xhdpi/ic_launcher_foreground.png",
+      "before": "b4a972b60f1a7386418aec3cc5440ef102c23f66",
+      "after": "cab78c4870a10ee92cdb696f1f7831e2aa88637e"
+    },
+    {
+      "path": "android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png",
+      "before": "68e77bb2ebec440ea170efcdd29545112001d8c9",
+      "after": "fe22497f6af3f33e847559d007035534c17675fe"
+    },
+    {
+      "path": "android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png",
+      "before": "ec0e019a617822e51fa699be429a26b24dde45f1",
+      "after": "ecd25f6c6ff72b04ff7a0ec64de41255bb7c80b6"
+    },
+    {
+      "path": "android/app/src/main/res/mipmap-xxhdpi/ic_launcher_foreground.png",
+      "before": "3ded116292a33eee676895f6fd3655c10c772a39",
+      "after": "f63680d5451c175000f67c217091b997bfe597c7"
+    },
+    {
+      "path": "android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png",
+      "before": "d1db203e3f8aa2c5262d601b4d52f4941049a5d1",
+      "after": "e9c5e724e06b0757ec3ca8ef3b2c15caefe20600"
+    },
+    {
+      "path": "android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png",
+      "before": "4b660eba6dea754636132fd05f197314e483d4f5",
+      "after": "24b74f4b921ee5d656d298b33863d4db96c9f5c8"
+    },
+    {
+      "path": "android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png",
+      "before": "c93c8b2917b57a4ab7b3d1d8db4f13531799fce2",
+      "after": "99ae497593c7c908f8582ff0f43aba23fd467570"
+    },
+    {
+      "path": "android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png",
+      "before": "cdbe9e9e111fb9bd73a59325bc74e8de16608fb1",
+      "after": "035ef1bc97f611f6e8e79479d25605a9e0a117bb"
+    },
+    {
+      "path": "android/app/src/main/res/values/ic_launcher_background.xml",
+      "before": "cdde88fb8db7277bddbe94548a4d53f72fecb17a",
+      "after": "f91586640cace7c00340e478fd6b74da3d0f53c4"
+    },
+    {
+      "path": "scripts/test-app-intro-branding-07.mjs",
+      "before": null,
+      "after": "6d99e1320a0a0541232180d9b9ea75588b86b109"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "c9c2853d315c0676cf6129ffba32267d35fd569f",
+      "after": "fe88fbe0b895779fe588ce973c967931403d52f2"
+    },
+    {
+      "path": "android/app/src/test/java/com/xandeflix/prebuilt/intro/AppIntroPolicyTest.java",
+      "before": null,
+      "after": "cea6cefc792ea2a47f426e7104ab6434448f6988"
+    }
+  ]
+}

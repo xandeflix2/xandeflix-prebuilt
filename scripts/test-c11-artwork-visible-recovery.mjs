@@ -1,3 +1,6 @@
+import {acceptDpadRepeat} from '../src/ui/dpad-repeat.ts';
+import { getSourceCacheScope } from '../src/bootstrap/source-replacement.ts';
+import {railWindow} from '../src/ui/rail-pagination.ts';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import ts from 'typescript';
@@ -18,7 +21,11 @@ function load(file, imports) {
     'parental-content': { canShowParentalItem: () => true }, ...imports };
   const module = { exports: {} };
   new Function('require', 'module', 'exports', ts.transpileModule(readFileSync(new URL('../' + file, import.meta.url), 'utf8'), { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.React } }).outputText)(name => {
+    if(name.endsWith('/source-replacement.ts'))return { getSourceCacheScope };
     for (const [key, value] of Object.entries(imports)) if (name.includes(key)) return value;
+    if(name.endsWith('/rail-pagination.ts'))return{railWindow};
+    if(name.endsWith('/dpad-repeat.ts'))return{acceptDpadRepeat};
+    if(name.endsWith('/ProgressiveCategoryRail.tsx'))return{ProgressiveCategoryRail:()=>null};
     throw Error('Uncontrolled dependency: ' + name);
   }, module, module.exports);
   return module.exports;
@@ -78,6 +85,7 @@ const railReact = { ...React, useRef: value => ({ current: value }), useMemo: fn
     return [railStates[index], value => { const next = typeof value === 'function' ? value(railStates[index]) : value; if (!Object.is(next, railStates[index])) { railStates[index] = next; railDirty = true; } }]; },
   useEffect(fn) { railEffects.push(fn); },
 };
+railReact.useLayoutEffect=railReact.useEffect;
 const { MediaRail } = load('src/ui/components/MediaRail.tsx', {
   react: { default: railReact, ...railReact }, 'category-presentation': presentation,
   MediaCard: { MediaCard: () => null }, useRailArtworkPreparation: { useRailArtworkPreparation: () => ({ root: {}, prepare: true }) },

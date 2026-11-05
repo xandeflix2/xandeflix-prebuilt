@@ -44,7 +44,7 @@ for(const[file,name]of [['src/device/device-identity.service.ts','IDENTITY'],['s
 rejects('MISSING_IDENTITY_FILE_BLOCKS','CANON_PROTECTED_FILE_MISSING',overlay({'src/device/device-identity.service.ts':null}));
 rejects('NEW_SERVER_MIGRATION_BLOCKS','CANON_PROTECTED_CONTENT_CHANGED',overlay({'supabase/migrations/20990101000000_unapproved.sql':'select 1;'}));
 rejects('DELTA_SCHEMA_SILENT_CHANGE_BLOCKS','CANON_PROTECTED_CONTENT_CHANGED',overlay({'schemas/prebuilt-catalog-delta.schema.json':current('schemas/prebuilt-catalog-delta.schema.json').replace('"additionalProperties": false','"additionalProperties": true')}));
-const gradle='android/app/build.gradle',next=current(gradle).replace('versionCode 37','versionCode 38').replace('versionName "1.0.37"','versionName "1.0.38"');
+const gradle='android/app/build.gradle',next=current(gradle).replace(/\bversionCode\s+\d+\b/,'versionCode 38').replace(/\bversionName\s+"[^"]+"/,'versionName "1.0.38"');
 rejects('VERSION_38_WITHOUT_NEW_GATE_BLOCKS','CANON_VERSION_GATE_REQUIRED',overlay({[gradle]:next}));
 rejects('SILENT_PACKAGE_ID_SWAP_BLOCKS','CANON_ANDROID_PACKAGE_CHANGED',overlay({[gradle]:current(gradle).replaceAll('com.xandeflix.prebuilt','com.example.unapproved')}));
 // Receipts remain separate: overlays are synthetic inputs to the real verifier.
@@ -80,14 +80,16 @@ rejects('LEGACY_EVIDENCE_WITHOUT_NOMINAL_GATE_BLOCKS','CANON_REVIEW_EVIDENCE_REQ
 rejects('G10_RECEIPT_REWORDING_BLOCKS','CANON_RECEIPT_CONTENT_CHANGED',editReceipt(AUTHORIZATION,a=>a.reason+=' Unauthorized rewording.'));
 rejects('LEGACY_RECEIPT_REWORDING_BLOCKS','CANON_RECEIPT_CONTENT_CHANGED',editReceipt(LEGACY_AUTHORIZATION,a=>a.reason+=' Unauthorized rewording.'));
 // Future approvals add a new receipt/registration; historical bytes remain untouched.
-const approval={schema:1,gate:'ANDROID-38',status:'APPROVED_BY_CHAT_MASTER',referenceCommit:REFERENCE,reason:'Synthetic control for a future explicitly approved version evolution.',physicalImpact:'REQUIRED',requiredTests:[SUITES[0][0]],evidence:'docs/evidence/SYNTHETIC_APPROVAL.md',changes:[{path:gradle,before:original.baseline.get(gradle).hash,after:blobHash(gradle,next)}]};
+const versionPredecessor=Array.from(current(PHASED).matchAll(/<!-- CANON-01:AUTHORIZATION -->\s*```json\s*([\s\S]*?)```/g),m=>JSON.parse(current(JSON.parse(m[1]).path))).reverse().find(record=>record.changes.some(item=>item.path===gradle));
+const versionBefore=versionPredecessor?versionPredecessor.changes.find(item=>item.path===gradle).after:original.baseline.get(gradle).hash;
+const approval={schema:1,gate:'ANDROID-38',status:'APPROVED_BY_CHAT_MASTER',referenceCommit:REFERENCE,reason:'Synthetic control for a future explicitly approved version evolution.',physicalImpact:'REQUIRED',requiredTests:[SUITES[0][0]],evidence:'docs/evidence/SYNTHETIC_APPROVAL.md',supersedes:versionPredecessor?{[gradle]:versionPredecessor.gate}:{},changes:[{path:gradle,before:versionBefore,after:blobHash(gradle,next)}]};
 const approved=additionalAuthorization(approval,{[gradle]:next});
 const future=verifyCanonical(overlay(approved));assert.deepEqual(future.currentVersion,{code:38,name:'1.0.38'});assert.equal(future.historicalVersion.code,37);pass('VERSION_38_ACCEPTED_WITH_SPECIFIC_GATE_HISTORY_STAYS_37');
 rejects('THIS_GATE_CANNOT_AUTHORIZE_RUNTIME','CANON_CHANGE_NOT_AUTHORIZED',overlay(additionalAuthorization({...approval,gate:'CANON-01'},{[gradle]:next})));
 rejects('UNAPPROVED_CHANGE_RECORD_BLOCKS','CANON_CHANGE_NOT_AUTHORIZED',overlay(additionalAuthorization({...approval,status:'DRAFT'},{[gradle]:next})));
 rejects('EMPTY_IMPACT_TEST_PLAN_BLOCKS','CANON_REGRESSION_PLAN_REQUIRED',overlay(additionalAuthorization({...approval,requiredTests:[]},{[gradle]:next})));
 rejects('EXTRA_UNREVIEWED_VERSION_BYTES_BLOCK','CANON_VERSION_GATE_REQUIRED',overlay({...approved,[gradle]:next.replace('versionCode 38','versionCode 39')}));
-rejects('STALE_GRADLE_APPROVAL_BLOCKS','CANON_STALE_OR_UNUSED_AUTHORIZATION',overlay({...approved,[gradle]:current(gradle)}));
+rejects('STALE_GRADLE_APPROVAL_BLOCKS','CANON_STALE_OR_UNUSED_AUTHORIZATION',overlay({...approved,[gradle]:original.baselineText.get(gradle)}));
 const weakened='console.log("RESULT=26_TESTS_PASSED");',suite='scripts/test-c11-new-device-activation.mjs';
 rejects('SUITE_CHANGE_NEEDS_SEPARATE_REVIEW','CANON_TEST_WEAKENING_REVIEW_REQUIRED',overlay(additionalAuthorization({...approval,changes:[...approval.changes,{path:suite,before:original.baseline.get(suite).hash,after:blobHash(suite,weakened)}]},{[gradle]:next,[suite]:weakened})));
 const workflow='.github/workflows/canonical-regression.yml';
@@ -102,7 +104,7 @@ for(const[name,args,env,expected]of [['MISSING_GIT_FAILS_CLI',[],{...process.env
 }
 // Hardening additions preserve the 72 preceding named controls and all suites.
 for(const file of [AUTHORIZATION,LEGACY_AUTHORIZATION])assert.deepEqual(overlay(approved).read(file),original.read(file));
-assert.deepEqual(future.authorizedAmendments,['CANON-01-G10FIX','CANON-01-LEGACYTESTS',HARDENING_GATE,SITE_BUILD_GATE,A2_ARTIFACT_GATE,PREBUILT_GATE,'CANON-01-A22A-CI-DIAG','CANON-01-A22A-WINDOWS-EOL','CANON-01-SOURCE-OUTPUT','CANON-01-CATALOG-READ-DIAG','CANON-01-XUI-OPAQUE-RECOVERY','CANON-01-CATALOG-PHYSICAL-FIXES','CANON-01-SERIES-POSTER-COMPOSITION','CANON-01-TMDB-CONTEXT-IDENTITY','CANON-01-TMDB-SUBTITLE-PREVIEW','CANON-01-CATALOG-RETENTION','CANON-01-DETAIL-BACKDROP-UI','CANON-01-DETAIL-BACKDROP-TYPES','CANON-01-TV-SIDEBAR-COMPOSITION','CANON-01-A22A-WINDOWS-METADATA-EOL','ANDROID-38']);pass('FUTURE_38_PRESERVES_BOTH_HISTORICAL_RECEIPTS');
+assert.deepEqual(future.authorizedAmendments,['CANON-01-G10FIX','CANON-01-LEGACYTESTS',HARDENING_GATE,SITE_BUILD_GATE,A2_ARTIFACT_GATE,PREBUILT_GATE,'CANON-01-A22A-CI-DIAG','CANON-01-A22A-WINDOWS-EOL','CANON-01-SOURCE-OUTPUT','CANON-01-CATALOG-READ-DIAG','CANON-01-XUI-OPAQUE-RECOVERY','CANON-01-CATALOG-PHYSICAL-FIXES','CANON-01-SERIES-POSTER-COMPOSITION','CANON-01-TMDB-CONTEXT-IDENTITY','CANON-01-TMDB-SUBTITLE-PREVIEW','CANON-01-CATALOG-RETENTION','CANON-01-DETAIL-BACKDROP-UI','CANON-01-DETAIL-BACKDROP-TYPES','CANON-01-TV-SIDEBAR-COMPOSITION','CANON-01-A22A-WINDOWS-METADATA-EOL','CANON-01-VERCEL-PREBUILT-RECOVERY-01','CANON-01-OPAQUE-HLS-MIME-RECOVERY','CANON-01-STREAMED-VOD-INVENTORY-RECOVERY','CANON-01-TABLET-SIDEBAR-TRANSPARENCY','CANON-01-HERO-PLATFORM-COMPOSITION','CANON-01-HERO-PLATFORM-ALIGNMENT','CANON-01-LIVE-SINGLE-TRANSPORT','CANON-01-NETWORK-DIAGNOSTICS','CANON-01-NETWORK-UI-POLISH','CANON-01-LIVE-NETWORK-ACTIONS','CANON-01-TV-CAST-SENDER-HIDDEN','CANON-01-TMDB-RELEASE-TAGS','CANON-01-VOD-DPAD-HIDDEN-CONTROLS','CANON-01-DPAD-EXPANDED-CARDS-AUTOPREVIEW-01','CANON-01-HOME-DPAD-CAROUSEL-PREVIEW-PAGINATION-02','CANON-01-DPAD-CARD-SCOPE-SEEALL-GRID-01','CANON-01-XANDEFLIX-UI-PERFORMANCE-RECOVERY-03','CANON-01-XANDEFLIX-APP-INTRO-BRANDING-07','CANON-01-XANDEFLIX-INTRO-VIDEO-ONLY-07-R1','CANON-01-MOBILE-CATALOG-HEADER-SPACING','CANON-01-PHONE-HEADER-REFINEMENT','CANON-01-SERIES-EPISODE-RETURN','CANON-01-TRAILER-CONTAINMENT-R4','CANON-01-TMDB-EPISODE-METADATA-ENRICHMENT','CANON-01-P250-V139-CANONICAL-RECOVERY','CANON-01-TMDB-EPISODE-RUNTIME-RECOVERY','CANON-01-EPISODE-ROW-ALIGNMENT','CANON-01-EPISODE-GENERAL-IDENTITY','CANON-01-DETAIL-HERO-REFINEMENT','CANON-01-ACTOR-PROFILE','CANON-01-IDENTITY-HERO-RECOVERY','CANON-01-TABLET-HERO-SPACING','CANON-01-MOBILE-HEADER-ALIGNMENT','CANON-01-MOBILE-DETAIL-HEADER-ALIGNMENT','CANON-01-CARD-TRAILER-AUDIO','CANON-01-NEXT-EPISODE-G2-R2','CANON-01-NEXT-EPISODE-G2-R4-REGRESSION-RECOVERY','CANON-01-NEXT-EPISODE-G3-MARKERS','CANON-01-NEXT-EPISODE-G3-REGRESSION-EXPECTATION','CANON-01-PERF-PARENTAL-HERO-REFINEMENT','CANON-01-SOURCE-SWITCH-ISOLATION','CANON-01-SOURCE-SWITCH-ISOLATION-CACHE-REVIEW','ANDROID-38']);pass('FUTURE_38_PRESERVES_BOTH_HISTORICAL_RECEIPTS');
 rejects('G10_IDENTITY_SWAP_TO_ANDROID_38_BLOCKS','CANON_HISTORICAL_AUTHORIZATION_IDENTITY',overlay({...approved,[AUTHORIZATION]:JSON.stringify({...primary,gate:'ANDROID-38',evidence:approval.evidence})}));
 rejects('LEGACY_IDENTITY_SWAP_TO_ANDROID_38_BLOCKS','CANON_LEGACY_AUTHORIZATION_IDENTITY',overlay({...approved,[LEGACY_AUTHORIZATION]:JSON.stringify({...legacy,gate:'ANDROID-38',evidence:approval.evidence})}));
 rejects('G10_IDENTITY_SWAP_TO_LEGACY_BLOCKS','CANON_HISTORICAL_AUTHORIZATION_IDENTITY',editReceipt(AUTHORIZATION,a=>{a.gate=legacy.gate;a.evidence=legacy.evidence}));
@@ -180,8 +182,125 @@ const ciDiagnosticReceipt='docs/governance/authorizations/CANON-01-A22A-CI-DIAG.
 rejects('CI_DIAG_RECEIPT_REQUIRED','CANON_REQUIRED_FILE_MISSING',overlay({[ciDiagnosticReceipt]:null}));
 rejects('CI_DIAG_RECEIPT_IMMUTABLE','CANON_REGISTERED_RECEIPT_CHANGED',overlay({[ciDiagnosticReceipt]:current(ciDiagnosticReceipt)+'\n'}));
 rejects('CI_DIAG_RUNNER_SILENT_CHANGE','CANON_PROTECTED_CONTENT_CHANGED',overlay({'scripts/test-canonical-regression.mjs':current('scripts/test-canonical-regression.mjs')+'\n// unapproved logging change\n'}));
+// L1 adds receipt-specific protection after every preceding named control.
+assert.equal(cases.length,128,'PREVIOUS_128_CONTROLS_MUST_RUN');
+const recoveryGate='CANON-01-VERCEL-PREBUILT-RECOVERY-01';
+const recoveryReceipt=AUTHORIZATION_DIRECTORY+recoveryGate+'.json';
+function recoveryReceiptChange(mutate){
+ const record=JSON.parse(current(recoveryReceipt));mutate(record);const content=JSON.stringify(record);
+ const contract=current(PHASED).replace(/(<!-- CANON-01:AUTHORIZATION -->\s*```json\s*)([\s\S]*?)(```)/g,(full,start,body,end)=>{
+  const entry=JSON.parse(body);return entry.gate===recoveryGate?start+JSON.stringify({...entry,hash:blobHash(recoveryReceipt,content)})+'\n'+end:full;
+ });
+ return overlay({[PHASED]:contract,[recoveryReceipt]:content});
+}
+rejects('RECOVERY_RECEIPT_REQUIRED','CANON_REQUIRED_FILE_MISSING',overlay({[recoveryReceipt]:null}));
+rejects('RECOVERY_RECEIPT_UNREGISTERED_CHANGE_BLOCKS','CANON_REGISTERED_RECEIPT_CHANGED',overlay({[recoveryReceipt]:current(recoveryReceipt)+'\n'}));
+rejects('RECOVERY_RECEIPT_IDENTITY_SWAP_BLOCKS','CANON_ADDITIONAL_AUTHORIZATION_IDENTITY',recoveryReceiptChange(a=>a.gate='ANDROID-38'));
+rejects('RECOVERY_PREDECESSOR_REQUIRED','CANON_AUTHORIZATION_CHAIN_INVALID',recoveryReceiptChange(a=>delete a.supersedes[PREBUILT_SCRIPT]));
+rejects('RECOVERY_BEFORE_HASH_REQUIRED','CANON_AUTHORIZATION_CHAIN_INVALID',recoveryReceiptChange(a=>a.changes.find(c=>c.path===PREBUILT_SCRIPT).before='0'.repeat(40)));
+rejects('RECOVERY_TEST_REVIEW_CANNOT_BE_INHERITED','CANON_TEST_WEAKENING_REVIEW_REQUIRED',recoveryReceiptChange(a=>a.testChangesReviewed=false));
+rejects('RECOVERY_POLICY_SILENT_CHANGE_BLOCKS','CANON_PROTECTED_CONTENT_CHANGED',overlay({[PREBUILT_SCRIPT]:current(PREBUILT_SCRIPT).replace("ref:'refs/heads/fix/source-output-format-recovery'","ref:'refs/heads/governance/canon-01-hardening'")}));
+// Preserve every preceding L1 control and add protection for this isolated recovery.
+assert.equal(cases.length,135,'PREVIOUS_135_CONTROLS_MUST_RUN');
+const opaqueHlsReceipt=AUTHORIZATION_DIRECTORY+'CANON-01-OPAQUE-HLS-MIME-RECOVERY.json';
+rejects('OPAQUE_HLS_RECEIPT_REQUIRED','CANON_REQUIRED_FILE_MISSING',overlay({[opaqueHlsReceipt]:null}));
+rejects('OPAQUE_HLS_RECEIPT_IMMUTABLE','CANON_REGISTERED_RECEIPT_CHANGED',overlay({[opaqueHlsReceipt]:current(opaqueHlsReceipt)+'\n'}));
+for(const file of ['android/app/src/main/java/com/xandeflix/prebuilt/player/NativeStreamRequest.java','android/app/src/main/java/com/xandeflix/prebuilt/player/NativeAndroidPlayerPlugin.java','android/app/src/main/java/com/xandeflix/prebuilt/player/NativePlayerActivity.java']){
+ rejects('OPAQUE_HLS_NATIVE_TAMPER_'+file.split('/').at(-1),'CANON_PROTECTED_CONTENT_CHANGED',overlay({[file]:current(file)+'\n// unapproved native mutation\n'}));
+}
+// Preserve every preceding control and protect the streaming exception.
+assert.equal(cases.length,140,'PREVIOUS_140_CONTROLS_MUST_RUN');
+const streamedVodReceipt=AUTHORIZATION_DIRECTORY+'CANON-01-STREAMED-VOD-INVENTORY-RECOVERY.json';
+rejects('STREAMED_VOD_RECEIPT_REQUIRED','CANON_REQUIRED_FILE_MISSING',overlay({[streamedVodReceipt]:null}));
+rejects('STREAMED_VOD_RECEIPT_IMMUTABLE','CANON_REGISTERED_RECEIPT_CHANGED',overlay({[streamedVodReceipt]:current(streamedVodReceipt)+'\n'}));
+for(const file of ["src/source/source-streamed-vod-inventory.ts","src/source/real-source-importer.service.ts","scripts/test-streamed-vod-inventory.mjs","src/ui/pages/ActivationPage.tsx","src/ui/pages/ActivationPage.css"]){
+ rejects('STREAMED_VOD_UNAPPROVED_CONTENT_'+file.split('/').at(-1),'CANON_PROTECTED_CONTENT_CHANGED',overlay({[file]:current(file)+'\n// unapproved streaming mutation\n'}));
+}
+// Preserve all preceding controls and protect the single-transport amendment.
+assert.equal(cases.length,147,'PREVIOUS_147_CONTROLS_MUST_RUN');
+const singleTransportReceipt=AUTHORIZATION_DIRECTORY+'CANON-01-LIVE-SINGLE-TRANSPORT.json';
+rejects('SINGLE_TRANSPORT_RECEIPT_REQUIRED','CANON_REQUIRED_FILE_MISSING',overlay({[singleTransportReceipt]:null}));
+rejects('SINGLE_TRANSPORT_RECEIPT_IMMUTABLE','CANON_REGISTERED_RECEIPT_CHANGED',overlay({[singleTransportReceipt]:current(singleTransportReceipt)+'\n'}));
+for(const file of ["android/app/src/main/java/com/xandeflix/prebuilt/player/NativePlayerActivity.java","android/app/src/main/java/com/xandeflix/prebuilt/player/NativeAndroidPlayerPlugin.java","scripts/test-live-single-transport.mjs"]){
+ rejects('SINGLE_TRANSPORT_SILENT_TAMPER_'+file.split('/').at(-1),'CANON_PROTECTED_CONTENT_CHANGED',overlay({[file]:current(file)+'\n// unapproved transport mutation\n'}));
+}
+// Network diagnostics preserves every preceding control and adds protection.
+assert.equal(cases.length,152,'PREVIOUS_152_CONTROLS_MUST_RUN');
+const networkReceipt=AUTHORIZATION_DIRECTORY+'CANON-01-NETWORK-DIAGNOSTICS.json';
+rejects('NETWORK_RECEIPT_REQUIRED','CANON_REQUIRED_FILE_MISSING',overlay({[networkReceipt]:null}));
+rejects('NETWORK_RECEIPT_IMMUTABLE','CANON_REGISTERED_RECEIPT_CHANGED',overlay({[networkReceipt]:current(networkReceipt)+'\n'}));
+for(const file of ["src/network/diagnostic-policy.ts","src/network/network-status.ts","src/network/source-connections.ts","src/ui/components/ConnectionIndicator.tsx","src/ui/components/NetworkSettings.tsx","src/ui/components/NetworkDiagnostics.css","src/ui/pages/SettingsPage.tsx","src/ui/pages/LiveTvPage.tsx","src/ui/pages/LiveTvPage.css","android/app/src/main/java/com/xandeflix/prebuilt/MainActivity.java","android/app/src/main/java/com/xandeflix/prebuilt/network/NetworkStatusPlugin.java","scripts/test-network-diagnostics.mjs","android/app/src/test/java/com/xandeflix/prebuilt/network/NetworkStatusPluginTest.java","scripts/test-canonical-regression.mjs"]){
+ rejects('NETWORK_UNAPPROVED_CONTENT_'+file,'CANON_PROTECTED_CONTENT_CHANGED',overlay({[file]:current(file)+'\n// unapproved diagnostics mutation\n'}));
+}
+// Visual amendment retains every preceding control and all suites.
+assert.equal(cases.length,168,'PREVIOUS_168_CONTROLS_MUST_RUN');
+const networkUiReceipt=AUTHORIZATION_DIRECTORY+'CANON-01-NETWORK-UI-POLISH.json';
+rejects('NETWORK_UI_RECEIPT_REQUIRED','CANON_REQUIRED_FILE_MISSING',overlay({[networkUiReceipt]:null}));
+rejects('NETWORK_UI_RECEIPT_IMMUTABLE','CANON_REGISTERED_RECEIPT_CHANGED',overlay({[networkUiReceipt]:current(networkUiReceipt)+'\n'}));
+// Live network actions retain all earlier cases and add receipt/new-module guards.
+assert.equal(cases.length,170,'PREVIOUS_170_CONTROLS_MUST_RUN');
+const liveNetworkReceipt=AUTHORIZATION_DIRECTORY+'CANON-01-LIVE-NETWORK-ACTIONS.json';
+rejects('LIVE_NETWORK_RECEIPT_REQUIRED','CANON_REQUIRED_FILE_MISSING',overlay({[liveNetworkReceipt]:null}));
+rejects('LIVE_NETWORK_RECEIPT_IMMUTABLE','CANON_REGISTERED_RECEIPT_CHANGED',overlay({[liveNetworkReceipt]:current(liveNetworkReceipt)+'\n'}));
+rejects('LIVE_NETWORK_BUTTON_SILENT_MUTATION','CANON_PROTECTED_CONTENT_CHANGED',overlay({'src/ui/components/NetworkConnectionButton.tsx':current('src/ui/components/NetworkConnectionButton.tsx')+'\n// unapproved modal change\n'}));
+// TV Cast sender visibility keeps the existing 173 controls and all suites.
+assert.equal(cases.length,173,'PREVIOUS_173_CONTROLS_MUST_RUN');
+const tvCastReceipt=AUTHORIZATION_DIRECTORY+'CANON-01-TV-CAST-SENDER-HIDDEN.json';
+rejects('TV_CAST_RECEIPT_REQUIRED','CANON_REQUIRED_FILE_MISSING',overlay({[tvCastReceipt]:null}));
+rejects('TV_CAST_RECEIPT_IMMUTABLE','CANON_REGISTERED_RECEIPT_CHANGED',overlay({[tvCastReceipt]:current(tvCastReceipt)+'\n'}));
+rejects('TV_CAST_LIVE_SILENT_CHANGE','CANON_PROTECTED_CONTENT_CHANGED',overlay({'src/ui/pages/LiveTvPage.tsx':current('src/ui/pages/LiveTvPage.tsx')+'\n// unapproved sender UI mutation\n'}));
+// Release-label metadata recovery preserves all 176 earlier controls.
+assert.equal(cases.length,176,'PREVIOUS_176_CONTROLS_MUST_RUN');
+const releaseTagsReceipt=AUTHORIZATION_DIRECTORY+'CANON-01-TMDB-RELEASE-TAGS.json';
+rejects('RELEASE_TAGS_RECEIPT_REQUIRED','CANON_REQUIRED_FILE_MISSING',overlay({[releaseTagsReceipt]:null}));
+rejects('RELEASE_TAGS_RECEIPT_IMMUTABLE','CANON_REGISTERED_RECEIPT_CHANGED',overlay({[releaseTagsReceipt]:current(releaseTagsReceipt)+'\n'}));
+rejects('RELEASE_TAGS_UNAPPROVED_NORMALIZER','CANON_PROTECTED_CONTENT_CHANGED',overlay({'src/artwork/tmdb-metadata.service.ts':current('src/artwork/tmdb-metadata.service.ts')+'\n// unapproved normalization change\n'}));
+// Hidden VOD shortcuts preserve every preceding control and visible-navigation suite.
+assert.equal(cases.length,179,'PREVIOUS_179_CONTROLS_MUST_RUN');
+const vodDpadReceipt=AUTHORIZATION_DIRECTORY+'CANON-01-VOD-DPAD-HIDDEN-CONTROLS.json';
+rejects('VOD_DPAD_RECEIPT_REQUIRED','CANON_REQUIRED_FILE_MISSING',overlay({[vodDpadReceipt]:null}));
+rejects('VOD_DPAD_RECEIPT_IMMUTABLE','CANON_REGISTERED_RECEIPT_CHANGED',overlay({[vodDpadReceipt]:current(vodDpadReceipt)+'\n'}));
+rejects('VOD_DPAD_CONTROLLER_UNAPPROVED','CANON_PROTECTED_CONTENT_CHANGED',overlay({'android/app/src/main/java/com/xandeflix/prebuilt/player/VodDpadController.java':current('android/app/src/main/java/com/xandeflix/prebuilt/player/VodDpadController.java')+'\n// unapproved hidden shortcut change\n'}));
+// Expanded-card previews preserve every previous case and suite.
+assert.equal(cases.length,182,'PREVIOUS_182_CONTROLS_MUST_RUN');
+const expandedReceipt=AUTHORIZATION_DIRECTORY+'CANON-01-DPAD-EXPANDED-CARDS-AUTOPREVIEW-01.json';
+rejects('EXPANDED_RECEIPT_REQUIRED','CANON_REQUIRED_FILE_MISSING',overlay({[expandedReceipt]:null}));
+rejects('EXPANDED_RECEIPT_IMMUTABLE','CANON_REGISTERED_RECEIPT_CHANGED',overlay({[expandedReceipt]:current(expandedReceipt)+'\n'}));
+rejects('EXPANDED_SESSION_UNAPPROVED','CANON_PROTECTED_CONTENT_CHANGED',overlay({'src/ui/card-preview-session.ts':current('src/ui/card-preview-session.ts')+'\n// unapproved preview mutation\n'}));
+// Preserve every preceding control and suite.
+assert.equal(cases.length,185,'PREVIOUS_185_CONTROLS_MUST_RUN');
+const homeCarouselReceipt=AUTHORIZATION_DIRECTORY+'CANON-01-HOME-DPAD-CAROUSEL-PREVIEW-PAGINATION-02.json';
+rejects('HOME_CAROUSEL_RECEIPT_REQUIRED','CANON_REQUIRED_FILE_MISSING',overlay({[homeCarouselReceipt]:null}));
+rejects('HOME_CAROUSEL_RECEIPT_IMMUTABLE','CANON_REGISTERED_RECEIPT_CHANGED',overlay({[homeCarouselReceipt]:current(homeCarouselReceipt)+'\n'}));
+rejects('HOME_PAGINATION_UNAPPROVED','CANON_PROTECTED_CONTENT_CHANGED',overlay({'src/ui/rail-pagination.ts':current('src/ui/rail-pagination.ts')+'\n// silent mutation\n'}));
+// Scope/grid amendment preserves every preceding control and all31 suites.
+assert.equal(cases.length,188,'PREVIOUS_188_CONTROLS_MUST_RUN');
+const cardScopeReceipt=AUTHORIZATION_DIRECTORY+'CANON-01-DPAD-CARD-SCOPE-SEEALL-GRID-01.json';
+rejects('CARD_SCOPE_RECEIPT_REQUIRED','CANON_REQUIRED_FILE_MISSING',overlay({[cardScopeReceipt]:null}));
+rejects('CARD_SCOPE_RECEIPT_IMMUTABLE','CANON_REGISTERED_RECEIPT_CHANGED',overlay({[cardScopeReceipt]:current(cardScopeReceipt)+'\n'}));
+rejects('CARD_SCOPE_UNAPPROVED_CONTROLLER','CANON_PROTECTED_CONTENT_CHANGED',overlay({'src/ui/expanded-card-controller.ts':current('src/ui/expanded-card-controller.ts')+'\n// unauthorized scope\n'}));
+rejects('SEEALL_UNAPPROVED_GRID','CANON_PROTECTED_CONTENT_CHANGED',overlay({'src/ui/components/VirtualCatalogGrid.tsx':current('src/ui/components/VirtualCatalogGrid.tsx')+'\n// unauthorized grid\n'}));
+assert.equal(cases.length,192,'PREVIOUS_192_CONTROLS_MUST_RUN');
+const uiRecoveryReceipt=AUTHORIZATION_DIRECTORY+'CANON-01-XANDEFLIX-UI-PERFORMANCE-RECOVERY-03.json';
+rejects('UI_RECOVERY_RECEIPT_REQUIRED','CANON_REQUIRED_FILE_MISSING',overlay({[uiRecoveryReceipt]:null}));
+rejects('UI_RECOVERY_RECEIPT_IMMUTABLE','CANON_REGISTERED_RECEIPT_CHANGED',overlay({[uiRecoveryReceipt]:current(uiRecoveryReceipt)+'\n'}));
+rejects('UI_RECOVERY_SILENT_REPEAT_CHANGE','CANON_PROTECTED_CONTENT_CHANGED',overlay({'src/ui/dpad-repeat.ts':current('src/ui/dpad-repeat.ts')+'\n// unauthorized change\n'}));
+rejects('UI_RECOVERY_SILENT_SEARCH_CHANGE','CANON_PROTECTED_CONTENT_CHANGED',overlay({'src/ui/search-dpad-navigation.ts':current('src/ui/search-dpad-navigation.ts')+'\n// unauthorized change\n'}));
+assert.equal(cases.length,196,'PREVIOUS_196_CONTROLS_MUST_RUN');
+const introReceipt=AUTHORIZATION_DIRECTORY+'CANON-01-XANDEFLIX-APP-INTRO-BRANDING-07.json';
+rejects('INTRO_RECEIPT_REQUIRED','CANON_REQUIRED_FILE_MISSING',overlay({[introReceipt]:null}));
+rejects('INTRO_RECEIPT_IMMUTABLE','CANON_REGISTERED_RECEIPT_CHANGED',overlay({[introReceipt]:current(introReceipt)+'\n'}));
+rejects('INTRO_NATIVE_SILENT_MUTATION','CANON_PROTECTED_CONTENT_CHANGED',overlay({'android/app/src/main/java/com/xandeflix/prebuilt/intro/AppIntroController.java':current('android/app/src/main/java/com/xandeflix/prebuilt/intro/AppIntroController.java')+'\n// unauthorized change\n'}));
+const corruptedIntro=Buffer.from(original.read('android/app/src/main/res/raw/intro_horizontal.mp4'));corruptedIntro[0]^=1;
+rejects('INTRO_LOCAL_VIDEO_TAMPER_BLOCKS','CANON_PROTECTED_CONTENT_CHANGED',overlay({'android/app/src/main/res/raw/intro_horizontal.mp4':corruptedIntro}));
+rejects('INTRO_BOOT_GATE_BYPASS_BLOCKS','CANON_PROTECTED_CONTENT_CHANGED',overlay({'src/intro-main.ts':current('src/intro-main.ts').replace('waitForAppIntro()','Promise.resolve()')}));
+assert.equal(cases.length,201,'PREVIOUS_201_CONTROLS_MUST_RUN');
+const videoOnlyReceipt=AUTHORIZATION_DIRECTORY+'CANON-01-XANDEFLIX-INTRO-VIDEO-ONLY-07-R1.json';
+rejects('VIDEO_ONLY_RECEIPT_REQUIRED','CANON_REQUIRED_FILE_MISSING',overlay({[videoOnlyReceipt]:null}));
+rejects('VIDEO_ONLY_LAYOUT_TAMPER_BLOCKS','CANON_PROTECTED_CONTENT_CHANGED',overlay({'android/app/src/main/res/layout/app_intro.xml':current('android/app/src/main/res/layout/app_intro.xml').replace('</FrameLayout>','<Button android:id="@+id/intro_skip" /></FrameLayout>')}));
+rejects('VIDEO_ONLY_LAUNCH_RESOURCE_TAMPER_BLOCKS','CANON_PROTECTED_CONTENT_CHANGED',overlay({'android/app/src/main/res/drawable/intro_launch_blank.xml':current('android/app/src/main/res/drawable/intro_launch_blank.xml').replace('#00000000','#FFFFFFFF')}));
 const results=[];
-const suites=[...SUITES,['scripts/test-g10-delta-extensions-regression.mjs','G10_DELTA_EXTENSIONS_REGRESSION=PASS'],[SITE_BUILD_TEST,'SITE_BUILD_CONTRACT=PASS'],[A2_ARTIFACT_TEST,'A2_ARTIFACT_CONTRACT=PASS'],[PREBUILT_TEST,'A22_PREBUILT_CONTRACT=PASS'],['scripts/test-c105-directory-import.mjs','SOURCE_OUTPUT_FORMAT_REGRESSION=PASS'],['scripts/test-catalog-read-diagnostic.mjs','CATALOG_READ_DIAGNOSTIC=PASS'],['scripts/test-xui-m3u-kind-recovery.mjs','XUI_M3U_RECOVERY=PASS'],['scripts/test-catalog-physical-regressions.mjs','CATALOG_PHYSICAL_REGRESSIONS=PASS'],['scripts/test-series-poster-composition.mjs','SERIES_POSTER_COMPOSITION=PASS'],['scripts/test-tmdb-context-identity.mjs','TMDB_CONTEXT_IDENTITY=PASS'],['scripts/test-tmdb-subtitle-preview-recovery.mjs','TMDB_SUBTITLE_PREVIEW_RECOVERY=PASS'],['scripts/test-catalog-snapshot-retention.mjs','CATALOG_SNAPSHOT_RETENTION=PASS'],['scripts/test-detail-backdrop-recovery.mjs','DETAIL_BACKDROP_RECOVERY=PASS']];
+const suites=[...SUITES,['scripts/test-g10-delta-extensions-regression.mjs','G10_DELTA_EXTENSIONS_REGRESSION=PASS'],[SITE_BUILD_TEST,'SITE_BUILD_CONTRACT=PASS'],[A2_ARTIFACT_TEST,'A2_ARTIFACT_CONTRACT=PASS'],[PREBUILT_TEST,'A22_PREBUILT_CONTRACT=PASS'],['scripts/test-c105-directory-import.mjs','SOURCE_OUTPUT_FORMAT_REGRESSION=PASS'],['scripts/test-catalog-read-diagnostic.mjs','CATALOG_READ_DIAGNOSTIC=PASS'],['scripts/test-xui-m3u-kind-recovery.mjs','XUI_M3U_RECOVERY=PASS'],['scripts/test-catalog-physical-regressions.mjs','CATALOG_PHYSICAL_REGRESSIONS=PASS'],['scripts/test-series-poster-composition.mjs','SERIES_POSTER_COMPOSITION=PASS'],['scripts/test-tmdb-context-identity.mjs','TMDB_CONTEXT_IDENTITY=PASS'],['scripts/test-tmdb-subtitle-preview-recovery.mjs','TMDB_SUBTITLE_PREVIEW_RECOVERY=PASS'],['scripts/test-catalog-snapshot-retention.mjs','CATALOG_SNAPSHOT_RETENTION=PASS'],['scripts/test-detail-backdrop-recovery.mjs','DETAIL_BACKDROP_RECOVERY=PASS'],['scripts/test-streamed-vod-inventory.mjs','STREAMED_VOD_INVENTORY=PASS'],['scripts/test-c107-fire-hero-metadata.mjs','HERO_PLATFORM_METADATA=PASS'],['scripts/test-c107-watch-providers.mjs','HERO_PLATFORM_LOGOS=PASS'],['scripts/test-live-single-transport.mjs','SINGLE_TRANSPORT_PLAYBACK=PASS'],['scripts/test-network-diagnostics.mjs','NETWORK_DIAGNOSTICS=PASS'],['scripts/test-tmdb-release-tags.mjs','TMDB_RELEASE_TAGS=PASS'],['scripts/test-dpad-expanded-cards.mjs','DPAD_EXPANDED_CARDS=PASS'],['scripts/test-home-dpad-carousel-preview-pagination.mjs','HOME_DPAD_CAROUSEL_PREVIEW_PAGINATION=PASS'],['scripts/test-dpad-card-scope-seeall-grid.mjs','DPAD_CARD_SCOPE_SEEALL_GRID=PASS'],['scripts/test-ui-performance-recovery-03.mjs','UI_PERFORMANCE_RECOVERY_03=PASS'],['scripts/test-app-intro-branding-07.mjs','APP_INTRO_BRANDING_07=PASS'],['scripts/test-series-episode-return.mjs','SERIES_EPISODE_RETURN=PASS'],['scripts/test-trailer-containment-r4.mjs','TRAILER_CONTAINMENT_R4=PASS'],['scripts/test-tmdb-episode-enrichment.mjs','TMDB_EPISODE_ENRICHMENT=PASS'],['scripts/test-tmdb-episode-runtime-recovery.mjs','TMDB_EPISODE_RUNTIME_RECOVERY=PASS'],['scripts/test-episode-general-identity.mjs','EPISODE_GENERAL_IDENTITY=PASS'],['scripts/test-detail-hero-refinement.mjs','DETAIL_HERO_REFINEMENT=PASS'],['scripts/test-actor-profile.mjs','ACTOR_PROFILE=PASS'],['scripts/test-identity-hero-recovery.mjs','IDENTITY_HERO_RECOVERY=PASS'],['scripts/test-source-replacement-isolation.mjs','SOURCE_REPLACEMENT_ISOLATION=PASS'],['scripts/test-source-replacement-bootstrap.mjs','SOURCE_REPLACEMENT_BOOTSTRAP=PASS'],['scripts/test-source-replacement-ui.mjs','SOURCE_REPLACEMENT_UI=PASS']];
 for(const[file,marker]of suites){
  const run=spawnSync(process.execPath,[path.join(root,file)],{cwd:root,encoding:'utf8',timeout:180000,maxBuffer:8*1024*1024});
  fs.writeFileSync(path.join(dir,path.basename(file)+'.log'),(run.stdout||'')+(run.stderr||''));

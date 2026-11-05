@@ -1,0 +1,74 @@
+[BOOT_TELEMETRY] T7_SOURCE_RESOLUTION_READY reached at +-1793878171897ms
+[BOOT_TELEMETRY] T8_CATALOG_SYNC_STARTED reached at +-1793878171895ms
+[BOOT_TELEMETRY] T10_FULL_STAGING_COMPLETE reached at +-1793878171878ms
+[BOOT_TELEMETRY] T11_PROMOTION_COMPLETE reached at +-1793878171853ms
+==================================================
+[BOOT_TELEMETRY_SUMMARY]
+APP_SHELL_VISIBLE_MS=N/A
+APP_INTERACTIVE_MS=N/A
+CATALOG_SYNC_STARTED_MS=-1793878171895
+FIRST_REAL_DATA_MS=N/A
+FULL_CATALOG_READY_MS=-1793878171853
+FULL_CATALOG_SYNC_DURATION_MS=42
+MAX_MAIN_THREAD_BLOCK_MS=0
+==================================================
+PASS installed boot checks authority before exposure; migration bypasses checkpoint and NO_OP
+==================================================
+[BOOT_TELEMETRY_SUMMARY]
+APP_SHELL_VISIBLE_MS=N/A
+APP_INTERACTIVE_MS=N/A
+CATALOG_SYNC_STARTED_MS=-1793878171895
+FIRST_REAL_DATA_MS=N/A
+FULL_CATALOG_READY_MS=-1793878171853
+FULL_CATALOG_SYNC_DURATION_MS=42
+MAX_MAIN_THREAD_BLOCK_MS=0
+==================================================
+==================================================
+[BOOT_TELEMETRY_SUMMARY]
+APP_SHELL_VISIBLE_MS=N/A
+APP_INTERACTIVE_MS=N/A
+CATALOG_SYNC_STARTED_MS=-1793878171895
+FIRST_REAL_DATA_MS=N/A
+FULL_CATALOG_READY_MS=-1793878171853
+FULL_CATALOG_SYNC_DURATION_MS=42
+MAX_MAIN_THREAD_BLOCK_MS=0
+==================================================
+PASS A to B to A reloads both times without reusing original snapshot
+==================================================
+[BOOT_TELEMETRY_SUMMARY]
+APP_SHELL_VISIBLE_MS=N/A
+APP_INTERACTIVE_MS=N/A
+CATALOG_SYNC_STARTED_MS=-1793878171895
+FIRST_REAL_DATA_MS=N/A
+FULL_CATALOG_READY_MS=-1793878171853
+FULL_CATALOG_SYNC_DURATION_MS=42
+MAX_MAIN_THREAD_BLOCK_MS=0
+==================================================
+PASS failed B plus offline restart blocks A usage; returning A imports fresh
+PASS unknown or denied authority cannot clear metadata or expose legacy catalog
+PASS verified exact snapshot works offline; rollback snapshot never inherits readiness
+PASS authority change before promotion rejects stale source import
+PASS empty and wrong-source staging cannot promote or expose old catalog
+==================================================
+[BOOT_TELEMETRY_SUMMARY]
+APP_SHELL_VISIBLE_MS=N/A
+APP_INTERACTIVE_MS=N/A
+CATALOG_SYNC_STARTED_MS=-1793878171895
+FIRST_REAL_DATA_MS=N/A
+FULL_CATALOG_READY_MS=-1793878171853
+FULL_CATALOG_SYNC_DURATION_MS=42
+MAX_MAIN_THREAD_BLOCK_MS=0
+==================================================
+PASS concurrent calls coalesce into one reset and one post-restart import
+==================================================
+[BOOT_TELEMETRY_SUMMARY]
+APP_SHELL_VISIBLE_MS=N/A
+APP_INTERACTIVE_MS=N/A
+CATALOG_SYNC_STARTED_MS=-1793878171895
+FIRST_REAL_DATA_MS=N/A
+FULL_CATALOG_READY_MS=-1793878171853
+FULL_CATALOG_SYNC_DURATION_MS=42
+MAX_MAIN_THREAD_BLOCK_MS=0
+==================================================
+PASS promotion guard failure blocks stale UI and supports a safe retry
+SOURCE_REPLACEMENT_BOOTSTRAP=PASS 9

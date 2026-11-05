@@ -1,0 +1,14 @@
+[
+  {
+    "transport": "large",
+    "success": false,
+    "code": "UNKNOWN_TRANSPORT_ERROR",
+    "stage": "HTTP_RESPONSE"
+  },
+  {
+    "transport": "capacitor-http",
+    "failed": true,
+    "errorClass": "Error",
+    "messageClass": "RESET"
+  }
+]

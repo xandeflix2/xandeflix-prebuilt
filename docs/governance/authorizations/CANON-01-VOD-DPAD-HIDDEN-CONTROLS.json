@@ -1,0 +1,115 @@
+{
+  "schema": 1,
+  "gate": "CANON-01-VOD-DPAD-HIDDEN-CONTROLS",
+  "parentGate": "CANON-01",
+  "amendment": "CANON-01-VOD-DPAD-HIDDEN-CONTROLS",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "EXPLICIT_USER_ATTACHED_VOD_DPAD_REQUEST_AND_HIDDEN_VISIBLE_SEPARATION_2026_10_25",
+  "authorizationRequestSha256": "572859c6a2312ebd7235ac7aa9bfdc73053696d07f462e1661857d3884173f3b",
+  "reason": "Only hidden movie/episode horizontal remote keys seek10s without showing controls; hidden OK pauses and captures its complete key cycle. Visible controls and live routing retain their existing behavior.",
+  "physicalImpact": "REQUIRED",
+  "physicalImpactJustification": "Physical Fire Stick/Android TV playback and remote validation remains pending. Current request permits local correction and automated tests/report, not a new APK installation.",
+  "testChangesReviewed": true,
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c105-complete-root-search.mjs",
+    "scripts/test-c107-catalog-return-navigation.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c11-landscape-navigation.mjs",
+    "scripts/validate-direct-playback.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock",
+    "npm run typecheck",
+    "npm run playback:check",
+    "node scripts/test-c161-player-navigation.mjs",
+    "gradlew.bat --offline --no-daemon --max-workers=2 --console=plain testDebugUnitTest"
+  ],
+  "evidence": "docs/evidence/VOD_DPAD_HIDDEN_CONTROLS.md",
+  "compatibilityRisk": "Synthetic JVM event/Player ports cannot certify hardware remote delivery, real Media3 view animation or network seeking. Visible navigation, media keys, live and original touch interfaces remain routed unchanged.",
+  "restrictions": [
+    "Only12 paths; no Git add/commit/push/PR/merge/main, backend/admin/deploy, APK generation/installation/reset or next implementation.",
+    "Preserve32 previous receipts,179 controls/29 suites,906 protected files and222 native tests/37 suites. Add3 receipt/tamper controls and17 meaningful native scenarios.",
+    "Change only NativePlayerActivity hidden shortcut integration and a small tested controller. Reuse existing bounded10s seek primitive; do not alter legacy helper/tests, source/streams/catalog, bridge/C9/live/buffer, activation/identity/parental, touch handlers, version/dependencies/configuration/layouts/workflows/verifier.",
+    "C161 existing fixture gets only a false port for the new hidden dispatcher method; all old assertions and visible Next navigation are preserved. New hidden route uses real production controller in JUnit.",
+    "Controls visible always bypass new seek/OK handling; captured DOWN repeats/UP do not leak to newly displayed controls. Disabled context never performs a new action.",
+    "Android compilation/unit tests only in this cycle. No claim of physical-device execution or a newly installed APK."
+  ],
+  "previousGovernanceHashes": {
+    "docs/governance/CANON_CHANGE_AUTHORIZATION.json": "e73152f228cbb625c508062d70ef810e8342059a",
+    "docs/governance/CANON_01_LEGACY_TESTS_AUTHORIZATION.json": "e59e2d328db3d0dfd8c1d873b154e2e3f7900a0c",
+    "docs/governance/CANON_01_AUTHORIZATION_HARDENING.json": "766db763ee98aeeb33230c2828f050a8527555b7",
+    "docs/governance/authorizations/CANON-01-VERCEL-BUILD-A1.json": "7edaa32c4b13c8295fc0daa64abed1ef7a4b0c2d",
+    "docs/governance/authorizations/CANON-01-VERCEL-A2-ARTIFACT.json": "fb613a143676e3e32267ebacb3bec81123791823",
+    "docs/governance/authorizations/CANON-01-VERCEL-A22A.json": "c698fec429f4058118d4701a7f5208ece9a0b0d1",
+    "docs/governance/authorizations/CANON-01-A22A-CI-DIAG.json": "7d89451bf23a05fa1ba819b72b99b28025aa7a66",
+    "docs/governance/authorizations/CANON-01-A22A-WINDOWS-EOL.json": "73ffd5ed494cb87a7c0d22e4a8a3f94252cf321e",
+    "docs/governance/authorizations/CANON-01-SOURCE-OUTPUT.json": "a93d98a1022f99c0e0957dd8f4a2c7d078b8f588",
+    "docs/governance/authorizations/CANON-01-CATALOG-READ-DIAG.json": "169b19ee02a4c1cacbe575cded00ec02928fa3c7",
+    "docs/governance/authorizations/CANON-01-XUI-OPAQUE-RECOVERY.json": "cf4176d0007b4a04997bf2631558bd9d954fd6f7",
+    "docs/governance/authorizations/CANON-01-CATALOG-PHYSICAL-FIXES.json": "ea179b852518e2a14c7ee79b6c3c72e76c0df6a9",
+    "docs/governance/authorizations/CANON-01-SERIES-POSTER-COMPOSITION.json": "645dc8b2b5d4b822bc83d72e9f5ab9f4f4cb4347",
+    "docs/governance/authorizations/CANON-01-TMDB-CONTEXT-IDENTITY.json": "3ab236bab99175dcb5374047c2fc6565650d8945",
+    "docs/governance/authorizations/CANON-01-TMDB-SUBTITLE-PREVIEW.json": "5e50d1c29c33b5fe3455112818e978213d065e96",
+    "docs/governance/authorizations/CANON-01-CATALOG-RETENTION.json": "b3c18f01ba1e753597af3a162c2605669dcd4e6b",
+    "docs/governance/authorizations/CANON-01-DETAIL-BACKDROP-UI.json": "579097e952a7ddf142ba885aaf23e164c0241e54",
+    "docs/governance/authorizations/CANON-01-DETAIL-BACKDROP-TYPES.json": "da8c532e25e220040bba3c942bad41507d4b9245",
+    "docs/governance/authorizations/CANON-01-TV-SIDEBAR-COMPOSITION.json": "f5d43f845cd4e3fdb7947dc33e4f9b3df8669ab7",
+    "docs/governance/authorizations/CANON-01-A22A-WINDOWS-METADATA-EOL.json": "90d7db4a18e84221afa6fa9dda40c82d6dad6121",
+    "docs/governance/authorizations/CANON-01-VERCEL-PREBUILT-RECOVERY-01.json": "9cb685590481ba094ffbca2e2abe2f585aa3ae46",
+    "docs/governance/authorizations/CANON-01-OPAQUE-HLS-MIME-RECOVERY.json": "5a8c735b59f921a5d24be15f6c14f32541687719",
+    "docs/governance/authorizations/CANON-01-STREAMED-VOD-INVENTORY-RECOVERY.json": "a16dd131aa09b3027724ea94f49a6d841551a9cb",
+    "docs/governance/authorizations/CANON-01-TABLET-SIDEBAR-TRANSPARENCY.json": "ffcc5c6c6005e4fcd24ce40ba776950bf55a5dbe",
+    "docs/governance/authorizations/CANON-01-HERO-PLATFORM-COMPOSITION.json": "75f9ca539c1723ca1db6c2e8948a63a3a19d5264",
+    "docs/governance/authorizations/CANON-01-HERO-PLATFORM-ALIGNMENT.json": "66a112450541d8a038292d8b07d08cc5547ad51e",
+    "docs/governance/authorizations/CANON-01-LIVE-SINGLE-TRANSPORT.json": "039d22359310380cd79432efe17f9533c93fb6cb",
+    "docs/governance/authorizations/CANON-01-NETWORK-DIAGNOSTICS.json": "80a4d01348eb82b4a7cafd4836c3f221d97e02e5",
+    "docs/governance/authorizations/CANON-01-NETWORK-UI-POLISH.json": "2fc3ce79b3a78454e7ad15f1d06002a6bc69d594",
+    "docs/governance/authorizations/CANON-01-LIVE-NETWORK-ACTIONS.json": "e345e800a7a52d79241701cb5fd13f34bc699e01",
+    "docs/governance/authorizations/CANON-01-TV-CAST-SENDER-HIDDEN.json": "f1e466b249afac7a6dab2a62952dc83a4dd31540",
+    "docs/governance/authorizations/CANON-01-TMDB-RELEASE-TAGS.json": "30bcebd64ad85f8d981f09b320cbf3864b6bad7a"
+  },
+  "supersedes": {
+    "android/app/src/main/java/com/xandeflix/prebuilt/player/NativePlayerActivity.java": "CANON-01-LIVE-SINGLE-TRANSPORT",
+    "scripts/test-canonical-regression.mjs": "CANON-01-TMDB-RELEASE-TAGS"
+  },
+  "changes": [
+    {
+      "path": "android/app/src/main/java/com/xandeflix/prebuilt/player/NativePlayerActivity.java",
+      "before": "0e6758a07b87cc97054f8e6d509a4a355193cb15",
+      "after": "5db3702923e2e40450f1bbed4c85c1bb4531e626"
+    },
+    {
+      "path": "android/app/src/main/java/com/xandeflix/prebuilt/player/VodDpadController.java",
+      "before": null,
+      "after": "0a10877f686f0850081e76d150853e85b549eacc"
+    },
+    {
+      "path": "android/app/src/test/java/com/xandeflix/prebuilt/player/VodDpadControllerTest.java",
+      "before": null,
+      "after": "52a95b6c1d6ab6eb5d8b6497d76906b44d3d4f46"
+    },
+    {
+      "path": "scripts/test-c161-player-navigation.mjs",
+      "before": "23b67ed019f83f57814320846f30d7a0061ea476",
+      "after": "d0902a9fe8736621190b8ec725e5352eb831ab2d"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "5a79eb63d820a03a153c196c96470e3fb56a56b8",
+      "after": "4639bf5f54571afc1b93419c881e4ae8c080db87"
+    }
+  ],
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": true,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false
+}

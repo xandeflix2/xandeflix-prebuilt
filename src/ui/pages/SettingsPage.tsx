@@ -2,6 +2,7 @@ import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { useDevicePresentation } from '../hooks/useDevicePresentation.ts';
 import { devicePresentationModels, getDevicePresentationModel, openDevicePresentation } from '../device-presentation.ts';
 import './SettingsPage.css';
+import { NetworkSettings } from '../components/NetworkSettings.tsx';
 import { AppUpdateSettings } from '../../app-update/AppUpdateSettings.tsx';
 import { ActiveSourceSettings } from '../components/ActiveSourceSettings.tsx';
 import { openSettingsDestination, openSettingsWindow } from '../settings/settings-window.ts';
@@ -42,6 +43,9 @@ export function SettingsPage({ onOpenActivation, onOpenParental, onOpenAdult }: 
     <div className="settings-sections">
       <SettingsOption title="Atualizações do aplicativo" description="Consulte e instale novas versões.">
         <AppUpdateSettings />
+      </SettingsOption>
+      <SettingsOption title="Internet e conexão" description="Confira a rede e teste a velocidade de download." mountOnOpen>
+        <NetworkSettings />
       </SettingsOption>
       <SettingsOption title="Fonte e catálogo" description="Confira a fonte ativa e atualize o catálogo.">
         <ActiveSourceSettings onOpenAdult={onOpenAdult ? () => openSettingsDestination(onOpenAdult) : undefined}/>

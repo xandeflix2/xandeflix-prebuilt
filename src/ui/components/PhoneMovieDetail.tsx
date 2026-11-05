@@ -6,9 +6,9 @@ import { resolveMoviePresentation, type MoviePresentation } from '../../artwork/
 import { watchFingerprint } from '../../playback/watch-history.ts';
 import { SeriesTrailer } from './SeriesTrailer.tsx';
 import { SeriesPersonalActions } from './SeriesPersonalActions.tsx';
-import { CastButton } from './CastButton.tsx';
-import { RelatedTitles } from './RelatedTitles.tsx';
+import { SeriesDetailSections } from './SeriesDetailSections.tsx';
 import { WatchProviders } from './WatchProviders.tsx';
+import { CastButton } from './CastButton.tsx';
 
 interface Props {
   detail: MovieDetailViewModel;
@@ -67,11 +67,8 @@ export function PhoneMovieDetail({ detail, identity, readModel, resolving, statu
         <CastButton/>
       </div>
       {statusMessage && <p role="status" aria-live="polite" className={`playback-status-notice ${statusKind === 'error' ? 'notice-error' : 'notice-info'}`}>{statusMessage}</p>}
-      {source && <SeriesPersonalActions key={detail.id} kind="movie" itemId={detail.id} fingerprint={watchFingerprint('movie', source)} title={detail.title} tmdbId={extra?.tmdbId}/>}
-      {onSelectItem && <section className="series-phone-panel movie-phone-related" aria-label="Títulos semelhantes">
-        <h2 className="section-heading">Títulos semelhantes</h2>
-        <RelatedTitles kind="movie" itemId={detail.id} readModel={readModel} onSelectItem={onSelectItem} layout="grid"/>
-      </section>}
+      {source && <SeriesPersonalActions key="movie-personal-actions" kind="movie" itemId={detail.id} fingerprint={watchFingerprint('movie', source)} title={detail.title} tmdbId={extra?.tmdbId}/>}
+      <SeriesDetailSections key="movie-detail-sections" kind="movie" seriesId={detail.id} identity={identity} layout="grid" readModel={readModel} onSelectItem={onSelectItem}/>
     </div>
   </>;
 }

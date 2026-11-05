@@ -1,3 +1,4 @@
+import { sourceScopedStorageKey } from '../bootstrap/source-replacement.ts';
 import type { LiveCatalog, LiveChannel } from '../catalog/live/live-tv.types.ts';
 import { liveChannelFingerprint } from './last-live-channel.ts';
 import { watchFingerprint } from './watch-history.ts';
@@ -11,10 +12,11 @@ export function liveFavoriteScope(sourceId: string): string {
 }
 /** Presentation preference only: no catalog, source credentials or URLs. */
 export class LiveFavorites {
+  private readonly storageKey = sourceScopedStorageKey(KEY);
   private readonly port: () => Port | undefined;
   constructor(port: () => Port | undefined = () => typeof window === 'undefined' ? undefined : window.localStorage) { this.port = port; }
   private read(): Rows {
-    const raw = this.port()?.getItem(KEY);
+    const raw = this.port()?.getItem(this.storageKey);
     if (!raw) return {};
     if (raw.length > 40000) throw Error('LIVE_FAVORITES_INVALID');
     const data = JSON.parse(raw);
@@ -33,8 +35,8 @@ export class LiveFavorites {
     rows[scope] = [...values];
     const raw = JSON.stringify({ version: 1, sources: rows }), port = this.port();
     if (!port) throw Error('LIVE_FAVORITES_UNAVAILABLE');
-    port.setItem(KEY, raw);
-    if (port.getItem(KEY) !== raw) throw Error('LIVE_FAVORITES_UNAVAILABLE');
+    port.setItem(this.storageKey, raw);
+    if (port.getItem(this.storageKey) !== raw) throw Error('LIVE_FAVORITES_UNAVAILABLE');
     return values;
   }
 }

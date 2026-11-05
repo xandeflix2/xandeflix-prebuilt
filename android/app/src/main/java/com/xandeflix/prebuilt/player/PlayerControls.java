@@ -75,6 +75,17 @@ final class PlayerControls {
         setTransitioning(false);
     }
     boolean hasNext(){return episodes!=null&&episodes.optBoolean("hasNext",false);}
+    org.json.JSONObject getNextEpisode() {
+        if(episodes==null||!hasNext())return null;
+        JSONArray list=episodes.optJSONArray("episodes");
+        if(list==null)return null;
+        String currentId=episodes.optString("currentEpisodeId");
+        for(int i=0;i<list.length()-1;i++){
+            JSONObject ep=list.optJSONObject(i);
+            if(ep!=null&&currentId.equals(ep.optString("id")))return list.optJSONObject(i+1);
+        }
+        return null;
+    }
     boolean containsEpisode(String id) {
         if(episodes==null||id==null||id.equals(episodes.optString("currentEpisodeId")))return false;
         JSONArray list=episodes.optJSONArray("episodes");

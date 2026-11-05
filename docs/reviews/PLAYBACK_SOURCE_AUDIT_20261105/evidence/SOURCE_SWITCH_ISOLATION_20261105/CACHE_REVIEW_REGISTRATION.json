@@ -1,0 +1,33 @@
+{
+  "observedUTC": "2026-11-05T11:38:37.868Z",
+  "gate": "CANON-01-SOURCE-SWITCH-ISOLATION-CACHE-REVIEW",
+  "receipt": "docs/governance/authorizations/CANON-01-SOURCE-SWITCH-ISOLATION-CACHE-REVIEW.json",
+  "receiptBlob": "99a5a618006283fcf3ba8a753440021dee765c65",
+  "changes": [
+    {
+      "path": "src/bootstrap/source-replacement.ts",
+      "before": "71828a35f43c309eb15542187db9319e65c53557",
+      "after": "84eec2b43e199cfe1cbf57593c0e7765a6be8567"
+    },
+    {
+      "path": "src/bootstrap/boot-sync-coordinator.ts",
+      "before": "94c1c7a25c31f3a67d0c4c525e5cd3a16a23f394",
+      "after": "0153aec0631f7cbcdc26919fa59415e66856ced9"
+    },
+    {
+      "path": "scripts/test-source-replacement-isolation.mjs",
+      "before": "b2047e7eadd67b76a37f7b7ce0a4f11d193cb660",
+      "after": "1d1758e1b2ee94a597b24bfac5a860ed3db4d9d0"
+    },
+    {
+      "path": "scripts/test-source-replacement-bootstrap.mjs",
+      "before": "dc090286fbf6d52f979c515f1fdb81dd42e66f52",
+      "after": "2944a7426583fadd803af24752126ccda70ccfaa"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "ff64fd90dde8297622f8ee99fa07eda845ad94e9",
+      "after": "23d6ad5fe63d6a993d427e232d410d3296ac40bd"
+    }
+  ]
+}

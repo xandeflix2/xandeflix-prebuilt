@@ -82,22 +82,54 @@ export const Hero: React.FC<HeroProps> = ({ item, onSelect, onPlay, playbackBusy
   const platformCategory = item.categoryLabels.map(label => label.trim().replace(/^(?:s[eé]ries|filmes)\s*\|\s*/i, '').trim())
     .find(label => label && !/^geral$/i.test(label))?.slice(0, 100);
   const overview = mobilePoster ? metadata?.overview || item.overviewSnippet : item.overviewSnippet || metadata?.overview;
+  const currentKey = `${item.kind}:${item.id}:${artworkUri || item.backdropUri || ''}`;
+  const backdropElement = artworkUri ? <img src={cached.src} alt={item.title} data-immersive-artwork={mobilePoster?'poster':'backdrop'} className={`hero-backdrop-img${mobilePoster?' hero-poster-img':''}`} loading="eager" decoding="async" {...{fetchpriority:'high'}} onError={() => {if(!cached.handleCacheError())onArtworkError?.();}}/>
+    : mobilePoster ? <HeroPoster key={artworkIdentityKey(identity)} item={item} metadata={metadata} /> : <Artwork
+    uri={item.backdropUri}
+    fallbackUri={item.posterUri}
+    identity={identity}
+    priority="high"
+    tmdbBackdropOnly
+    immersiveArtwork="backdrop"
+    title={item.title}
+    kind="backdrop"
+    className="hero-backdrop-img"
+  />;
+
+  const [layers, setLayers] = useState<{ activeKey: string; current: React.ReactNode; previous?: React.ReactNode }>({
+    activeKey: currentKey,
+    current: backdropElement
+  });
+
+  useEffect(() => {
+    setLayers(prev => {
+      if (prev.activeKey === currentKey) {
+        return { ...prev, current: backdropElement };
+      }
+      return {
+        activeKey: currentKey,
+        current: backdropElement,
+        previous: prev.current
+      };
+    });
+    const timer = setTimeout(() => {
+      setLayers(prev => prev.previous ? { activeKey: prev.activeKey, current: prev.current } : prev);
+    }, 380);
+    return () => clearTimeout(timer);
+  }, [currentKey, cached.src, item.backdropUri]);
+
   if (!allowed) return null;
   return (
     <section ref={immersive} className={`hero-banner hero-banner--actions${mobilePoster ? ' hero-banner--vertical' : ''}${artworkDetails ? ' hero-banner--artwork-details' : ''}`} aria-label={`Destaque: ${item.title}`}>
       <div className="hero-backdrop-container">
-        {artworkUri ? <img src={cached.src} alt={item.title} data-immersive-artwork={mobilePoster?'poster':'backdrop'} className={`hero-backdrop-img${mobilePoster?' hero-poster-img':''}`} loading="eager" decoding="async" {...{fetchpriority:'high'}} onError={() => {if(!cached.handleCacheError())onArtworkError?.();}}/>
-          : mobilePoster ? <HeroPoster key={artworkIdentityKey(identity)} item={item} metadata={metadata} /> : <Artwork
-          uri={item.backdropUri}
-          fallbackUri={item.posterUri}
-          identity={identity}
-          priority="high"
-          tmdbBackdropOnly
-          immersiveArtwork="backdrop"
-          title={item.title}
-          kind="backdrop"
-          className="hero-backdrop-img"
-        />}
+        {layers.previous && (
+          <div className="hero-backdrop-crossfade hero-backdrop-crossfade--prev" aria-hidden="true">
+            {layers.previous}
+          </div>
+        )}
+        <div className={`hero-backdrop-crossfade${layers.previous ? ' hero-backdrop-crossfade--enter' : ''}`}>
+          {layers.current}
+        </div>
         <div className="hero-overlay-gradient" />
         {artworkDetails && <button type="button" className="hero-artwork-link"
           aria-label={`Ver detalhes de ${item.title}`}
@@ -120,16 +152,16 @@ export const Hero: React.FC<HeroProps> = ({ item, onSelect, onPlay, playbackBusy
         <div className="hero-meta">
           <span className="hero-badge">{item.kind === 'movie' ? 'FILME' : 'SÉRIE'}</span>
           {badge && <span className="hero-content-badge">{badge}</span>}
-          {platformCategory && <span className="hero-content-badge hero-category-badge" aria-label={platformCategory} title={platformCategory}><PlatformCategoryLogo label={platformCategory}/></span>}
           {year && <span className="hero-year">{year}</span>}
           {duration && (
             <span className="hero-duration">{duration}</span>
           )}
         </div>
         <Title className="hero-title">{item.title}</Title>
-        {genres.length > 0 && (
-          <p className="hero-genres">{genres.join(' • ')}</p>
-        )}
+        {(platformCategory || genres.length > 0) && <div className="hero-platform-genres">
+          {platformCategory && <span className="hero-category-badge hero-platform-slot" aria-label={platformCategory} title={platformCategory}><PlatformCategoryLogo label={platformCategory}/></span>}
+          {genres.length > 0 && <p className="hero-genres">{genres.join(' • ')}</p>}
+        </div>}
         {overview && (
           <p className="hero-overview">{overview}</p>
         )}

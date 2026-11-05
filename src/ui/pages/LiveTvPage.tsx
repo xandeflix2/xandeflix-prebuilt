@@ -1,3 +1,4 @@
+import { NetworkConnectionButton } from '../components/NetworkConnectionButton.tsx';
 /**
  * Xandeflix Prebuilt — Live TV Three-Pane Layout (Gate R7C / Cycle R6B)
  *
@@ -18,7 +19,7 @@
 import React, { useState, useEffect, useLayoutEffect, useCallback, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import type { LiveCatalog, LiveChannel } from '../../catalog/live/live-tv.types.ts';
-import { LiveCatalogService, resolveCanonicalLiveTotal, type LiveChannelPage } from '../../catalog/live/live-catalog.service.ts';
+import { LiveCatalogService, type LiveChannelPage } from '../../catalog/live/live-catalog.service.ts';
 import {
   addNativePreviewErrorListener,
   addNativePreviewFullscreenListener,
@@ -87,6 +88,8 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
   const [fullscreenReturnNonce, setFullscreenReturnNonce] = useState(0);
   const appliedFullscreenReturn = useRef(0);
   const { tabletPortrait, stackedLive: isMobile, squareLive } = useLivePresentation();
+  const phoneLive = isMobile && !tabletPortrait && !squareLive;
+  const [networkWindowOpen, setNetworkWindowOpen] = useState(false);
   const [mobileTab, setMobileTab] = useState<'groups' | 'channels'>('channels');
   const [isEpgOpen, setIsEpgOpen] = useState(false);
   const [mobileHeaderTarget, setMobileHeaderTarget] = useState<HTMLElement | null>(null);
@@ -389,13 +392,13 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
   useEffect(() => {
     const previewId = previewIdRef.current;
     if (!previewId) return;
-    const obscured = Boolean(parental.prompt);
+    const obscured = Boolean(parental.prompt) || networkWindowOpen;
     // Separate from media handoff, which may itself be waiting for this PIN.
     previewVisibility.current = previewVisibility.current.then(async () => {
       if (!previewMounted.current || previewLeaving.current || previewIdRef.current !== previewId) return;
       await updateNativeAndroidPreview({ previewId, obscured });
     }).catch(() => {});
-  }, [parental.prompt?.id, controlsReady]);
+  }, [parental.prompt?.id, controlsReady, networkWindowOpen]);
 
   // O canal em reprodução independe da categoria, página ou filtro em navegação.
   const hasPreviewSurface = selectedChannel !== null;
@@ -926,7 +929,7 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' || e.key === 'Back' || e.keyCode === 4) {
-        if (e.defaultPrevented || document.querySelector('.parental-dialog[open]')) return;
+        if (e.defaultPrevented || document.querySelector('.parental-dialog[open], [data-network-dialog][open]')) return;
         e.preventDefault();
         if (isPreviewFullscreen) {
           void exitNativeAndroidPreviewFullscreen({ previewId: previewIdRef.current || undefined });
@@ -943,29 +946,25 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
     title={liveContext.favorite?'Remover canal dos favoritos':'Adicionar canal aos favoritos'} aria-label={liveContext.favorite?'Remover canal dos favoritos':'Adicionar canal aos favoritos'}
     onClick={()=>toggleFavorite()} onKeyDown={event=>{
       if(event.key!=='ArrowLeft')return;
+      const networkButton=event.currentTarget.closest('.live-channel-status, .live-preview-legacy-title')?.querySelector<HTMLButtonElement>('.network-connection-button');
+      if(networkButton){event.preventDefault();event.stopPropagation();networkButton.focus({preventScroll:true});return;}
       const rows=[...document.querySelectorAll<HTMLButtonElement>('.live-channel-list [data-live-channel]')];
       const target=rows.find(row=>row.dataset.liveChannel===favoriteReturnChannel.current)||rows.find(row=>row.dataset.liveChannel===selectedChannel?.id)||rows[0];
       if(target){event.preventDefault();event.stopPropagation();target.focus({preventScroll:true});}
     }}><svg viewBox="0 0 24 24" aria-hidden="true" fill={liveContext.favorite?'currentColor':'none'} stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"><path d="m12 3 2.8 5.7 6.3.9-4.6 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9Z"/></svg></button>;
-  const pageHeader = (
-    <div className="live-page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem 1.5rem', borderBottom: '1px solid #1e293b', backgroundColor: '#0f172a', flexShrink: 0 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-        <button type="button" className="focusable-item live-page-back" onClick={handleBackNavigation} aria-label="Voltar para a tela anterior" title="Voltar"
-          style={{ background: '#1e293b', color: '#f8fafc', border: '1px solid #334155', padding: '0.45rem 0.9rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem' }}>
-          <span className="live-back-label">← Voltar</span>
-          <svg className="live-back-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M19 12H5m6-6-6 6 6 6"/></svg>
-        </button>
-        {(isMobile || squareLive) && onHome && <button type="button" className="focusable-item live-page-home" onClick={onHome} aria-label="Ir para Início" title="Início">
+  const previewNetworkActions = !phoneLive ? <div className="live-preview-network-actions"><CastButton /><NetworkConnectionButton onOpenChange={setNetworkWindowOpen} /></div> : null;
+  const pageHeader = phoneLive ? (
+    <div className="live-page-header">
+      <div>
+        <h1 title="Canais ao Vivo"><span aria-hidden="true">📺</span> Canais ao Vivo</h1>
+        {onHome && <button type="button" className="focusable-item live-page-home" onClick={onHome} aria-label="Ir para Início" title="Início">
           <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V21h-6v-7H9v7H3z"/></svg>
         </button>}
-        <h1 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}><span aria-hidden="true">📺</span> Canais ao Vivo</h1>
-        <span className="live-channel-total" style={{ backgroundColor: '#166534', color: '#86efac', fontSize: '0.7rem', fontWeight: 700, padding: '0.2rem 0.6rem', borderRadius: '999px' }}>
-          {liveCatalog ? `${resolveCanonicalLiveTotal(liveCatalog, canonicalGroupCounts)} CANAIS` : isLoading ? 'Carregando…' : 'Sem canais'}
-        </span>
-        <CastButton iconOnly={isMobile || squareLive} />
+        <NetworkConnectionButton onOpenChange={setNetworkWindowOpen} />
+        <CastButton iconOnly />
       </div>
     </div>
-  );
+  ) : null;
   const headerPortal = mobileHeaderTarget ? createPortal(pageHeader, mobileHeaderTarget) : null;
 
   if (isLoading) {
@@ -1023,7 +1022,7 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
   return (
     <>{headerPortal}
     <div
-      className={`live-tv-page${squareLive ? ' live-tv-page--square' : ''}${isMobile ? ' live-tv-page--mobile' : ''}${isMobile && isEpgOpen ? ' live-tv-page--epg-open' : ''}`}
+      className={`live-tv-page${phoneLive ? ' live-tv-page--phone' : ''}${squareLive ? ' live-tv-page--square' : ''}${isMobile ? ' live-tv-page--mobile' : ''}${isMobile && isEpgOpen ? ' live-tv-page--epg-open' : ''}`}
       style={{
         display: 'flex',
         flexDirection: 'column',
@@ -1034,6 +1033,7 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
       }}
     >
       {!mobileHeaderTarget && pageHeader}
+      {!phoneLive && <h1 className="live-page-title-sr">Canais ao Vivo</h1>}
 
       {/* TABS DE NAVEGAÇÃO MOBILE EM SMARTPHONE */}
       {isMobile && (
@@ -1309,6 +1309,7 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
                     >
                       ● AO VIVO
                     </span>
+                    {!phoneLive && (isMobile||squareLive) && previewNetworkActions}
                     {(isMobile||squareLive)&&favoriteButton}
                     <h2
                       style={{
@@ -1524,7 +1525,7 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
                       Identificador: {selectedChannel.id} • Formato: {selectedChannel.streamRef.containerExtension?.toUpperCase() || 'TS'}
                     </div>
                   </div>
-                  <div className="live-channel-status"><span className="live-channel-live-badge">● AO VIVO</span>{favoriteButton}</div>
+                  <div className="live-channel-status"><span className="live-channel-live-badge">● AO VIVO</span>{previewNetworkActions}{favoriteButton}</div>
                 </div>
 
                 <LiveEpgPanel channel={guideChannel ?? selectedChannel} browsing={browsingGuide} inline open embedded onToggle={() => {}}/>

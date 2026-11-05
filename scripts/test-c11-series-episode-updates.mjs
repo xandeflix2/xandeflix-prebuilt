@@ -1,3 +1,6 @@
+import * as actualAdultPolicy from '../src/playback/content-adult-policy.ts';
+import {artworkCategoryContext} from '../src/artwork/tmdb-metadata.service.ts';
+import {categoryGridSeed} from '../src/ui/catalog-grid-window.ts';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import ts from 'typescript';
@@ -219,6 +222,11 @@ function load(file, extra = {}) {
     const parental=parentalFixtureBindings(name);if(parental)return parental;
     if(name.endsWith('useCardGenres.ts'))return{useCardGenres:item=>({ref:{current:null},genres:item.genreLabels||[],visible:true})};
     if(name.includes('useHeroPlayback'))return {useHeroPlayback:()=>({})};
+    if(name.endsWith('content-adult-policy.ts'))return actualAdultPolicy;
+    if(name.endsWith('tmdb-metadata.service.ts'))return{artworkCategoryContext};
+    if(name.endsWith('CardExpansion.tsx'))return{CardExpansionHost:()=>null};
+    if(name.endsWith('catalog-grid-window.ts'))return{categoryGridSeed};
+    if(name.endsWith('VirtualCatalogGrid.tsx'))return{VirtualCatalogGrid:Grid};
     if(name.includes('BrowseHero'))return {BrowseHero:marker('BrowseHero')};
     if(name.includes('FavoriteTitles'))return {FavoriteTitles:()=>null};
     if(name.includes('startup-catalog-preview'))return {selectStartupPosters:()=>[]};

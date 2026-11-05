@@ -1,0 +1,382 @@
+{
+  "result": "PASS",
+  "negativeAndEvolutionControls": 203,
+  "controls": [
+    "REAL_GIT_ANCHORED_TREE_AND_CONTRACTS",
+    "LF_CRLF_ONLY_NORMALIZATION_IS_SYMMETRIC",
+    "MISSING_CONTRACT_BLOCKS",
+    "MISSING_DEPENDENCY_BLOCKS",
+    "OLD_NODE_BLOCKS",
+    "OLD_HISTORY_CANNOT_BE_REWRITTEN",
+    "REMOVED_NEW_NORMATIVE_REFERENCE_BLOCKS",
+    "TIZEN_CANNOT_BECOME_AUTHORIZED",
+    "WEBOS_CANNOT_BECOME_AUTHORIZED",
+    "PILOT_CANNOT_BECOME_EXECUTED",
+    "PHASE_ORDER_CANNOT_BE_SKIPPED",
+    "EVIDENCE_CANNOT_BECOME_A_VERSION_CEILING",
+    "PHYSICAL_COUNTS_CANNOT_BE_INVENTED",
+    "MISSING_C11_RUNNER_BLOCKS",
+    "ALWAYS_GREEN_SUITE_REPLACEMENT_BLOCKS",
+    "REMOVED_C11_NEGATIVES_BLOCK",
+    "PREBUILD_BYPASS_BLOCKS",
+    "PLATFORM_DEPENDENCY_ADD_BLOCKS",
+    "IDENTITY_SILENT_MUTATION_BLOCKS",
+    "CATALOG_SILENT_MUTATION_BLOCKS",
+    "SEARCH_SILENT_MUTATION_BLOCKS",
+    "PLAYBACK_SILENT_MUTATION_BLOCKS",
+    "SIGNATURE_SILENT_MUTATION_BLOCKS",
+    "BACKUP_SILENT_MUTATION_BLOCKS",
+    "MISSING_IDENTITY_FILE_BLOCKS",
+    "NEW_SERVER_MIGRATION_BLOCKS",
+    "DELTA_SCHEMA_SILENT_CHANGE_BLOCKS",
+    "VERSION_38_WITHOUT_NEW_GATE_BLOCKS",
+    "SILENT_PACKAGE_ID_SWAP_BLOCKS",
+    "INDEPENDENT_RECEIPTS_BOTH_RECOGNIZED",
+    "MISSING_G10_RECEIPT_BLOCKS",
+    "MISSING_LEGACY_RECEIPT_BLOCKS",
+    "CORRUPT_LEGACY_RECEIPT_BLOCKS",
+    "ALTERED_G10_APPROVAL_BLOCKS",
+    "ALTERED_LEGACY_APPROVAL_BLOCKS",
+    "LEGACY_WRONG_BASELINE_BLOCKS",
+    "LEGACY_WRONG_PARENT_BLOCKS",
+    "LEGACY_CANNOT_REPLACE_G10",
+    "LEGACY_REVIEW_REQUIRED",
+    "LEGACY_REVIEW_MUST_BE_BOOLEAN",
+    "LEGACY_BEFORE_HASH_MISMATCH_BLOCKS",
+    "LEGACY_AFTER_HASH_MISMATCH_BLOCKS",
+    "G10_BEFORE_HASH_MISMATCH_BLOCKS",
+    "G10_AFTER_HASH_MISMATCH_BLOCKS",
+    "DUPLICATED_GRANT_ACROSS_RECEIPTS_BLOCKS",
+    "DUPLICATED_LEGACY_GRANT_BLOCKS",
+    "LEGACY_RUNTIME_GRANT_BLOCKS",
+    "LEGACY_EXTRA_FUTURE_GRANT_BLOCKS",
+    "LEGACY_CANNOT_REAUTHORIZE_G10_GRANT",
+    "RECEIPT_GENERIC_BYPASS_FIELD_BLOCKS",
+    "GRANT_CANNOT_INJECT_REVIEW_PERMISSION",
+    "LEGACY_PERMISSION_ESCALATION_BLOCKS",
+    "LEGACY_UNKNOWN_APPROVAL_ORIGIN_BLOCKS",
+    "LEGACY_CANNOT_REMOVE_PARENTAL_SUITE",
+    "LEGACY_EVIDENCE_MISSING_BLOCKS",
+    "LEGACY_EVIDENCE_WITHOUT_NOMINAL_GATE_BLOCKS",
+    "G10_RECEIPT_REWORDING_BLOCKS",
+    "LEGACY_RECEIPT_REWORDING_BLOCKS",
+    "VERSION_38_ACCEPTED_WITH_SPECIFIC_GATE_HISTORY_STAYS_37",
+    "THIS_GATE_CANNOT_AUTHORIZE_RUNTIME",
+    "UNAPPROVED_CHANGE_RECORD_BLOCKS",
+    "EMPTY_IMPACT_TEST_PLAN_BLOCKS",
+    "EXTRA_UNREVIEWED_VERSION_BYTES_BLOCK",
+    "STALE_GRADLE_APPROVAL_BLOCKS",
+    "SUITE_CHANGE_NEEDS_SEPARATE_REVIEW",
+    "SHALLOW_CI_CHECKOUT_BLOCKS",
+    "CI_CONTINUE_ON_ERROR_BLOCKS",
+    "CI_CONDITIONAL_SKIP_BLOCKS",
+    "COMMENTED_CI_TEST_IS_NOT_A_STEP",
+    "MISSING_CI_TEST_STEP_BLOCKS",
+    "MISSING_GIT_FAILS_CLI",
+    "SKIP_FLAG_FAILS_CLI",
+    "FUTURE_38_PRESERVES_BOTH_HISTORICAL_RECEIPTS",
+    "G10_IDENTITY_SWAP_TO_ANDROID_38_BLOCKS",
+    "LEGACY_IDENTITY_SWAP_TO_ANDROID_38_BLOCKS",
+    "G10_IDENTITY_SWAP_TO_LEGACY_BLOCKS",
+    "OLD_ANDROID_38_RECEIPT_REPLACEMENT_BLOCKS",
+    "FUTURE_APPROVAL_CANNOT_REMOVE_G10",
+    "FUTURE_APPROVAL_CANNOT_REMOVE_LEGACY",
+    "UNREGISTERED_FUTURE_RECEIPT_BLOCKS",
+    "REGISTERED_RECEIPT_MISSING_BLOCKS",
+    "REGISTERED_RECEIPT_HASH_MISMATCH_BLOCKS",
+    "DUPLICATED_FUTURE_REGISTRATION_BLOCKS",
+    "HISTORICAL_GATE_CANNOT_REGISTER_AGAIN",
+    "HISTORICAL_PATH_CANNOT_BE_REGISTRY_TARGET",
+    "MISSING_HARDENING_RECEIPT_BLOCKS",
+    "HARDENING_RECEIPT_CHANGE_WITHOUT_REGISTRATION_BLOCKS",
+    "MISSING_HARDENING_REGISTRATION_BLOCKS",
+    "GOVERNANCE_SILENT_CHANGE_BLOCKS_verify-canonical-contract.mjs",
+    "GOVERNANCE_SILENT_CHANGE_BLOCKS_test-canonical-regression.mjs",
+    "GOVERNANCE_EVOLUTION_REQUIRES_NEW_LINKED_REVIEWED_RECEIPT",
+    "GOVERNANCE_CHAIN_CANNOT_INHERIT_TEST_REVIEW",
+    "GOVERNANCE_CHAIN_PREDECESSOR_REQUIRED",
+    "GOVERNANCE_CHAIN_BEFORE_HASH_MUST_MATCH",
+    "FUTURE_CANNOT_BORROW_HISTORICAL_GRANTS",
+    "SITE_BUILD_REQUIRED_site-build-validation.yml",
+    "SITE_BUILD_SILENT_CHANGE_site-build-validation.yml",
+    "SITE_BUILD_REQUIRED_test-site-build-contract.mjs",
+    "SITE_BUILD_SILENT_CHANGE_test-site-build-contract.mjs",
+    "SITE_BUILD_RECEIPT_MISSING_BLOCKS",
+    "SITE_BUILD_RECEIPT_UNREGISTERED_CHANGE_BLOCKS",
+    "SITE_BUILD_CHECK_REQUIRED",
+    "SITE_BUILD_REGRESSION_REQUIRED",
+    "SITE_BUILD_FULL_HISTORY_REQUIRED",
+    "SITE_BUILD_NO_SECRETS",
+    "SITE_BUILD_NO_DEPLOY",
+    "SITE_BUILD_SITE_BUILD_REQUIRED",
+    "SITE_BUILD_HASH_GRANT_CANNOT_AUTHORIZE_DEPLOY",
+    "A2_REQUIRED_verify-vercel-artifact.mjs",
+    "A2_SILENT_MUTATION_verify-vercel-artifact.mjs",
+    "A2_REQUIRED_test-vercel-artifact-contract.mjs",
+    "A2_SILENT_MUTATION_test-vercel-artifact-contract.mjs",
+    "A2_RECEIPT_REQUIRED",
+    "A2_RECEIPT_MUTATION",
+    "A2_REGISTRATION_REQUIRED",
+    "A22_REQUIRED_vercel-prebuilt-attested.yml",
+    "A22_SILENT_MUTATION_vercel-prebuilt-attested.yml",
+    "A22_REQUIRED_vercel-prebuilt-contract.mjs",
+    "A22_SILENT_MUTATION_vercel-prebuilt-contract.mjs",
+    "A22_REQUIRED_test-vercel-prebuilt-contract.mjs",
+    "A22_SILENT_MUTATION_test-vercel-prebuilt-contract.mjs",
+    "A22_RECEIPT_REQUIRED",
+    "A22_RECEIPT_IMMUTABLE",
+    "A22_REGISTRATION_REQUIRED",
+    "A22_HASH_GRANT_CANNOT_AUTHORIZE_DEPLOY",
+    "CI_DIAG_RECEIPT_REQUIRED",
+    "CI_DIAG_RECEIPT_IMMUTABLE",
+    "CI_DIAG_RUNNER_SILENT_CHANGE",
+    "RECOVERY_RECEIPT_REQUIRED",
+    "RECOVERY_RECEIPT_UNREGISTERED_CHANGE_BLOCKS",
+    "RECOVERY_RECEIPT_IDENTITY_SWAP_BLOCKS",
+    "RECOVERY_PREDECESSOR_REQUIRED",
+    "RECOVERY_BEFORE_HASH_REQUIRED",
+    "RECOVERY_TEST_REVIEW_CANNOT_BE_INHERITED",
+    "RECOVERY_POLICY_SILENT_CHANGE_BLOCKS",
+    "OPAQUE_HLS_RECEIPT_REQUIRED",
+    "OPAQUE_HLS_RECEIPT_IMMUTABLE",
+    "OPAQUE_HLS_NATIVE_TAMPER_NativeStreamRequest.java",
+    "OPAQUE_HLS_NATIVE_TAMPER_NativeAndroidPlayerPlugin.java",
+    "OPAQUE_HLS_NATIVE_TAMPER_NativePlayerActivity.java",
+    "STREAMED_VOD_RECEIPT_REQUIRED",
+    "STREAMED_VOD_RECEIPT_IMMUTABLE",
+    "STREAMED_VOD_UNAPPROVED_CONTENT_source-streamed-vod-inventory.ts",
+    "STREAMED_VOD_UNAPPROVED_CONTENT_real-source-importer.service.ts",
+    "STREAMED_VOD_UNAPPROVED_CONTENT_test-streamed-vod-inventory.mjs",
+    "STREAMED_VOD_UNAPPROVED_CONTENT_ActivationPage.tsx",
+    "STREAMED_VOD_UNAPPROVED_CONTENT_ActivationPage.css",
+    "SINGLE_TRANSPORT_RECEIPT_REQUIRED",
+    "SINGLE_TRANSPORT_RECEIPT_IMMUTABLE",
+    "SINGLE_TRANSPORT_SILENT_TAMPER_NativePlayerActivity.java",
+    "SINGLE_TRANSPORT_SILENT_TAMPER_NativeAndroidPlayerPlugin.java",
+    "SINGLE_TRANSPORT_SILENT_TAMPER_test-live-single-transport.mjs",
+    "NETWORK_RECEIPT_REQUIRED",
+    "NETWORK_RECEIPT_IMMUTABLE",
+    "NETWORK_UNAPPROVED_CONTENT_src/network/diagnostic-policy.ts",
+    "NETWORK_UNAPPROVED_CONTENT_src/network/network-status.ts",
+    "NETWORK_UNAPPROVED_CONTENT_src/network/source-connections.ts",
+    "NETWORK_UNAPPROVED_CONTENT_src/ui/components/ConnectionIndicator.tsx",
+    "NETWORK_UNAPPROVED_CONTENT_src/ui/components/NetworkSettings.tsx",
+    "NETWORK_UNAPPROVED_CONTENT_src/ui/components/NetworkDiagnostics.css",
+    "NETWORK_UNAPPROVED_CONTENT_src/ui/pages/SettingsPage.tsx",
+    "NETWORK_UNAPPROVED_CONTENT_src/ui/pages/LiveTvPage.tsx",
+    "NETWORK_UNAPPROVED_CONTENT_src/ui/pages/LiveTvPage.css",
+    "NETWORK_UNAPPROVED_CONTENT_android/app/src/main/java/com/xandeflix/prebuilt/MainActivity.java",
+    "NETWORK_UNAPPROVED_CONTENT_android/app/src/main/java/com/xandeflix/prebuilt/network/NetworkStatusPlugin.java",
+    "NETWORK_UNAPPROVED_CONTENT_scripts/test-network-diagnostics.mjs",
+    "NETWORK_UNAPPROVED_CONTENT_android/app/src/test/java/com/xandeflix/prebuilt/network/NetworkStatusPluginTest.java",
+    "NETWORK_UNAPPROVED_CONTENT_scripts/test-canonical-regression.mjs",
+    "NETWORK_UI_RECEIPT_REQUIRED",
+    "NETWORK_UI_RECEIPT_IMMUTABLE",
+    "LIVE_NETWORK_RECEIPT_REQUIRED",
+    "LIVE_NETWORK_RECEIPT_IMMUTABLE",
+    "LIVE_NETWORK_BUTTON_SILENT_MUTATION",
+    "TV_CAST_RECEIPT_REQUIRED",
+    "TV_CAST_RECEIPT_IMMUTABLE",
+    "TV_CAST_LIVE_SILENT_CHANGE",
+    "RELEASE_TAGS_RECEIPT_REQUIRED",
+    "RELEASE_TAGS_RECEIPT_IMMUTABLE",
+    "RELEASE_TAGS_UNAPPROVED_NORMALIZER",
+    "VOD_DPAD_RECEIPT_REQUIRED",
+    "VOD_DPAD_RECEIPT_IMMUTABLE",
+    "VOD_DPAD_CONTROLLER_UNAPPROVED",
+    "EXPANDED_RECEIPT_REQUIRED",
+    "EXPANDED_RECEIPT_IMMUTABLE",
+    "EXPANDED_SESSION_UNAPPROVED",
+    "HOME_CAROUSEL_RECEIPT_REQUIRED",
+    "HOME_CAROUSEL_RECEIPT_IMMUTABLE",
+    "HOME_PAGINATION_UNAPPROVED",
+    "CARD_SCOPE_RECEIPT_REQUIRED",
+    "CARD_SCOPE_RECEIPT_IMMUTABLE",
+    "CARD_SCOPE_UNAPPROVED_CONTROLLER",
+    "SEEALL_UNAPPROVED_GRID",
+    "UI_RECOVERY_RECEIPT_REQUIRED",
+    "UI_RECOVERY_RECEIPT_IMMUTABLE",
+    "UI_RECOVERY_SILENT_REPEAT_CHANGE",
+    "UI_RECOVERY_SILENT_SEARCH_CHANGE",
+    "INTRO_RECEIPT_REQUIRED",
+    "INTRO_RECEIPT_IMMUTABLE",
+    "INTRO_NATIVE_SILENT_MUTATION",
+    "INTRO_LOCAL_VIDEO_TAMPER_BLOCKS",
+    "INTRO_BOOT_GATE_BYPASS_BLOCKS",
+    "VIDEO_ONLY_RECEIPT_REQUIRED",
+    "VIDEO_ONLY_LAYOUT_TAMPER_BLOCKS",
+    "VIDEO_ONLY_LAUNCH_RESOURCE_TAMPER_BLOCKS"
+  ],
+  "suites": [
+    {
+      "file": "scripts/validate-device-bootstrap.mjs",
+      "result": "PASS"
+    },
+    {
+      "file": "scripts/test-c105-complete-root-search.mjs",
+      "result": "PASS"
+    },
+    {
+      "file": "scripts/test-c107-catalog-return-navigation.mjs",
+      "result": "PASS"
+    },
+    {
+      "file": "scripts/test-c11-vod-direct-stream-contract.mjs",
+      "result": "PASS"
+    },
+    {
+      "file": "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+      "result": "PASS"
+    },
+    {
+      "file": "scripts/validate-security-recovery.mjs",
+      "result": "PASS"
+    },
+    {
+      "file": "scripts/test-c11-phone-ui-orientation.mjs",
+      "result": "PASS"
+    },
+    {
+      "file": "scripts/test-c11-landscape-navigation.mjs",
+      "result": "PASS"
+    },
+    {
+      "file": "scripts/validate-direct-playback.mjs",
+      "result": "PASS"
+    },
+    {
+      "file": "scripts/test-c126-parental-control.mjs",
+      "result": "PASS"
+    },
+    {
+      "file": "scripts/test-g10-delta-extensions-regression.mjs",
+      "result": "PASS"
+    },
+    {
+      "file": "scripts/test-site-build-contract.mjs",
+      "result": "PASS"
+    },
+    {
+      "file": "scripts/test-vercel-artifact-contract.mjs",
+      "result": "PASS"
+    },
+    {
+      "file": "scripts/test-vercel-prebuilt-contract.mjs",
+      "result": "PASS"
+    },
+    {
+      "file": "scripts/test-c105-directory-import.mjs",
+      "result": "PASS"
+    },
+    {
+      "file": "scripts/test-catalog-read-diagnostic.mjs",
+      "result": "PASS"
+    },
+    {
+      "file": "scripts/test-xui-m3u-kind-recovery.mjs",
+      "result": "PASS"
+    },
+    {
+      "file": "scripts/test-catalog-physical-regressions.mjs",
+      "result": "PASS"
+    },
+    {
+      "file": "scripts/test-series-poster-composition.mjs",
+      "result": "PASS"
+    },
+    {
+      "file": "scripts/test-tmdb-context-identity.mjs",
+      "result": "PASS"
+    },
+    {
+      "file": "scripts/test-tmdb-subtitle-preview-recovery.mjs",
+      "result": "PASS"
+    },
+    {
+      "file": "scripts/test-catalog-snapshot-retention.mjs",
+      "result": "PASS"
+    },
+    {
+      "file": "scripts/test-detail-backdrop-recovery.mjs",
+      "result": "PASS"
+    },
+    {
+      "file": "scripts/test-streamed-vod-inventory.mjs",
+      "result": "PASS"
+    },
+    {
+      "file": "scripts/test-c107-fire-hero-metadata.mjs",
+      "result": "PASS"
+    },
+    {
+      "file": "scripts/test-c107-watch-providers.mjs",
+      "result": "PASS"
+    },
+    {
+      "file": "scripts/test-live-single-transport.mjs",
+      "result": "PASS"
+    },
+    {
+      "file": "scripts/test-network-diagnostics.mjs",
+      "result": "PASS"
+    },
+    {
+      "file": "scripts/test-tmdb-release-tags.mjs",
+      "result": "PASS"
+    },
+    {
+      "file": "scripts/test-dpad-expanded-cards.mjs",
+      "result": "PASS"
+    },
+    {
+      "file": "scripts/test-home-dpad-carousel-preview-pagination.mjs",
+      "result": "PASS"
+    },
+    {
+      "file": "scripts/test-dpad-card-scope-seeall-grid.mjs",
+      "result": "PASS"
+    },
+    {
+      "file": "scripts/test-ui-performance-recovery-03.mjs",
+      "result": "PASS"
+    },
+    {
+      "file": "scripts/test-app-intro-branding-07.mjs",
+      "result": "PASS"
+    },
+    {
+      "file": "scripts/test-series-episode-return.mjs",
+      "result": "PASS"
+    },
+    {
+      "file": "scripts/test-trailer-containment-r4.mjs",
+      "result": "PASS"
+    },
+    {
+      "file": "scripts/test-tmdb-episode-enrichment.mjs",
+      "result": "PASS"
+    },
+    {
+      "file": "scripts/test-tmdb-episode-runtime-recovery.mjs",
+      "result": "PASS"
+    },
+    {
+      "file": "scripts/test-episode-general-identity.mjs",
+      "result": "PASS"
+    },
+    {
+      "file": "scripts/test-detail-hero-refinement.mjs",
+      "result": "PASS"
+    },
+    {
+      "file": "scripts/test-actor-profile.mjs",
+      "result": "PASS"
+    },
+    {
+      "file": "scripts/test-identity-hero-recovery.mjs",
+      "result": "PASS"
+    }
+  ],
+  "physicalTestPerformed": false,
+  "remoteWrites": 0
+}

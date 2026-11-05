@@ -1,0 +1,137 @@
+{
+  "schema": 1,
+  "gate": "CANON-01-HERO-PLATFORM-COMPOSITION",
+  "parentGate": "CANON-01",
+  "amendment": "CANON-01-HERO-PLATFORM-COMPOSITION",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "EXPLICIT_USER_HERO_PLATFORM_BELOW_TITLE_LEFT_OF_GENRE_AND_EARLIER_LOGO_2026_10_23_AND_EXPLICIT_DOUBLE_SIZE_32PX_AND_TABLET_BRAND_CORNER_AMBIENT_FIX",
+  "authorizationRequestSha256": "4e105d55c96fbd85e3c3548cb7f46c80ed9fb1bf4efdffec50a9b10551580113",
+  "reason": "Move existing optional platform logo below the title beside the genre in the shared Hero. Remove fixed2s delay, read validated directory cache synchronously and warm at most8 small logos alongside parental-filtered hero artwork without blocking content. User explicitly requested doubling the initial16px logo to32px in this same unpublished local gate; candidate16 source/receipt/results are archived, compact rows may grow to prevent overlap. The user additionally reported a dark upper-left rectangle in tablet movie/series browse/details. Extend only the existing ambient back-row surface behind the transparent brand corner, preserving geometry and non-tablet layouts.",
+  "physicalImpact": "REQUIRED",
+  "physicalImpactJustification": "Recoverable APK/UI update in existing tablet in-place workflow, preserve private state and inspect actual hero placement. No reset, new activation or source modification.",
+  "testChangesReviewed": true,
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c105-complete-root-search.mjs",
+    "scripts/test-c107-catalog-return-navigation.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c11-landscape-navigation.mjs",
+    "scripts/validate-direct-playback.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock",
+    "npm run typecheck",
+    "npm run update:check",
+    "npm run security:check",
+    "npm run playback:check",
+    "npm run build",
+    "npm run site:build",
+    "node scripts/test-site-build-contract.mjs",
+    "node scripts/test-vercel-artifact-contract.mjs",
+    "node scripts/verify-vercel-artifact.mjs inspect",
+    "node scripts/test-vercel-prebuilt-contract.mjs",
+    "node scripts/test-c107-watch-providers.mjs",
+    "node scripts/test-c107-fire-hero-metadata.mjs",
+    "node scripts/test-c105-artwork-background-priority.mjs"
+  ],
+  "evidence": "docs/evidence/HERO_PLATFORM_COMPOSITION.md",
+  "compatibilityRisk": "A cold/failed API or image connection cannot guarantee simultaneous logo paint. Hero/title/synopsis never wait for optional metadata. Existing logo only becomes visible after image onLoad; stale label/unmount/failed image guards remain. Availability by title stays separate and250ms deferred.",
+  "restrictions": [
+    "Preserve all24 historical receipts, active root/L1 and APKs. Reuse isolated build workspace only after exact byte capture to new received/ archive.",
+    "Only five production UI/artwork-public files. No source/catalog/player/native/version/storage/license/backend/Git publication/main/Vercel or next Gate changes.",
+    "Keep147 controls and24 previous suites; add two named suites. Review only prior placement/delay assertions and stale fixture ports; preserve all security and metadata assertions.",
+    "Optional logo warmup sees already parental-filtered candidate labels, not playback/source credentials. At most8 simultaneous public small images,16 retained,8s timeout; no private host or fake success.",
+    "In-place tablet update under existing explicit UI/ADB authorization only after validated APK, same package/certificate. No uninstall/reset/restore or other-device install."
+  ],
+  "previousGovernanceHashes": {
+    "docs/governance/authorizations/CANON-01-OPAQUE-HLS-MIME-RECOVERY.json": "5a8c735b59f921a5d24be15f6c14f32541687719",
+    "docs/governance/authorizations/CANON-01-STREAMED-VOD-INVENTORY-RECOVERY.json": "a16dd131aa09b3027724ea94f49a6d841551a9cb",
+    "docs/governance/authorizations/CANON-01-TABLET-SIDEBAR-TRANSPARENCY.json": "ffcc5c6c6005e4fcd24ce40ba776950bf55a5dbe",
+    "docs/governance/authorizations/CANON-01-VERCEL-PREBUILT-RECOVERY-01.json": "9cb685590481ba094ffbca2e2abe2f585aa3ae46",
+    "docs/governance/CANON_01_AUTHORIZATION_HARDENING.json": "766db763ee98aeeb33230c2828f050a8527555b7",
+    "docs/governance/CANON_01_LEGACY_TESTS_AUTHORIZATION.json": "e59e2d328db3d0dfd8c1d873b154e2e3f7900a0c",
+    "docs/governance/CANON_CHANGE_AUTHORIZATION.json": "e73152f228cbb625c508062d70ef810e8342059a",
+    "docs/governance/authorizations/CANON-01-A22A-CI-DIAG.json": "7d89451bf23a05fa1ba819b72b99b28025aa7a66",
+    "docs/governance/authorizations/CANON-01-A22A-WINDOWS-EOL.json": "73ffd5ed494cb87a7c0d22e4a8a3f94252cf321e",
+    "docs/governance/authorizations/CANON-01-A22A-WINDOWS-METADATA-EOL.json": "90d7db4a18e84221afa6fa9dda40c82d6dad6121",
+    "docs/governance/authorizations/CANON-01-CATALOG-PHYSICAL-FIXES.json": "ea179b852518e2a14c7ee79b6c3c72e76c0df6a9",
+    "docs/governance/authorizations/CANON-01-CATALOG-READ-DIAG.json": "169b19ee02a4c1cacbe575cded00ec02928fa3c7",
+    "docs/governance/authorizations/CANON-01-CATALOG-RETENTION.json": "b3c18f01ba1e753597af3a162c2605669dcd4e6b",
+    "docs/governance/authorizations/CANON-01-DETAIL-BACKDROP-TYPES.json": "da8c532e25e220040bba3c942bad41507d4b9245",
+    "docs/governance/authorizations/CANON-01-DETAIL-BACKDROP-UI.json": "579097e952a7ddf142ba885aaf23e164c0241e54",
+    "docs/governance/authorizations/CANON-01-SERIES-POSTER-COMPOSITION.json": "645dc8b2b5d4b822bc83d72e9f5ab9f4f4cb4347",
+    "docs/governance/authorizations/CANON-01-SOURCE-OUTPUT.json": "a93d98a1022f99c0e0957dd8f4a2c7d078b8f588",
+    "docs/governance/authorizations/CANON-01-TMDB-CONTEXT-IDENTITY.json": "3ab236bab99175dcb5374047c2fc6565650d8945",
+    "docs/governance/authorizations/CANON-01-TMDB-SUBTITLE-PREVIEW.json": "5e50d1c29c33b5fe3455112818e978213d065e96",
+    "docs/governance/authorizations/CANON-01-TV-SIDEBAR-COMPOSITION.json": "f5d43f845cd4e3fdb7947dc33e4f9b3df8669ab7",
+    "docs/governance/authorizations/CANON-01-VERCEL-A2-ARTIFACT.json": "fb613a143676e3e32267ebacb3bec81123791823",
+    "docs/governance/authorizations/CANON-01-VERCEL-A22A.json": "c698fec429f4058118d4701a7f5208ece9a0b0d1",
+    "docs/governance/authorizations/CANON-01-VERCEL-BUILD-A1.json": "7edaa32c4b13c8295fc0daa64abed1ef7a4b0c2d",
+    "docs/governance/authorizations/CANON-01-XUI-OPAQUE-RECOVERY.json": "cf4176d0007b4a04997bf2631558bd9d954fd6f7"
+  },
+  "supersedes": {
+    "src/ui/components/Hero.tsx": "CANON-01-TMDB-CONTEXT-IDENTITY",
+    "src/ui/hooks/useWatchProviders.ts": "CANON-01-TMDB-CONTEXT-IDENTITY",
+    "src/index.css": "CANON-01-TABLET-SIDEBAR-TRANSPARENCY",
+    "scripts/test-canonical-regression.mjs": "CANON-01-TABLET-SIDEBAR-TRANSPARENCY"
+  },
+  "changes": [
+    {
+      "path": "src/ui/components/Hero.tsx",
+      "before": "511fee75591f0d81b3d62f54c5b830eb240c0de3",
+      "after": "01c7ffafa3e468077893d94e0dc6dcac273ba07a"
+    },
+    {
+      "path": "src/ui/hooks/useHeroArtwork.ts",
+      "before": "9266903511d0f4d0fa880db79bc9385ceb70f261",
+      "after": "fbd438c8b8c87a2e13ddbb37026b8cff2539f374"
+    },
+    {
+      "path": "src/ui/hooks/useWatchProviders.ts",
+      "before": "215225ca02ac7bcac93c2cd74915d6d156b3dfdd",
+      "after": "33a8d63c3212987a03a43d9f77e0569473f06363"
+    },
+    {
+      "path": "src/artwork/tmdb-watch-providers.service.ts",
+      "before": "b83a8380118f0bf5898c287011d313b8c8c6e5bf",
+      "after": "5b328159b00dedd3a0a265a4a69ddb7402c49f06"
+    },
+    {
+      "path": "src/index.css",
+      "before": "acec426f190be85fef0fea4d92849d3ac83ae3d3",
+      "after": "ccf19ceab4e192220edd1a1eaea82e16f81c25f0"
+    },
+    {
+      "path": "scripts/test-c107-fire-hero-metadata.mjs",
+      "before": "688df56149388b7ef0cdc3a3623f39c71dcd1db6",
+      "after": "a52774d68fe52f8d23e65d9a82263c722b69583c"
+    },
+    {
+      "path": "scripts/test-c107-watch-providers.mjs",
+      "before": "a77e6a157c1f5d750cdef196030d2416a289e76a",
+      "after": "05f95cf3b2e509730fb31a32eb3753dcefda9883"
+    },
+    {
+      "path": "scripts/test-c105-artwork-background-priority.mjs",
+      "before": "06fc33736cc59c47cf04336d3e7e2d50a7e09849",
+      "after": "5402be7975a13e761b180e716b5a71dab2966dab"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "a5155a4a94bc28282a79e0175a956b1bf1e74849",
+      "after": "06112841fc0a0c5140f4ccdd66ad8b0d07ed1229"
+    }
+  ],
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": true,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false
+}

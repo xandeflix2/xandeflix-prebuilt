@@ -1,0 +1,28 @@
+{
+  "observedUTC": "2026-11-05T17:28:03.983Z",
+  "observerPresent": true,
+  "events": [
+    {
+      "event": "OPEN",
+      "kind": "movie",
+      "scheme": "http:",
+      "typedPath": "movie",
+      "extension": "mp4",
+      "pathDepth": 4,
+      "hasQuery": false,
+      "headerNames": [
+        "User-Agent"
+      ],
+      "uaClass": "IPTV_SMARTERS_DEFAULT",
+      "observedUTC": "2026-11-05T17:27:59.548Z"
+    },
+    {
+      "event": "OPEN_RETURN",
+      "accepted": true,
+      "candidateCount": 1,
+      "observedUTC": "2026-11-05T17:27:59.607Z"
+    }
+  ],
+  "privateRequestPresent": true,
+  "visibility": "hidden"
+}

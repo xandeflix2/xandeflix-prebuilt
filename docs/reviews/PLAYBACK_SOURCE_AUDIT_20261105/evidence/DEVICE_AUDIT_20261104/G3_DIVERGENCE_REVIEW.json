@@ -1,0 +1,426 @@
+{
+  "observedUTC": "2026-11-04T19:38:09.850Z",
+  "baseline": "G3 prospective snapshot; no retrospective reconstruction",
+  "identicalSnapshotFiles": 7931,
+  "changed": 27,
+  "extras": 12,
+  "differences": [
+    {
+      "path": "android/.gradle/8.11.1/checksums/checksums.lock",
+      "kind": "EXTRA",
+      "currentSha256": "2b70ab117bf1642f1802c577b239d4749371944b49fbfa6824dcb45d159bed9d",
+      "expectedSha256": null,
+      "size": 17,
+      "nlink": 1,
+      "modifiedUTC": "2026-11-04T19:30:07.213Z",
+      "category": "GRADLE_CACHE"
+    },
+    {
+      "path": "android/.gradle/8.11.1/fileChanges/last-build.bin",
+      "kind": "EXTRA",
+      "currentSha256": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d",
+      "expectedSha256": null,
+      "size": 1,
+      "nlink": 1,
+      "modifiedUTC": "2026-11-04T19:30:07.167Z",
+      "category": "GRADLE_CACHE"
+    },
+    {
+      "path": "android/.gradle/8.11.1/fileHashes/fileHashes.lock",
+      "kind": "EXTRA",
+      "currentSha256": "f2a965ebc13e595fd82a871e4100f46ed7b04e8f0c8bfa7e696f346edb0a69d6",
+      "expectedSha256": null,
+      "size": 17,
+      "nlink": 1,
+      "modifiedUTC": "2026-11-04T19:30:07.211Z",
+      "category": "GRADLE_CACHE"
+    },
+    {
+      "path": "android/.gradle/8.11.1/gc.properties",
+      "kind": "EXTRA",
+      "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expectedSha256": null,
+      "size": 0,
+      "nlink": 1,
+      "modifiedUTC": "2026-11-04T17:53:35.834Z",
+      "category": "GRADLE_CACHE"
+    },
+    {
+      "path": "android/.gradle/buildOutputCleanup/buildOutputCleanup.lock",
+      "kind": "EXTRA",
+      "currentSha256": "12f78336b10738ba88423b196c42344e2416b361bcfa8e05a3a62b43d4f7bd4f",
+      "expectedSha256": null,
+      "size": 17,
+      "nlink": 1,
+      "modifiedUTC": "2026-11-04T19:30:07.171Z",
+      "category": "GRADLE_CACHE"
+    },
+    {
+      "path": "android/.gradle/buildOutputCleanup/cache.properties",
+      "kind": "EXTRA",
+      "currentSha256": "2fb996ed0d74b7a6dbd057f6d862f6f24951a66387135828ad5b75e3e8b62d49",
+      "expectedSha256": null,
+      "size": 60,
+      "nlink": 1,
+      "modifiedUTC": "2026-11-02T10:16:13.668Z",
+      "category": "GRADLE_CACHE"
+    },
+    {
+      "path": "android/.gradle/vcs-1/gc.properties",
+      "kind": "EXTRA",
+      "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expectedSha256": null,
+      "size": 0,
+      "nlink": 1,
+      "modifiedUTC": "2026-11-04T17:53:35.830Z",
+      "category": "GRADLE_CACHE"
+    },
+    {
+      "path": "android/build/reports/problems/problems-report.html",
+      "kind": "EXTRA",
+      "currentSha256": "6f8c53ad0c34185bc67916353e3bfaa06ac351effd331ac39ccb1c860cbcda55",
+      "expectedSha256": null,
+      "size": 126877,
+      "nlink": 1,
+      "modifiedUTC": "2026-11-04T19:30:07.117Z",
+      "category": "GRADLE_REPORT"
+    },
+    {
+      "path": "node_modules/@capacitor/android/capacitor/.gradle/9.2.0/fileHashes/fileHashes.bin",
+      "kind": "CHANGED",
+      "nlink": 1,
+      "currentSha256": "136b3fa986d2e19bfe9a939524f365573a8d969bb6742e60b644da3b6f82166d",
+      "expectedSha256": "99992c490de44c52530c4c887291662203694adf59b1773b826f182eb2910d6d",
+      "size": 18547,
+      "modifiedUTC": "2026-11-02T10:33:11.576Z",
+      "category": "GRADLE_CACHE"
+    },
+    {
+      "path": "node_modules/@capacitor/android/capacitor/.gradle/9.2.0/fileHashes/fileHashes.lock",
+      "kind": "CHANGED",
+      "nlink": 1,
+      "currentSha256": "1e9a407b47326e2f0e4c5cc01f6504a63283d22a9aa542a276031c600057290b",
+      "expectedSha256": "c3981f2bec2e1d0c6ade88cfe7b4add3fb76dafbcc5ada4e114e4f057b89ec61",
+      "size": 17,
+      "modifiedUTC": "2026-11-04T19:28:08.013Z",
+      "category": "GRADLE_CACHE"
+    },
+    {
+      "path": "node_modules/@capacitor/android/capacitor/.gradle/buildOutputCleanup/buildOutputCleanup.lock",
+      "kind": "CHANGED",
+      "nlink": 1,
+      "currentSha256": "19fc68175720adb1f3ec34f11753fb8fc8ded12a213ef1720b7dcf1f13a02de0",
+      "expectedSha256": "49fdbdac61e575cce026e5c3817f7d8649db47ec818dc69350c18e1c02b01e20",
+      "size": 17,
+      "modifiedUTC": "2026-11-04T19:28:08.001Z",
+      "category": "GRADLE_CACHE"
+    },
+    {
+      "path": "node_modules/@capacitor/android/capacitor/.gradle/buildOutputCleanup/cache.properties",
+      "kind": "CHANGED",
+      "nlink": 1,
+      "currentSha256": "87e8e8d2ed17315b21636f90b99f874055a60c98d35711d00781a9bccddf139c",
+      "expectedSha256": "76ad07254c308bcb3436e2668d597d12466d396ffefa4529106800f8080a3dad",
+      "size": 59,
+      "modifiedUTC": "2026-11-02T10:33:11.479Z",
+      "category": "GRADLE_CACHE"
+    },
+    {
+      "path": "node_modules/@capacitor/android/capacitor/build/reports/problems/problems-report.html",
+      "kind": "EXTRA",
+      "currentSha256": "a60b3b3d89df9b50706d0578b5b1241d23134196a2a29001ca29c4d3c47426b7",
+      "expectedSha256": null,
+      "size": 142199,
+      "nlink": 1,
+      "modifiedUTC": "2026-11-04T19:28:07.961Z",
+      "category": "GRADLE_REPORT"
+    },
+    {
+      "path": "node_modules/@capacitor/browser/android/.gradle/9.2.0/fileHashes/fileHashes.bin",
+      "kind": "CHANGED",
+      "nlink": 1,
+      "currentSha256": "136b3fa986d2e19bfe9a939524f365573a8d969bb6742e60b644da3b6f82166d",
+      "expectedSha256": "99992c490de44c52530c4c887291662203694adf59b1773b826f182eb2910d6d",
+      "size": 18547,
+      "modifiedUTC": "2026-11-02T10:33:20.103Z",
+      "category": "GRADLE_CACHE"
+    },
+    {
+      "path": "node_modules/@capacitor/browser/android/.gradle/9.2.0/fileHashes/fileHashes.lock",
+      "kind": "CHANGED",
+      "nlink": 1,
+      "currentSha256": "45f62d74d67a2526bbc55e5acc7ee1016ba42fbe5ce948329d7725a154c54094",
+      "expectedSha256": "916f2d39b97cd39e63724969364b020c33341365b737f8d59cab6446a1a97004",
+      "size": 17,
+      "modifiedUTC": "2026-11-04T19:27:56.734Z",
+      "category": "GRADLE_CACHE"
+    },
+    {
+      "path": "node_modules/@capacitor/browser/android/.gradle/buildOutputCleanup/buildOutputCleanup.lock",
+      "kind": "CHANGED",
+      "nlink": 1,
+      "currentSha256": "9f7f89e886e2a4c16fd1ba59ab464445e83001a6abea98a8b6f865cdb6c04df4",
+      "expectedSha256": "123a3d3015006021a80afbf3fa6985b14e1b46f692bf972274ec3805750a4ae5",
+      "size": 17,
+      "modifiedUTC": "2026-11-04T19:27:56.719Z",
+      "category": "GRADLE_CACHE"
+    },
+    {
+      "path": "node_modules/@capacitor/browser/android/.gradle/buildOutputCleanup/cache.properties",
+      "kind": "CHANGED",
+      "nlink": 1,
+      "currentSha256": "9de504565fbee28ee08ad3bfea51ab1ce8dca06fae31e7f688277bdc4914f12d",
+      "expectedSha256": "bf7d06d774464dc55a2cc243849c5130e5e1bd77fa42d488029e8ef815de0da5",
+      "size": 59,
+      "modifiedUTC": "2026-11-02T10:33:20.008Z",
+      "category": "GRADLE_CACHE"
+    },
+    {
+      "path": "node_modules/@capacitor/browser/android/build/reports/problems/problems-report.html",
+      "kind": "EXTRA",
+      "currentSha256": "4ba7fc2eb7ef318df6d845a1c1eb8332db08d2388c21754dd23ac6aecc47e28a",
+      "expectedSha256": null,
+      "size": 142212,
+      "nlink": 1,
+      "modifiedUTC": "2026-11-04T19:27:56.681Z",
+      "category": "GRADLE_REPORT"
+    },
+    {
+      "path": "node_modules/@capacitor/filesystem/android/.gradle/9.2.0/fileHashes/fileHashes.bin",
+      "kind": "CHANGED",
+      "nlink": 1,
+      "currentSha256": "136b3fa986d2e19bfe9a939524f365573a8d969bb6742e60b644da3b6f82166d",
+      "expectedSha256": "99992c490de44c52530c4c887291662203694adf59b1773b826f182eb2910d6d",
+      "size": 18547,
+      "modifiedUTC": "2026-11-02T10:33:01.159Z",
+      "category": "GRADLE_CACHE"
+    },
+    {
+      "path": "node_modules/@capacitor/filesystem/android/.gradle/9.2.0/fileHashes/fileHashes.lock",
+      "kind": "CHANGED",
+      "nlink": 1,
+      "currentSha256": "1617013e756a7f87bb3e2e2d4749ad3b1995aa8b53b9d58102eef7ff6e8df594",
+      "expectedSha256": "437cbb39e162936362175c805d8743155058488ea94ece959f303262fda35443",
+      "size": 17,
+      "modifiedUTC": "2026-11-04T19:27:47.493Z",
+      "category": "GRADLE_CACHE"
+    },
+    {
+      "path": "node_modules/@capacitor/filesystem/android/.gradle/buildOutputCleanup/buildOutputCleanup.lock",
+      "kind": "CHANGED",
+      "nlink": 1,
+      "currentSha256": "ca2ab7f4c2a384baced2d8d88ee261573e763c910c7f46a999ee7e11823cccb9",
+      "expectedSha256": "c3f67a01f2f9297a56099f1d17b3c3dc701cc134a895edf2c95155d0a50fd5dc",
+      "size": 17,
+      "modifiedUTC": "2026-11-04T19:27:47.482Z",
+      "category": "GRADLE_CACHE"
+    },
+    {
+      "path": "node_modules/@capacitor/filesystem/android/.gradle/buildOutputCleanup/cache.properties",
+      "kind": "CHANGED",
+      "nlink": 1,
+      "currentSha256": "deb1a87e979b0cbaac315048b021cbe25e5703babb5aee29ea30d37a0a7ac801",
+      "expectedSha256": "cdbc214a082926152156ba6d30a63d6576553dd44a8346f943172b0b1bf3ac9f",
+      "size": 59,
+      "modifiedUTC": "2026-11-02T10:33:01.074Z",
+      "category": "GRADLE_CACHE"
+    },
+    {
+      "path": "node_modules/@capacitor/filesystem/android/build/reports/problems/problems-report.html",
+      "kind": "EXTRA",
+      "currentSha256": "d80d417b338bce937f458ea6f2b72e285b790218e1f7f193e0b81a391670cd0c",
+      "expectedSha256": null,
+      "size": 141694,
+      "nlink": 1,
+      "modifiedUTC": "2026-11-04T19:27:47.462Z",
+      "category": "GRADLE_REPORT"
+    },
+    {
+      "path": "node_modules/@capacitor/share/android/.gradle/9.2.0/fileHashes/fileHashes.bin",
+      "kind": "CHANGED",
+      "nlink": 1,
+      "currentSha256": "136b3fa986d2e19bfe9a939524f365573a8d969bb6742e60b644da3b6f82166d",
+      "expectedSha256": "99992c490de44c52530c4c887291662203694adf59b1773b826f182eb2910d6d",
+      "size": 18547,
+      "modifiedUTC": "2026-11-02T10:32:57.954Z",
+      "category": "GRADLE_CACHE"
+    },
+    {
+      "path": "node_modules/@capacitor/share/android/.gradle/9.2.0/fileHashes/fileHashes.lock",
+      "kind": "CHANGED",
+      "nlink": 1,
+      "currentSha256": "b8e48fb306262da5d5bb1df4205efdef83589182b23689eb406770db2c85a7a4",
+      "expectedSha256": "280695284bd4de191c314bb39bbadc36de37bcf98bf1fff2c7aeb43fe1c035b6",
+      "size": 17,
+      "modifiedUTC": "2026-11-04T19:27:41.678Z",
+      "category": "GRADLE_CACHE"
+    },
+    {
+      "path": "node_modules/@capacitor/share/android/.gradle/buildOutputCleanup/buildOutputCleanup.lock",
+      "kind": "CHANGED",
+      "nlink": 1,
+      "currentSha256": "a92eb02d1dbc0308c6ff5b79167bd42363022b330c21ac363d96c7231cccbe20",
+      "expectedSha256": "b6949115f7d0d2992070ebfbfc69b5feeec3a42e32dc8947fb7255884d93efa6",
+      "size": 17,
+      "modifiedUTC": "2026-11-04T19:27:41.667Z",
+      "category": "GRADLE_CACHE"
+    },
+    {
+      "path": "node_modules/@capacitor/share/android/.gradle/buildOutputCleanup/cache.properties",
+      "kind": "CHANGED",
+      "nlink": 1,
+      "currentSha256": "36b1a89efc9563d112fb55ff4b2c90fc637787b246d3aa46ef703bba07747842",
+      "expectedSha256": "b52031cb739ba7f4432c39d4b4d9f99b78da0f2c48de06c2a28e68785e0e6d1a",
+      "size": 59,
+      "modifiedUTC": "2026-11-02T10:32:57.410Z",
+      "category": "GRADLE_CACHE"
+    },
+    {
+      "path": "node_modules/@capacitor/share/android/build/reports/problems/problems-report.html",
+      "kind": "EXTRA",
+      "currentSha256": "c7d74a32ca81dd0d9425207d6d095ea015e45d6b03984585758555bb00008e29",
+      "expectedSha256": null,
+      "size": 139397,
+      "nlink": 1,
+      "modifiedUTC": "2026-11-04T19:27:41.645Z",
+      "category": "GRADLE_REPORT"
+    },
+    {
+      "path": "tmp/canon-01/test-c105-complete-root-search.mjs.log",
+      "kind": "CHANGED",
+      "nlink": 1,
+      "currentSha256": "66177bbac7639cddd694196026a9123a41b2790a507af47ac669469d40fbd9f9",
+      "expectedSha256": "e561468960f819a1f5d6e84b6c3237fc925352598916d4279ffe6927b36626c7",
+      "size": 334,
+      "modifiedUTC": "2026-11-03T00:38:59.215Z",
+      "category": "TEST_OUTPUT"
+    },
+    {
+      "path": "tmp/canon-01/test-c105-directory-import.mjs.log",
+      "kind": "CHANGED",
+      "nlink": 1,
+      "currentSha256": "9c46f50f28ff9f393e544a16b3bb76a0f548e89be07c137c67ddb169c0a2133d",
+      "expectedSha256": "eb3b0921faa60c2c247c0df17cbbc0593aeb48e42610e58dce66eefbfa1fc9dc",
+      "size": 1077,
+      "modifiedUTC": "2026-11-03T00:41:34.102Z",
+      "category": "TEST_OUTPUT"
+    },
+    {
+      "path": "tmp/canon-01/test-c11-playback-session-c9-runtime-wiring.mjs.log",
+      "kind": "CHANGED",
+      "nlink": 1,
+      "currentSha256": "793293cc64e3854413d8689b3902932609c5c4ad4288dbbdcc434c1f90d6f9a8",
+      "expectedSha256": "b57832392833cc389846d31e0feaf39c7831875f19d539e5fe1bbd7f341bd8fb",
+      "size": 1235,
+      "modifiedUTC": "2026-11-03T00:39:07.013Z",
+      "category": "TEST_OUTPUT"
+    },
+    {
+      "path": "tmp/canon-01/test-c11-vod-direct-stream-contract.mjs.log",
+      "kind": "CHANGED",
+      "nlink": 1,
+      "currentSha256": "0ce4f99f665d7c26718d0f0b9771553f2fa1de2f684ef305a4429d53d4c89350",
+      "expectedSha256": "3be7000fd814c6c7163066e138b09c8f732d117b066fc7f53adf0bc00437cd03",
+      "size": 1019,
+      "modifiedUTC": "2026-11-03T00:39:05.587Z",
+      "category": "TEST_OUTPUT"
+    },
+    {
+      "path": "tmp/canon-01/test-catalog-physical-regressions.mjs.log",
+      "kind": "CHANGED",
+      "nlink": 1,
+      "currentSha256": "6b7d3a9c9036a55a36e8e45fa14b626470cab2dd9b12dadfba6ada325b128c0f",
+      "expectedSha256": "f5fde7ef56649baf33e92ae23a44ffe65c5d4cecead9f78f43fe7f6e7d0e0ed9",
+      "size": 932,
+      "modifiedUTC": "2026-11-03T00:41:46.328Z",
+      "category": "TEST_OUTPUT"
+    },
+    {
+      "path": "tmp/canon-01/test-streamed-vod-inventory.mjs.log",
+      "kind": "CHANGED",
+      "nlink": 1,
+      "currentSha256": "3bb36c307ce1a486cdd71f2e3380a83aa8b26916803f27bbadaa7c7866472ee0",
+      "expectedSha256": "87f8a0339adcade26d0ed001d75aae18f15947c7ad636afdc62e735e1cd111c6",
+      "size": 2519,
+      "modifiedUTC": "2026-11-03T00:42:45.529Z",
+      "category": "TEST_OUTPUT"
+    },
+    {
+      "path": "tmp/canon-01/test-xui-m3u-kind-recovery.mjs.log",
+      "kind": "CHANGED",
+      "nlink": 1,
+      "currentSha256": "e4672c415b35076c1b798a016deea20acd1535d497a94a9a0c3db2d75632cdf7",
+      "expectedSha256": "4718968bc2a876b76d532de779fb87f169cd34684ab57dc45359e8b337034a8c",
+      "size": 963,
+      "modifiedUTC": "2026-11-03T00:41:42.475Z",
+      "category": "TEST_OUTPUT"
+    },
+    {
+      "path": "tmp/canon-01/validate-device-bootstrap.mjs.log",
+      "kind": "CHANGED",
+      "nlink": 1,
+      "currentSha256": "5b2523fc2796fc1b4178d65a72d4872b89437338f8ca5c7e6ef061816fbc8baf",
+      "expectedSha256": "78ebc72eb640b4c04c5c9057e67318f3ffd59a6c9480104f06590b368c568744",
+      "size": 2853,
+      "modifiedUTC": "2026-11-03T00:38:57.916Z",
+      "category": "TEST_OUTPUT"
+    },
+    {
+      "path": "tmp/canon-01/validate-direct-playback.mjs.log",
+      "kind": "CHANGED",
+      "nlink": 1,
+      "currentSha256": "efddbb4274b148443c9643b3879f2c9f6773ae1ea51f53ee00d20014f961f82b",
+      "expectedSha256": "7107352d109d8cf3153bfab1fa65d2e2a367cc8a6a8ed904cd013fb73a62d02c",
+      "size": 4403,
+      "modifiedUTC": "2026-11-03T00:39:41.724Z",
+      "category": "TEST_OUTPUT"
+    },
+    {
+      "path": "tmp/canon-01/validate-security-recovery.mjs.log",
+      "kind": "CHANGED",
+      "nlink": 1,
+      "currentSha256": "887387492a02199202f7fc9fb340679b18241275fd82546995ebe249644518bd",
+      "expectedSha256": "b4082f315f9fc87ea2fef148e6b439809af5ee31dd7f10a7240c571b50860e91",
+      "size": 3346,
+      "modifiedUTC": "2026-11-03T00:39:10.432Z",
+      "category": "TEST_OUTPUT"
+    },
+    {
+      "path": "tmp/episode-metadata-ui/RESULT.json",
+      "kind": "CHANGED",
+      "nlink": 1,
+      "currentSha256": "6e050042b06d1817628b4acfb8cc69db485ced91c9cafe74dfd26fbc1c81d77a",
+      "expectedSha256": "d5486316189e5086c24000c07f3c7ea6e4aa5cc5b072cc638f855f11480fbca1",
+      "size": 5956,
+      "modifiedUTC": "2026-11-03T00:43:47.897Z",
+      "category": "TEST_OUTPUT"
+    }
+  ],
+  "moduleCheck": [
+    {
+      "path": "src/playback/next-episode-resolver.ts",
+      "sha256": "538000d1d5fa9c9ab5f9fa33953626ad54d1f588a3bb7d51cd48bc6ccbb447bf",
+      "matchesG3": true
+    },
+    {
+      "path": "scripts/test-next-episode-resolver.mjs",
+      "sha256": "4478a3566268141afd720aeee67d6f5b4ad3c66628b7f6acc258d8b0cb8c524e",
+      "matchesG3": true
+    },
+    {
+      "path": "src/playback/credits-marker.ts",
+      "sha256": "7435877d14c862d41ed01151ab7b893f2e24f3913b9dfc8de43f08fc9c13b20f",
+      "matchesG3": true
+    },
+    {
+      "path": "scripts/test-credits-marker.mjs",
+      "sha256": "5e88b56f5aecfa48e179808fe060a264bba6e2f7c6326e6d423f74cec69c6700",
+      "matchesG3": true
+    }
+  ],
+  "gitSnapshotBytesChanged": false,
+  "managedProductDifferences": [],
+  "attribution": "NOT_PROVEN; current audit did not run Gradle or tests in this isolated candidate",
+  "installation": "NOT_EXECUTED",
+  "productPatch": "NOT_EXECUTED"
+}

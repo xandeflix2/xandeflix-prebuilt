@@ -11,7 +11,7 @@ function callback(file,name,ports){
 const deferred=()=>{let resolve,reject;const promise=new Promise((a,b)=>{resolve=a;reject=b;});return{promise,resolve,reject};};
 function detailHarness(kind){
  const gate=deferred(),messages=[],busy=[],calls=[],model={fixture:true};
- const ports={readModel:model,defaultPlaybackService:{playMovie:(...a)=>{calls.push(a);return gate.promise;},playEpisode:(...a)=>{calls.push(a);return gate.promise;}},movieId:'movie-fixture',seriesId:'series-fixture',setIsResolving:v=>busy.push(v),setStatusKind(){},setStatusMessage:v=>messages.push(v),setResolvingEpisodeId:v=>busy.push(v),setEpisodeStatusNotice:v=>messages.push(v)};
+ const ports={episodeReturn:{},returnFocus:{},seasons:[{id:'season-fixture',episodes:[{id:'episode-fixture'}]}],setSelectedEpisodeId(){},readModel:model,defaultPlaybackService:{playMovie:(...a)=>{calls.push(a);return gate.promise;},playEpisode:(...a)=>{calls.push(a);return gate.promise;}},movieId:'movie-fixture',seriesId:'series-fixture',setIsResolving:v=>busy.push(v),setStatusKind(){},setStatusMessage:v=>messages.push(v),setResolvingEpisodeId:v=>busy.push(v),setEpisodeStatusNotice:v=>messages.push(v)};
  const fn=callback(kind==='movie'?'src/ui/pages/MovieDetailPage.tsx':'src/ui/pages/SeriesDetailPage.tsx',kind==='movie'?'handlePlayMovie':'handlePlayEpisode',ports);
  return{gate,messages,busy,calls,run:()=>fn('episode-fixture'),model};
 }

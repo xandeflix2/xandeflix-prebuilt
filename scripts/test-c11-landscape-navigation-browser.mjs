@@ -342,13 +342,15 @@ try {
     for(const width of [320,390,430]) {
       await open(width,844,'Android Mobile',true);
       const homeBrandLeft=await evaluate('document.querySelector(".brand-container").getBoundingClientRect().left');
-      assert.ok(await evaluate('document.querySelector(".app-header").getBoundingClientRect().height>=64'),'PHONE_HOME_HEADER_MUST_MATCH_OTHER_64PX_HEADERS');
+      assert.equal(await evaluate('getComputedStyle(document.querySelector(".app-header")).paddingTop'),'12px','PHONE_CATALOG_HEADER_APPROVED_TOP_SPACING');
+      assert.ok(await evaluate('document.querySelector(".app-header").getBoundingClientRect().height>=62'),'PHONE_CATALOG_HEADER_CONTAINS_44PX_ACTIONS');
+      assert.equal(await evaluate('getComputedStyle(document.querySelector(".app-content > .page-container")).paddingTop'),'8px','PHONE_CATALOG_HERO_GAP_REMAINS_VISIBLE');
       assert.equal(await visibleBacks(),0);
       for(const name of ['movies','series','search']) {
         await navigatePhone(name);assert.equal(await route(),'Rota: '+name);assert.equal(await visibleBacks(),1);
         const layout=await geometry();
         const centering=await evaluate('(()=>{const b=document.querySelector(".app-header .btn-back"),r=b.getBoundingClientRect(),h=document.querySelector(".app-header").getBoundingClientRect(),icon=b.querySelector(".back-arrow-icon"),i=icon?.getBoundingClientRect();return {headerHeight:h.height,contained:r.top>=h.top&&r.bottom<=h.bottom,centered:!!i&&i.width>0&&Math.abs((i.left+i.right-r.left-r.right)/2)<=1&&Math.abs((i.top+i.bottom-r.top-r.bottom)/2)<=1};})()');
-        assert.ok(centering.headerHeight>=64,'PHONE_HEADER_MUST_HAVE_ROOM_FOR_CENTERED_BACK');assert.ok(centering.contained);assert.ok(centering.centered,'PHONE_ARROW_MUST_BE_CENTERED_IN_BUTTON');
+        if(name==='movies'||name==='series'){assert.ok(centering.headerHeight>=62,'PHONE_CATALOG_HEADER_CONTAINS_44PX_ACTIONS');assert.equal(await evaluate('getComputedStyle(document.querySelector(".app-header")).paddingTop'),'12px');assert.equal(await evaluate('getComputedStyle(document.querySelector(".app-content > .page-container")).paddingTop'),'8px');}else{assert.ok(centering.headerHeight>=64,'NON_CATALOG_HEADER_HEIGHT_PRESERVED');}assert.ok(centering.contained);assert.ok(centering.centered,'PHONE_ARROW_MUST_BE_CENTERED_IN_BUTTON');
         assert.ok(layout.left>=layout.brandRight,'PHONE_BACK_MUST_FOLLOW_BRAND_AT_RIGHT');
         assert.ok(Math.abs(layout.brandLeft-homeBrandLeft)<=1,'PHONE_BRAND_MUST_NOT_SHIFT_WHEN_BACK_APPEARS');
         assert.ok(layout.right<=width&&layout.right>=width-32,'PHONE_BACK_MUST_ALIGN_WITH_RIGHT_HEADER_EDGE');

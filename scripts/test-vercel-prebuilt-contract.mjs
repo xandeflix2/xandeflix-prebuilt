@@ -36,6 +36,13 @@ const project={id:POLICY.projectId,name:POLICY.projectName,accountId:POLICY.team
   buildCommand:'npm run site:build',installCommand:'npm ci',outputDirectory:'tmp/c154-web-production/site'};
 try{
   pass('MANUAL_CONTEXT_POLICY_ONLY',()=>assert.equal(context.environment,'preview'));
+  pass('RECOVERY_POLICY_REF_EXACT',()=>assert.equal(POLICY.ref,'refs/heads/fix/source-output-format-recovery'));
+  pass('RECOVERY_HISTORICAL_RECEIVED_HEAD_PRESERVED',()=>assert.equal(POLICY.receivedHead,'a27d7cd4a74bd447221bba2851ee0af033d0a2fd'));
+  pass('RECOVERY_CONTEXT_BINDINGS_POLICY_ONLY',()=>{
+    assert.equal(context.ref,'refs/heads/fix/source-output-format-recovery');
+    assert.equal(context.sourceSha,env.EXPECTED_SOURCE_SHA);
+    assert.equal(context.workflow,PREBUILT_WORKFLOW);
+  });
   for(const[key,value,code]of [
     ['GITHUB_REPOSITORY','other/repository','A22_REPOSITORY_MISMATCH'],
     ['GITHUB_SERVER_URL','https://example.invalid','A22_REPOSITORY_MISMATCH'],
@@ -49,6 +56,14 @@ try{
     ['RUNNER_ENVIRONMENT','self-hosted','A22_HOSTED_ACTIONS_REQUIRED'],
     ['GITHUB_ACTIONS','false','A22_HOSTED_ACTIONS_REQUIRED'],
   ])reject('CONTEXT_REJECTS_'+key,code,()=>contextFromEnvironment({...env,[key]:value}));
+  reject('CONTEXT_REJECTS_OLD_BRANCH','A22_MANUAL_REVIEW_BRANCH_REQUIRED',()=>contextFromEnvironment({...env,GITHUB_REF:'refs/heads/governance/canon-01-hardening'}));
+  reject('CONTEXT_REJECTS_MAIN_BRANCH','A22_MANUAL_REVIEW_BRANCH_REQUIRED',()=>contextFromEnvironment({...env,GITHUB_REF:'refs/heads/main'}));
+  reject('CONTEXT_REJECTS_PUSH_EVENT','A22_MANUAL_REVIEW_BRANCH_REQUIRED',()=>contextFromEnvironment({...env,GITHUB_EVENT_NAME:'push'}));
+  reject('CONTEXT_REJECTS_PULL_REQUEST_EVENT','A22_MANUAL_REVIEW_BRANCH_REQUIRED',()=>contextFromEnvironment({...env,GITHUB_EVENT_NAME:'pull_request'}));
+  reject('CONTEXT_REJECTS_WORKFLOW_REF_OLD_BRANCH','A22_WORKFLOW_IDENTITY_MISMATCH',()=>contextFromEnvironment({...env,GITHUB_WORKFLOW_REF:POLICY.repository+'/'+PREBUILT_WORKFLOW+'@refs/heads/governance/canon-01-hardening'}));
+  reject('CONTEXT_REJECTS_WORKFLOW_REF_MAIN','A22_WORKFLOW_IDENTITY_MISMATCH',()=>contextFromEnvironment({...env,GITHUB_WORKFLOW_REF:POLICY.repository+'/'+PREBUILT_WORKFLOW+'@refs/heads/main'}));
+  reject('CONTEXT_REJECTS_MATCHING_BUT_UNREQUESTED_SHA','A22_SOURCE_SHA_MISMATCH',()=>contextFromEnvironment({...env,GITHUB_SHA:'0'.repeat(40),GITHUB_WORKFLOW_SHA:'0'.repeat(40)}));
+  reject('CONTEXT_REJECTS_OTHER_WORKFLOW_ON_RECOVERY_BRANCH','A22_WORKFLOW_IDENTITY_MISMATCH',()=>contextFromEnvironment({...env,GITHUB_WORKFLOW_REF:POLICY.repository+'/.github/workflows/canonical-regression.yml@'+POLICY.ref}));
   reject('NO_GIT_REJECTED','A22_GIT_OR_BASELINE_UNAVAILABLE',()=>verifyGitSource(dir,context));
   execFileSync('git',['-c','init.defaultBranch=a22-negative-fixture','init','--quiet',dir],{stdio:'pipe'});
   execFileSync('git',['remote','add','origin','https://github.com/'+POLICY.repository+'.git'],{cwd:dir,stdio:'pipe'});

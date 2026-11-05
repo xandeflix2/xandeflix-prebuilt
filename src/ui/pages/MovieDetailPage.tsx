@@ -14,8 +14,8 @@ import { getMovieDetail } from '../../catalog/catalog-selectors.ts';
 import { Artwork } from '../components/Artwork.tsx';
 import { DetailBackdrop } from '../components/DetailBackdrop.tsx';
 import { useArtworkMetadata } from '../hooks/useArtworkMetadata.ts';
-import { tmdbPosterPath } from '../../artwork/tmdb-metadata.service.ts';
-import { RelatedTitles } from '../components/RelatedTitles.tsx';
+import { normalizeArtworkIdentity, tmdbPosterPath } from '../../artwork/tmdb-metadata.service.ts';
+import { SeriesDetailSections } from '../components/SeriesDetailSections.tsx';
 import { useImmersiveArtwork } from '../hooks/useImmersiveArtwork.ts';
 import { useDetailInitialFocus } from '../hooks/useDetailInitialFocus.ts';
 import { DetailTrailer } from '../components/DetailTrailer.tsx';
@@ -42,10 +42,12 @@ export const MovieDetailPage: React.FC<MovieDetailPageProps> = ({ movieId, readM
   const sourceDetail = getMovieDetail(readModel, movieId);
   const identity = sourceDetail ? { kind: 'movie' as const, title: sourceDetail.title,
     year: sourceDetail.yearFormatted, tmdbId: sourceDetail.externalIds?.tmdbId, posterPath: tmdbPosterPath(sourceDetail.posterUri), sourcePosterUri: sourceDetail.posterUri } : undefined;
+  const normalizedTitle = identity ? normalizeArtworkIdentity(identity).title : '';
   const sourceGenres = meaningfulDetailGenres(sourceDetail?.genreLabels || []);
   const metadata = useArtworkMetadata(identity, Boolean(sourceDetail && (!sourceDetail.overview || !sourceDetail.yearFormatted
-    || !sourceDetail.originalTitle || !sourceDetail.durationFormatted || !sourceGenres.length)), 'high');
+    || !sourceDetail.originalTitle || !sourceDetail.durationFormatted || !sourceGenres.length || normalizedTitle !== sourceDetail.title)), 'high');
   const detail = sourceDetail && { ...sourceDetail,
+    title: metadata?.title || normalizedTitle || sourceDetail.title,
     originalTitle: sourceDetail.originalTitle || metadata?.originalTitle,
     yearFormatted: sourceDetail.yearFormatted || (metadata?.year ? String(metadata.year) : undefined),
     durationFormatted: sourceDetail.durationFormatted || metadata?.durationFormatted,
@@ -219,7 +221,7 @@ export const MovieDetailPage: React.FC<MovieDetailPageProps> = ({ movieId, readM
           </div>
         </div>
         </div>
-        {onSelectItem && <RelatedTitles kind="movie" itemId={movieId} readModel={readModel} onSelectItem={onSelectItem} />}
+        <SeriesDetailSections key={movieId} kind="movie" seriesId={movieId} identity={identity} readModel={readModel} onSelectItem={onSelectItem}/>
       </div>
     </main>
   );

@@ -55,6 +55,7 @@ public class C161NavigationHarness {
  static class NativePlayerActivity extends Base{static final String TAG="fixture";PlayerControls controls;boolean wasCasting,finishing;String currentKind="series",watchPlaybackId="watch1";JSONObject episodeContext=new JSONObject();EpisodeNavigationState episodeNavigation=new EpisodeNavigationState();Player player=new Player();View playerView=new View();Handler observabilityHandler=new Handler();Runnable episodeTimeout;int progress;boolean lastEnded;
   NativePlayerActivity(){baseView=playerView;episodeNavigation.started(watchPlaybackId);controls=new PlayerControls(playerView,()->requestEpisode("next",null),episodeContext);playerView.focused=playerView.findViewById(R.id.player_next);}
   boolean isFinishing(){return finishing;}void emitWatchProgress(boolean ended){progress++;lastEnded=ended;}void failEpisodeTransition(){}boolean handleDpadKey(int k,int a,String kind){return false;}
+  boolean dispatchHiddenVodDpad(KeyEvent event){return false;} // This historical fixture covers visible controls; hidden shortcuts have native unit coverage.
   ${method(activity,'private boolean requestEpisode(')}
   ${method(activity,'public boolean dispatchKeyEvent(')}
  }

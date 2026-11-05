@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "gate": "CANON-01-CARD-TRAILER-AUDIO",
+  "parentGate": "CANON-01-MOBILE-DETAIL-HEADER-ALIGNMENT",
+  "amendment": "CANON-01-CARD-TRAILER-AUDIO",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "CURRENT_EXPLICIT_USER_CARD_TRAILER_SILENT_2026_10_29_AND_STANDING_AUTONOMOUS_FIX_TEST_SAME_FIRE_UPDATE; NOT_NEW_MASTER_ATTACHMENT",
+  "authorizationRequestSha256": "c49e112b7882cfbeb3770c7a994332520a957c278c0f21727f9cc1923e809ada",
+  "reason": "Remove forced mute from the current DOM card trailer and web adapter, requesting official player unMute and nonzero player volume while preserving cancellation and isolation.",
+  "physicalImpact": "REQUIRED",
+  "physicalImpactJustification": "Same connected AFTSS/G071CQ070344374G, audited package/signature in-place update and RAM-only comparisons under standing user authorization. Confirm official player unmuted, clock/decoded audio and cleanup; distinguish acoustic HDMI/Bluetooth output.",
+  "testChangesReviewed": true,
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c105-complete-root-search.mjs",
+    "scripts/test-c107-catalog-return-navigation.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c11-landscape-navigation.mjs",
+    "scripts/validate-direct-playback.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock",
+    "node node_modules/typescript/bin/tsc --noEmit",
+    "node scripts/test-trailer-containment-r4.mjs",
+    "official build and APK asset/signature audits",
+    "offline native257/39",
+    "same Fire public card playback audio settings/decoding and cancellation",
+    "node scripts/test-dpad-expanded-cards.mjs"
+  ],
+  "evidence": "docs/evidence/CARD_TRAILER_AUDIO.md",
+  "compatibilityRisk": "Card preview requests audible playback; preserve OS volume, iframe clipping/origin/sandbox/bridge isolation, single session, focus/visibility/lifecycle stop and autoplay-block handling. Inline/modal/legacy/player/source unchanged.",
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": true,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false,
+  "supersedes": {
+    "src/ui/card-preview-media.ts": "CANON-01-TRAILER-CONTAINMENT-R4",
+    "android/app/src/main/java/com/xandeflix/prebuilt/trailer/CardTrailerFramePolicy.java": "CANON-01-TRAILER-CONTAINMENT-R4",
+    "android/app/build.gradle": "CANON-01-MOBILE-DETAIL-HEADER-ALIGNMENT",
+    "scripts/test-trailer-containment-r4.mjs": "CANON-01-TRAILER-CONTAINMENT-R4",
+    "scripts/trailer-containment-r4-native-probe.mjs": "CANON-01-TRAILER-CONTAINMENT-R4",
+    "scripts/test-canonical-regression.mjs": "CANON-01-MOBILE-DETAIL-HEADER-ALIGNMENT"
+  },
+  "changes": [
+    {
+      "path": "src/ui/card-preview-media.ts",
+      "before": "b9c363e0450981caf88e2c90895331e62142ae8e",
+      "after": "e9c28268ee313362068ed9426c292b6f86c22b4c"
+    },
+    {
+      "path": "android/app/src/main/java/com/xandeflix/prebuilt/trailer/CardTrailerFramePolicy.java",
+      "before": "5e783ba60747ddf3dc6e0c643ffa8936fbcfd775",
+      "after": "9d02cdd8facc7a0c7c2ebe4ffca17bc82c2651d1"
+    },
+    {
+      "path": "android/app/build.gradle",
+      "before": "f3f39ec1c6db038b34986c4707b90a9042dace5c",
+      "after": "c1eeab1da062d3fe473ec81512fd1838d7aa52c5"
+    },
+    {
+      "path": "scripts/test-trailer-containment-r4.mjs",
+      "before": "5127ec9b83d04ace1f0f81cacdd15a64284f5e0c",
+      "after": "5842c0a21929645984c04142aa44fd21438473cc"
+    },
+    {
+      "path": "scripts/trailer-containment-r4-native-probe.mjs",
+      "before": "776e58340250c41f0e3036aa89bf89b55e37deae",
+      "after": "12e9d968f35d0dd8ac1a55fea9add93f8c7b51f6"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "da4f3393b3c69bea09731510ac73a8203a96dc26",
+      "after": "2f55a4a2c4f4e12dc2700450532fc4d2606f39cc"
+    }
+  ],
+  "restrictions": [
+    "Preserve54 prior receipts,204 controls42 suites, all18 received R4 JS cases and12 native families; add audio positives/negatives without deleting assertions. Muted behavior of current card path explicitly superseded by current user sound request. Legacy PublicTrailerPolicy unchanged.",
+    "Only same Fire in-place installation; no volume/reset/network/source/backend/Git/root promotion/other-device install or next gate."
+  ]
+}

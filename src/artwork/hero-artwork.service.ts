@@ -16,9 +16,9 @@ export class HeroArtworkService {
   private readonly pending = new Map<string, Promise<string | undefined>>();
   private readonly queue: (() => void)[] = [];
   private active = 0;
-  private readonly metadata: (item: CatalogItemViewModel, priority: 'high' | 'normal') => Promise<ArtworkMetadata | null>;
+  private readonly metadata: (item: CatalogItemViewModel, priority: 'high' | 'normal', profile:HeroImageProfile) => Promise<ArtworkMetadata | null>;
   private readonly decode: (uri:string,profile:HeroImageProfile,priority: 'high' | 'normal') => Promise<boolean>;
-  constructor(metadata = (item: CatalogItemViewModel, priority: 'high' | 'normal') => tmdbMetadataService.resolve(heroArtworkIdentity(item), priority), decode = decodeHeroImage) { this.metadata = metadata; this.decode = decode; }
+  constructor(metadata = (item: CatalogItemViewModel, priority: 'high' | 'normal', profile:HeroImageProfile) => profile==='horizontal'?tmdbMetadataService.resolveBackdrop(heroArtworkIdentity(item),priority):tmdbMetadataService.resolve(heroArtworkIdentity(item), priority), decode = decodeHeroImage) { this.metadata = metadata; this.decode = decode; }
   private key(item:CatalogItemViewModel,profile:HeroImageProfile) { return `${profile}:${artworkIdentityKey(heroArtworkIdentity(item))}`; }
   peek(item:CatalogItemViewModel,profile:HeroImageProfile): string | undefined {
     const entry=this.cache.get(this.key(item,profile)); return entry && entry.expires>Date.now() ? entry.uri : undefined;
@@ -34,8 +34,9 @@ export class HeroArtworkService {
     const job=new Promise<string|undefined>(resolve=>{finish=resolve});this.pending.set(key,job);
     this.queue.push(()=>{this.active++;void(async()=>{
       let uri:string|undefined;
-      try{const metadata=await this.metadata(item,priority);const candidate=profile==='horizontal'?metadata?.backdropUri:chooseHeroPoster(metadata,item.posterUri);
-        if(candidate && /^https:\/\/image\.tmdb\.org\/t\/p\/(?:w342|w780|w1280)\/[A-Za-z0-9_.-]+$/.test(candidate) && await this.decode(candidate,profile,priority))uri=candidate;
+      try{const metadata=await this.metadata(item,priority,profile);
+        const candidates=profile==='horizontal'?[metadata?.backdropUri,...(metadata?.backdropUris||[])]:[chooseHeroPoster(metadata,item.posterUri)];
+        for(const candidate of [...new Set(candidates)].slice(0,5))if(candidate && /^https:\/\/image\.tmdb\.org\/t\/p\/(?:w342|w780|w1280)\/[A-Za-z0-9_.-]+$/.test(candidate) && await this.decode(candidate,profile,priority)){uri=candidate;break;}
       }catch{/* Optional presentation never blocks catalog. */}
       this.cache.delete(key);this.cache.set(key,{uri,expires:Date.now()+(uri?6*60*60*1000:60000)});
       while(this.cache.size>160)this.cache.delete(this.cache.keys().next().value!);

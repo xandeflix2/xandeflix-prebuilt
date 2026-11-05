@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { getSourceCacheScope } from '../src/bootstrap/source-replacement.ts';
 import {loadImage,invalidateLoadedImage,reserveHeroImageSlot} from '../src/artwork/image-load-queue.ts';
 import {readFileSync} from 'node:fs';
 import ts from 'typescript';
@@ -46,7 +47,7 @@ try{
 
 const source=readFileSync(new URL('../src/artwork/artwork-file-cache.ts',import.meta.url),'utf8'),compiled=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText,mod={exports:{}};
 let calls=0,clock=10000,broken=false;
-new Function('require','module','exports',compiled)(()=>({Capacitor:{getPlatform:()=> 'android',isPluginAvailable:()=>true,convertFileSrc:path=>'https://localhost/'+path},registerPlugin:()=>({get:async()=>{calls++;if(broken)throw Error('synthetic failure');return{path:'opaque-'+calls};}})}),mod,mod.exports);
+new Function('require','module','exports',compiled)(name=>name.endsWith('/source-replacement.ts')?{getSourceCacheScope}:({Capacitor:{getPlatform:()=> 'android',isPluginAvailable:()=>true,convertFileSrc:path=>'https://localhost/'+path},registerPlugin:()=>({get:async()=>{calls++;if(broken)throw Error('synthetic failure');return{path:'opaque-'+calls};}})}),mod,mod.exports);
 const originalNow=Date.now;Date.now=()=>clock;
 try{
  const cache=mod.exports,uri='https://fixture.invalid/cached';

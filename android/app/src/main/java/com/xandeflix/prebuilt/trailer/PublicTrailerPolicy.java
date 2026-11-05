@@ -9,6 +9,7 @@ public final class PublicTrailerPolicy {
         return smallestWidthDp > 0 && smallestWidthDp < 600 && (uiMode & 15) != 4;
     }
     public static boolean presentation(int smallestWidthDp, int uiMode, String mode) {
+        if ("card".equals(mode)) return smallestWidthDp > 0;
         return "inline".equals(mode) ? phone(smallestWidthDp, uiMode)
             : "modal".equals(mode) && smallestWidthDp > 0;
     }
@@ -25,11 +26,23 @@ public final class PublicTrailerPolicy {
             && finite(viewportWidth) && viewportWidth >= 1 && viewportWidth <= 8192;
     }
     public static String html(String id) {
+        return html(id, false);
+    }
+    public static boolean cardBounds(double width, double height) {
+        return finite(width) && finite(height) && width >= 200 && height >= 200;
+    }
+    public static String html(String id, boolean card) {
         if (!videoId(id)) throw new IllegalArgumentException("Invalid public trailer ID");
         return "<!doctype html><html><head><meta name='viewport' content='width=device-width,initial-scale=1'>"
             + "<meta name='referrer' content='strict-origin-when-cross-origin'><style>html,body,#player{margin:0;width:100%;height:100%;background:#000;overflow:hidden}</style></head><body>"
             + "<div id='player'></div><script>var player;function onYouTubeIframeAPIReady(){player=new YT.Player('player',{width:'100%',height:'100%',videoId:'" + id
-            + "',playerVars:{autoplay:1,playsinline:1,controls:0,rel:0,origin:'https://com.xandeflix.prebuilt'},events:{onReady:function(e){console.log('XANDE_PUBLIC_TRAILER:ready');e.target.playVideo()},onStateChange:function(e){if(e.data===1)console.log('XANDE_PUBLIC_TRAILER:playing');else if(e.data===2)console.log('XANDE_PUBLIC_TRAILER:player-paused')},onError:function(){console.log('XANDE_PUBLIC_TRAILER:error')}}})}"
+            + "',playerVars:{autoplay:1,playsinline:1,controls:0,rel:0," + (card ? "mute:1,disablekb:1,fs:0," : "")
+            + "origin:'https://com.xandeflix.prebuilt'},events:{onReady:function(e){console.log('XANDE_PUBLIC_TRAILER:ready');"
+            + (card ? "e.target.mute();setTimeout(function(){pausePublicTrailer();console.log('XANDE_PUBLIC_TRAILER:ended')},45000);" : "")
+            + "e.target.playVideo()},onStateChange:function(e){if(e.data===1)console.log('XANDE_PUBLIC_TRAILER:playing');else if(e.data===2)console.log('XANDE_PUBLIC_TRAILER:player-paused')"
+            + (card ? ";else if(e.data===0)console.log('XANDE_PUBLIC_TRAILER:ended')" : "")
+            + "},onError:function(){console.log('XANDE_PUBLIC_TRAILER:error')}"
+            + (card ? ",onAutoplayBlocked:function(){console.log('XANDE_PUBLIC_TRAILER:error')}" : "") + "}})}"
             + "function playPublicTrailer(){if(player&&player.playVideo)player.playVideo()}"
             + "function pausePublicTrailer(){if(player&&player.pauseVideo)player.pauseVideo()}"
             + "</script><script src='https://www.youtube.com/iframe_api'></script></body></html>";

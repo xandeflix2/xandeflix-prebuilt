@@ -1,0 +1,17 @@
+{
+  "observedUTC": "2026-11-05T10:15:27.565Z",
+  "status": "REQUEST_BOUND",
+  "sourceProtocol": "M3U",
+  "sameOrigin": true,
+  "typedSeriesPath": true,
+  "pathDepth": 4,
+  "usernameMatches": true,
+  "passwordMatches": true,
+  "episodeIdMatches": true,
+  "contextEpisodeMatches": true,
+  "extensionMatches": true,
+  "directSourceEmpty": true,
+  "hasEpisodeToken": false,
+  "hasInfoToken": false,
+  "scope": "Comparison only within device RAM; no URL, credential, token, title or episode ID exported"
+}

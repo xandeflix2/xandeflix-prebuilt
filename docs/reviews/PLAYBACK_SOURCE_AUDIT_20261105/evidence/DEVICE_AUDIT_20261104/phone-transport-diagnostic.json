@@ -1,0 +1,12 @@
+[
+  {
+    "method": "startDownload",
+    "success": false,
+    "errorCode": "UNKNOWN_TRANSPORT_ERROR",
+    "stage": "HTTP_RESPONSE",
+    "httpStatusClass": "UNKNOWN",
+    "httpResponseReceived": "NAO",
+    "retryable": false,
+    "bytesWritten": 0
+  }
+]

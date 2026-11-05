@@ -13,7 +13,7 @@ export const PREBUILT_WORKFLOW_SHA256='537b97b586af931d76797df7314083c206e5dc03d
 export const POLICY=Object.freeze({repository:'xandeflix2/xandeflix-prebuilt',
   baseline:'b3fc8d1e3844bc5601813ab1b298289af5b3f1fd',
   receivedHead:'a27d7cd4a74bd447221bba2851ee0af033d0a2fd',
-  ref:'refs/heads/governance/canon-01-hardening',
+  ref:'refs/heads/fix/source-output-format-recovery',
   projectId:'prj_OJcEZDNVPI3NV8Z1GfHOB02v20TF',
   projectName:'xandeflix-prebuilt-nm3x',teamId:'team_gHZGQz2zRhEWsyK2jfOLLD5t',
   environment:'preview',cliVersion:'64.7.0'});

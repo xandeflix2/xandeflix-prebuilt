@@ -1,0 +1,3 @@
+# CANON-01-TMDB-EPISODE-RUNTIME-RECOVERY
+
+Autorização: pedido atual do usuário e confirmação específica de série por título/pôster e marcador SxxExx. Diagnóstico real do Fire e API pública em EPISODE_TMDB_RECOVERY_20261028. Prévia ao vivo solicitada posteriormente; somente assets públicos locais, mesma origem/native, antes do empacotamento final. Baseline204/37+C11 e RED preservados; novo GREEN15 casos. Validação integral e física em andamento, sem alegação antecipada de correção. Nova entrega1.0.40/code40, dados/autoridade/C9/parental/R4/streams preservados. Nenhuma alteração dos45 recibos históricos ou verifier; apenas46ºrecibo e38ªsuite.

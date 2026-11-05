@@ -1,0 +1,55 @@
+{
+  "observedUTC": "2026-11-04T19:41:50.238Z",
+  "RESULT": "DEVICE_AUDIT_COMPLETE_CORRECTIONS_BLOCKED_PREFLIGHT_AND_SOURCE",
+  "devices": [
+    {
+      "label": "fire",
+      "versionName": "1.0.52",
+      "versionCode": 52,
+      "apkSha256": "f1eb668de79aebd0384424c67a289eea9c5206fa8db901020789f52a8a079358",
+      "sameAsCandidate": false
+    },
+    {
+      "label": "tablet",
+      "versionName": "1.0.52",
+      "versionCode": 52,
+      "apkSha256": "0146a2fc05d3e45f5670f4c5aba0fa0d0ba1cd25bd0086f7ac00de4cb6ab8c29",
+      "sameAsCandidate": true
+    },
+    {
+      "label": "phone",
+      "versionName": "1.0.52",
+      "versionCode": 52,
+      "apkSha256": "0146a2fc05d3e45f5670f4c5aba0fa0d0ba1cd25bd0086f7ac00de4cb6ab8c29",
+      "sameAsCandidate": true
+    }
+  ],
+  "verification": {
+    "canonical": "PASS_970",
+    "c11": "PASS",
+    "typecheck": "PASS",
+    "regression": {
+      "status": "PASS",
+      "controls": 204,
+      "suites": 42
+    }
+  },
+  "g3Snapshot": {
+    "identical": 7931,
+    "changed": 27,
+    "extras": 12,
+    "gitSnapshotBytesChanged": false,
+    "moduleHashesPreserved": true,
+    "provenance": "UNRESOLVED"
+  },
+  "sourceApi": "FAILURES_OBSERVED_404_OR_NO_HTTP_RESPONSE",
+  "playback": "NOT_CERTIFIED_ERRORS_OBSERVED",
+  "productPatch": false,
+  "apkInstall": false,
+  "build": false,
+  "supabaseWrite": false,
+  "existingRepositoryGitWrite": false,
+  "privateDataExport": false,
+  "creditsEngine": "FUTURE_SPEC_ONLY",
+  "nextGateStarted": false
+}

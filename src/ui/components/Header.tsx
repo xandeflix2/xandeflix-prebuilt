@@ -5,6 +5,7 @@
  */
 
 import React from 'react';
+import sidebarLogo from '../../assets/xandeflix-sidebar-logo.png';
 import type { AppView } from '../navigation/route-state.ts';
 
 declare const __XANDEFLIX_DEBUG_BUILD__: boolean;
@@ -28,6 +29,7 @@ const NavigationIcon: React.FC<{ view: AppView }> = ({ view }) => (
 );
 
 interface HeaderProps {
+  parentalConfigured?: boolean;
   tabletPortrait?: boolean;
   currentView: AppView;
   onNavigate: (view: AppView) => void;
@@ -39,6 +41,7 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({
   currentView,
+  parentalConfigured = false,
   tabletPortrait = false,
   onNavigate,
   onBack,
@@ -72,7 +75,7 @@ export const Header: React.FC<HeaderProps> = ({
           aria-label="Xandeflix Prebuilt - Início"
         >
           <span className="brand-mark" aria-hidden="true">
-            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round"><path d="m5 4 14 16M19 4 5 20" /></svg>
+            <img src={sidebarLogo} width="40" height="30" alt="" decoding="async" className="sidebar-brand-image"/>
           </span>
           <span className="brand-logo">XANDEFLIX</span>
           <span className="brand-sub">PREBUILT</span>
@@ -142,9 +145,9 @@ export const Header: React.FC<HeaderProps> = ({
         >
           <NavigationIcon view="search" /><span className="nav-label">Busca</span>
         </button>
-        <button type="button" className={`focusable-item nav-link ${currentView === 'adult' ? 'active' : ''}`} onClick={() => onNavigate('adult')} aria-current={currentView === 'adult' ? 'page' : undefined} aria-label="Área 18+ protegida por PIN" title="Área 18+">
+        {parentalConfigured && <button type="button" className={`focusable-item nav-link ${currentView === 'adult' ? 'active' : ''}`} onClick={() => onNavigate('adult')} aria-current={currentView === 'adult' ? 'page' : undefined} aria-label="Área 18+ protegida por PIN" title="Área 18+">
           <NavigationIcon view="adult" /><span className="nav-label">18+</span>
-        </button>
+        </button>}
         <button type="button" className={`focusable-item nav-link nav-settings ${currentView === 'settings' ? 'active' : ''}`} onClick={() => onNavigate('settings')} aria-current={currentView === 'settings' ? 'page' : undefined} aria-label="Configurações" title="Configurações">
           <NavigationIcon view="settings" />
         </button>
@@ -171,7 +174,7 @@ export const Header: React.FC<HeaderProps> = ({
       </nav>
 
       <div className="header-right">
-          <button type="button" className="focusable-item header-adult-button" onClick={() => onNavigate('adult')} aria-label="Área 18+ protegida por PIN" title="Área 18+">18+</button>
+          {parentalConfigured && currentView !== 'live' && <button type="button" className="focusable-item header-adult-button" onClick={() => onNavigate('adult')} aria-label="Área 18+ protegida por PIN" title="Área 18+">18+</button>}
           <button
             type="button"
             className="focusable-item header-settings-button"

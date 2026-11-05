@@ -1,0 +1,216 @@
+{
+  "observedUTC": "2026-11-05T11:54:56.472Z",
+  "result": "PASS_WITH_EXPLICIT_GENERATED_OUTPUT_CLASSIFICATION",
+  "firstAudit": "PRESERVATION_POST_BUILD.json retained with unclassified paths and exit 1; classification completed before further installation.",
+  "originalSourcePreserved": true,
+  "originalGitPreserved": true,
+  "candidateGitPreserved": true,
+  "originalDependencyFilesPreserved": 6760,
+  "candidateDependencyInputsPreserved": 6732,
+  "candidateGeneratedDependencyOutputs": [
+    {
+      "path": "@capacitor/android/capacitor/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/layout_bridge_layout_main.xml.flat",
+      "producer": "capacitor-android:compileDebugLibraryResources",
+      "status": "REGENERATED_ANDROID_BUILD_OUTPUT_NOT_PACKAGE_SOURCE"
+    },
+    {
+      "path": "@capacitor/android/capacitor/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/layout_capacitor_bridge_layout_main.xml.flat",
+      "producer": "capacitor-android:compileDebugLibraryResources",
+      "status": "REGENERATED_ANDROID_BUILD_OUTPUT_NOT_PACKAGE_SOURCE"
+    },
+    {
+      "path": "@capacitor/android/capacitor/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/layout_no_webview.xml.flat",
+      "producer": "capacitor-android:compileDebugLibraryResources",
+      "status": "REGENERATED_ANDROID_BUILD_OUTPUT_NOT_PACKAGE_SOURCE"
+    },
+    {
+      "path": "@capacitor/android/capacitor/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties",
+      "producer": "capacitor-android:packageDebugResources",
+      "status": "REGENERATED_ANDROID_BUILD_OUTPUT_NOT_PACKAGE_SOURCE"
+    },
+    {
+      "path": "@capacitor/android/capacitor/build/intermediates/incremental/debug/packageDebugResources/merger.xml",
+      "producer": "capacitor-android:packageDebugResources",
+      "status": "REGENERATED_ANDROID_BUILD_OUTPUT_NOT_PACKAGE_SOURCE"
+    },
+    {
+      "path": "@capacitor/android/capacitor/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml",
+      "producer": "capacitor-android:mergeDebugJniLibFolders",
+      "status": "REGENERATED_ANDROID_BUILD_OUTPUT_NOT_PACKAGE_SOURCE"
+    },
+    {
+      "path": "@capacitor/android/capacitor/build/intermediates/incremental/mergeDebugShaders/merger.xml",
+      "producer": "capacitor-android:mergeDebugShaders",
+      "status": "REGENERATED_ANDROID_BUILD_OUTPUT_NOT_PACKAGE_SOURCE"
+    },
+    {
+      "path": "@capacitor/android/capacitor/build/intermediates/incremental/packageDebugAssets/merger.xml",
+      "producer": "capacitor-android:packageDebugAssets",
+      "status": "REGENERATED_ANDROID_BUILD_OUTPUT_NOT_PACKAGE_SOURCE"
+    },
+    {
+      "path": "@capacitor/android/capacitor/build/outputs/logs/manifest-merger-debug-report.txt",
+      "producer": "capacitor-android:processDebugManifest",
+      "status": "REGENERATED_ANDROID_BUILD_OUTPUT_NOT_PACKAGE_SOURCE"
+    },
+    {
+      "path": "@capacitor/browser/android/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties",
+      "producer": "capacitor-browser:packageDebugResources",
+      "status": "REGENERATED_ANDROID_BUILD_OUTPUT_NOT_PACKAGE_SOURCE"
+    },
+    {
+      "path": "@capacitor/browser/android/build/intermediates/incremental/debug/packageDebugResources/merger.xml",
+      "producer": "capacitor-browser:packageDebugResources",
+      "status": "REGENERATED_ANDROID_BUILD_OUTPUT_NOT_PACKAGE_SOURCE"
+    },
+    {
+      "path": "@capacitor/browser/android/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml",
+      "producer": "capacitor-browser:mergeDebugJniLibFolders",
+      "status": "REGENERATED_ANDROID_BUILD_OUTPUT_NOT_PACKAGE_SOURCE"
+    },
+    {
+      "path": "@capacitor/browser/android/build/intermediates/incremental/mergeDebugShaders/merger.xml",
+      "producer": "capacitor-browser:mergeDebugShaders",
+      "status": "REGENERATED_ANDROID_BUILD_OUTPUT_NOT_PACKAGE_SOURCE"
+    },
+    {
+      "path": "@capacitor/browser/android/build/intermediates/incremental/packageDebugAssets/merger.xml",
+      "producer": "capacitor-browser:packageDebugAssets",
+      "status": "REGENERATED_ANDROID_BUILD_OUTPUT_NOT_PACKAGE_SOURCE"
+    },
+    {
+      "path": "@capacitor/browser/android/build/intermediates/manifest_merge_blame_file/debug/processDebugManifest/manifest-merger-blame-debug-report.txt",
+      "producer": "capacitor-browser:processDebugManifest",
+      "status": "REGENERATED_ANDROID_BUILD_OUTPUT_NOT_PACKAGE_SOURCE"
+    },
+    {
+      "path": "@capacitor/browser/android/build/outputs/logs/manifest-merger-debug-report.txt",
+      "producer": "capacitor-browser:processDebugManifest",
+      "status": "REGENERATED_ANDROID_BUILD_OUTPUT_NOT_PACKAGE_SOURCE"
+    },
+    {
+      "path": "@capacitor/filesystem/android/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties",
+      "producer": "capacitor-filesystem:packageDebugResources",
+      "status": "REGENERATED_ANDROID_BUILD_OUTPUT_NOT_PACKAGE_SOURCE"
+    },
+    {
+      "path": "@capacitor/filesystem/android/build/intermediates/incremental/debug/packageDebugResources/merger.xml",
+      "producer": "capacitor-filesystem:packageDebugResources",
+      "status": "REGENERATED_ANDROID_BUILD_OUTPUT_NOT_PACKAGE_SOURCE"
+    },
+    {
+      "path": "@capacitor/filesystem/android/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml",
+      "producer": "capacitor-filesystem:mergeDebugJniLibFolders",
+      "status": "REGENERATED_ANDROID_BUILD_OUTPUT_NOT_PACKAGE_SOURCE"
+    },
+    {
+      "path": "@capacitor/filesystem/android/build/intermediates/incremental/mergeDebugShaders/merger.xml",
+      "producer": "capacitor-filesystem:mergeDebugShaders",
+      "status": "REGENERATED_ANDROID_BUILD_OUTPUT_NOT_PACKAGE_SOURCE"
+    },
+    {
+      "path": "@capacitor/filesystem/android/build/intermediates/incremental/packageDebugAssets/merger.xml",
+      "producer": "capacitor-filesystem:packageDebugAssets",
+      "status": "REGENERATED_ANDROID_BUILD_OUTPUT_NOT_PACKAGE_SOURCE"
+    },
+    {
+      "path": "@capacitor/filesystem/android/build/outputs/logs/manifest-merger-debug-report.txt",
+      "producer": "capacitor-filesystem:processDebugManifest",
+      "status": "REGENERATED_ANDROID_BUILD_OUTPUT_NOT_PACKAGE_SOURCE"
+    },
+    {
+      "path": "@capacitor/share/android/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties",
+      "producer": "capacitor-share:packageDebugResources",
+      "status": "REGENERATED_ANDROID_BUILD_OUTPUT_NOT_PACKAGE_SOURCE"
+    },
+    {
+      "path": "@capacitor/share/android/build/intermediates/incremental/debug/packageDebugResources/merger.xml",
+      "producer": "capacitor-share:packageDebugResources",
+      "status": "REGENERATED_ANDROID_BUILD_OUTPUT_NOT_PACKAGE_SOURCE"
+    },
+    {
+      "path": "@capacitor/share/android/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml",
+      "producer": "capacitor-share:mergeDebugJniLibFolders",
+      "status": "REGENERATED_ANDROID_BUILD_OUTPUT_NOT_PACKAGE_SOURCE"
+    },
+    {
+      "path": "@capacitor/share/android/build/intermediates/incremental/mergeDebugShaders/merger.xml",
+      "producer": "capacitor-share:mergeDebugShaders",
+      "status": "REGENERATED_ANDROID_BUILD_OUTPUT_NOT_PACKAGE_SOURCE"
+    },
+    {
+      "path": "@capacitor/share/android/build/intermediates/incremental/packageDebugAssets/merger.xml",
+      "producer": "capacitor-share:packageDebugAssets",
+      "status": "REGENERATED_ANDROID_BUILD_OUTPUT_NOT_PACKAGE_SOURCE"
+    },
+    {
+      "path": "@capacitor/share/android/build/outputs/logs/manifest-merger-debug-report.txt",
+      "producer": "capacitor-share:processDebugManifest",
+      "status": "REGENERATED_ANDROID_BUILD_OUTPUT_NOT_PACKAGE_SOURCE"
+    }
+  ],
+  "generatedAssetReplacement": [
+    {
+      "path": "android/app/src/main/assets/public/assets/index-CaP1mZod.js",
+      "producer": "Vite production build + Capacitor sync (declared before execution)",
+      "status": "AUTHORIZED_GENERATED_OUTPUT_REPLACEMENT"
+    },
+    {
+      "path": "android/app/src/main/assets/public/assets/main-CvPs0nkG.js",
+      "producer": "Vite production build + Capacitor sync (declared before execution)",
+      "status": "AUTHORIZED_GENERATED_OUTPUT_REPLACEMENT"
+    },
+    {
+      "path": "android/app/src/main/assets/public/assets/parental-storage-B2We-MID.js",
+      "producer": "Vite production build + Capacitor sync (declared before execution)",
+      "status": "AUTHORIZED_GENERATED_OUTPUT_REPLACEMENT"
+    },
+    {
+      "path": "android/app/src/main/assets/public/assets/poster-identity-CcRU0_zO.js",
+      "producer": "Vite production build + Capacitor sync (declared before execution)",
+      "status": "AUTHORIZED_GENERATED_OUTPUT_REPLACEMENT"
+    },
+    {
+      "path": "android/app/src/main/assets/public/assets/web-B9IMg_bw.js",
+      "producer": "Vite production build + Capacitor sync (declared before execution)",
+      "status": "AUTHORIZED_GENERATED_OUTPUT_REPLACEMENT"
+    },
+    {
+      "path": "android/app/src/main/assets/public/assets/web-BSolGl22.js",
+      "producer": "Vite production build + Capacitor sync (declared before execution)",
+      "status": "AUTHORIZED_GENERATED_OUTPUT_REPLACEMENT"
+    },
+    {
+      "path": "android/app/src/main/assets/public/assets/web-CGH2gZSZ.js",
+      "producer": "Vite production build + Capacitor sync (declared before execution)",
+      "status": "AUTHORIZED_GENERATED_OUTPUT_REPLACEMENT"
+    },
+    {
+      "path": "android/app/src/main/assets/public/index.html",
+      "producer": "Vite production build + Capacitor sync (declared before execution)",
+      "status": "AUTHORIZED_GENERATED_OUTPUT_REPLACEMENT"
+    }
+  ],
+  "approvedExistingSourceChanges": [
+    "android/app/build.gradle",
+    "android/app/src/main/java/com/xandeflix/prebuilt/artwork/ArtworkCachePlugin.java",
+    "android/app/src/main/java/com/xandeflix/prebuilt/artwork/ArtworkDiskCache.java",
+    "docs/ERRORS_AND_BLOCKERS.md",
+    "docs/EVOLUTION_REPORT.md",
+    "docs/STATUS.md",
+    "docs/architecture/XANDEFLIX_PREBUILT_PHASED_EXPANSION.md",
+    "scripts/test-c11-artwork-visible-recovery.mjs",
+    "scripts/test-c11-new-content-badge.mjs",
+    "scripts/test-c11-page-artwork-preparation.mjs",
+    "scripts/test-canonical-regression.mjs",
+    "src/App.tsx",
+    "src/artwork/artwork-file-cache.ts",
+    "src/bootstrap/boot-sync-coordinator.ts",
+    "src/catalog/new-content-badge.ts",
+    "src/playback/last-live-channel.ts",
+    "src/playback/live-favorites.ts",
+    "src/playback/watch-history.ts",
+    "src/ui/series-personal.store.ts"
+  ],
+  "unexplainedChanges": 0
+}

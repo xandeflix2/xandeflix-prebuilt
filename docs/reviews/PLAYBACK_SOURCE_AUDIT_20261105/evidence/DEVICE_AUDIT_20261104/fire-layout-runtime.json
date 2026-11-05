@@ -1,0 +1,54 @@
+{
+  "observedUTC": "2026-11-04T19:31:08.334Z",
+  "viewport": {
+    "width": 960,
+    "height": 540
+  },
+  "headings": [
+    "Nova versão pronta para instalar",
+    "Silo (2023)",
+    "Título original: Silo",
+    "O que achou desta série?"
+  ],
+  "headers": [
+    {
+      "tag": "HEADER",
+      "className": "app-header",
+      "top": 0,
+      "height": 540,
+      "width": 56,
+      "display": "grid",
+      "visibility": "visible"
+    }
+  ],
+  "hero": [
+    {
+      "tag": "DIV",
+      "className": "app-shell app-shell--hero-top app-shell--television app-shell--android-tv app-shell--fire-stick app-shell--side-nav app-shell--phone-header-back app-shell--phone-detail-page",
+      "top": 0,
+      "height": 1495.5,
+      "width": 960,
+      "display": "flex",
+      "visibility": "visible"
+    },
+    {
+      "tag": "DIV",
+      "className": "detail-hero-wide",
+      "top": 12,
+      "height": 316.5,
+      "width": 880,
+      "display": "block",
+      "visibility": "visible"
+    },
+    {
+      "tag": "DIV",
+      "className": "detail-actions series-detail-hero-actions",
+      "top": 200.1796875,
+      "height": 44,
+      "width": 678,
+      "display": "flex",
+      "visibility": "visible"
+    }
+  ],
+  "controls": []
+}

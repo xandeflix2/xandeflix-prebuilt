@@ -1,0 +1,12 @@
+[
+  {
+    "path": "android/capacitor.settings.gradle",
+    "byteIdentical": true,
+    "normalizedIdentical": true
+  },
+  {
+    "path": "android/app/capacitor.build.gradle",
+    "byteIdentical": true,
+    "normalizedIdentical": true
+  }
+]

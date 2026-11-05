@@ -1,0 +1,15 @@
+PASS_TMDB_SMALL_CARD_HERO_SIZE_FILENAME_AND_OTHER_SOURCE_PRESERVED
+file:///C:/Xandeflix/Audits/SOURCE_SWITCH_ISOLATION_20261105/workspace/scripts/test-c11-artwork-visible-recovery.mjs:27
+    throw Error('Uncontrolled dependency: ' + name);
+          ^
+
+Error: Uncontrolled dependency: ../bootstrap/source-replacement.ts
+    at file:///C:/Xandeflix/Audits/SOURCE_SWITCH_ISOLATION_20261105/workspace/scripts/test-c11-artwork-visible-recovery.mjs:27:11
+    at eval (eval at load (file:///C:/Xandeflix/Audits/SOURCE_SWITCH_ISOLATION_20261105/workspace/scripts/test-c11-artwork-visible-recovery.mjs:22:3), <anonymous>:10:33)
+    at load (file:///C:/Xandeflix/Audits/SOURCE_SWITCH_ISOLATION_20261105/workspace/scripts/test-c11-artwork-visible-recovery.mjs:22:252)
+    at file:///C:/Xandeflix/Audits/SOURCE_SWITCH_ISOLATION_20261105/workspace/scripts/test-c11-artwork-visible-recovery.mjs:39:23
+    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)
+    at async node:internal/modules/esm/loader:643:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+
+Node.js v24.19.0

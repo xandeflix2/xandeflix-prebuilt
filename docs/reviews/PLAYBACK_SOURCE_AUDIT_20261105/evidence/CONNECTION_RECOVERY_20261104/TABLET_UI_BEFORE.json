@@ -1,0 +1,19 @@
+{
+  "observedUTC": "2026-11-05T01:23:26.765Z",
+  "visibility": "hidden",
+  "shell": "app-shell app-shell--hero-top app-shell--catalog-page app-shell--tablet app-shell--phone-header-back",
+  "hero": false,
+  "episodeCards": 0,
+  "visibleNav": [
+    "Filmes",
+    "Séries",
+    "Canais",
+    "Busca"
+  ],
+  "visibleActions": [
+    "Ver Detalhe "
+  ],
+  "recoveryObserverPresent": false,
+  "priorConnectionObserver": false,
+  "errorVisible": false
+}

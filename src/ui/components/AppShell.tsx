@@ -9,7 +9,8 @@ import type { AppView } from '../navigation/route-state.ts';
 import { Header } from './Header.tsx';
 import { useLandscapeNavigation } from '../hooks/useLandscapeNavigation.ts';
 import { useLivePresentation } from '../hooks/useLivePresentation.ts';
-import { CastButton } from './CastButton.tsx';
+import { HeroActions } from './HeroActions.tsx';
+import { usePhoneLayout } from '../hooks/usePhoneLayout.ts';
 import { isFireTvPresentation, isTelevisionPresentation } from '../device-presentation.ts';
 import { useDevicePresentation } from '../hooks/useDevicePresentation.ts';
 import { useParentalControl } from '../hooks/useParentalControl.ts';
@@ -38,6 +39,9 @@ export const AppShell: React.FC<AppShellProps> = ({
   warningNotice,
   children,
 }) => {
+  const content=React.useRef<HTMLDivElement>(null);
+  const phone=usePhoneLayout();
+  const heroView=['home','movies','series','movie-detail','series-detail'].includes(currentView);
   const parental = useParentalControl();
   React.useEffect(() => {
     const changed = () => { if (document.hidden) parentalControl.lock(); };
@@ -62,13 +66,14 @@ export const AppShell: React.FC<AppShellProps> = ({
   const remoteBackOnly = television && (currentView === 'movies' || currentView === 'series' || detailPage);
   if (parental.status === 'loading') return <StartupLoadingScreen stage="reading"/>;
   return (
-    <div className={`app-shell${currentView === 'adult' ? ' app-shell--adult-page' : ''}${television ? ' app-shell--television' : ''}${androidTv ? ' app-shell--android-tv' : ''}${squareLive ? ' app-shell--square-display' : ''}${fireStick ? ' app-shell--fire-stick' : ''}${tablet ? ' app-shell--tablet' : ''}${tabletPortrait ? ' app-shell--tablet-portrait' : ''}${squareLivePage ? ' app-shell--live-square' : ''}${currentView === 'live' && stackedLive ? ' app-shell--live-stacked' : ''}${sideNavigation ? ' app-shell--side-nav' : ''}${sideNavigation && currentView === 'live' ? ' app-shell--live-view' : ''}${currentView === 'live' ? ' app-shell--live-page' : ''}${currentView === 'home' ? ' app-shell--home-page' : ''}${currentView === 'movies' || currentView === 'series' || currentView === 'search' || currentView === 'activation' || currentView === 'settings' || currentView === 'adult' || detailPage ? ' app-shell--phone-header-back' : ''}${detailPage ? ' app-shell--phone-detail-page' : ''}`}>
+    <div className={`app-shell${heroView?' app-shell--hero-top':''}${currentView === 'home' || currentView === 'movies' || currentView === 'series' ? ' app-shell--catalog-page' : ''}${currentView === 'adult' ? ' app-shell--adult-page' : ''}${television ? ' app-shell--television' : ''}${androidTv ? ' app-shell--android-tv' : ''}${squareLive ? ' app-shell--square-display' : ''}${fireStick ? ' app-shell--fire-stick' : ''}${tablet ? ' app-shell--tablet' : ''}${tabletPortrait ? ' app-shell--tablet-portrait' : ''}${squareLivePage ? ' app-shell--live-square' : ''}${currentView === 'live' && stackedLive ? ' app-shell--live-stacked' : ''}${sideNavigation ? ' app-shell--side-nav' : ''}${sideNavigation && currentView === 'live' ? ' app-shell--live-view' : ''}${currentView === 'live' ? ' app-shell--live-page' : ''}${currentView === 'home' ? ' app-shell--home-page' : ''}${currentView === 'movies' || currentView === 'series' || currentView === 'search' || currentView === 'activation' || currentView === 'settings' || currentView === 'parental-control' || currentView === 'adult' || detailPage ? ' app-shell--phone-header-back' : ''}${detailPage ? ' app-shell--phone-detail-page' : ''}`}>
       <Header
         currentView={currentView}
+        parentalConfigured={parental.status === 'ready'}
         tabletPortrait={tabletPortrait || squareLivePage}
         onNavigate={onNavigate}
         onBack={onBack}
-        canGoBack={!remoteBackOnly && !sideNavigation && !tabletPortrait && currentView !== 'live' && currentView !== 'home' && canGoBack}
+        canGoBack={!heroView && !remoteBackOnly && !sideNavigation && !tabletPortrait && currentView !== 'live' && currentView !== 'home' && canGoBack}
         snapshotId={snapshotId}
         catalogVersion={catalogVersion}
       />
@@ -80,13 +85,13 @@ export const AppShell: React.FC<AppShellProps> = ({
         </div>
       )}
 
-      <div className="app-content">
-        {!remoteBackOnly && (sideNavigation || tabletPortrait) && canGoBack && onBack && currentView !== 'manager-panel' && currentView !== 'live' && currentView !== 'home' && (
+      <div ref={content} className="app-content">
+        {heroView&&<HeroActions content={content} showBack={tablet&&!phone&&!television&&!remoteBackOnly&&currentView!=='home'&&canGoBack&&Boolean(onBack)} showCast={detailPage&&tablet&&!phone&&!television} onBack={onBack}/> }
+        {!heroView && !remoteBackOnly && (sideNavigation || tabletPortrait) && canGoBack && onBack && currentView !== 'manager-panel' && currentView !== 'live' && currentView !== 'home' && (
           <div className={`page-back-row${detailPage ? ' page-back-row--detail' : ''}${currentView === 'movies' || currentView === 'series' ? ' page-back-row--browse' : ''}`}>
             <button type="button" className="focusable-item btn-back" onClick={onBack} aria-label="Voltar para a tela anterior">
               ← Voltar
             </button>
-            {tablet && detailPage && <CastButton iconOnly />}
           </div>
         )}
         {parental.status === 'error' && currentView !== 'settings' && currentView !== 'parental-control'

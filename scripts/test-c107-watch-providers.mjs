@@ -64,13 +64,54 @@ await test('HERO_PLATFORM_NEVER_SHOWS_NAME_PENDING_FAILED_UNKNOWN_OR_BEFORE_IMAG
  const previousUri=uri;uri='https://image.tmdb.org/t/p/w45/other.png';image=PlatformCategoryLogo({label:'Prime Video'});assert.equal(image.props.style.visibility,'hidden');image.props.onLoad({currentTarget:{currentSrc:previousUri}});assert.equal(PlatformCategoryLogo({label:'Prime Video'}).props.style.visibility,'hidden');
  image.props.onLoad({currentTarget:{currentSrc:uri}});assert.equal(PlatformCategoryLogo({label:'Prime Video'}).props.style.visibility,'visible');image.props.onError();assert.equal(PlatformCategoryLogo({label:'Prime Video'}),null);assert.equal(PlatformCategoryLogo({label:'Unknown platform'}),null);
 });
-await test('OPTIONAL_HOOKS_DEFER_REQUESTS_AND_IGNORE_STALE_OR_UNMOUNTED_RESULTS',async()=>{
+await test('OPTIONAL_AVAILABILITY_DEFERRED_LOGO_IMMEDIATE_AND_UNMOUNTED_RESULTS_IGNORED',async()=>{
  const states=[],effects=[],timers=[];let index=0,requested=0,releaseA,releaseB;
  const react={useState:initial=>{const i=index++;return[states[i]??initial,next=>states[i]=next];},useEffect:fn=>effects.push(fn)};
- const service={peek:()=>null,resolve:i=>{requested++;return new Promise(r=>i.tmdbId===1?releaseA=r:releaseB=r);},logo:async()=>{requested++;return 'synthetic-logo';}};
+ const service={peek:()=>null,peekLogo:()=>undefined,resolve:i=>{requested++;return new Promise(r=>i.tmdbId===1?releaseA=r:releaseB=r);},logo:async()=>{requested++;return 'synthetic-logo';}};
  const hooks=load('src/ui/hooks/useWatchProviders.ts',name=>name==='react'?react:name.includes('tmdb-watch-providers')?{tmdbWatchProvidersService:service}:{artworkIdentityKey:i=>i.kind+':'+i.tmdbId},{setTimeout:(fn,ms)=>{timers.push({fn,ms});return timers.length;},clearTimeout(){}});
  index=0;hooks.useWatchProviders({...identity,tmdbId:1});const cleanupA=effects.pop()();assert.equal(requested,0);assert.equal(timers.at(-1).ms,250);timers.at(-1).fn();cleanupA();
  index=0;hooks.useWatchProviders({...identity,tmdbId:2});const cleanupB=effects.pop()();timers.at(-1).fn();releaseA({groups:[{mode:'buy',providers:[]}]});await Promise.resolve();assert.equal(states[0],undefined);releaseB({groups:[]});await Promise.resolve();index=0;assert.deepEqual(hooks.useWatchProviders({...identity,tmdbId:2}),{groups:[]});cleanupB();
- index=1;hooks.usePlatformLogo('Netflix');const cleanupLogo=effects.pop()();assert.equal(timers.at(-1).ms,2000);timers.at(-1).fn();cleanupLogo();await Promise.resolve();assert.equal(states[1],undefined);
+ index=1;hooks.usePlatformLogo('Netflix');const beforeLogo=requested,timerCount=timers.length;const cleanupLogo=effects.pop()();assert.equal(requested,beforeLogo+1);assert.equal(timers.length,timerCount);cleanupLogo();await Promise.resolve();assert.equal(states[1],undefined);
+});
+await test('LOGO_PEEK_SYNCHRONOUS_PERSISTED_VALIDATED_AND_EXPIRES_WITH_DIRECTORY',async()=>{
+ let clock=1000,stored='',requests=0;const opts={...options,now:()=>clock,storage:{getItem:()=>stored,setItem:(_,v)=>{stored=v;}},fetchImpl:async()=>{requests++;return response({results:[row(1)]});}};
+ const service=new TmdbWatchProvidersService(opts);assert.equal(service.peekLogo('Netflix'),undefined);assert.equal(requests,0);
+ await service.logo('Netflix');assert.equal(service.peekLogo('Netflix'),'https://image.tmdb.org/t/p/w45/synthetic.png');assert.equal(requests,1);
+ const restored=new TmdbWatchProvidersService(opts);assert.equal(restored.peekLogo('Netflix'),'https://image.tmdb.org/t/p/w45/synthetic.png');assert.equal(restored.peekLogo('Not a platform'),undefined);assert.equal(requests,1);
+ clock+=7*86400000+1;assert.equal(restored.peekLogo('Netflix'),undefined);assert.equal(requests,1);
+});
+await test('CACHED_LOGO_FIRST_RENDER_FAILURE_AND_STALE_LABEL_NEVER_REINTRODUCE_OLD_LOGO',async()=>{
+ let state,releaseA,releaseB,calls=0;const effects=[],timers=[];
+ const url='https://image.tmdb.org/t/p/w45/';const service={peekLogo:label=>url+(label==='Netflix'?'a.png':'b.png'),logo:label=>{calls++;return new Promise(r=>label==='Netflix'?releaseA=r:releaseB=r);}};
+ const react={useState:()=>[state,v=>{state=v;}],useEffect:fn=>effects.push(fn)};
+ const hook=load('src/ui/hooks/useWatchProviders.ts',name=>name==='react'?react:name.includes('tmdb-watch-providers')?{tmdbWatchProvidersService:service}:{artworkIdentityKey:()=>''},{setTimeout:(fn,ms)=>{timers.push({fn,ms});},clearTimeout(){}});
+ let a=hook.usePlatformLogo('Netflix');assert.equal(a.uri,url+'a.png');const cleanupA=effects.pop()();assert.equal(calls,1);assert.equal(timers.length,0);
+ cleanupA();let b=hook.usePlatformLogo('Prime');const cleanupB=effects.pop()();assert.equal(b.uri,url+'b.png');releaseA(url+'old.png');await Promise.resolve();assert.equal(state,undefined);
+ releaseB(url+'b.png');await Promise.resolve();b=hook.usePlatformLogo('Prime');assert.equal(b.uri,url+'b.png');b.failed();assert.equal(hook.usePlatformLogo('Prime').uri,undefined);cleanupB();
+});
+await test('WARMUP_DEDUPES_VALIDATED_SMALL_IMAGES_AND_NEVER_WAITS_ON_CONTENT',async()=>{
+ const images=[],timers=new Map();let serial=0,lookups=0;
+ class Image{naturalWidth=45;set src(value){this.uri=value;images.push(this);}}
+ const service={logo:async label=>{lookups++;return label==='Unsafe'?'https://private.invalid/key':'https://image.tmdb.org/t/p/w45/'+(label==='Alias'?'Netflix':label)+'.png';}};
+ const hook=load('src/ui/hooks/useWatchProviders.ts',name=>name==='react'?{}:name.includes('tmdb-watch-providers')?{tmdbWatchProvidersService:service}:{},{Image,setTimeout:(fn,ms)=>{assert.equal(ms,8000);const id=++serial;timers.set(id,fn);return id;},clearTimeout:id=>timers.delete(id)});
+ const one=hook.warmPlatformLogos(['Netflix','Netflix','Alias','Unsafe']);await Promise.resolve();await Promise.resolve();assert.equal(images.length,1);assert.equal(lookups,3);assert.equal(images[0].fetchPriority,'low');assert.equal(images[0].referrerPolicy,'no-referrer');
+ const two=hook.warmPlatformLogos(['Netflix']);await Promise.resolve();assert.equal(images.length,1);images[0].onload();await Promise.all([one,two]);assert.equal(timers.size,0);
+ await hook.warmPlatformLogos(['Netflix']);assert.equal(images.length,1);
+});
+await test('WARMUP_BOUNDS_CONCURRENT_IMAGES_AND_CLEANS_ERROR_TIMEOUT',async()=>{
+ const images=[],timers=new Map();let serial=0;
+ class Image{naturalWidth=45;set src(v){this.uri=v;images.push(this);}removeAttribute(name){assert.equal(name,'src');this.cancelled=true;}}
+ const hook=load('src/ui/hooks/useWatchProviders.ts',name=>name==='react'?{}:name.includes('tmdb-watch-providers')?{tmdbWatchProvidersService:{logo:async label=>'https://image.tmdb.org/t/p/w45/'+label+'.png'}}:{},{Image,setTimeout:(fn,ms)=>{const id=++serial;timers.set(id,fn);return id;},clearTimeout:id=>timers.delete(id)});
+ const a=hook.warmPlatformLogos(Array.from({length:100},(_,i)=>'p'+i));await Promise.resolve();await Promise.resolve();assert.equal(images.length,8);
+ const b=hook.warmPlatformLogos(['different']);await Promise.resolve();await Promise.resolve();assert.equal(images.length,8);await b;
+ images[0].onerror();for(const callback of [...timers.values()])callback();await a;assert.equal(timers.size,0);assert.ok(images.every(i=>i.onload===null&&i.onerror===null&&i.cancelled));
+});
+await test('WARMUP_RETAINS_ONLY_SIXTEEN_SMALL_DECODED_LOGOS',async()=>{
+ const images=[];class Image{naturalWidth=45;set src(v){this.uri=v;images.push(this);}}
+ const hook=load('src/ui/hooks/useWatchProviders.ts',name=>name==='react'?{}:name.includes('tmdb-watch-providers')?{tmdbWatchProvidersService:{logo:async label=>'https://image.tmdb.org/t/p/w45/'+label+'.png'}}:{} ,{Image});
+ for(let i=0;i<17;i++){const p=hook.warmPlatformLogos(['brand'+i]);await Promise.resolve();await Promise.resolve();images.at(-1).onload();await p;}
+ assert.equal(images.length,17);const evicted=hook.warmPlatformLogos(['brand0']);await Promise.resolve();await Promise.resolve();assert.equal(images.length,18);images.at(-1).onload();await evicted;
 });
 console.log(JSON.stringify({tests,pass:true,syntheticOnly:true,liveApiRequests:0}));
+
+console.log("HERO_PLATFORM_LOGOS=PASS");

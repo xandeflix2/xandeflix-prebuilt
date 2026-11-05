@@ -81,6 +81,10 @@ export class TmdbWatchProvidersService {
     if(!found||!Number.isSafeInteger(found.tmdbId)||found.tmdbId<=0)return null;
     return await this.load(identity.kind+':'+found.tmdbId,(identity.kind==='movie'?'movie':'tv')+'/'+found.tmdbId+'/watch/providers') as WatchAvailability|null;
   }
+  peekLogo(label:string):string|undefined {
+    const directory=this.cached('directory');
+    return Array.isArray(directory)?matchPlatform(label,directory)?.logo:undefined;
+  }
   async logo(label:string):Promise<string|undefined>{const directory=await this.load('directory','watch/providers/tv',true);return directory?matchPlatform(label,directory as WatchProvider[])?.logo:undefined;}
 }
 export const tmdbWatchProvidersService=new TmdbWatchProvidersService({credential:()=>String(import.meta.env?.VITE_TMDB_API_KEY||import.meta.env?.VITE_TMDB_READ_ACCESS_TOKEN||'')});

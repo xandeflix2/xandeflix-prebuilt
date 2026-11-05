@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "gate": "CANON-01-P250-V139-CANONICAL-RECOVERY",
+  "parentGate": "CANON-01",
+  "amendment": "CANON-01-P250-V139-CANONICAL-RECOVERY",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "CURRENT_USER_CONTINUE_AFTER_P2_50D_R0_REPORT_AND_CONCRETE_RECOVERY_PLAN_2026_10_28; REQUEST_ORIGIN_IS_USER_NOT_NEW_MASTER_ATTACHMENT; LOCAL_EXECUTION_REVIEW_PENDING",
+  "authorizationRequestSha256": "e3de089b6b00816e11012777b87498d82fd45097d136f3d5c0de76645100a525",
+  "reason": "User continuation authorizes the isolated A+D+C recovery plan: adopt previously approved P2.43B source-status feedback and P2.50C Unicode bytes, recognize Android1.0.39, and review only four canonical regression fixtures without modifying the verifier.",
+  "physicalImpact": "REQUIRED",
+  "physicalImpactJustification": "Product bytes were already prepared and approved in P2.50C; this local recovery does not homologate APK or physical authorization. Future build and physical gates remain pending.",
+  "testChangesReviewed": true,
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c105-complete-root-search.mjs",
+    "scripts/test-c107-catalog-return-navigation.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c11-landscape-navigation.mjs",
+    "scripts/validate-direct-playback.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock",
+    "npm run typecheck",
+    "node scripts/test-c135-active-source.mjs",
+    "node scripts/test-c11-automatic-source-refresh.mjs",
+    "Unicode/AST check on isolated candidate",
+    "P2_27_current_evidence_gate.mjs unchanged"
+  ],
+  "evidence": "docs/evidence/P2_50_V139_CANONICAL_RECOVERY.md",
+  "compatibilityRisk": "Fixture38 intentionally exercises explicit future version authorization even though the real candidate is39. Baseline37 stale fixture isolates unused authorization. No checker changes, no skipped negatives or suites; physical authorization and build remain separate.",
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": false,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false,
+  "restrictions": [
+    "Write Git only in independent clone and synthetic test fixtures. No root Git or original candidate changes.",
+    "Retain both approved product SHA256; no new product code.",
+    "Preserve44 inherited receipts, all204 controls and37 suites; four normative prefixes append-only.",
+    "No Vite/Capacitor/Gradle/APK/device/Supabase/commit/push/PR/next gate."
+  ],
+  "previousGovernanceHashes": {
+    "scripts/test-canonical-regression.mjs": "005385917d2972875783e993a0a1aeaabb7bbeb6"
+  },
+  "supersedes": {
+    "src/ui/components/ActiveSourceSettings.tsx": "CANON-01-PHONE-HEADER-REFINEMENT",
+    "scripts/test-canonical-regression.mjs": "CANON-01-TMDB-EPISODE-METADATA-ENRICHMENT"
+  },
+  "changes": [
+    {
+      "path": "src/ui/components/ActiveSourceSettings.tsx",
+      "before": "47cf14f6527f83a4a1183f466e7b19be67b170c1",
+      "after": "dd97ccce6b5261def81f933c91b9dd315191b81f"
+    },
+    {
+      "path": "android/app/build.gradle",
+      "before": "02dc4b64ba03cc5c9d5db3f6f48966b3dbe9f7f4",
+      "after": "bd2883c2d64c0821e1ed2467d753ac294218c177"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "005385917d2972875783e993a0a1aeaabb7bbeb6",
+      "after": "0da6ebc6cabdb9833a78ea0d0ee9d556e71660bd"
+    }
+  ]
+}

@@ -1,0 +1,157 @@
+{
+  "schema": 1,
+  "gate": "CANON-01-IDENTITY-HERO-RECOVERY",
+  "parentGate": "CANON-01-ACTOR-PROFILE",
+  "amendment": "CANON-01-IDENTITY-HERO-RECOVERY",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "CURRENT_USER_FRIENDS_METADATA_AND_HERO_TOP_CONTROLS_2026_10_29; NOT_NEW_MASTER_ATTACHMENT; CURRENT_USER_PHOTO_ONLY_CAST_AND_COUNT_INDEPENDENT_ACTOR_COVERS",
+  "authorizationRequestSha256": "127d21f2b265aef921d0085c9834c5a704648c359067fbf02ee69e4005234333",
+  "reason": "General public poster-confirmed recovery of conflicting source year, guarded episode presentation placeholder and hero-contained navigation. Photo-only cast UI with failed-image removal and compact filmography grid retaining empty tracks.",
+  "physicalImpact": "REQUIRED",
+  "physicalImpactJustification": "Same Fire under standing autonomous in-place test authorization; other profiles browser-only, APK for user tests.",
+  "testChangesReviewed": true,
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c105-complete-root-search.mjs",
+    "scripts/test-c107-catalog-return-navigation.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c11-landscape-navigation.mjs",
+    "scripts/validate-direct-playback.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock",
+    "node node_modules/typescript/bin/tsc --noEmit",
+    "node scripts/test-identity-hero-recovery.mjs",
+    "official configured build and APK/asset audits",
+    "offline native257/39",
+    "same Fire Friends and hero validation"
+  ],
+  "evidence": "docs/evidence/IDENTITY_HERO_RECOVERY.md",
+  "compatibilityRisk": "Optional presentation only; explicit IDs/context/edits/distribution guards preserved, no source/count/order/player/auth changes. Hero controls reuse handlers and remote Back policy.",
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": true,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false,
+  "supersedes": {
+    "src/artwork/tmdb-metadata.service.ts": "CANON-01-EPISODE-GENERAL-IDENTITY",
+    "src/catalog/episode-presentation.ts": "CANON-01-EPISODE-GENERAL-IDENTITY",
+    "src/ui/pages/SeriesDetailPage.tsx": "CANON-01-DETAIL-HERO-REFINEMENT",
+    "src/ui/components/AppShell.tsx": "CANON-01-PHONE-HEADER-REFINEMENT",
+    "src/ui/components/PhoneMovieDetail.tsx": "CANON-01-DETAIL-HERO-REFINEMENT",
+    "src/ui/components/PhoneSeriesDetail.tsx": "CANON-01-DETAIL-HERO-REFINEMENT",
+    "src/index.css": "CANON-01-ACTOR-PROFILE",
+    "android/app/build.gradle": "CANON-01-ACTOR-PROFILE",
+    "scripts/test-canonical-regression.mjs": "CANON-01-ACTOR-PROFILE",
+    "scripts/test-series-episode-return.mjs": "CANON-01-ACTOR-PROFILE",
+    "scripts/test-tmdb-episode-enrichment-ui.mjs": "CANON-01-ACTOR-PROFILE",
+    "scripts/test-c11-source-first-tmdb-artwork.mjs": "CANON-01-DETAIL-HERO-REFINEMENT",
+    "scripts/test-c107-fire-hero-metadata.mjs": "CANON-01-DPAD-EXPANDED-CARDS-AUTOPREVIEW-01",
+    "src/ui/components/TitleCast.tsx": "CANON-01-ACTOR-PROFILE",
+    "scripts/test-actor-profile.mjs": "CANON-01-ACTOR-PROFILE",
+    "scripts/test-detail-hero-refinement.mjs": "CANON-01-ACTOR-PROFILE"
+  },
+  "changes": [
+    {
+      "path": "src/artwork/tmdb-metadata.service.ts",
+      "before": "c66e40bc4459e93efc968e91d286c6862aea9ed0",
+      "after": "973bed51e74970c061742017a1f01ab086424f2c"
+    },
+    {
+      "path": "src/catalog/episode-presentation.ts",
+      "before": "94e8276eca042a6edc6bcf78667eeec352e83ee6",
+      "after": "1c1dd5a32661736d5abda2a270361e48c31869a4"
+    },
+    {
+      "path": "src/ui/pages/SeriesDetailPage.tsx",
+      "before": "7157d0ec8aca93eeedd4e7cf89af8babfb7404a7",
+      "after": "22df6cd43ec257b3547eded67ba1003c35c7c364"
+    },
+    {
+      "path": "src/ui/components/AppShell.tsx",
+      "before": "eadbd6e62ee3317d3057fad29f206672ce17877d",
+      "after": "68feddcefa276dd9847168c5bff3ee3afef0798c"
+    },
+    {
+      "path": "src/ui/components/HeroActions.tsx",
+      "before": null,
+      "after": "b72de7d28ea931606016f6b5a525cef8ac89ddaf"
+    },
+    {
+      "path": "src/ui/components/PhoneMovieDetail.tsx",
+      "before": "f506f7490c5128acbfd55a18e57c1cf3ab8c1c65",
+      "after": "e28e2591d72d1e5f416b85e76646c38dffdb3533"
+    },
+    {
+      "path": "src/ui/components/PhoneSeriesDetail.tsx",
+      "before": "21e125fc4a0f28d8b5736d0f4be01f20f540c40e",
+      "after": "071909cb880e103a04d275628f31472b7e99bc18"
+    },
+    {
+      "path": "src/index.css",
+      "before": "8a9795956b1d9e555e8c028090b3373d4374c398",
+      "after": "1866c979b30c4e13fa80d7d5e351f815944c1588"
+    },
+    {
+      "path": "android/app/build.gradle",
+      "before": "b0814c0e8e32a36f19f03773c695d8615c9ad4f9",
+      "after": "c846e2718389cfbdc94338defa831a52c303476f"
+    },
+    {
+      "path": "scripts/test-identity-hero-recovery.mjs",
+      "before": null,
+      "after": "16ed500194bff91ea202d4965e0abdafe57bac7a"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "9614c03be6ca7be7429bd59b94c492dee257bf6d",
+      "after": "16df16631760e0f374d233c824e70e34c26b5d93"
+    },
+    {
+      "path": "scripts/test-series-episode-return.mjs",
+      "before": "e4b1592d3f3e12d3bb965f2d4104150857295e5a",
+      "after": "918a51e401dd89461c75fb469b67d0fa599cb6c7"
+    },
+    {
+      "path": "scripts/test-tmdb-episode-enrichment-ui.mjs",
+      "before": "556eeffb7951d8216cbd8ca134e8bb3cc66f2c39",
+      "after": "a37e1ac9c0467d034caf7b39880ffab30fc49697"
+    },
+    {
+      "path": "scripts/test-c11-source-first-tmdb-artwork.mjs",
+      "before": "b94fc910ed2b787b420d2f796c65382f47552eea",
+      "after": "b1db84f52bac67781ec14a8c0362c788c5496ad7"
+    },
+    {
+      "path": "scripts/test-c107-fire-hero-metadata.mjs",
+      "before": "262dd074203bf3416f4d50a880cff86d64eff3db",
+      "after": "78220c6e4f83b37d133ef3798ea810110908cd63"
+    },
+    {
+      "path": "src/ui/components/TitleCast.tsx",
+      "before": "611fe8e235aeb6988499d95f6adee63b2727f38d",
+      "after": "8432d563131dfcce4141d2c581b5ad1c6078c6ed"
+    },
+    {
+      "path": "scripts/test-actor-profile.mjs",
+      "before": "dabfd38aaf737939adbf727af97f8dfdd848586f",
+      "after": "c50ba98ac68cd1ca371ae9eb547772ea82c83506"
+    },
+    {
+      "path": "scripts/test-detail-hero-refinement.mjs",
+      "before": "dcd23cff7b5901e504e0cc79b4908bebe318ab6d",
+      "after": "64c7630492ff8ab985d8efab4b098c1a3042f241"
+    }
+  ],
+  "restrictions": [
+    "Preserve50 received receipts and204controls41suites; only actual helper export ports added in two old UI fixtures, every assertion/deadline retained.",
+    "No source/backend/Git/reset/other-device installation/next gate."
+  ]
+}

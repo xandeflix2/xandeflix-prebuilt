@@ -1,0 +1,29 @@
+[
+  {
+    "event": "progress",
+    "positionMs": 0,
+    "durationMs": 0,
+    "ended": false
+  },
+  {
+    "event": "resume",
+    "positionMs": 0,
+    "ended": false,
+    "errorCode": "NATIVE_ERROR",
+    "errorCategory": "NETWORK_TIMEOUT",
+    "media3ErrorCode": 2001,
+    "checkpoint": "DATASOURCE_OPEN"
+  },
+  {
+    "event": "progress",
+    "positionMs": 0,
+    "durationMs": 0,
+    "ended": false
+  },
+  {
+    "event": "progress",
+    "positionMs": 0,
+    "durationMs": 0,
+    "ended": false
+  }
+]

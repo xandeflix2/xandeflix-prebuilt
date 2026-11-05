@@ -1,0 +1,13 @@
+{
+  "observedUTC": "2026-11-05T01:33:50.630Z",
+  "status": "DETAILS_COMPARED",
+  "sourceBindingStable": true,
+  "bytes": 14119,
+  "episodeRows": 12,
+  "selectedMatches": 1,
+  "seasonsShape": "ARRAY",
+  "declaredExtension": "mp4",
+  "requestExtension": "mp4",
+  "hasInfo": true,
+  "alternateReferenceFields": []
+}

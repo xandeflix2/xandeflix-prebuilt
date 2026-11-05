@@ -1,0 +1,23 @@
+[
+  {
+    "name": "01_CANONICAL_BEFORE",
+    "script": "scripts/verify-canonical-contract.mjs",
+    "startedUTC": "2026-11-05T10:57:46.887Z",
+    "finishedUTC": "2026-11-05T10:57:50.491Z",
+    "exitCode": 0
+  },
+  {
+    "name": "02_C11_BEFORE",
+    "script": "scripts/test-c11-new-device-activation-lock.mjs",
+    "startedUTC": "2026-11-05T10:57:50.492Z",
+    "finishedUTC": "2026-11-05T10:58:07.732Z",
+    "exitCode": 0
+  },
+  {
+    "name": "03_REGRESSION_BEFORE",
+    "script": "scripts/test-canonical-regression.mjs",
+    "startedUTC": "2026-11-05T10:58:07.733Z",
+    "finishedUTC": "2026-11-05T11:03:13.401Z",
+    "exitCode": 0
+  }
+]

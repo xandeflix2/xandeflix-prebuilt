@@ -162,15 +162,18 @@ function runtimeConfig(record: LocalSecureSourceRecord): SourceRuntimeConfig {
 
 function normalizeDetails(value: unknown, seriesId: string, providerSeriesId: string, config: SourceRuntimeConfig): CatalogSeriesDetails {
   const payload = object(value), episodeGroups = object(payload?.episodes);
-  if (!payload || !episodeGroups || !Array.isArray(payload.seasons)) invalid();
+  const rawSeasons = Array.isArray(payload?.seasons)
+    ? payload.seasons
+    : (payload?.seasons && typeof payload.seasons === 'object' ? Object.values(payload.seasons) : undefined);
+  if (!payload || !episodeGroups || !rawSeasons) invalid();
   const info = object(payload.info);
   if (info?.series_id !== undefined && providerId(info.series_id) !== providerSeriesId) invalid();
   const seasonMetadata = new Map<number, Record<string, unknown>>();
-  for (const entry of payload.seasons) {
+  for (const entry of rawSeasons) {
     const season = object(entry);
     if (!season) invalid();
     const number = integer(season.season_number);
-    if (seasonMetadata.has(number)) invalid();
+    if (seasonMetadata.has(number)) continue;
     seasonMetadata.set(number, season);
   }
   const seasons: Season[] = [], episodes: Episode[] = [], streams: StreamRef[] = [];
@@ -184,8 +187,13 @@ function normalizeDetails(value: unknown, seriesId: string, providerSeriesId: st
       const episode = object(entry);
       if (!episode) invalid();
       const id = providerId(episode.id);
-      const episodeNumber = integer(episode.episode_num, 1);
-      if (episode.season !== undefined && integer(episode.season) !== seasonNumber) invalid();
+      const episodeNumber = integer(episode.episode_num, 0);
+      if (episode.season !== undefined) {
+        const epSeason = typeof episode.season === 'string' && !/^\d+$/.test(episode.season)
+          ? Number(episode.season.replace(/\D+/g, ''))
+          : integer(episode.season);
+        if (epSeason !== seasonNumber) invalid();
+      }
       if (episodeIds.has(id)) invalid();
       episodeIds.add(id);
       if (episodeIds.size > DIRECTORY_DETAILS_MAX_EPISODES) throw new Error('DIRECTORY_DETAILS_LIMIT_EXCEEDED');

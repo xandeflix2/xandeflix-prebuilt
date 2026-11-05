@@ -34,6 +34,11 @@ public final class ArtworkDiskCache {
         } catch(Exception ignored) { throw new IOException("CACHE_KEY_FAILED"); }
     }
     public File getCached(String uri,long now) throws IOException { return cached(key(uri),now); }
+    private String scopedKey(String uri,String scope) throws IOException {
+        if(scope==null || !(scope.equals("legacy") || scope.matches("s_[A-Za-z0-9_-]{8,80}"))) throw new IOException("CACHE_INVALID_SCOPE");
+        return key(scope.equals("legacy") ? uri : scope+"\u0000"+uri);
+    }
+    public File getCached(String uri,String scope,long now) throws IOException { return cached(scopedKey(uri,scope),now); }
     private void index(long now) throws IOException {
         if(indexed)return;
         if(!directory.isDirectory() && !directory.mkdirs() && !directory.isDirectory())throw new IOException("CACHE_DIRECTORY_FAILED");
@@ -65,7 +70,10 @@ public final class ArtworkDiskCache {
         return null;
     }
     public File get(String uri, long now, Fetcher fetcher, Validator validator) throws IOException {
-        String key=key(uri);File hit=cached(key,now);if(hit!=null)return hit;
+        return get(uri,"legacy",now,fetcher,validator);
+    }
+    public File get(String uri,String scope,long now,Fetcher fetcher,Validator validator) throws IOException {
+        String key=scopedKey(uri,scope);File hit=cached(key,now);if(hit!=null)return hit;
         FutureTask<File> task=new FutureTask<>(()->load(key,uri,now,fetcher,validator));
         FutureTask<File> existing=pending.putIfAbsent(key,task);
         if(existing!=null)task=existing;else task.run();

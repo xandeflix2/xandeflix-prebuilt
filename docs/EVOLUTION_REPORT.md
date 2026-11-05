@@ -3882,3 +3882,812 @@ User now reports playback starts then stalls repeatedly on slow connections. Buf
 ## CANON-01-A22A-WINDOWS-METADATA-EOL — 2026-10-22
 
 Windows CI test fixture failure diagnosed: scripts/test-vercel-prebuilt-contract.mjs asserted ATTEST_ARTIFACT_METADATA_PERMISSION against raw workflow string, failing under CRLF checkouts on GitHub Actions Windows runners. Scoped patch asserts against lfWorkflow. Minimal chained receipt CANON-01-A22A-WINDOWS-METADATA-EOL added; all 19 historical/prior receipts, 128 canonical controls / 23 suites and 116 dedicated prebuilt controls preserved. No Android, runtime, backend, workflow or production changes. No automatic commit/push/PR.
+
+
+## CANON-01-VERCEL-PREBUILT-RECOVERY-01 — L1 local adoption/registration — 2026-10-23
+
+Latest user authorizes autonomous review/adoption of the three preexisting partial L1 changes. Incoming bytes/diff preserved; original author not inferred. Committed HEAD d8a7410 baseline passed3/3 in isolated same-branch full-history copy (20 receipts,891 protected files,128 controls/23 suites,116 dedicated controls), without restoring the active worktree. Only POLICY.ref changes in implementation; tests add branch/anchor/context/SHA/workflow and receipt-chain negatives. New21st chained receipt registered with real UTF-8/LF authorization SHA25665d5f1bc7871986f2f0db0faea569323be7f831dcb325070ff058299c456e89e. Original specification prefix and all20 old receipts preserved. Full13 real-worktree validations still PENDING. No verifier/workflow/runtime/native/backend/version/Git publication change; real build/signature/deploy and C1/L2–L5 remain unexecuted.
+
+
+## CANON-01-VERCEL-PREBUILT-RECOVERY-01 — conclusão local L1 — 2026-10-23
+
+RESULT=L1_LOCAL_READY_FOR_CHAT_MASTER_REVIEW. Treze comandos executados em sequência na árvore real, todos exit0 na primeira tentativa completa. Baseline separado3/3 exit0 no HEAD comprometido. Canonical135 controles/23 suítes, preservados nominalmente todos128 controles anteriores e todas23 suítes; Prebuilt127 controles, preservadas as linhas de teste dos116 anteriores.891 arquivos protegidos;21 recibos totais,20 anteriores byte a byte preservados. Somente POLICY.ref muda na implementação; receivedHead/baseline/projeto/equipe/preview/CLI/pin/OIDC/credenciais permanecem.
+
+Allowlist exatamente10 caminhos, index vazio, HEAD/branch/main inalterados. Especificação original e4 documentos normativos preservam prefixos de bytes. git diff --check PASS;0 whitespace inesperado nos untracked,10 hard breaks Markdown preservados. A primeira varredura auxiliar sinalizou2 literais de credenciais sintéticas de testes negativos preexistentes; conferência contra HEAD comprovou identidade exata, mantidos os testes e classificadas as fixtures explicitamente.0 padrão de credencial privada nova identificado. Não houve falha de comando oficial, ajuste de timeout/assertion ou segunda tentativa.
+
+Auth SHA256 65d5f1bc7871986f2f0db0faea569323be7f831dcb325070ff058299c456e89e; recibo blobLF 9cb685590481ba094ffbca2e2abe2f585aa3ae46; recibo SHA256 f0a49ca75427803a1c8842c47b84910a47cb3417d3efc6e798aa5b0d207c6832. Transcrição completa está na evidência e reproduz os bytes normalizados. Isso não é assinatura humana criptográfica. Logs/diff/hashes em tmp/canon-01-vercel-prebuilt-recovery-01-l1-20261023. Nenhum Git add/commit/push/merge/PR, workflow remoto, Prebuilt real, atestação real, deploy, build Android, mudança de versão, dado ou Supabase. C1/L2–L5 permanecem apenas planejados.
+
+
+## CANON-01-OPAQUE-HLS-MIME-RECOVERY — isolated conditional P1, 2026-10-23
+
+Fire Stick normal UI reproduced opaque HLS UnrecognizedInputFormatException. Baseline135 controls/23 suites,127 Prebuilt and C11 PASS. Nine unchanged new JVM tests failed before patch (seven missing MIME-hint method; two missing native entry wiring). Two setup failures are recorded separately: missing generated Capacitor files, then the canonical guard correctly rejected the still-unregistered new test during web build. Ordinary baseline web build and sync prepared the isolated test environment; no guard was skipped. Minimal shared MIME hint now binds both preview and fullscreen for strict opaque HTTP(S) HLS paths. URI/query/headers/candidates, TS and VOD inference preserved. Validation of patched tree PENDING. No claim of startup optimization or physical recovery. Authorization transcript SHA256 92cd46c5247e1fa08746e5c36491e2d1f024ca577d52748bb53133edba47374f. Original L1/21 receipts are unchanged in active workspace; new receipt exists only in isolated copy. No install/Git/backend/Vercel.
+
+
+## CANON-01-OPAQUE-HLS-MIME-RECOVERY — conclusão local isolada, 2026-10-23
+
+Os 13 comandos oficiais passaram com exit code 0; 140 controles/23 suítes canônicas, 127 Prebuilt, 892 arquivos protegidos e 22 recibos totais. Todos os 21 recibos recebidos e a L1 foram preservados byte a byte. Android: 215 testes/36 suítes, 0 falhas/erros/skips, incluindo os mesmos 9 testes que falharam antes do patch. assembleDebug e lock C11 final PASS. A recuperação física permanece pendente: nenhuma instalação foi executada. A lentidão da primeira importação continua PENDING, sem alteração do importador. Cópia isolada e APK experimental não publicados. Nenhum Git add/commit/push/main, Vercel, backend ou dado de aparelho alterado pelo agente.
+
+
+## CANON-01-STREAMED-VOD-INVENTORY-RECOVERY — 2026-10-23
+
+Usuário aprovou exceção nominal para leitura global VOD em fluxo:64 MiB brutos,256 KiB/objeto,profundidade32,200000 raízes,16 MiB projetados retidos. JSON convencional16 MiB e classificação XUI intactos. Categorias/playlist não provaram cobertura; varredura M3U225314ms no Fire não recuperava o tempo. Teste vermelho real reproduziu DIRECTORY_JSON_TOO_LARGE em19453789bytes/18000 títulos sem staging. O leitor novo valida documento inteiro,UTF-8,IDs/tipos/limites; só erro de tamanho VOD autoriza uma tentativa em fluxo. Todas as listas completas precedem staging/promoção. IDs,URLs C105,autoridade,legado,HLS e episódios sob demanda preservados. Steering posterior restaura fundo público TMDB na tela de ativação reutilizando a apresentação existente; nenhuma alteração de handlers/identidade/licença/source/polling. Allowlist13 caminhos. Validação integral e teste físico PENDING; reinstalação limpa apenas Fire depois de APK auditado e ativação legítima pelo usuário. Sem Git/backend/Vercel/main/versão. Autorização SHA256 083f0fc139d66586010a9d73abc7859ca0e610850377f3aa8982daafbc4cc304.
+
+
+## Refinamento validado após falha real — 2026-10-23
+
+Primeiro candidato:13 comandos locais,147 controles/24 suítes,38 testes dedicados e build Android PASS; não instalado. Três leituras reais rejeitaram registros repetidos. Inspeção instrumental separada demonstrou oito IDs com conteúdo idêntico e categorias diferentes; ela não é um PASS do candidato. Novo leitor preserva todas as memberships e falha para diferenças de nome/formato/capa/ano. Limite200000 considera registros brutos,incluindo duplicatas; limite16MiB projetados também inclui memberships e teto512 categorias por filme. Campo interno não vem do provedor. Uma falha de teste transitória detectou mudança do código público de erro HTTP; corrigido mapeamento para DIRECTORY_JSON_FETCH_FAILED, sem relaxar a assertion.
+
+Transferência única: até16MiB, documento original/digest preservados; acima, parser incremental do prefixo limitado e resto, sem refetch. As duas listas pesadas se sobrepõem com no máximo dois pedidos de alto nível, ambos aguardados em falha antes de fallback. Testes novos exigem overlap e drenagem. Aprovação de bounds mantida; no source/identity/license/C9/native/version/backend change.
+
+Leitura real final do helper SEM relaxar duplicatas:43996 registros brutos/43988 filmes únicos,8 memberships preservadas,17078782bytes brutos e8589017projetados,65296ms. Cinco listas companheiras válidas,9470 raízes de séries,2034 canais; ponteiro ativo preservado. Prova sanitizada streamed-real-provider-proof-1792775463134.json. Helper SHA256 7809663205e757302129dd5bebf20e84c856f553cef81c26f6df471f90ef191b. Não é teste de instalação nova nem promessa90s. Segunda validação integral dos bytes refinados PENDING; recibos22 anteriores e L1 intactos.
+
+Grants atualizados somente no recibo NOVO ainda não publicado:
+
+```json
+[
+  {
+    "path": "src/source/source-streamed-vod-inventory.ts",
+    "before": null,
+    "after": "e6b2939976e44a150464827b28bc0c19c819c909"
+  },
+  {
+    "path": "src/source/real-source-importer.service.ts",
+    "before": "1ca46d9658b11d3a290206da12fd0b6892744b88",
+    "after": "662562db833c93c192703cd3f15b394ae1cc57f5"
+  },
+  {
+    "path": "scripts/test-streamed-vod-inventory.mjs",
+    "before": null,
+    "after": "aa45b21d1c22659801d960612fff323eb4fde77e"
+  },
+  {
+    "path": "src/ui/pages/ActivationPage.tsx",
+    "before": "611c2be793792abf3cc378235ba41b626f67f287",
+    "after": "e2d3f1b854dbfbf60c20fb47842fdc8c350f7c4a"
+  },
+  {
+    "path": "src/ui/pages/ActivationPage.css",
+    "before": "77622641076122d7afe12e8cac9c8145f1f1d442",
+    "after": "d6503d335067dce24f1624c4505491604f844aeb"
+  },
+  {
+    "path": "scripts/test-canonical-regression.mjs",
+    "before": "d752c9915c36f25582a961f63a100025e6ceddf5",
+    "after": "4aa9f24b83f2080008396cefc8d3d0a8867a3cd7"
+  }
+]
+```
+
+
+## CANON-01-STREAMED-VOD-INVENTORY-RECOVERY — validação final local, 2026-10-23
+
+RESULT=LOCAL_VALIDATED_FIRE_CLEAN_INSTALL_PENDING. Candidato final:13 comandos oficiais em sequência, todos exit0;147 controles canônicos/24 suítes,894 arquivos protegidos,23 recibos,127 controles Prebuilt. Testes dedicados46 PASS, inclusive memberships completas, conflitos, um único request global,overlap de duas raízes e drenagem em falha. Digest HLS legado,TS/mpegts e12 testes C105 preservados. C115 tendências públicas e C165 transição após ativação PASS. Build Android/lock final concluídos; auditoria de assinatura/assets e instalação física ainda PENDING nesta anotação.
+
+Falhas preservadas: três tentativas reais do primeiro candidato rejeitaram IDs duplicados; a inspeção que permitia duplicatas foi exclusivamente diagnóstico, nunca PASS do release. Leitura posterior sem relaxação validou43988 filmes únicos/43996 registros e oito memberships,9470 séries e2034 canais. Uma assertion transitória detectou mudança de código de erro HTTP, corrigido mantendo o código compatível. Tentativa2 da validação integral perdeu o código de saída quando o watchdog EXTERNO de300s terminou; seu processo filho concluiu147/24 PASS e foi aguardado antes de repetir. Tentativa3 usou900s somente no orquestrador externo e concluiu com exit0 real; timeouts/assertions do projeto não foram modificados.
+
+Todos22 recibos recebidos, arquivos nativos HLS,package/lock,versão e workspace L1 preservados. Novo recibo atualizado somente antes do fechamento; nenhum recibo histórico reescrito. Não houve Git add/commit/push/main,Vercel,Supabase administrativo ou outro Gate. Homologação de primeira instalação90s e imagens no Fire não é substituída por mocks ou leitura quente. Usuário ainda realizará ativação normal após a instalação limpa autorizada, com espera humana separada.
+
+
+## CANON-01-TABLET-SIDEBAR-TRANSPARENCY — 2026-10-23
+
+Pedido explícito: transparência do menu lateral TABLET e atualização ADB in-place. A faixa escura vinha do shell/ausência de extensão do fundo imersivo, não da opacidade do header. Somente CSS tablet+side-nav, excluído retrato, estende background herdado; mantém80px de rail, hit targets, ícones, foco, callbacks e estilos TV/phone. Novo recibo com2 grants encadeados,23 históricos intactos. Autorização UTF-8/LF SHA256 eed871d7101e7c757650d09709e8af97004106176d2aae259ee3955388698401. Baseline147 controles/24 suítes,894 protegidos,C11 PASS; validação final/build/instalação PENDING. Sem reset/rotação/fonte/backend/versão/Git/main ou próximo Gate.
+
+
+## CANON-01-HERO-PLATFORM-COMPOSITION — 2026-10-23
+
+Usuário pediu logo abaixo do título à esquerda do gênero e junto ao carregamento dos demais dados. SharedHero preserva todos callbacks,metadados/catálogo e plataforma existente. Logo16px reutiliza a linha do gênero. Removido delay fixo2s somente da logo; diretório BR validado/TTL/cooldown/credenciais intactos, peek imediato e prefetch pequeno no hook de capas após filtro parental, sem await/readiness gate. Imagem ainda depende de onLoad. Novo recibo9 grants,24 recibos anteriores íntegros. Fonte em fluxo/HLS/menu transparente/ativação preservados. Baseline por hashes do release anterior +canon exit0 e testes dedicados; duas fixtures antigas incompletas foram diagnosticadas antes do patch. Validação final/layout/APK/físico PENDING. Auth SHA256 991e26d1e09fcd6fea37f79401fdbd8aaeb9469d2256370f58ec8229259f694c. Sem Git/main/deploy/backend/reset/versão ou próximo Gate.
+
+
+## CANON-01-HERO-PLATFORM-COMPOSITION — fechamento local: logo32px e canto do tablet, 2026-10-23
+
+RESULT=PASS. Logo dobrada16→32px conforme pedido posterior explícito, abaixo do título à esquerda do gênero. Candidato16px e candidato32px anterior à correção do canto preservados em tmp; nenhum recibo histórico foi reescrito. Espera fixa2s removida, cache válido no primeiro render e prefetch público opcional bounded, sem bloquear título/sinopse/catálogo e sem garantir simultaneidade em rede fria. Imagem continua dependente de onLoad real.
+
+Causa do retângulo confirmada por CDP no tablet instalado: faixa Voltar começa emx80,y0 e main imersivo emy44. A extensão lateral do main não cobre o espaço superior atrás do X. CSS mínimo estende o ::before do back-row browse/detail até x0 com a mesma cor --navigation-ambient, isolamento atrás dos controles e pointer-events:none. Sem mudança de geometria ou de perfis celular/TV/portrait. Chrome real/CSS real em10 cenários sintéticos reproduziu o gap original e confirmou correção, fallback e perfis inalterados. Hero real/metadados sintéticos em12 cenários confirmou32px, posição, ausência de overflow/spacer e sem sobreposição. Gap normal do tablet41px preservado; celular+9px e Fire+14.5px são crescimento natural da linha para acomodar a imagem maior.
+
+Treze comandos oficiais do estado final exit0;147 controles/26 suítes,15 testes de logos e11 de metadata preservados/aprovados; prioridades e carrossel PASS. C11 antes de entregar e canon após cópia/fechamento PASS. Nenhum assertion histórico/timeout foi reduzido nem skip incluído. O primeiro teste visual auxiliar32px estimava incorretamente crescimento compacto máximo10px; medição foi preservada e o critério foi corrigido para16px, a diferença exata entre tamanhos, mantendo dimensão exata e asserts de não sobreposição.
+
+APK Xandeflix-v1.0.37-hero-plataforma-32px-tablet-20261023.apk SHA256 08b695465c2e2de1175f6d4b5551674ec0aceb4387b771c18d2087698ae0716f,1.0.37/code37 e certificado mantidos. Atualização tablet SM-X610 install-r, sem reset/limpeza. Identidade/chave/ativação/fonte/parental/ponteiro/manifesto/catálogo comparados em memória antes/depois; todos preservados, assim como firstInstallTime. Sem exportar hashes privados. Quatro páginas físicas conferidas por navegação normal: Filmes, Séries e detalhes de ambos, cantos PASS. Logos presentes em0 amostras; carregadas e visíveis em0. Ausência de logo opcional não é aprovação sintética de imagem. Não foi iniciada reprodução nem alterada fonte.
+
+Native215 testes/36 suítes/0 falhas/erros/skips são evidência real reutilizada do release anterior com bytes nativos idênticos, não nova execução. Allowlist16 caminhos,9 grants e25 recibos totais;24 históricos íntegros. Prefixos dos documentos recebidos preservados. Todas as mudanças funcionais ficam no workspace operacional isolado e são apresentadas em full-final.diff/hashes-final.json. Root ativo/L1/branch/HEAD/main e APKs anteriores preservados. Sem Git add/commit/push/PR/merge/main/Vercel/Supabase administrativo/versão/outro aparelho/próximo Gate.
+
+
+Verificação física adicional: aberto Ver todos da categoria Netflix por navegação normal do tablet. PHYSICAL_PLATFORM_LOGO32.json confirmou logo real da API carregada e visível,32x32 CSS px exatos, abaixo do título/à esquerda do gênero/antes da sinopse, sem imagem sintética ou fonte alterada. Screenshot tablet-logo32-netflix.png. As quatro amostras iniciais não tinham logo reconhecida; isso não foi mascarado como logo carregada. Screenshot tablet-final-series32-corner.png confirmou visualmente o canto corrigido com arte real.
+
+
+## CANON-01-HERO-PLATFORM-ALIGNMENT — registro anterior à validação final, 2026-10-23
+
+Pedido explícito: centralizar o gênero no meio da logo32px e separar a sinopse por12px. Patch CSS mínimo: flex center e margens inferiores iguais apenas para slot não vazio/gênero adjacente. Preservados fundo/canto transparente,32px, antecipação opcional e comportamento sem logo. Novo26º recibo2 grants encadeados ao HERO-PLATFORM-COMPOSITION,25 anteriores íntegros. Auth SHA256 83762cc1e81655fd1219e90cbd373268e1d149038b7e8c7ed640fab0e1c4c8d5. Baseline completo reutilizado por todos os bytes do release anterior, canon/C11 antes do patch exit0. Validação visual/APK/físico finais PENDING. Sem native/versão/fonte/Git/main/backend/reset/outros aparelhos/próximo Gate.
+
+
+## CANON-01-HERO-PLATFORM-ALIGNMENT — conclusão local e tablet, 2026-10-23
+
+RESULT=PASS. Gênero centralizado pelo centro real do bloco de texto com a logo32px, e sinopse separada por pelo menos12px. CSS somente: align-items:center; slot sem margem superior/com12px inferior; parágrafo adjacente recebe a mesma margem inferior somente quando o slot não está vazio. Nenhum ajuste absoluto/transform/:has. Sem logo, margens anteriores e ausência de spacer preservadas.
+
+Chrome real/CSS e Hero reais com fixtures sintéticas:12 casos PASS, incluindo Home/Filmes/Séries, phone/tablet/Fire/TV/web, gênero longo/ausente e logo ausente. As duas falhas anteriores foram reproduzidas pelas medições de antes; nenhum erro de rede foi usado como causa. A amostra física de baseline Home não tinha logo carregada e foi honestamente registrada como tal. Após update in-place, categoria Netflix aberta por navegação normal confirmou logo real32px carregada/visível, delta de centro gênero/logo 9.5367431640625e-7px, espaço logo/sinopse 12px. Screenshot tablet-alignment.png, sem imagem injetada ou fonte alterada.
+
+Todos13 comandos oficiais exit0,147 controles/26 suítes,894 protegidos,127 Prebuilt. Baseline completo anterior reutilizado por igualdade SHA256 de todos os arquivos; baseline canon/C11 também executados antes do CSS. Cópia Capacitor, assembleDebug, C11 antes da entrega e canon após copy/fechamento exit0. Native215 testes/36 suítes/0 falhas/erros/skips são evidência real reutilizada da etapa anterior com bytes nativos idênticos, não nova execução. Sem redução de assertion/timeout/skip.
+
+APK Xandeflix-v1.0.37-hero-plataforma-alinhada-20261023.apk, SHA256 63f3232b049c8052542e0239fa0f1d43bb727bc81d8770a5022227e8b2c3513f, versão1.0.37/code37/package/certificado preservados, assets conferidos e sem dados/credenciais privadas encontrados. Tablet SM-X610 install-r, sem reset/uninstall/restore. firstInstallTime e todos os registros privados medidos de identidade/chave/ativação/fonte/parental/catálogo preservados por comparação em memória; nenhum valor/hash privado persistido. Nenhum outro aparelho foi instalado.
+
+Gate26 com2 grants; todos25 recibos históricos preservados. Allowlist9 caminhos, prefixos documentais recebidos preservados, CSS anterior mantido como prefixo, runner só acrescenta a identidade da emenda. Nenhuma alteração TSX/hook/serviço/API/fonte/player/Android/version/package/lock. Root ativo/L1/branch/HEAD/main e APKs anteriores intactos; sem Git add/commit/push/PR/merge/Vercel/Supabase administrativo ou próximo Gate. Evidências/diff/hashes em tmp/hero-platform-alignment-20261023.
+
+
+A primeira inspeção após install-r terminou VISUAL_VERIFICATION_PENDING: Home montada, dados preservados, mas header foi observado durante estado de fundo. A primeira medição de logo tinha geometria correta porém document.visibilityState hidden e ficou FAIL, preservada em PHYSICAL_ALIGNMENT.json. Leitura nativa confirmou tablet acordado e sem keyguard; reaberto normalmente am start -W, sem reset/reinstalação/bypass, e a página voltou visible/focused. TABLET_UI_RECHECK.json confirmou header transparente, Home/fundo/extensão e mesma geometria. PHYSICAL_ALIGNMENT_RECHECK.json confirmou logo real carregada em primeiro plano, centro delta≈0 e12px de respiro. Nenhuma mudança de código ou ajuste de assertion/timeout foi feita entre essas medições. As evidências iniciais continuam intactas; o resultado final usa a nova execução positiva.
+
+
+## CANON-01-LIVE-SINGLE-TRANSPORT — 2026-10-23
+
+Autorização expressa atual para retirar GET diagnóstico extra e gerar APK/testar dois aparelhos. Recebido1364 arquivos/26 recibos verificados; baseline canon/C11 exit0, canon147/26 real recente reutilizado por inputs idênticos. RED detectou ambos callers antigos. Patch apenas remove disparos de probe de fullscreen/preview, mantendo observação passiva/Media3/buffer/C9/HLS/fonte/dados/versão. Novo recibo27 com4 grants reais,3 encadeados e script novo. Suíte dedicada positiva/negativa e controles de integridade adicionais. Auth SHA256 af1f00bdf115b0e1320d4a7945632a5785d51d49bbb8caf0dc243837ba291b39. Validações finais, APK e teste físico PENDING. Duas falhas auxiliares de harness já identificadas na auditoria ficam fora desta emenda; não são reclassificadas como PASS. Sem Git/publicação/backend ou próxima implementação.
+
+
+## Conclusão local — CANON-01-LIVE-SINGLE-TRANSPORT
+
+Treze comandos oficiais exit0,152 controles/27 suítes e895 protegidos,13 cenários dedicados e127 Prebuilt. Todos215 testes nativos/36 suítes executados novamente,0 falhas/erros/skips. Código compilado: 2 callers antigos de probe contra0 novos nos dois players; helper histórico/R6 preservados. Buffer/C9/HLS/versão/fonte/UI não mudam. APK Xandeflix-v1.0.37-live-conexao-unica-20261023.apk SHA256 efc87e066427bd656abcdbefcc063a04b7a8a4ff4c1f35a6d3b131d80ff27f56, mesma assinatura b235c7117c9660e17cf0732cd6493600a812692af289e627454988ea096e848d.
+
+Uma primeira aplicação parou no guard de bloco LF contra arquivo recebido CRLF; ajustado apenas o localizador, preservando EOL e a cópia recebida. Primeiro Gradle não executou testes porque local.properties ignorado tinha escape Windows inválido; caminho SDK verificado corrigido para barras normais e retry real exit0. Logs originais e falhas preservados, sem alteração de timeout/assertion nem código entre13 comandos e retry nativo. Duas falhas auxiliares de harness da auditoria anterior continuam conhecidas e fora da validação ampliada deste patch.
+
+Instalações in-place confirmadas: 2/2; registros privados medidos preservados, sem valores/hashes privados exportados. Homologação física de duas telas: BLOCKED_CATALOG_STARTUP_ERROR. Resultado observado é separado de quota do provedor e de internet lenta controlada. Nenhum Git add/commit/push/PR/merge/main, deploy, mudança administrativa Supabase/Vercel, fonte/licença, reset ou nova implementação.
+
+
+Resultado físico final: BLOCKED_CATALOG_STARTUP_ERROR. Tablet e Fire Stick exibiram “Não foi possível concluir o carregamento”, após resolver fonte e iniciar sincronização, antes da navegação normal de canais. Nenhum player foi iniciado pelo teste; buffer, queda de rede e duas telas reais NÃO foram medidos/aprovados. A causa detalhada da falha de catálogo e sua relação com este APK permanecem indeterminadas; não atribuir ao provedor ou à correção sem evidência. Metadados privados foram conferidos byte a byte imediatamente após cada instalação, antes da abertura normal; a importação normal posterior pode atualizar catálogo. A primeira tentativa no Fire Stick parou antes da instalação por ausência do executável test no Fire OS, não por ausência dos registros privados: verificação via sh/test comprovou o falso negativo, e a retomada somente no Fire Stick preservou todos os11 registros medidos. Nenhum dado foi limpo. Procedimentos/evidências iniciais preservados. RESULT=BLOCKED_PHYSICAL_VALIDATION; APK_LOCAL=PASS; INSTALLED=2/2; DUAL_PLAYBACK=NOT_RUN; PHYSICAL_BUFFER=NOT_RUN.
+
+
+## R2 — correção de empacotamento e retomada física — 2026-10-24
+
+A investigação posterior confirmou a causa da regressão de catálogo do R1: o build novo por cap copy omitiu o asset gerado e ignorado capacitor.plugins.json. Filesystem/Browser/Share não eram registrados; a importação terminava em not implemented, embora o download de fonte respondesse HTTP2xx. Os três APKs anteriores tinham o registro. O status bloqueado anterior permanece como evidência histórica e não é a conclusão do R2. Falha de empacotamento assumida pelo executor, sem atribuição ao provedor.
+
+Correção: gerar somente o asset ignorado com writePluginsJson da CLI Capacitor instalada, usando plugins reais. Registro semanticamente igual ao APK anterior; quatro negativos rejeitam R1 sem registro, Filesystem ausente, duplicata e classe errada. Nenhum código/recibo/CLI/dependência/Gradle/configuração mudou. A comparação dos ZIPs R1/R2 comprovou somente capacitor.plugins.json e metadados de assinatura diferentes; DEX/manifest/resources/web idênticos. Cinco verificações adicionais de empacotamento/build/lock/canon exit0.
+
+APK R2 Xandeflix-v1.0.37-live-conexao-unica-corrigido-20261024.apk; SHA256 38f8e421f10d24beeee2b5bde602b41f183943afebbc95dddef05c039722c077; bytes 11482629; package com.xandeflix.prebuilt,1.0.37/code37, mesma assinatura. R1 preservado para auditoria e rejeitado para entrega. Atualizações in-place tablet+Fire Stick concluídas;11 registros privados conferidos em RAM e primeira instalação preservados por aparelho, sem valores/hashes privados registrados. Plugins registrados, stat do ponteiro local e Home/navegação confirmados nos dois. Celular não atualizado: última correção expressa do usuário informa conta diferente. Par de simultaneidade permanece tablet+Fire Stick, mesma conta segundo usuário, sem quota presumida como consultada.
+
+A primeira observação física R2 terminou em EVALUATION_TIMEOUT; o usuário informou ter reiniciado a conexão ruim do Fire Stick. Instante exato não medido, sem atribuir todos os eventos à rede. Evidências iniciais preservadas e classificadas INCONCLUSIVE; a retomada R2B usa o mesmo APK, sem reinstalar. Observação simultânea R2B por 126193ms depois do segundo início: ambos emitiram playing, adquiriram C9 e não emitiram erro de preview/mensagem nem erro nativo observado. Sem novas retomadas/buffering na telemetria observada=true. PROBE_START=0 nos dois. Progresso independente de SurfaceView confirmado em ambos=false; ausência dessa métrica no tablet limita a confirmação independente de vídeo contínuo. Sem interrupção forçada de rede pelo agente, limitação artificial de velocidade, consulta de quota do provedor, PIN/bypass ou terceira reprodução por este teste. Resultado restrito à rede/canais/conta observados; não certifica todas as fontes nem duração de reprodução durante queda. Buffer conserva metas live10–20s/início2,5s/retomada4s, condicionadas à mídia/memória; logs de transição não medem continuamente a reserva. Ao final, navegação normal para Home solicitada para liberar as sessões de teste.
+
+Treze comandos oficiais anteriores exit0,152 controles/27 suítes,895 protegidos,127 Prebuilt e215 testes nativos/36 suítes sem falha/erro/skip permanecem evidências dos mesmos hashes de fonte. Nenhum teste repetido sem necessidade; negativos novos do empacotamento e checks antes/depois registrados separadamente.27 recibos,26 históricos preservados; allowlist11 caminhos e documentos normativos append-only. Sem Git add/commit/push/merge/main, mudança de versão, dados/reset, administração Supabase/Vercel, deploy ou próximo Gate. Evidências: tmp/live-single-transport-20261023/R2_REPORT.md, R2_APK_AUDIT.json, R2_PLUGIN_GENERATION.json, INSTALL_R2_TWO.json, R2_PLUGIN_CAPABILITIES.json, R2B_PHYSICAL_DUAL_RESULT.json.
+
+
+## CANON-01-NETWORK-DIAGNOSTICS — implementação local — 2026-10-24
+
+Pedido atual retomou diagnóstico de internet em Configurações e indicador antes de Voltar em Live, incluindo contagem informada pela fonte. Especificação anterior ao código: docs/architecture/NETWORK_DIAGNOSTICS.md; autorização UTF-8/LF SHA256 aa62eb5c93cb5e7e9e7b6a01e2e22b3a3a43e3500dce33276729e44067715026 (transcrição, não assinatura humana). Trabalho isolado sobre R2, root/L1 e recebido preservados. Grants encadeados: {"scripts/test-canonical-regression.mjs":"CANON-01-LIVE-SINGLE-TRANSPORT"}. Player/buffer/C9, fontes, identidade, versão e dependências preservados; sem instalação/publicação ou escrita administrativa.
+
+Estado nativo sem sondagem, teste manual até5MB/15s com abort/guarda de playback/Cast, contador autenticado até64KiB por minuto em foreground. Nenhum GET de mídia ou contagem fabricada. Preliminar21 cenários PASS; revisão visual refinou título/altura do telefone e5 layouts confirmaram posição antes/centralizada com Voltar. Settings sintético confirmou zero solicitações automáticas, resultado manual, cancelamento sem falso resultado e fechamento. Fixtures não certificam aparelhos. Validações13 comandos/testes nativos/APK PENDING neste registro.
+
+
+## CANON-01-NETWORK-DIAGNOSTICS — conclusão local — 2026-10-24
+
+RESULT=LOCAL_READY_FOR_DEVICE_TEST. Internet e conexão em Configurações, medição manual de download/resposta HTTP, indicador OS de transporte/internet junto à esquerda de Voltar e contagem active_cons/max_connections quando válida. Sem contagem fabricada, enforcement, GET extra de mídia ou mudança no player/C9. Metadados da fonte atualizados em foreground a cada60s depois de concluir a consulta, com limite64KiB; teste público até5MB/15s, cancelável e bloqueado por reprodução/Cast. Web online permanece acesso não confirmado.
+
+Treze comandos oficiais exit0 na árvore isolada. Canônico168 controles/28 suítes, preservados152/27 anteriores; nova suíte21 cenários. Android222 testes/37 suítes executados com0 falhas/erros/skips. Cinco layouts em navegador e fluxo Settings passaram com fixtures, incluindo zero solicitações automáticas e foco restaurado ao cancelar. Endpoint público respondeu HTTP200/CORS para origem local em GET de0bytes; não foi medido throughput real em aparelhos. Novo plugin compilado/registrado, três plugins base presentes no APK, permissões iguais ao R2, todos assets dist conferidos, sem padrão de credencial privada detectado.
+
+APK de teste Xandeflix-v1.0.37-diagnostico-internet-20261024.apk SHA256 ba3ba5bbc99d1d825f308978a9aab68046a5042e13350a09b5f30e6b8724759a,11423505bytes, mesma versão1.0.37/code37/package/assinatura. Nenhum dispositivo atualizado neste ciclo: validação física do novo recurso PENDING e congelamento Live previamente relatado não corrigido por esta feature. A observação anterior10min34s pertence ao R2 anterior e não é evidência física deste APK.
+
+Vinte e sete recibos anteriores intactos, novo28º recibo LF 80a4d01348eb82b4a7cafd4836c3f221d97e02e5, SHA256 be38ad8db5fc38cf700adebee4be7bb845a10797bc6c0401166705b016a79030. Allowlist21 caminhos; root/L1 e recebido congelados, documentos normativos append-only. Sem Git add/commit/push/PR/merge/main, atualização administrativa Supabase/Vercel, reset, versão nova ou próximo Gate. Preparação: guard Unicode de integração retomado sem descartar import; teste SSR preliminar precisava de React real no harness; revisão de imagem encontrou título/altura do telefone e refinou CSS/asserções antes dos13 comandos. Nenhum teste foi enfraquecido para esconder falha.
+
+
+## CANON-01-NETWORK-UI-POLISH — implementação local — 2026-10-24
+
+Pedido atual autoriza alinhamento das ações mobile, respiro na janela de internet e relatório de três dispositivos. Especificação anterior ao código: docs/architecture/NETWORK_UI_POLISH.md, allowlist10; transcrição UTF-8/LF SHA256 63c831c00022457ea95374e48e1379335099e704b93a4cf39295b9c77653ed84, sem alegação de assinatura humana. Baseline real canon/check/test/C11 PASS,168 controles/28 suítes. Patch funcional restrito a2 CSS; nenhum callback, métrica, endpoint, guarda, contador, código nativo, player/buffer/C9 ou versão muda. Recibo29 encadeia {"src/ui/components/NetworkDiagnostics.css":"CANON-01-NETWORK-DIAGNOSTICS","src/ui/pages/LiveTvPage.css":"CANON-01-NETWORK-DIAGNOSTICS","scripts/test-canonical-regression.mjs":"CANON-01-NETWORK-DIAGNOSTICS"}. Capturas do usuário: celular48,9Mbps/490ms, tablet98,6/212, Fire7,9/441,5MB cada; não são medições instrumentadas pelo executor nem certificam estabilidade/provedor. Resultados finais dos13 comandos/APK serão anexados; nenhum dispositivo instalado/resetado.
+
+
+## CANON-01-NETWORK-UI-POLISH — conclusão local — 2026-10-24
+
+RESULT=LOCAL_READY_FOR_DEVICE_TEST. Patch funcional2 CSS e condição visual no Header: botão18+ ausente somente no topo Live; todos ícones de Live mobile, inclusive retorno Cast conectado, em uma única linha com alvos44px e Wi-Fi apenas ícone colorido, indicador diretamente antes de Voltar, título/total abaixo; corpo Internet e conexão com padding20–24px, ritmo16px e cartões adaptáveis. Nenhuma lógica de medição/fonte/player/C9, callback ou código nativo mudou. Baseline3 comandos PASS;13 comandos oficiais finais exit0. Canônico170 controles/28 suítes;21 cenários dedicados anteriores e127 Prebuilt preservados. Android222 testes/37 suítes reexecutados,0 falhas/erros/skips.
+
+Browser QA:14 cenários com Cast real conectado/desconectado, telefone320/360/393 com todos cinco elementos da faixa de ações alinhados/sem sobreposição/altura44; tablet/TV/retrato/quadrado preservados;4 janelas com inset mínimo21px incluindo borda, cards internos, scroll quando necessário, zero teste automático, cancelamento/fechamento/foco PASS. Imagens renderizadas inspecionadas. RED anterior reproduziu desalinhamento/sobreposição mobile e inset1px/cards tocando borda. Primeira execução green usou uma aba sem prontidão de estado confirmado e mostrou contagem indisponível; harness passou a trazer a aba ao primeiro plano e esperar a fixture renderizada, sem alterar produto ou enfraquecer asserts. Uma tentativa inicial de preparação chamou indiretamente o inicializador anterior por nome de argumento e parou antes de escrever; corrigido somente modo do helper. Evidências preservadas. Primeira sequência oficial interrompida durante canon:test pelo executor para tratar ação secundária do Cast (exit4294967295, não PASS); Uma segunda sequência foi interrompida pela orientação adicional do usuário para remover o botão18+ Live, não por falha funcional;13 comandos finais executados novamente sobre o hash final. A sequência r3 também foi interrompida pela última orientação de linha única/ícone Wi-Fi. As três sequências incompletas não são PASS; logs e recibos preliminares preservados. Helpers de registro presumiram inicialmente predecessor do Header; leitura Git comprovou ausência de grant anterior e blob baseline66f5e2e19958214f714659c353604654023f99a1 idêntico ao recebido, usado diretamente sem supersedes inventado. Conferência SSR22 casos preservou todas outras telas e menu adulto.
+
+APK Xandeflix-v1.0.37-internet-layout-linha-unica-20261024.apk,SHA256 5475acf0067e9fb082614d69769713cf454a8d3f285284e603e9cf77e9e1d279,11424266bytes, mesma1.0.37/code37/package/assinatura. Registro Capacitor real3 plugins base e NetworkStatus compilado/registrado, permissões preservadas e assets dist idênticos ao APK. Não instalado neste ciclo. Três medições físicas são capturas fornecidas pelo usuário no APK anterior: celular48,9Mbps/490ms; tablet98,6/212; Fire7,9/441;5MB cada. Não são medições instrumentadas pelo executor nem teste controlado de estabilidade/fonte. Relatório interpretativo em tmp/network-ui-polish-20261024/DEVICE_MEASUREMENTS.md. Congelamento Live continua separado e não corrigido por CSS.
+
+Recibo29,28 anteriores preservados; allowlist11, documentos normativos append-only. Auth SHA256 a047f5645fe32b01d9420bc79c8e3fd0ec7c6258b76d7ef70c442b2be80f42ef, recibo blobLF 2fc3ce79b3a78454e7ad15f1d06002a6bc69d594, recibo SHA256 d86f9e3d7e589a480c9d396bee72601db01109217354df81d623b8a82aa0836c; transcrição não é assinatura humana. Root/L1 e recebido congelados. Nenhum Git add/commit/push/merge/PR/main, install/reset, backend admin, versão nova ou próxima implementação.
+
+
+## CANON-01-LIVE-NETWORK-ACTIONS — implementação local — 2026-10-24
+
+Pedido explícito atual e escopo anterior ao código em docs/architecture/LIVE_NETWORK_ACTIONS.md; transcrição UTF-8/LF SHA256 cc12f95fd89066aadde151e26c90cacd71a02b3402d0f966bcc266239bc3fb7d, sem alegação de assinatura humana. Baseline canon/check/test/C11 PASS:170 controles/28 suítes,904 protegidos,29 recibos. Novo recibo30 registra7 componentes/estilos,1 teste existente e runner;16 caminhos totais. Todos21 casos de rede preservados; somente a assertion de declaração do topo antigo é adaptada ao pedido que remove Back/contador. Script browser histórico preservado com expectativas antigas e não declarado PASS neste gate; novo QA cobre a aceitação atual.
+
+Telefone tem título e ações numa única linha; sem Voltar/total/contador fora do modal. Tablet/TV removem a faixa acima do vídeo e mostram AO VIVO/Transmitir/Wi-Fi/Favorito abaixo. Cast em TV permanece indisponível por restrição nativa existente, sem fingir capacidade. Wi-Fi verde validado/cinza sem confirmação abre modal portal body, com contador autenticado e medição bloqueada no Live. Configurações mantém teste manual/guardas anteriores. Superfície nativa usa obscured já existente, combinado com prompt parental; sessão/mídia/heartbeat não são encerrados para exibir o modal.
+
+QA preliminar12 cenários de navegador passou: cores/linha/topo/ordem, contador somente durante modal, zero downloads automáticos, cancelamento/foco. Imagens são fixtures, não dispositivos. Tablet real antes do patch tinha cabeçalho de73,6px; Fire estava na Home; primeiro CDP do celular indisponível. Os13 comandos finais, APK e instalação física ainda PENDING neste registro. Nenhuma publicação/Git/admin/reset/versão ou próxima implementação.
+
+
+## CANON-01-LIVE-NETWORK-ACTIONS — encerramento local — 2026-10-24
+
+RESULT=LOCAL_READY_INSTALLED_AND_UI_VERIFIED. Telefone: uma linha acima do player, título à esquerda, Início/Wi-Fi/Cast/Configurações à direita; removidos Voltar, total global e contador de fonte. Tablet/TV: preview no topo da página e AO VIVO/Transmitir/Wi-Fi/Favorito abaixo. Em tablet Transmitir é apenas SVG, alvo44px, aria-label/title e função existentes mantidos. TV segue Cast indisponível por contrato nativo existente. Wi-Fi verde apenas com internet validada, cinza caso contrário; botão abre Internet e conexão. Contador real do provedor aparece somente nas janelas de conexão abertas. Medição de velocidade continua bloqueada no Live e manual em Configurações com guardas anteriores. Modal combina obscured existente com prompt parental, sem trocar URI, parar player ou suspender C9.
+
+Baseline3 comandos exit0; sequência oficial final13/13 exit0. Canônico173 controles/28 suítes,905 arquivos protegidos,30 recibos com29 anteriores preservados;21 cenários de rede e127 Prebuilt mantidos. Android222 testes/37 suítes,0 falhas/erros/skips. QA Chromium12 cenários de componentes reais com portas simuladas: telefone320/360/393, Cast conectado/desconectado, tablet1365/1024, TV960/1280, retrato800 e quadrado768, Configurações390. Checados geometria, cores verde/cinza, ordem/44px, contador só no modal, zero download automático, cancelamento e retorno de foco. QA não representa medição de velocidade nem teste físico.
+
+APK Xandeflix-v1.0.37-live-rede-acoes-20261024.apk, SHA256 034fe1c2d9aa6cc13cb7a738fe46a740e88dbde8ac9872a611943f4c6a257a0e, 11425238bytes, mesma1.0.37/code37/package/assinatura. Registro real3 plugins Capacitor base e NetworkStatus compilado/registrado, assets dist idênticos, permissões preservadas. Update in-place realizado nos3 aparelhos nominais; backup do APK anterior, certificado e SHA verificados, firstInstallTime e todos os registros privados medidos preservados. Apenas booleanos públicos persistidos, sem conteúdo ou hash privado; sem uninstall/reset. Validação física de UI: 3/3 PASS; resultados individuais anexados ao relatório. Hardware Back fecha modal sem sair de Live e devolve foco nos aparelhos aprovados. Continuidade de mídia/buffer e estabilidade prolongada não instrumentadas nesta emenda; não há alegação de correção do congelamento anterior.
+
+Allowlist16; fonte recebida e root/L1 congelados, index vazio, HEAD/main/branch preservados. Documentos normativos append-only, nenhuma alteração de source transport, credenciais/licença, native/bridge/C9/buffer, versão/package/dependências/workflow/verificador, backend/admin ou publicação. Auth UTF-8/LF SHA256 335fbf6134da9868413a034309a650572afa5ab5841032bba298c38536ddb673; recibo blobLF e345e800a7a52d79241701cb5fd13f34bc699e01, SHA256 8c5e4c2d9e527729ec4c3af1c1d19b3dcc1425869975eba05349b299b45af4eb. Isso registra autorização explícita, não assinatura humana. Nenhum Git add/commit/push/PR/merge/main/deploy ou próxima implementação.
+
+
+## CANON-01-TV-CAST-SENDER-HIDDEN — registro local — 2026-10-24
+
+Pedido explícito atual substitui somente a decisão anterior de exibir Cast desativado em TV: Transmitir fica ausente em Fire Stick/Android TV, usando capacidade móvel já existente. Telefone/tablet e ícone do tablet mantidos. Patch funcional de uma propriedade; spec e allowlist9 anteriores ao código, recibo31 com dois grants e predecessores reais do gate30. SHA256 da transcrição UTF-8/LF 838af459996b558596ac5f67ec20e44e6b4c4809355a501bc622fafececd94c5. Baseline atual canon/check e C11 exit0; canon:test173/28 da execução imediatamente anterior preservada com hashes exatos, sem alegar nova execução. Validação final/build/APK e instalação Fire ainda pendentes neste registro. Sem Git/admin/reset/versão, native/source/C9/buffer ou próxima implementação.
+
+
+## CANON-01-TV-CAST-SENDER-HIDDEN — encerramento — 2026-10-24
+
+RESULT=LOCAL_READY_FIRE_UPDATED_CAST_HIDDEN. Única alteração de produção: retirar showUnavailable da instância CastButton abaixo do preview. Política existente limita remetente a celular/tablet; botão ausente no Fire Stick/Android TV. Tablet mantém ícone apenas, celular mantém ação no topo. Wi-Fi/modal/Favorito mantidos. Nenhuma mudança de receiver, native/bridge/player, C9/buffer, fonte/catálogo/identidade/licença, permissões, package/dependências/versão ou backend.
+
+Baseline: fresh canon:check/C11 exit0, e referência explícita à execução real anterior173/28 com bytes/log SHA verificados, não novo canon:test de baseline. Validação final específica5/5 comandos npm exit0: canon:check, canon:test, C11, typecheck e build. 176 controles/28 suítes,905 protegidos,31 recibos com30 anteriores preservados;21 cenários de rede/127 Prebuilt preservados. Não se alega reexecução dos13 comandos do gate anterior. Cap copy/registro oficial3 plugins/C11 antes de Gradle e entrega PASS. Android222 testes/37 suítes executados neste ciclo,0 falhas/erros/skips, assemble offline PASS.
+
+QA Chromium13 cenários com componentes reais/portas simuladas: Fire960/1280 e Android TV genérico1280 sem Cast no DOM, player no topo, badge AO VIVO/Wi-Fi/Favorito na ordem correta; telefone/tablet/retrato/quadrado e modal mantidos. Imagens inspecionadas. Somente Fire AFTSS recebeu update -r neste ciclo; certificado/SHA do APK instalado conferidos,11 registros privados e firstInstallTime preservados em RAM, apenas booleanos registrados. Sem uninstall/reset. UI física confirmou ausência de Cast, Wi-Fi/modal/Back/foco. Android TV genérico não é aparelho físico conectado; celular/tablet não foram reinstalados. Nenhuma nova alegação de buffer, velocidade ou estabilidade prolongada.
+
+APK Xandeflix-v1.0.37-tv-sem-transmitir-20261024.apk, SHA256 66e7757c5c77143520466f41b86634481e464e19ad9d8accaaac135d7fa0e783, 11425218bytes; mesma1.0.37/code37/package/assinatura, plugins/assets/permissões auditados. Allowlist9, docs normativos append-only, root/L1 e recebido congelados, index vazio e HEAD/main/branch preservados. Auth UTF-8/LF SHA256 838af459996b558596ac5f67ec20e44e6b4c4809355a501bc622fafececd94c5, recibo blobLF f1e466b249afac7a6dab2a62952dc83a4dd31540, SHA256 fb6c4b27c68e96bd4a20c61658ca57080fe494fe2831fe78121951605198323d. Transcrição não é assinatura humana. Nenhum Git add/commit/push/PR/merge/main, escrita administrativa/deploy ou próxima implementação.
+
+
+## CANON-01-TMDB-RELEASE-TAGS — registro — 2026-10-24
+
+Pedido atual e allowlist11 documentados antes do patch. Consulta pública real Mayday DV HDR retornouHTTP200/zero resultados; Mayday retornou o filme2026 entre homônimos. Normalizador reparado genericamente e título localizado confirmado disponível no detalhe, sem fonte/IDs alterados nem purge global. Nova suíte29 testa rótulos/Unicode/anos/subtítulo/números/contexto/poster/cache/privacidade;31 recibos intactos. Auth SHA256 847adabb8663f59d0bf23c8ad47c4b1a6c24ded108471cad13a92d77d34a790b. Baselinefresh canon/check/C11 exit0; referência real176/28 da árvore recebida idêntica.
+
+A primeira tentativa RED tinha erro de sintaxe no próprio novo fixture (apóstrofo), não provava a regressão. Log original preservado RED_HARNESS_SYNTAX; fixture corrigido. RED válido executado depois do patch, contra módulo recebido byte-idêntico congelado, falhou por Mayday DV HDR versus Mayday com exit1. Teste do módulo corrigido passou. Não houve restauração/reescrita do recebido. Validação final/APK/tablet ainda pendentes neste registro. Sem Git/admin/reset/versão ou próxima implementação.
+
+
+## Revisão nominal anterior ao ajuste do port de teste
+
+Allowlist passa de11 para12 caminhos, incluindo apenas scripts/test-c11-source-first-tmdb-artwork.mjs. Seu mock de módulo não expõe normalizeArtworkIdentity, que MovieDetailPage agora usa. Adicionar a função real já importada ao objeto do port, sem remover ou alterar qualquer asserção. Não tocar testes de visibilidade nem verificador. Primeiro focused passou subtitle/context e falhou composição por TypeError de export ausente no port, não por associação incorreta do produto. Registro canônico falhou CANON_REGRESSION_PLAN_REQUIRED porque requiredTests admite somente SUITES históricas estáticas: manter o plano histórico intacto e declarar novo cenário como comando obrigatório e suíte29 real do runner protegido. Corrigir apenas o recibo32 em andamento, com cópia do rascunho e hash de registro atualizado;31 recibos encerrados intocados. Nenhuma validação oficial final iniciada ainda.
+
+
+## CANON-01-TMDB-RELEASE-TAGS — encerramento — 2026-10-25
+
+RESULT=LOCAL_READY_TABLET_MAYDAY_CONFIRMED. Regra genérica no normalizador compartilhado retira rótulos técnicos reconhecidos de grupos/prefixos/sufixos e formatação Unicode, preserva nomes significativos, pontuação e números; [L]/(L) terminal mantidos. Ano explícito separado, sem tratar2049 de Blade Runner como lançamento. Mayday4K [DV][HDR] passa a Mayday. A consulta independe do servidor/URL/painel, sem editar fonte, catálogo, IDs, categorias, streams, licença/parental/C9, buffer ou native. Título público localizado confirmado passa à cache allowlisted e à página interna. Cache antiga/Match7/512/TTL/concorrência2 preservados sem purge ou reimportação; misses comDV/HDR não prendem nova identidade.
+
+Antes: tablet real encontrou as variantes Mayday e Mayday4K [DV][HDR]; varianteUHD tinha zero campos de metadados. Poster público /hVXjX1jLZ1ljFSNGXpjJfbTUOa7.jpg corresponde ao filme2026. API pública real retornouHTTP200/zero resultados para Mayday DV HDR. Depois: serviço real corrigido realizou2GETs públicos (search/movie?query=Mayday e movie/1137844), confirmou títuloMayday,2026,1h51min,Ação/Comédia,sinopse209 caracteres e backdrop. Sem URL/credencial da fonte enviados ao TMDB ou persistidos. Tablet atualizado -r preservando11 registros privados/firstInstallTime, mesma assinatura/package; tela real confirmou títuloMayday,ano/gêneros/sinopse preenchidos. Resultado de semelhantes observado: sem mensagem de erro no instante da amostra; não é auditoria completa das recomendações. Sem reprodução de vídeo, nova medição de velocidade/buffer ou estabilidade.
+
+Validação final:5 comandos npm específicos exit0 (canon:check/test,C11,typecheck,build), suíte nova standalone exit0, 179 controles/29 suítes,906 protegidos,32 recibos/31 anteriores íntegros,21 cenários de rede/127 Prebuilt preservados. Android222 testes/37 suítes executados,0 falhas/erros/skips; cap copy/registro oficial3 plugins/C11/assemble offline e auditoria de assets/permissões/assinatura PASS. Não se alega nova execução dos13 comandos L1. Baseline176/28 da execução anterior idêntica documentado com hash real, fresh baseline canon/check/C11 exit0.
+
+Quatro cenários reais de MovieDetailPage/PhoneMovieDetail no Chromium com portas simuladas passaram: normalização→serviço→título localizado/ano/duração/gêneros/sinopse, fonte completa mantém sua sinopse, cliqueAssistir usa ID original e título original permanece no modelo. API/objetos desses cenários são fixtures, não dispositivos. Testes novos incluem homônimos/ano/tipo/poster/privacidade/cache/transiente; todos antigos preservados. Erros de preparação honestos: primeiro RED era SyntaxError do fixture, corrigido; RED válido posterior contra recebido congelado exit1 provou Mayday DV HDR errado. Registro inicial falhou por requiredTests estático; corrigido somente recibo32/registro em andamento, suíte29 obrigatória no runner. MockTSX antigo precisava exportar o normalizador real, uma propriedade adicionada sem alterar assertions. Harness browser teve exports transitivos faltantes, cache warm inesperada para casos cold, erro de quoting no helper e porta DevTools antiga; corrigido somente harness, execuções falhas não são PASS. Notas/logs preservados.
+
+APK Xandeflix-v1.0.37-tmdb-titulos-4k-hdr-20261024.apk, SHA256 e0d3795d2092936e7f6b776b09900fe07e1d562caf95413bbb19e7478a10d201, 11426007bytes; mesma1.0.37/code37/certificado. Somente tablet atualizado neste ciclo; APK universal disponível para instalação manual nos outros aparelhos. Novas regras de TV semCast e demais UI recebidas preservadas. Allowlist12, normativos append-only, root/L1 e recebido congelados, índices vazios e HEAD/main/branch preservados. Auth SHA256 847adabb8663f59d0bf23c8ad47c4b1a6c24ded108471cad13a92d77d34a790b; recibo blobLF 30bcebd64ad85f8d981f09b320cbf3864b6bad7a, SHA256 72b2334e90c10a74eab09c54c3515ea7e81dedbc75ef16dcb293f17080973d01. Sem Git add/commit/push/PR/merge/main, backend/admin/deploy, reset, versão/dependências/manifest/verificador/workflows ou próxima implementação.
+
+Auditoria inicial do APK recusou o exit1 histórico de preparação do recibo; helper original preservado. Correção somente no helper ignorado exige exatamente registered-canon/exit1/CANON_REGRESSION_PLAN_REQUIRED, sua substituição registered-canon-r2/exit0 e todos os demais comandos exit0. Nenhuma falha foi convertida em PASS. Primeira tentativa ADB parou antes de mutação por inventário sem tablet; nova leitura e repetição in-place tiveram sucesso. Primeiro harness de busca após instalar parou em resultado parcial sem a variante UHD, amostra preservada; espera limitada pela variante exata encontrou o registro correto e confirmou metadados. Captura TABLET_MAYDAY_after.png inspecionada visualmente: título Mayday, 2026, 1h51min, Ação/Comédia, sinopse, fundo e lista de semelhantes visíveis. Esses ajustes de observação não alteraram o produto nem relaxaram as verificações.
+
+
+## CANON-01-VOD-DPAD-HIDDEN-CONTROLS — registro — 2026-10-25
+
+Solicitação e recomendação posterior transcritas antes do patch: controles ocultos têm10s horizontal/OK pausa e exibe; controles visíveis continuam no dispatcher original. Baseline fresh canon:check/test/C11/Android passou179 controles/29 suítes,222 testes nativos/37 suítes. RED compilou o dispatcher recebido em fixture isolado e falhou exatamente HIDDEN_RIGHT_MUST_NOT_OPEN_CONTROLS com exit1; não é falha do baseline nem teste físico. Novo controller captura ciclo completo de tecla, usa seek existente limitado e não recria mídia. C161 mock recebe somente porta de método novo; todos asserts anteriores preservados. Allowlist12,32 recibos anteriores intactos, novo33. Validação pós-patch ainda PENDING. Sem APK/instalação/Git/backend/admin/versão/source/live/buffer. Auth SHA256 572859c6a2312ebd7235ac7aa9bfdc73053696d07f462e1661857d3884173f3b.
+
+
+## CANON-01-VOD-DPAD-HIDDEN-CONTROLS — encerramento local — 2026-10-25
+
+RESULT=LOCAL_READY_AUTOMATED_VALIDATION_PHYSICAL_PENDING. NativePlayerActivity usa nova rota antes do dispatcher anterior exclusivamente quando há filme/episódio com controles ocultos. Direita/esquerda buscam10s por comando, repetição acumula, limites/seekable/ad/command/duração do mecanismo existente preservados. Nenhum showController/play/pause no seek e nenhuma recriação/prepare/reload do player. OK oculto pausa inclusive buffering, mostra/foca play-pause e consome repetições/UP para impedir clique involuntário. Novo DOWN com controles visíveis retorna à navegação original. Foreground, PiP/Cast, bloqueio, diálogo, transição e modificadores são verificados na rota.
+
+Dispatcher anterior preservado literalmente exceto uma chamada inicial; helper legado e seu teste+15/-5 não são o caminho real de VOD oculto com PlayerControls e não foram alterados. Canais live, toque/gestos, Back/Menu/mídia/verticais e fonte/C9/buffer/ativação/identidade/catalog/versão permanecem recebidos. O teste C161 só recebeu uma porta false para o novo método fora de seu cenário visível; asserts antigos byte-idênticos. Verificador, dependências, manifests, layouts, workflows e32 recibos anteriores intocados. Allowlist12, índices vazios/root/L1/recebido/main/HEAD/branch preservados, documentos normativos somente append.
+
+Baseline fresh canon/check/test/C11/Android/C161 exit0:179 controles/29 suítes,222 testes nativos/37 suítes. RED do dispatcher realmente extraído do recebido compilou exit0 e falhou exit1 com HIDDEN_RIGHT_MUST_NOT_OPEN_CONTROLS; falha esperada preservada, sem fabricação de PASS. Depois17 testes novos JUnit passaram, total239 testes/38 suítes Android,0 falhas/erros/skips. Integração JVM executou dispatcher/helper/seek reais e controller/policy reais,123 verificações:10s/acumulação, OK/release/repeat, visível sem seek, nove contextos inelegíveis e comparação live ao corpo anterior nos estados oculto/visível. São ports Android/View/Player sintéticos, não execução física Media3. Cinco comandos npm finais e C161 standalone exit0;182 controles/29 suítes preservadas,908 protegidos/33 recibos,127 controles Prebuilt/21 cenários de rede preservados. Não foram repetidos os13 comandos do antigo L1 nem declarado build web.
+
+Não houve geração de APK, instalação, reprodução em dispositivo, reset, novas conexões de fonte, Git add/commit/push/PR/merge/main ou backend/admin/Supabase/deploy. Homologação física de filme e episódio no Fire Stick/Android TV continua PENDING; controle real, animação/foco Media3, seek de rede e retomada com Play/Pause exigem essa etapa. APK anterior continua com o comportamento anterior; esta correção está somente na árvore isolada desta emenda. Auth SHA256 572859c6a2312ebd7235ac7aa9bfdc73053696d07f462e1661857d3884173f3b; recibo blobLF f33a7c6510ca7fe14f22367d0da0344e285e754a, SHA256 1cfa7af344aa7f258e2bb9f498f23f05c8f1936b0246d60916d080f68776c6a0. Próxima implementação não iniciada.
+
+Preparação auxiliar inicialmente recusou argv genérico prepare herdado por outro helper, antes de escrever qualquer saída; opção nominal corrigida, guard preservou os diretórios anteriores. Nenhum comando de validação oficial falhou e nenhum timeout/assert foi relaxado. Logs, RED, grants, hashes e relatório em tmp/vod-dpad-hidden-controls-20261025.
+
+
+# Entrega APK — D-pad10s — 2026-10-25
+
+Pedido explícito atual GERE O APK ATUALIZADO autoriza build/entrega da correção CANON-01-VOD-DPAD-HIDDEN-CONTROLS já encerrada e validada. Substitui somente a ausência de autorização de APK naquele ciclo anterior; não autoriza instalação/reset, Git/publicação/backend ou mudança de implementação. Gerar em cópia independente da árvore encerrada, root/L1/recebido congelados. Mesma1.0.37/code37/package/certificado usados nos APKs locais atuais; sem alteração de versão/dependências/manifest ou fonte.
+
+Nenhuma alteração de código/teste/recibo: preservar33 recibos/908 protegidos, todos os hashes de fonte/testes da correção.179+3=182 controles/29 suítes e123 verificações de integração vêm da execução real anterior, identificada por log/hash. Não declarar canon:test reexecutado. Rodar canon:check/C11 fresh, npm build com prebuild C11, Capacitor copy/registro oficial Browser/Filesystem/Share, C11 antes de Gradle, Android unit tests completos e assembleDebug offline, lock antes da entrega e auditoria de assinatura/identidade/permissões/assets/plugins/bytecode D-pad/privacidade. Native239 testes/38 suítes devem passar sem falhas/erros/skips.
+
+Auditoria compara bundle físico do APK com todos os arquivos dist e confere registro de plugins, NetworkStatus manual e classe VodDpadController compilada. Não usar old/dist nem empacotar dados/credenciais da fonte. APK universal é entrega local para instalação manual; teste físico D-pad continua pendente, sem acesso aos aparelhos neste ciclo. Nenhum commit/push/PR/merge/deploy/admin/Supabase ou próxima implementação.
+
+Allowlist documental6, append-only nos4 documentos existentes:
+- docs/architecture/VOD_DPAD_APK_BUILD.md
+- docs/evidence/VOD_DPAD_APK_BUILD.md
+- docs/architecture/XANDEFLIX_PREBUILT_PHASED_EXPANSION.md
+- docs/STATUS.md
+- docs/EVOLUTION_REPORT.md
+- docs/ERRORS_AND_BLOCKERS.md
+
+Auth SHA256 UTF-8/LF 6a5d43dd96b796ac46b63d5a9a82dc46e3f0949dbee2eb648fc490afb403af72. Nenhum novo recibo de runtime: grants imutáveis33 já cobrem os bytes idênticos. Prova de build/artefato e autorização separadas nesta evidência.
+
+
+## Entrega concluída — 2026-10-25
+
+RESULT=APK_READY_FOR_MANUAL_INSTALL. APK Xandeflix-v1.0.37-dpad-10s-20261025.apk, SHA256 e057a523c802f84ae2c2788352493f0b3766309cd3d7255aace326adf48a35eb, 11427023bytes; package com.xandeflix.prebuilt,1.0.37/code37, assinatura anterior preservada b235c7117c9660e17cf0732cd6493600a812692af289e627454988ea096e848d. Inclui a rota D-pad10s/OK oculto validada e todas as correções recebidas, sem alterar fonte/identidade/licença/C9/buffer/live ou lógica neste ciclo.
+
+Build web com prebuildC11, Capacitor copy/registro oficial3 plugins, C11 pré-Gradle, testDebugUnitTest+assembleDebug offline, canon:check pós-build e lock de entrega exit0. Native239 testes/38 suítes,0 falhas/erros/skips executados novamente. Regressores182/29 e integração123 são execução imediatamente anterior com bytes de fonte/testes/recibos idênticos verificados e log/hash explícito; canon:test não foi repetido neste build-only. Vite emitiu aviso de chunk grande, sem falha ou mudança de configuração.
+
+Auditoria PASS: assinatura/package/versão/permissões, todos os 8 arquivos dist comparados ao APK,3 plugins Capacitor e NetworkStatus registrado, classe VodDpadController em DEX e chamada dispatchHiddenVodDpad/seek/pause/show no bytecode compilado. Zero padrão de credencial privada encontrado no bundle e nenhum arquivo de identidade/ativação/fonte/cache/keystore no APK. Root/L1, recebido fechado,33 recibos e todos os arquivos de código/teste permanecem byte-idênticos. Só6 documentos desta entrega, existentes por append; índice vazio, HEAD/branch/main preservados.
+
+A autorização atual GERE O APK ATUALIZADO foi registrada antes do build, SHA256 6a5d43dd96b796ac46b63d5a9a82dc46e3f0949dbee2eb648fc490afb403af72. Não houve instalação/reset/ADB/reprodução física, Git add/commit/push/PR/merge/main ou backend/admin/Supabase/deploy. Teste físico do controle Fire Stick/Android TV continua pendente, conforme roteiro da correção anterior. Nenhuma próxima implementação iniciada.
+
+
+## CANON-01-DPAD-EXPANDED-CARDS-AUTOPREVIEW-01 — registro — 2026-10-25
+
+Solicitação/especificação/allowlist21 precederam patch, baseline fresh canon/check/test/C11 exit0 (182 controles/29 suítes). Novo preview oficial opcional não muda trailer manual. Host único por shell, eventos locais de MediaCard, modalidade real e grid estável com reserva lateral. Três negativos e nova suíte30,33 recibos anteriores preservados. Primeiro teste novo revelou fila Promise vazia por cancelamentos sem mídia; cancel agora só encadeia fechamento assíncrono real, mesmos asserts. Suíte focada13 passou. Pretypecheck inicial foi bloqueado pelo canon antes do registro desta emenda; tsc não executou, nenhum hook/verificador contornado. Falhas registradas, não são PASS nem RED histórico. Validação integral/browser/Android ainda PENDING. Auth SHA256 9bfa2adae476b3e0eaed259fbabc440df2645789a1d39e64e8ab3bdd01c53c7a.
+
+
+## Refinamento de identidade antes da validação final
+
+Browser inicial8 cenários PASS: Fire110→132px,desktop/tablet180→216px, expansão/3s/sessão única/Enter/sem trailer/bloqueio/touch/híbrido. Primeiro harness falhou EXPANDED porque usou Baixo para sair do menu lateral; o motor existente usa Direita. Corrigido somente o gesto do harness, sem mudar produto/asserts. Após inspeção, evento de identidade pública do card e verificação após awaits/mutação cancelam preview se catálogo atualizar o mesmo nó; Tab/wheel também restauram modalidade não-Dpad. Badge/ano antigos ocultos na superfície expandida para não cobrir vídeo, cards nunca remontados. Rascunho34 de recibo/registro preservado; hashes atualizados só desta emenda ainda em andamento,33 recibos históricos intocados. Final completa e nova QA ainda pendentes.
+
+
+## Adjudicação nominal de port legado antes da edição — allowlist22
+
+Primeira validação completa passou canon:check, mas canon:test falhou ao renderizar AppShell no fixture test-c107-fire-hero-metadata.mjs: novo CardExpansionHost estava undefined no mock. Oito asserts funcionais anteriores desse cenário passaram antes da falha de tipo React; suítes restantes ficaram NOT_RUN, não são PASS. Acrescentar somente port CardExpansionHost:()=>null no mock, sem alterar assertions, execução ou produto para satisfazer fixture. Demanda nova continua testada no componente real/browser. Incluir esse único script na allowlist22 e no grant34 com predecessor real;33 recibos históricos permanecem imutáveis. Preservar primeira validação/log/rascunhos e repetir seis comandos e Android completos.
+
+
+## CANON-01-DPAD-EXPANDED-CARDS-AUTOPREVIEW-01 — fechamento local — 2026-10-25
+
+IMPLEMENTADO_LOCALMENTE_VALIDACAO_AUTOMATIZADA_PASS_HARDWARE_PENDENTE. Baseline fresh3/3 exit0; segunda validação completa6/6 exit0, sessão13 casos PASS e Android242 testes/38 suítes sem falhas/erros/skips.914 protegidos/34 recibos/185 controles/30 suítes; todos182 controles/29 suítes e33 recibos recebidos preservados. Primeira validação final falhou em port de mock legado, corrigido em allowlist22 antes da repetição integral, sem alterar assertions. Browser8+3 cenários de componentes reais com mídia/metadata simuladas e Java HTML QA PASS; não são testes físicos ou rede real. Caps20% somente D-pad, expansão/backdrop, trailer público oficial mudo após3s, sessão única/8s startup/45s lifetime, Enter e cleanup. Root/L1 e entrega recebida congelados, prefixos normativos preservados. Relatório completo C:/Xandeflix/xandeflix-prebuilt-c11-main/tmp/expanded-cards-20261025/REPORT.md; auth SHA256 9bfa2adae476b3e0eaed259fbabc440df2645789a1d39e64e8ab3bdd01c53c7a; recibo blobLF 8d031488e5175dc1a0fbca3246345be638074fe7. Nenhum APK/install/ADB/reset, Git add/commit/push/PR/merge, remoto/deploy/Supabase ou próxima implementação. Homologação Fire/Android TV e touch híbrido pendente.
+
+
+# APK e instalação Fire Stick — capas expansíveis — 2026-10-25
+
+Pedido explícito GERE O APK E INSTALE NO FIRESTICK autoriza build/entrega e atualização in-place SOMENTE Fire Stick AFTSS/G071CQ070344374G via ADB USB. Esta nova autorização supersede apenas a ausência de autorização de APK/install no ciclo encerrado de implementação. Não alterar código/testes/recibos34, versão1.0.37/code37/package com.xandeflix.prebuilt/assinatura, dependências, fonte, catálogo, playback, ativação ou backend. Root/L1/estágio recebido congelados por hashes. Clone independente para build, nenhuma escrita no workspace histórico.
+
+Canônico185 controles/30 suítes e browser8+3 casos vêm da execução imediatamente anterior, com logs/hashes referenciados; não afirmar nova canon:test. Fresh canon:check/C11, npm build/prebuild, Capacitor copy/registro oficial dos3 plugins, C11 antes de Gradle,242 testes Android/38 suítes completos e assembleDebug offline. Auditar package/assinatura/plugins/permissões/bytes dist no APK/bytecode PublicTrailer card/mute e player D-pad antigo preservado, nenhum dado privado. Entregar APK com SHA256 real. Nenhuma outra instalação.
+
+Instalação: selecionar serial/modelo nominal, verificar APK anterior/assinatura e guardar somente APK público para rollback. force-stop próprio package para atualização, comparar digests privados em RAM antes/depois (sem exportar valores ou hashes) de identidade/chave/ativação/cofre/parental e catálogo. install -r, confirmar hash físico do APK e firstInstallTime, abrir MainActivity normal. Sem uninstall/pm clear/reset/rotacionar identidade ou fonte. Falha de preservação bloqueia abertura, registrar sem divulgar dados. Inspeção UI/D-pad limitada, sem iniciar conteúdo integral ou canal nesta tarefa. Não presumir trailer real/fluidez sem observação.
+
+Allowlist documental6 (4 append-only):
+- docs/architecture/DPAD_EXPANDED_CARDS_APK_INSTALL.md
+- docs/evidence/DPAD_EXPANDED_CARDS_APK_INSTALL.md
+- docs/architecture/XANDEFLIX_PREBUILT_PHASED_EXPANSION.md
+- docs/STATUS.md
+- docs/EVOLUTION_REPORT.md
+- docs/ERRORS_AND_BLOCKERS.md
+
+Auth SHA256 UTF8/LF 5855b8b1fe50bda22304beba027f1e543e2c4738315ae28c230011f6b286a461. Nenhum Git add/commit/push/PR/merge/main, deploy, Vercel, Supabase ou próximo desenvolvimento. Não precisa de novo grant runtime:34 recibos anteriores continuam cobrindo bytes idênticos.
+
+
+## APK capas expansíveis instalado Fire Stick — 2026-10-25
+
+RESULT=APK_BUILT_AUDITED_INSTALLED_FIRESTICK_IN_PLACE. Autorização explícita atual, build isolado sem alterar código/testes/34 recibos;242 testes Android/38 suítes fresh PASS, checks/lock/build/assemble exit0. Canon185/30 da implementação anterior por log/hash, não reexecutado neste ciclo. APK SHA256 4e4862a26eeefdb239ad6ece0ea21f015c18180fcbe26fd98f013a8fd654cfed; package/versão/certificado preservados, permissões iguais e dist conferido dentro do APK. AFTSS USB atualizado install-r; APK físico igual, firstInstallTime e todos registros privados medidos preservados por comparação somente em RAM. Nenhum reset/uninstall, outros aparelhos, Git/publicação/backend ou próxima implementação. Observação física limitada registrada em C:/Xandeflix/xandeflix-prebuilt-c11-main/tmp/expanded-cards-apk-20261025/REPORT.md; homologação completa pendente.
+
+
+## CANON-01-HOME-DPAD-CAROUSEL-PREVIEW-PAGINATION-02 — registro local — 2026-10-25
+
+Baseline fresh canon/check/test/C11 exit0 (185 controles/30 suítes,34 recibos/914 protegidos). Especificação/allowlist antes do patch; protótipo pager17 cenários PASS, incluindo10000 itens, cursor real segmentado, ordem reversa/retry/cancel/dedup/24 DOM lógico e trailer manual como fallback. Registra somente subset efetivamente modificado. Recibo35/auth SHA256 64cd3527d66926b1455727d27bac239c1b061723849c28d5aa4b3b318ad36380. Campos previewTrailer oficial e testes13 anteriores preservados. Diagnóstico real ainda não prova reprodução: Capitã Marvel ID299537/wTqUqYRoyNQ abriu modo card com bounds válidos e fechou por deadline sem playing observado. Primeira leitura ADB encontrou Fire adormecido e houve tentativa indevida no card Recentes que retoma VOD (HTTP403, nenhum vídeo confirmado); teste foi encerrado e aviso fechado, não atribuir ao trailer. Persistência privada/fonte não lidas nem exportadas. Validação integral/browser/hardware ainda PENDING.
+
+
+## Evidência física e ajuste nominal de inicialização — antes da edição
+
+Probe isolado com PublicTrailer card e mesmo trailer TMDB299537/wTqUqYRoyNQ, sem player da fonte: API pronta em torno6.4s, buffering/time0 em9.0s e11.3s; playing em13.3s/time2.89,15.3s/time4.91,17.4s/time6.98, muted=true. A tentativa do card instalado era encerrada pelo deadline8s. Esses números vêm da saída observada do probe-timed, cuja coleta final falhou por timeout CDP do host; não declarar harness completo PASS ou fluxo automático corrigido por esse teste isolado. O modal público anterior também foi observado em ended/time31.137958 de31.137958.
+
+Ajustar SOMENTE o chamador card para startup25s, mantendo padrão8s da classe CardPreviewSession e os13 testes anteriores. Adaptador card também25s, imagem até playing/tempo finito45s/cancel de foco intactos. Estado player-paused antes do primeiro playing não é falha comprovada, não encerrar por esse estado transitório; lifecycle paused/erro/bloqueio/ended continuam encerrando. Nenhuma ampliação de tempo do player principal/Live, fonte ou serviço TMDB8s. Sem instalação de binário novo. Produção2 arquivos já constam na allowlist candidata anterior; recalcular novo recibo35 em rascunho com backup e repetir validação.
+
+
+## Ports legados adjudicados antes da edição — allowlist candidata27
+
+Primeira regressão completa passou188 controles e18 suítes, falhou em série poster composition por dependência controlada nova rail-pagination no fixture test-c11-artwork-visible-recovery. Acrescentar somente import/port do helper real railWindow em3 fixtures que montam MediaRail; ProgressiveCategoryRail stub só em loader de cenário legado que usa progressive=false; alias useLayoutEffect ao runner useEffect existente em1 fixture. Assertions não serão editadas. Faixa não virtual preserva children array original (produto corrigido para manter forma estável). Outras duas: test-c11-category-rails e test-c11-startup-artwork. Incluir3 scripts nos grants com predecessor/before/after reais. Testes novos e navegador montam implementação real, sem usar esses stubs.
+
+Falha anterior pretypecheck por chain: ao incluir2 arquivos do deadline25 no rascunho faltaram predecessores; hook bloqueou antes de TSC. Corrigidos os2 grants para o predecessor Expanded Cards, sem contornar verificador; typecheck posterior passou. Browser auxiliar excedeu timeout do protocolo em avaliação longa e depois tentou serializar nó DOM (Object reference chain is too long); corrigido harness em blocos50/eventos e retorno booleano, sem enfraquecer asserts nem alterar produto para esconder erro.
+
+
+## Port adicional de fixture — fronteira original verificada
+
+Execução adicional read-only do fixture de categorias na base recebida confirmou a mesma falha Uncontrolled component dependency content-adult-policy antes do código novo. Não é falha da baseline canônica3/3 nem regressão deste patch. Para tornar a verificação pertinente executável, acrescentar port do módulo real content-adult-policy (sem stub/alterar regra/asserção) no mesmo fixture já na allowlist. Nenhuma afirmação de PASS sobre a execução antiga. Repetir fixture e validação completa após novo hash do rascunho35, preservando rascunho anterior.
+
+
+## Port real de metadata no fixture startup — antes da edição
+
+O teste standalone na base recebida também falha antes do patch em dependência controlada tmdb-metadata ao montar MediaCard. Acrescentar somente port com exports reais do módulo (normalização/identidade), sem alterar assertions; arquivo já está na allowlist de ports. Baseline canônica obrigatória permanece3/3 PASS, standalone antigo é FAIL declarado.
+
+
+## Correção final da propriedade da âncora — antes da edição
+
+A primeira cadeia6 comandos e Android242/38 passou, mas nova rodada browser encontrou FIXED_ANCHOR_second: card x230 contra referência92, apesar de foco correto e largura355.55. Latest regression wins; não encerrar como PASS com base nos testes anteriores. Centralizar alinhamento no controlador de foco (um rAF cancelável por250ms e realinhamento em scroll/mutação/resize), removendo o efeito passivo de alinhamento do portal. Assim foco/âncora não dependem da montagem de artwork. Calcular padding e tail reais, manter vertical/cancel/touch e identidade. Arquivos já na allowlist. Preservar validação anterior, recalcular recibo35 em rascunho e repetir checks completos e browser com transições repetidas. Nenhuma alteração de assertion/tolerância para ocultar o erro.
+
+
+## Proteção de evento de saída obsoleto — antes da edição
+
+Teste repetido de foco ainda mostrou caso x230/âncora92, apesar do ciclo completo2 e tour2000 passarem. Navegação virtual transfere foco durante commit React; handler CARD_LEAVE incondicional pode cancelar seleção posterior se blur de outro card chegar atrasado. Proteger saída pelo elemento atual, mantendo saída real/Enter/Back/ocultar/blur da janela. Ajuste mínimo no controlador já autorizado; invariantes de foco e recursos intactas. Instrumentação auxiliar de âncora passou3 tamanhos, mas não será tratada como teste limpo; repetir sem instrumentação e preservar erros anteriores.
+
+
+## Memória de seleção entre faixas virtualizadas — antes da edição
+
+Revisão identificou que coluna lógica100 não existe entre os20 nós iniciais de outra faixa: fallback pelo último nó pode saltar ao sair/retornar. Guardar índice corrente no track virtual (já no estado MediaRail), entrar em faixa nova pelo0 e restaurar seleção montada da faixa visitada, inclusive ação Ver todos→Baixo. Somente caminhos MediaRail/useDpadNavigation já permitidos; faixas não virtuais mantêm motor anterior. Adicionar teste browser Cima/Baixo e ida/volta após índice99. Não afirmar teste físico novo do carrossel, nem tocar source/player/autorização. Recalcular rascunho35 e repetir checks.
+
+
+## CANON-01-HOME-DPAD-CAROUSEL-PREVIEW-PAGINATION-02 — fechamento local — 2026-10-25
+
+RESULT=LOCAL_READY_VALIDATION_PASS_NEW_APK_HOMOLOGATION_PENDING. Baseline3/3 e validação final R4 seis comandos/Gradle exit0.917 protegidos/35 recibos/188 controles31 suítes;185 controles30 suítes e34 recibos recebidos preservados. Nova suíte19 casos, sessão anterior13 intacta, Android242 testes38 suítes sem falhas/erros/skips (rodadas posteriores up-to-date). Browser final6 PASS, stress3 viewports com22 transições cada; fixtures não equivalem a novo APK físico. Adaptador candidato real em RAM no Fire reproduziu trailer público mudo com tempo e quadros decodificados crescentes; resolver/carrossel completo instalado não testado. Deadline card25s, espera3s, lifetime45s; demais timeouts preservados.20 iniciais/lotes20/prefetch6/DOM24, cursor local real/queue2/dedup/retry/cancel. Metadados visitados acumulam RAM até sair da Home; consumo físico/primeira instalação não medidos.25 caminhos efetivamente alterados de27 candidatos,2 Java intactos; root/base recebida e prefixos preservados; sem mudança de fonte/import/ativação/Live/VOD/Supabase. Auth SHA256 64cd3527d66926b1455727d27bac239c1b061723849c28d5aa4b3b318ad36380; recibo blobLF a91ff1c57b2c412e808fb79917fc00a1bfaa1e1e. Relatório completo C:/Xandeflix/xandeflix-prebuilt-c11-main/tmp/home-carousel-preview-02-20261025/REPORT.md. Nenhum APK novo/install/reset/Git staging/commit/push/PR/merge/remote write/deploy ou próxima implementação.
+
+
+# APK e instalação Fire Stick — trailers, foco fixo e paginação — 2026-10-25
+
+Pedido explícito atual: se ja concluir, gere o apk e instale no firestick. Autoriza build/entrega e atualização in-place SOMENTE Fire Stick AFTSS/G071CQ070344374G via ADB USB. Supersede apenas a ausência de autorização APK/install do ciclo anterior encerrado. Não modificar código/testes/35 recibos, versão1.0.37/code37/package com.xandeflix.prebuilt/assinatura, dependências, fonte, importação, catálogo, Live/VOD, ativação ou backend. Root/L1 e estágios encerrados congelados por hashes. Novo clone independente para build; nenhuma escrita no workspace histórico.
+
+Proveniência: branch fix/source-output-format-recovery/HEAD d8a74102124fbb8a3f013f6fd8a502519c1db4b8; baseline/main b3fc8d1e3844bc5601813ab1b298289af5b3f1fd. Base operacional é estágio fechado HOME-DPAD-CAROUSEL-PREVIEW-PAGINATION-02,917 protegidos/35 recibos/188 controles31 suítes. Referenciar execução R4 por logs/hashes, sem declarar nova canon:test. Fresh canon:check/C11, build web/prebuild, Capacitor copy e registro oficial dos3 plugins, C11 antes de Gradle, testes Android242/38 e assembleDebug offline. Auditar assinatura/package/plugins/permissões/assets dist idênticos/recursos novos/nenhum dado privado. Não precisa novo grant runtime:35 recibos cobrem exatamente os mesmos bytes.
+
+Instalação: verificar serial/modelo e assinatura do APK instalado, guardar somente APK público anterior para rollback. force-stop do próprio app, comparar digests privados em RAM antes/depois (sem persistir valores/digests) de identidade/chave/ativação/cofre/parental/catalogo, install -r, verificar hash físico e firstInstallTime, abrir MainActivity normalmente. Sem uninstall/pm clear/reset, rotação de chave ou substituição de fonte; tablet/celular intocados. Observar foco/expansão/âncora/preview pelo próprio app, sem URL/credencial/source logs e sem iniciar Live/VOD integral. Nenhum tempo de primeira instalação será declarado, pois é atualização preservando dados.
+
+Allowlist documental6 (4 append-only):
+- docs/architecture/HOME_CAROUSEL_APK_FIRE_INSTALL.md
+- docs/evidence/HOME_CAROUSEL_APK_FIRE_INSTALL.md
+- docs/architecture/XANDEFLIX_PREBUILT_PHASED_EXPANSION.md
+- docs/STATUS.md
+- docs/EVOLUTION_REPORT.md
+- docs/ERRORS_AND_BLOCKERS.md
+
+Auth SHA256 UTF8/LF a18846982b08c99d115784bf5e3911c513299554d6fc77eb2098f07a535963df. Nenhum Git add/commit/push/PR/merge/main, deploy, Vercel, Supabase, dependência nova ou próximo desenvolvimento. Falha canônica ou de preservação bloqueia entrega/abertura; corrigir somente infraestrutura de build/harness já autorizada, sem patch funcional nesta etapa.
+
+
+## APK Home progressiva/trailers instalado Fire Stick — 2026-10-25
+
+RESULT=APK_BUILT_AUDITED_INSTALLED_FIRESTICK_IN_PLACE. Autorização atual SHA256 a18846982b08c99d115784bf5e3911c513299554d6fc77eb2098f07a535963df. Build isolado sem alterar fonte/testes/35 recibos,917 protegidos, checks/C11/build/copy/assemble exit0, Android242/38 fresh PASS. Canon188/31 por referência R4 real e hashes, não reexecução neste ciclo. APK SHA256 e457c211377ec405addfc118feeaaef67e057fe493e170f6a7f0ce6e890248e2; package1.0.37/code37/certificado e permissões preservados, dist idêntico no APK. AFTSS atualizado install-r e aberto, hash físico igual, firstInstallTime e todos11 registros privados medidos preservados somente em RAM. Nenhum reset/uninstall/troca de fonte/outro dispositivo/Git/publicação/backend/próximo desenvolvimento. UI física limitada em C:/Xandeflix/xandeflix-prebuilt-c11-main/tmp/home-carousel-apk-20261025/REPORT.md; primeira instalação/medição prolongada não executadas.
+
+
+## CANON-01-DPAD-CARD-SCOPE-SEEALL-GRID-01 — registro local — 2026-10-25
+
+Autoriza somente implementação local da demanda anexada e continue posterior; transcrição UTF8/LF SHA256 9c9ea4a2c750c1f3e6559e47a8ee8ba3c7b38854dc2f0bc0f76616fbbd1a9d9d. Baseline fresh3/3 exit0:188 controles31 suítes/35 recibos917 protegidos. Nova emenda36 com grants before/after LF e predecessores reais,35 anteriores imutáveis. Opt-in em tracks de categorias e host na página principal, fora de grids; SeeAll usa virtualização por linhas, largura TV responsiva, navegação lógica e retorno RAM. Browser20 cenários PASS com componentes reais e fronteiras externas simuladas, incluindo2mil títulos acessíveis; suíte nova9 controles PASS. Sem homologação física nova, APK/instalação ou promessa60 FPS. Atualizados somente adaptadores de6 testes, mantendo cada assertion;2 bindings parentais ausentes preexistentes corrigidos usando política real. Validação integral final PENDING. Root/L1/estágios recebidos e auditoria ficam congelados.
+
+
+## CANON-01-DPAD-CARD-SCOPE-SEEALL-GRID-01 — conclusão local — 2026-10-25
+
+RESULT=LOCAL_CORRECTION_VALIDATED_HARDWARE_PENDING.13/13 comandos oficiais exit0, baseline3/3 exit0. CANON192 controles32 suítes,920 protegidos/36 recibos, preservados188 controles31 suítes/35 recibos anteriores. Browser21 cenários PASS, suíte nova9 PASS e6 fixtures auxiliares PASS (episódios15 cenários/250mil registros). Expansão somente opt-in de categorias nos3 contextos principais, grids sem expansão/prévia, janela de linhas responsiva com foco/retorno e acesso aos2mil títulos da fixture. Delta 29/29 caminhos na allowlist;4 prefixos normativos e bytes de toda base recebida/root preservados; index vazio; diff-check/whitespace PASS. Auth SHA256 9c9ea4a2c750c1f3e6559e47a8ee8ba3c7b38854dc2f0bc0f76616fbbd1a9d9d; recibo blobLF 1be58b8db36f88a75e115fd1cb7bbb0d17f0bb71. Sem build Android/APK/install/ADB/reset/backend/Git/publicação. Hardware10min Fire/outro Android TV/tablet/celular e60 FPS/tela preta continuam pendentes. Relatório C:/Xandeflix/xandeflix-prebuilt-c11-main/tmp/dpad-card-scope-seeall-20261025/REPORT.md. P1–P4 amplos apenas planejados, NEXT_GATE_STARTED=NAO.
+
+
+# APK e instalação Fire Stick — escopo das capas e grade Ver todos — 2026-10-25
+
+Pedido explícito: GERE O APK E INSTALE NO FIRESTICK PARA TESTE. Autoriza build/entrega e atualização in-place SOMENTE Fire Stick AFTSS/G071CQ070344374G por ADB USB. Supersede apenas a ausência de autorização APK/install no ciclo encerrado DPAD-CARD-SCOPE-SEEALL-GRID-01 e no recibo36 histórico; não alterar esse recibo nem os35 anteriores. Root/L1 e base recebida congelados por hashes. Novo clone independente origin canônico/branch fix/source-output-format-recovery/HEAD d8a7410 e main b3fc8d1 preservados. Nenhum patch funcional, dependência, versão1.0.37/code37, package com.xandeflix.prebuilt, assinatura, fonte, dados, ativação, catálogo ou player. Pasta histórica somente leitura.
+
+Referenciar por hashes as13 validações/192 controles32 suítes/21 browser da implementação imediatamente anterior, sem afirmar nova canon:test. Fresh canon:check/C11/build com prebuild; Capacitor copy e registro oficial Browser/Filesystem/Share; C11 antes de Gradle;242 testes Android/38 suítes e assembleDebug offline; canon/C11 antes de entregar. Auditar assinatura/package/permissões/HTTPS/plugins/bytecode/bytes dist e marcadores explícitos de elegibilidade e janela da grade.
+
+Instalação autorizada: confirmar serial/modelo nominal e assinatura compatível; guardar somente APK público anterior para rollback; force-stop do próprio package; comparar digests privados antes/depois apenas em RAM, sem exportar valores/digests. install -r, verificar hash físico e firstInstallTime, abrir MainActivity normal. Sem uninstall/pm clear/reset, troca de fonte, rotação de chave, tablet/celular ou outro package. Inspeção UI limitada e segura; nenhuma emulação de screenshot/escala no Fire. Captura nativa ADB opcional; CDP somente estado DOM público de UI e input do próprio app, sem tráfego/armazenamento privado. Não iniciar conteúdo integral para testar grade. Homologação10min/60 FPS/piscadas não será inferida por instalar.
+
+Allowlist documental6 (4 append-only):
+- docs/architecture/DPAD_CARD_SCOPE_APK_FIRE_INSTALL.md
+- docs/evidence/DPAD_CARD_SCOPE_APK_FIRE_INSTALL.md
+- docs/architecture/XANDEFLIX_PREBUILT_PHASED_EXPANSION.md
+- docs/STATUS.md
+- docs/EVOLUTION_REPORT.md
+- docs/ERRORS_AND_BLOCKERS.md
+
+Auth SHA256 UTF8/LF 4f74279206b75a6cef73541d3b6e3bb2d2684af84bd11037e51ab9cbae3d3aca. Saídas normais/ignoradas de build/helpers/logs permitidas; nenhum source/test/recibo/verifier/workflow/package/lock/native/backend/Supabase/Git staging/commit/push/PR/merge/dispatch/deploy. Rollback: APK anterior mesmo package/assinatura, install-r sem schema migration, não executado. NEXT_GATE_STARTED=NAO.
+
+
+## APK do escopo das capas/Ver todos instalado Fire Stick — 2026-10-25
+
+RESULT=APK_BUILT_AUDITED_INSTALLED_FIRESTICK_IN_PLACE. Autorização atual SHA256 4f74279206b75a6cef73541d3b6e3bb2d2684af84bd11037e51ab9cbae3d3aca. Sem patch funcional/alteração dos36 recibos. Fresh canon/C11/build/copy/Android242 testes38 suítes/assemble/auditoria exit0;192 controles32 suítes e21 browser referenciados da implementação anterior por arquivos/logs/hashes idênticos. APK SHA256 ec7f53f728d3728f3e0f9756fd9a4808292c5fc6e26f7dfe8957660b1cc1569e,1.0.37/code37, assinatura/package/permissões preservados. Atualizado somente AFTSS via install-r; hash físico igual e firstInstallTime/todos11 registros privados medidos preservados somente em RAM. Smoke PASS_LIMITED_INSTALLED_SCOPE_AND_GRID_SMOKE; nenhuma emulação de captura/escala. Homologação10min/60 FPS/piscadas permanece pendente. Relatório C:/Xandeflix/xandeflix-prebuilt-c11-main/tmp/dpad-card-scope-apk-20261025/REPORT.md. Sem reset/outro aparelho/Git publicação/backend/próximo desenvolvimento.
+
+
+## CANON-01-XANDEFLIX-UI-PERFORMANCE-RECOVERY-03 — registro local — 2026-10-25
+
+Autorização nominal anexada UTF8/LF SHA256 8409bb26fd147dec97f610bc9dc7d0da69b4ec2328d48726b58a7e224b65119d. Especificação anterior ao código: docs/architecture/XANDEFLIX_UI_PERFORMANCE_RECOVERY_03.md. Recibo37 encadeia36 anteriores imutáveis, 23 grants reais. Performance/UI/Search/hero/preview1000ms/sidebar somente; sem APK/install/Git/backend. Baseline3/3 exit0; validações finais e física PENDENTES. NEXT_GATE_STARTED=NAO.
+
+
+## CANON-01-XANDEFLIX-UI-PERFORMANCE-RECOVERY-03 — conclusão local — 2026-10-25
+
+RESULT=LOCAL_IMPLEMENTATION_VALIDATED_PHYSICAL_PENDING. Implementação local concluída; 13 comandos oficiais exit0 no mesmo estado congelado, com retomada documentada da orquestração após ETIMEDOUT agregado durante site:build (não foi timeout/assertion de teste relaxado). Baseline3/3. CANON196 controles33 suítes/924 protegidos37 recibos, preservados192 controles32 suítes/36 recibos anteriores. Browser39 cenários e suíte específica11 casos PASS; fronteiras externas simuladas, não homologação física. Delta 35/43, produção21, adaptadores5; quatro prefixos normativos e bytes recebidos/root preservados; index vazio. Auth SHA256 8409bb26fd147dec97f610bc9dc7d0da69b4ec2328d48726b58a7e224b65119d, recibo blobLF 88fa16477c0f94dad02f962d7a42e26dc19f2670.
+
+Expansão instantânea/host estável, guard repeat55ms, leituras repetidas reduzidas, tamanhos D-pad, heros oficiais/fallback, grades verticais/largura, Busca bidirecional, prévia tentativa1000ms, logo original e retorno profundo corrigidos localmente. Home vertical ainda retém seções;60 FPS/piscadas/autoplay real/Phone/Tablet/TV e tempo de primeira instalação continuam pendentes. Observação da referência reaberta 635.3s/121 amostras Home de121; amostragem leve sem imagem não exclui piscada subsegundo. Saída anterior manual confirmada pelo usuário, depois REABERTO; não classificar como crash. Sem APK/install/Git/backend/publicação. Relatório C:/Xandeflix/xandeflix-prebuilt-c11-main/tmp/ui-performance-recovery-03-20261025/REPORT.md. NEXT_GATE_STARTED=NAO.
+
+
+# FIRESTICK-C03-APK-READINESS-05 — especificação anterior à compilação
+
+Autorização nominal atual UTF8/LF SHA256 09344acbbb692f8506bf4fe680787ceca40392f33436165a74a399d2df516dac. Preparar/compilar/auditar apenas o candidato03 fechado; nenhuma instalação ou mudança de dispositivo, funcionalidade, backend ou publicação Git. A ordem atual autoriza APK, substituindo somente a vedação de build do ciclo03 encerrado; não editar nenhum recibo histórico. Não incorpora04.
+
+Origem operacional: C:/Xandeflix/xandeflix-prebuilt-c11-main/tmp/ui-performance-recovery-03-20261025/workspace, CLOSURE=LOCAL_IMPLEMENTATION_VALIDATED_PHYSICAL_PENDING, 37 recibos/924 protegidos/196 controles33 suítes. Verificados todos os 1435 arquivos do manifesto, conjunto exato de arquivos gerenciados e SHA do relatório. Ciclo04 (C:/Xandeflix/xandeflix-prebuilt-c11-main/tmp/mobile-network-consent-04-20261025/workspace) verificado e congelado por manifesto e hashes dos artefatos externos. Root preservado com10 diferenças L1, HEAD d8a74102124fbb8a3f013f6fd8a502519c1db4b8, main b3fc8d1e3844bc5601813ab1b298289af5b3f1fd, branch fix/source-output-format-recovery, origin https://github.com/xandeflix2/xandeflix-prebuilt.git. A divergência histórica de branch está documentada na base operacional fechada; não normalizar/mover main. Clone independente recebe exclusivamente overlay integral03 validado, nunca reconstrói funcionalidades da main. Pasta histórica somente leitura, nenhuma operação nela.
+
+Allowlist fechada de documentos, quatro somente append:
+- docs/architecture/FIRESTICK_C03_APK_READINESS_05.md
+- docs/evidence/FIRESTICK_C03_APK_READINESS_05.md
+- docs/architecture/XANDEFLIX_PREBUILT_PHASED_EXPANSION.md
+- docs/STATUS.md
+- docs/EVOLUTION_REPORT.md
+- docs/ERRORS_AND_BLOCKERS.md
+
+Nenhum delta permitido em source, testes, package/lock/dependências, build.gradle, manifesto Android, backup, Capacitor config, scripts de teste/verificadores ou37 recibos. Outputs ignorados normais: dist, ativos Capacitor, registry gerado pelo CLI oficial, Cordova módulo gerado idêntico à infraestrutura anterior, local.properties, Gradle e artefatos sob tmp. Nenhuma normalização de bytes. Cópia node_modules por junction existente, sem instalar pacote.
+
+Procedimento: fresh canon:check, canon:test e C11; npm build com prebuild; capacitor copy android e geração oficial do registro3 plugins; C11 antes de Gradle; testDebugUnitTest/assembleDebug offline; CANON/C11 final. Referências às13 verificações anteriores/39 browser separadas das execuções novas. Versão1.0.37/code37 e package com.xandeflix.prebuilt permanecem os do03. Auditoria verifica assinatura criptográfica, package/versão/minSdk/permissões/recursos, todos os bytes dist e ativos, ausência de marcadores exclusivos04, registry e classes nativas obrigatórias; SHA final e certificado comparados ao APK de referência ec7f53f728d3728f3e0f9756fd9a4808292c5fc6e26f7dfe8957660b1cc1569e. Sem material de assinatura em documentação/log.
+
+ADB opcional estritamente read-only no alvo AFTSS/G071CQ070344374G: modelo/OS/API/ABI, versão/package/path/hash do APK público instalado. Sem input, captura CDP/emulação, start/stop, reset de contadores, shell writes, private data/logs ou operações em outros aparelhos. Não executar install/update/uninstall/clear/reboot.
+
+Rollback: preservar referência pública existente e cópia SHA-verificada no05; conferir mesmo certificado/package/code37, permissões/backup e caminhos persistentes sem migração funcional. Igual versionCode evita downgrade numérico, mas permite atualização somente se estado instalado e políticas do SO aceitarem. Não prometer restauração transacional nem dados após falha; rollback install-r permanece plano não executado. Revalidar alvo/cert/hash e comparar identidade/dados apenas em RAM no gate físico futuro autorizado.
+
+Aceitação: integrity03/04/root+37 recibos intactos;924 protegidos no CANON; preflight/build/Android tests/auditoria PASS; APK exclusivamente03; certificado/package/updatecompatíveis; referência preservada; relatório APTO ou NÃO APTO PARA INSTALAÇÃO CONTROLADA e plano físico completo. APTO não autoriza instalar nem certifica60 FPS, trailer playing/piscadas/10min/primeira instalação. Falha bloqueia entrega, sem contornar testes ou patch funcional. NEXT_GATE_STARTED=NAO.
+
+
+## FIRESTICK-C03-APK-READINESS-05 — conclusão — 2026-10-25
+
+RESULT=C03_APK_BUILT_AUDITED_READY_NO_INSTALLATION. APTO PARA INSTALAÇÃO CONTROLADA após autorização física específica. Autorização atual SHA256 09344acbbb692f8506bf4fe680787ceca40392f33436165a74a399d2df516dac. APK03 exclusivo SHA256 dd885bdd677c231e24684462abb8e0641fc50be05570b3c7cb26dba350ef833c,1.0.37/code37/package com.xandeflix.prebuilt, certificado b235c7117c9660e17cf0732cd6493600a812692af289e627454988ea096e848d. Fresh CANON196 controles33 suítes/924 protegidos37 recibos; C11/build/Android242 testes38 suítes/assemble/auditoria PASS. Seis documentos alterados; nenhum source/test/config/recibo. Candidato03/ciclo04/root e artefatos preservados. Referênciaec7f… e cópia verificadas; mesmo package/cert/code/manifest/minSdk/ABI suportam update-r e retorno planejados, não executados nem garantia transacional de dados. Fire AFTSS somente metadata/hash públicos via ADB read-only. Zero install/update/uninstall/clear/reboot, Git publicação/backend. Plano físico10min/36 comandos/playing/CPU/memória/60FPS/piscadas separado e não executado; sem captura CDP/emulação. Relatório C:/Xandeflix/xandeflix-prebuilt-c11-main/tmp/firestick-c03-apk-readiness-05-20261025/REPORT.md. NEXT_GATE_STARTED=NAO.
+
+
+## XANDEFLIX-PHYSICAL-VALIDATION-06 — diagnóstico físico em andamento
+
+Autorização nominal do usuário: identificar APKs já instalados, comparar candidato03 e ciclos, testar Fire/Phone/Tablet disponíveis, sem instalar/resetar/alterar fonte/runtime/Git/backend. Especificação docs/architecture/XANDEFLIX_PHYSICAL_VALIDATION_06.md. Disponibilidade explicitamente confirmada nos três alvos em AVAILABILITY.json. Source/test/config e37 recibos/924 protegidos permanecem idênticos ao05; root e03/04/05 congelados. Allowlist documental6, quatro append-only. User instalou o mesmo APK03 SHA256dd885bdd677c231e24684462abb8e0641fc50be05570b3c7cb26dba350ef833c nos três; ciclo04 não incluído. Evidência/métricas em C:/Xandeflix/xandeflix-prebuilt-c11-main/tmp/physical-validation-06-20261025. Rede foi alterada pelo operador durante os testes; segmentar e não inferir regressão de uma observação contaminada. NEXT_GATE_STARTED=NAO.
+
+
+## Encerramento XANDEFLIX-PHYSICAL-VALIDATION-06
+
+Sem implementação funcional. Fire:601,8s/843 comandos, rAF27,32Hz e intervalo p95116,8ms; repouso601,3s; background603,0s. Trailer: quatro opens/playing; sessão interrompida443,96s pelo transbordamento. Dados não são FPS HDMI nem comparação pareada. Navegação móvel longa em arquivos próprios; PASS não aprova todos os formatos/recursos. Relatório e matriz: docs/evidence/XANDEFLIX_PHYSICAL_VALIDATION_06.md; C:/Xandeflix/xandeflix-prebuilt-c11-main/tmp/physical-validation-06-20261025/REPORT.md e DEVICE_MATRIX.json. NEXT_GATE_STARTED=NAO.
+
+
+## XANDEFLIX-APP-INTRO-BRANDING-07 — implementação local
+
+Especificação docs/architecture/XANDEFLIX_APP_INTRO_BRANDING_07.md; evidência docs/evidence/XANDEFLIX_APP_INTRO_BRANDING_07.md. Implementação/testes locais em andamento no candidato isolado, sem APK ou dispositivos. Autoridade do PNG resolvida pela última instrução do usuário: usar anexo cf422e99…; originais intactos. Erro de helper gráfico inicial: Windows PowerShell5 interpretou nome Unicode sem BOM como ANSI; corrigido apenas o caminho por codepoint, antes de gerar derivados. Nenhum erro do produto inferido desse incidente. Sem04 e sem correções06. NEXT_GATE_STARTED=NAO.
+
+
+## Emenda posterior — APK de teste autorizado ao final
+
+# Emenda nominal — APK de teste ao final do gate07
+
+Data do usuário:26/10/2026, America/Sao_Paulo. Instrução expressa posterior, literal:
+
+> AO FINAL GERE O APK PARA TESTE NOS DISPOSITIVOS
+
+Autoriza gerar e auditar APK de teste depois da implementação e verificações locais deste mesmo gate. Substitui apenas a proibição anterior de geração de APK/assemble para o artefato de teste. Não autoriza instalação, desinstalação, clear/reset/reboot, publicação/deploy/Git/backend, mudança de versão/package/assinatura/autoridade ou novo gate. Preservar os aparelhos e os ciclos03/04/05/06.
+
+Procedimento após checks locais: fresh C11; build web válido, cap copy Android oficial, registry oficial dos mesmos plugins públicos instalados, Gradle offline assembleDebug com package/code37/name1.0.37/assinatura existentes. Auditar assinatura/package/versão/assets/recursos/bundle e SHA256; conferir ausência04, integridade dos dois MP4s e PNG original, presença das classes da intro, recursos de ícones/splash/Leanback e exclusões de backup. Comparar certificado do APK03 conhecido. Registrar o binário final distinguido pelo SHA256, sem instalar em nenhum alvo.
+
+NEXT_GATE_STARTED=NAO.
+
+
+
+## XANDEFLIX-APP-INTRO-BRANDING-07 — fechamento local — 2026-10-26
+
+RESULT=APP_INTRO_BRANDING_07_LOCAL_VALIDATED_PHYSICAL_PENDING. Emenda posterior autoriza APK de teste, não instalação. APK SHA256 734e6ca9b89c8639d1e45d70caf81bf4c6fcbd2611278a163ca00431ef5c9ac2, package com.xandeflix.prebuilt/code37/name1.0.37/certificado b235c7117c9660e17cf0732cd6493600a812692af289e627454988ea096e848d. CANON201 controles34 suítes/936 protegidos38 recibos;257 testes Android39 suítes e13 casos intro PASS.13 checks oficiais/assemble/auditoria PASS. Primeiro canon:test final falhou por interceptação textual do negativo antigo de orientação; reposicionamento do método sem mudar comportamento preservou o teste, repetido integralmente com PASS. Originais MP4/PNG e37 recibos preservados;03/04/05/06/root congelados. Classes04 ausentes; FAILs06 abertos. Relatório C:/Xandeflix/xandeflix-prebuilt-c11-main/tmp/app-intro-branding-07-20261026/REPORT.md; nenhuma instalação/operação de aparelho/publicação/Git/backend. Física pendente; NEXT_GATE_STARTED=NAO.
+
+
+## Intro07 R1 — apresentação inicial somente vídeo
+
+Pedido explícito posterior: AO ABRIR O APP A PRIMEIRA ABERTURA DEVE SER O VIDEO E SEM O BOTAO "PULAR INTRODUÇÃO". GERE O APK SO COM A ABERTURA DO VIDEO. Especificação docs/architecture/XANDEFLIX_INTRO_VIDEO_ONLY_07_R1.md precede o código. Remove botão/string e imagem estática no preparo; splash de lançamento neutra/transparente sobre preto, sem mudar ícones. Cancelamento físico, fallback de erro, mídia original e lifecycle mantidos. Novo recibo39/937 protegidos,38 antigos intactos. Testes/build/APK de teste autorizados, instalação/publicação/backend não. Root e03/04/05/06/07 preservados;04 não incorporado;FAILs06 abertos. NEXT_GATE_STARTED=NAO.
+
+
+## Intro07 R1 — fechamento local
+
+RESULT=INTRO_VIDEO_ONLY_07_R1_APK_VALIDATED_PHYSICAL_PENDING. Novo APK C:/Xandeflix/xandeflix-prebuilt-c11-main/Xandeflix-v1.0.37-intro-video-sem-botao-20261026.apk, SHA256 fd82bb15d941f4e3de3b2b354eee43d4a8253d655dc97a23b16d6d59c6a8f16a. Sem botão Pular nem marca estática no preparo; transição preta e vetor transparente. Fallback de erro/teclas/lifecycle preservados.204 controles34 suítes/14 casos intro/257 testes39 suítes e13 checks oficiais/assemble/auditoria PASS.39 recibos/937 protegidos,38 históricos e root/03/04/05/06/07 intactos. Fonte do teste atualizada somente para o requisito explícito substituído; nenhum limite relaxado. Nenhuma operação física/Git/backend. Relatório C:/Xandeflix/xandeflix-prebuilt-c11-main/tmp/app-intro-video-only-07-r1-20261026/REPORT.md. NEXT_GATE_STARTED=NAO.
+
+
+# Atualização nominal do celular — intro somente vídeo
+
+Data26/10/2026 America/Sao_Paulo. Autorização explícita posterior “Sim, atualizar o celular”, contexto nominal transcrito em AUTHORIZATION.txt SHA2569e5d94e8dc2ecc7a23e19edb41e058fa737ab61e2a1d6af30e591b13bd8e02d1. Libera atualização in-place SOMENTE SM-S926B/RXGYB03FL4W/package com.xandeflix.prebuilt, APKfd82bb15d941f4e3de3b2b354eee43d4a8253d655dc97a23b16d6d59c6a8f16a. Substitui somente a vedação anterior de instalar esse arquivo no celular. Não instalar Fire/tablet, não fazer rebuild/patch/reset/uninstall/clear/reboot, Git/backend/fonte. Screenshot de pareamento não é persistida nem seus códigos/endpoints são usados em comandos/logs. ADB já conectado por TLS autorizado.
+
+Base fechadaR1 integral1458 arquivos/39 recibos/937 protegidos,204 controles34 suítes e257 testes39 suítes herdados por hashes, não nova execução. Clone independente com overlay completo, mesmo origin/HEAD/branch/main operacional histórica preservados; root10 diferenças L1 e candidatoR1 intactos. Pasta histórica somente leitura. Allowlist documental6, quatro prefixos append-only; source/test/config/39 recibos idênticos. Outputs usuais ignorados/helper/evidências locais permitidos.
+
+Antes de instalar: CANON e C11 fresh, verificar modelo/serialnominal/API e hash instalado734e…, certificado b235c7117c9660e17cf0732cd6493600a812692af289e627454988ea096e848d dos dois APKs públicos. Preservar APK anterior conhecido por hash. Parar o próprio app para estabilizar registros; ler digests de identidade/chave/ativação/fonte/parental/pointer/manifest/catalog somente em RAM. Nunca persistir valores, hashes privados, snapshotId, URLs, código de pareamento ou dados de catálogo. Comparar igualdade/quantidade e firstInstallTime após adb install-r, sem uninstall/clear. Se qualquer diferença bloquear abertura e registrar resultado sanitizado, sem rollback automático.
+
+Abrir MainActivity pelo fluxo MAIN+LAUNCHER normal após preservação validada. Coletar só eventos XF_INTRO07 delimitados para PID novo, sem logcat geral ou limpar buffer. Captura nativa ADB opcional somente durante intro ativa, nunca CDP/Emulation; persistir apenas se primeiro quadro foi observado e não houve fim antes da captura. Não navegar/reproduzir conteúdo do catálogo. Som real/latência visual/60FPS/FAILs06 não homologados. Registro técnico deve distinguir checksum instalado, primeiro quadro, término e imagem observada.
+
+Rollback apenas plano: APK07 anterior734e6ca9b89c8639d1e45d70caf81bf4c6fcbd2611278a163ca00431ef5c9ac2 preservado, mesmos package/cert/code37, substituição in-place requer autorização expressa se necessária; APK não é backup privado. Relatório e preservação final, CANON/C11 depois, nenhuma mudança funcional ou próximo gate.
+
+## Allowlist
+
+- docs/architecture/INTRO_VIDEO_PHONE_UPDATE_20261026.md
+- docs/evidence/INTRO_VIDEO_PHONE_UPDATE_20261026.md
+- docs/architecture/XANDEFLIX_PREBUILT_PHASED_EXPANSION.md
+- docs/STATUS.md
+- docs/EVOLUTION_REPORT.md
+- docs/ERRORS_AND_BLOCKERS.md
+
+
+## Celular — abertura somente vídeo confirmada
+
+RESULT=PHONE_UPDATED_IN_PLACE_INTRO_VIDEO_ONLY_CONFIRMED. APK anterior734e6ca9 substituído in-place porfd82bb15 no SM-S926B nominal autorizado.11 registros/firstInstallTime preservados na comparação pré-abertura; primeiro quadro518ms e término ENDED8561ms do controller. Usuário: “Sim, ficou somente o vídeo”. Sem homologação de áudio/FPS/FAILs06. Fonte/testes/config/39 recibos idênticos; resultados funcionais herdados, CANON/C11 fresh. Relatório C:/Xandeflix/xandeflix-prebuilt-c11-main/tmp/intro-video-phone-update-20261026/REPORT.md. NEXT_GATE_STARTED=NAO.
+
+
+## Espaçamento móvel do catálogo — escopo atual
+
+Pedido explícito de reduzir espaços do cabeçalho/hero em Home/Filmes/Séries, especificado antes do código em docs/architecture/MOBILE_CATALOG_HEADER_SPACING.md. Classe somente nessas três rotas; até600px sem TV/tablet/sidebar/square: header56px com inset seguro, padding6px, página8px. Demais layouts/rotas, botões44px, intro e dados preservados. Teste existente atualiza somente expectativa substituída64→56 e conserva Busca64. Recibo40,39 anteriores intactos;204 controles/34 suítes preservados. APK local para revisão; nova instalação não autorizada. NEXT_GATE_STARTED=NAO.
+
+
+## Cabeçalho móvel compacto — fechamento local
+
+RESULT=MOBILE_CATALOG_HEADER_SPACING_APK_VALIDATED_PHYSICAL_PENDING. Home/Filmes/Séries móveis:56px header com inset,6px padding,8px até hero; redução16px nas larguras320–430,4px na fronteira600. Comparador SSR 42 casos PASS;204 controles/34 suítes,13 checks oficiais,257 testes Android/39 suítes, build e auditoria PASS. Native/intro byte idênticos; APK C:/Xandeflix/xandeflix-prebuilt-c11-main/Xandeflix-v1.0.37-cabecalho-compacto-20261026.apk SHA256 01b14a17b0db81ed2e7ac3243652d2acb306683f5e4da4d2c3d281ee20a726ec. Três aparelhos conectados via Wi-Fi; novo FireAFTSSS identificado. Nenhuma instalação nova. Ensaio amplo herdado inconclusivo por fixture/menu desatualizados; comparador focado final válido, tentativas preservadas.40 recibos,39 históricos e base/root preservados. Relatório C:/Xandeflix/xandeflix-prebuilt-c11-main/tmp/mobile-header-spacing-20261026/REPORT.md. NEXT_GATE_STARTED=NAO.
+
+
+## Refinamento visual do celular
+
+Gate CANON-01-PHONE-HEADER-REFINEMENT. Especificacao previa docs/architecture/PHONE_HEADER_REFINEMENT.md. Pedido explicito/previas: top12px catalog e Live, marca PNG alpha sem simbolo/PREBUILT e x8px em todos os headers phone que a exibem; rodape centralizado mantendo largura/altura/atalhos/bottom. Scope<=599px sem tablet/TV/sidebar/square; demais alturas e layouts intactos. Recibo41 com40 antigos imutaveis,204controles/34suites preservados. APK local para revisao, nenhuma instalacao autorizada. FAILs06 abertos. NEXT_GATE_STARTED=NAO.
+
+
+## Consolidacao final explicitamente solicitada
+
+Gate unico: header/mobile parental/PNGalpha/x8/top12/footer centralizado, atalhos18+ apenas apos PIN+PUK locais e grupos Live adultos ocultos antes da configuracao, Settings com ritmo visual/acoes padronizados. Recibo41 ainda aberto consolidado com10 grants/17caminhos,40 historicos intactos. Teste128 acrescenta ausencia de verificadores/render compartilhado/projecao Live sem alterar seguranca.204 controles34suites preservados. Fontes congeladas para verificacao final;13 execucoes anteriores sao fase visual anterior a ampliacao, repetir apos novo escopo. APK final autorizado sem instalacao/Git/backend. NEXT_GATE_STARTED=NAO.
+
+
+## Consolidacao final explicitamente solicitada
+
+Gate unico: header/mobile parental/PNGalpha/x8/top12/footer centralizado, atalhos18+ apenas apos PIN+PUK locais e grupos Live adultos ocultos antes da configuracao, Settings com ritmo visual/acoes padronizados. Recibo41 ainda aberto consolidado com10 grants/17caminhos,40 historicos intactos. Teste128 acrescenta ausencia de verificadores/render compartilhado/projecao Live sem alterar seguranca.204 controles34suites preservados. Fontes congeladas para verificacao final;13 execucoes anteriores sao fase visual anterior a ampliacao, repetir apos novo escopo. APK final autorizado sem instalacao/Git/backend. NEXT_GATE_STARTED=NAO.
+
+
+## Fechamento da consolidacao visual/parental
+
+RESULT=FINAL_UI_PARENTAL_APK_CONSOLIDATED_PHYSICAL_REVIEW_PENDING. APK C:/Users/Alexandre/Downloads/XANDEFLIX_AJUSTES_FINAIS_a70a2146.apk SHA256 a70a21463615b72f2750e7fbf588a60ce41cd95164832095da7299adeb1cad55.204controles34suites/938protegidos41recibos/14casos128/13checks e257testesAndroid39suites PASS; layout 79 headers e35 janelas locais. Codigo integral consolidado com manifesto/ZIP.40recibos,root e bases fechadas preservados. Nenhuma instalacao/Git/backend; revisao fisica do novoAPK pendente. Interrupcao transitoria de botoes voltou segundo usuario, causa nao confirmada. Relatorio C:/Xandeflix/xandeflix-prebuilt-c11-main/tmp/phone-header-refinement-20261026/REPORT.md. NEXT_GATE_STARTED=NAO.
+
+
+## Retorno do player ao episodio e temporada
+
+Gate CANON-01-SERIES-EPISODE-RETURN, especificacao previa docs/architecture/SERIES_EPISODE_RETURN.md. Posicao UI efemera por rota/serie/modelo sobrevive a remontagem do gate parental sem contornar autorizacao; retorno foca episodio explicitamente aberto e o torna visivel. Respeita loading, modal e erro, limpa listeners/rAF e descarta memoria ao sair/trocar serie/catalogo. Dois arquivos de produto, tres testes e runner;41 recibos anteriores imutaveis/42total.204 controles preservados, suite35 nova. APK atualizado/ZIP consolidado autorizados pelo pedido permanente anterior, nenhuma instalacao/Git/backend. Falha herdada de fixture continue-row confirmada na base e portas completadas sem remover assertions. FAILs06 permanecem abertos. NEXT_GATE_STARTED=NAO.
+
+
+## Fechamento do retorno ao episodio
+
+RESULT=SERIES_EPISODE_RETURN_APK_CONSOLIDATED_PHYSICAL_REVIEW_PENDING. APK C:/Users/Alexandre/Downloads/XANDEFLIX_RETORNO_EPISODIO_433a60d7.apk SHA256 433a60d77669430de4cc09b45db0b3f29760b2578d920d76f60ee9580ce18252.204 controles35 suites/939protegidos42recibos,16cenarios browser e ownershipApp, callback5 e continue-row PASS,13 checks e257 testesAndroid39suites PASS. PosicaoUI RAM por rota/serie/modelo, autorizacao preservada; APK novo ainda sem instalacao/homologacao fisica. Codigo integral/ZIP consolidado, root/base/41recibos preservados. Relatorio C:/Xandeflix/xandeflix-prebuilt-c11-main/tmp/series-episode-return-20261026/REPORT.md. FAILs06 fora do escopo abertos. NEXT_GATE_STARTED=NAO.
+
+
+## CANON-01-TRAILER-CONTAINMENT-R4 — candidato independente R3 — 27/10/2026
+
+Autorizacao CANON-01-TRAILER-CONTAINMENT-R4, spec docs/architecture/TRAILER_CONTAINMENT_R4.md, evidencia docs/evidence/TRAILER_CONTAINMENT_R4.md. Base1471 e42 recibos recebidos preservados, novo43 exclusivamente neste stage.204 controles35 suites historicas+nova36, Android257/39 exigidos pos-patch. Allowlist16 caminhos. Sem integracao R2/G2/G3; atualizacao somente do candidato R4 auditado no Fire autorizado para teste autonomo, sem reset. Homologacao fisica pendente. R2_PHYSICAL_VALIDATION=FAIL; causa visual original nao comprovada. Mudancas e RED/GREEN descritos na evidencia. Nenhuma alteracao de C9/parental/identidade/fonte/catalogo ativo. Sem root/Git/backend/SET01. NEXT_GATE_STARTED=NAO.
+
+
+## CANON-01-TRAILER-CONTAINMENT-R4 — fechamento fisico autonomo,27/10/2026
+
+Contencao PASS no Fire AFTSS/G071CQ070344374G, APK 0358e6445b8d273fa3f4ae1a9bf2be7b3a90f74f1159ce1d5ff69e3eebc2e3a9. Video oficial real por selecao UI/D-pad:35451 pontos internos em movimento e0/88623 externos; padrao oversized63446 vermelho→verde internos/0 externos/0 cantos; controle negativo sem clipping46011 externos/2 cantos. Captura composta Android, nao HDMI/FPS/primeiro quadro. Expansao horizontal Home/Filmes/Series e20 trocas fisicas discretas verificadas; iframe na mesma capa selecionada quando reproduziu. Falhas de startup publico e incidentes de helper preservados no relatorio; nao homologacao integral do app ou todos titulos/aparelhos. Nenhum resultado historico foi reescrito. Atualizacao in-place somente deste R4, identidade/ativacao/fonte cifrada/journal nativo preservados nos pares disponiveis. Sem novo PIN/PUK/reset/fonte/Git/backend/SET01. Relatorio e evidencias completos no tmp/trailer-containment-r4-20261027. NEXT_GATE_STARTED=NAO.
+
+
+## CANON-01-TMDB-EPISODE-METADATA-ENRICHMENT — implementacao local isolada,27/10/2026
+
+Autorizacao Chat Mestre e6e2d547; spec docs/architecture/TMDB_EPISODE_METADATA_ENRICHMENT.md; evidencia docs/evidence/TMDB_EPISODE_METADATA_ENRICHMENT.md. Base R4 completa1479/944/43 preservada. Novo recibo44, allowlist17, sete caminhos de produto somente de apresentacao/consulta publica de temporada. REDs antes de produto;36 casos unitarios e22 Chromium PASS com I/O adaptado. Regressao completa/build/auditoria seguintes, sem alegar homologacao fisica. Fonte segue autoridade de disponibilidade/ids/ordem/streams; Java e trailer R4 imutaveis. NovoAPK separado permitido apos PASS, instalacao/publicacao/promocao NAO. Foco/tempo medidos no host, nao aparelho/SLA. Refinamentos e incidentes no documento de evidencia, inclusive pasta vazia deixada apos bloqueio automatico de remocao. Sem C9/parental/backend/SET01/G2/G3. NEXT_GATE_STARTED=NAO.
+
+
+# Refinamento da allowlist antes de editar harness historico — 27/10/2026
+
+CANON-01-TMDB-EPISODE-METADATA-ENRICHMENT, mesma autorizacao local e mesmo produto. A primeira regressao completa falhou em test-series-poster-composition porque seu filho test-c11-source-first-tmdb-artwork possui loader CommonJS com portas TSX fixas. Novos imports de apresentacao nao sao reconhecidos. Auditoria identificou o mesmo limite em quatro outros renderizadores de teste e a necessidade de declarar destino CSS no bundler do teste de retorno real Chromium.
+
+Nao modificar produto para acomodar loaders antigos. Acrescentar APENAS estes seis caminhos ao escopo de testes/governanca, total23 caminhos, sem ampliar os sete de produto:
+
+1. scripts/test-c11-source-first-tmdb-artwork.mjs
+2. scripts/test-c11-home-hero.mjs
+3. scripts/test-c11-detail-tablet-tv.mjs
+4. scripts/test-c11-episode-continue-row.mjs
+5. scripts/test-c121-detail-genres.mjs
+6. scripts/test-series-episode-return.mjs
+
+Mudancas permitidas: novas portas de apresentacao opcional mantendo os episodios originais nas suites de artwork/hero/generos/continuar, e destino/leitura/servico do CSS compilado na suite Chromium que executa a pagina real. O harness de arvore sintetica pode materializar o render-prop fonte para continuar inspecionando as mesmas linhas/handlers. Nao remover/alterar assert, fixture de autoridade, negativo, timeout, skip, resultado ou marcador existente. Auditar AST de todos assert recebidos antes/depois; produto real de enriquecimento continua coberto por36 testes unitarios+22 Chromium da suite nova, sem stub dos novos componentes.
+
+Essa e uma compatibilidade de harness necessaria a regressao completa requerida pelo anexo; nao altera contrato de produto ou enfraquece teste. Registrar revisao do recibo44 com testChangesReviewed=true, novos hashes/supersedes, preservar43 recibos e o primeiro FAIL/logs. O texto original de spec e o hash continuam intactos; os termos iniciais '17 caminhos' e 'nenhum teste historico alterado' passam a ser historicos da primeira revisao, substituidos por este refinamento expresso. Nenhum verificador sera editado.
+
+
+## Refinamento de harness — escopo final22
+
+O ensaio extra test-c11-home-hero falhou antes dos loaders, no primeiro assert de normalizacao Movie (ano) | [4K]. Execucao somente leitura na R4 recebida confirmou o MESMO FAIL (undefined versus2026). Nao e regressao do enriquecimento nem integra as36 suites canonicas herdadas. Sua alteracao propria de loader foi revertida integralmente aos bytes R4 e o caminho retirado da allowlist/recibo/comandos deste Gate; nao corrigir normalizacao de release tags fora de escopo. Cinco harness recebem somente portas/destino CSS, todos asserts identicos. Allowlist FINAL22, produto7 inalterado, stage1490, protegidos952. Resultado/log extra e baseline mantidos como limitacao preexistente, sem alegar PASS dessa suite.
+
+
+## Escopo final de compatibilidade:20 caminhos
+
+Restringida a adaptacao aos tres harness efetivamente exigidos: source-first TMDB artwork (filho da suite canonica series-poster), episode-continue-row (comando herdado) e series-episode-return (suite canonica). Todos asserts recebidos identicos segundo AST. Experimento extra detail-tablet-tv encontrou porta DetailBackdrop ja ausente na R4, reproduzida em leitura na R4; seus bytes e os do helper detail-genres foram restaurados integralmente, sem ampliar contratos para consertar testes antigos fora da regressao exigida. Home-hero tambem permanece byte-identico ao recebido e seu FAIL extra/baseline foi preservado. A lista inicial6/23 e intermediaria5/22 sao historico dos refinamentos, NAO o escopo final. Allowlist FINAL20; tres harness mudam somente apresentacao de fixture/bundler/CSS,7produto intacto,37suites continuam obrigatorias. Esses dois FAILs extras da baseline nao sao promovidos a PASS ou classificados como regressao nova.
+
+
+# Ajuste mobile solicitado durante a execucao — 27/10/2026
+
+Pedido literal do usuario: "em tela mobile, coloque a imagem no topo e a sinopse e o botao abaixo".
+
+Mesmo Gate e mesma allowlist20. Aplicar aos cards de episodio no layout phone, retrato E paisagem: cena16:9 no topo ocupando a largura interna do card; titulo/numero/duracao, sinopse e botao abaixo. Manter o layout recebido de tablet/TV e os mesmos IDs/keys/handlers, sem nova area de foco. Reserva da altura antes de metadata/imagem para manter foco/scroll. A classe existente series-phone-panel permite distinguir phone de tablet, inclusive paisagem mais larga que640px; nao alterar PhoneSeriesDetail.
+
+Antes do CSS, novo RED no harness real com verificacao geometrica da imagem acima das informacoes/acao. GREEN exige isso nos dois viewports phone, largura correspondente ao card e16:9; asserts anteriores de foco/node/scroll/imagem/acao permanecem. Novo teste24 casos UI (22 recebidos desta implementacao+2 mobile),36 unitarios. Atualizar somente CSS do produto, script UI e recibo44/hashes/evidencia; os43 recibos e R4 continuam intactos. Nova validacao final completa depois do ajuste, APK separado e sem instalacao.
+
+RED_MOBILE_LAYOUT exit1 preservado antes do CSS. O ensaio em andamento anterior ao pedido mobile e revisao intermediaria; somente nova regressao apos ajuste serve ao candidato final. Produto alterado somente no CSS ja allowlisted; UI24 casos agora, todas verificacoes anteriores mantidas.
+
+
+# Referencia visual mobile substitui arranjo anterior — 27/10/2026
+
+Pedido do usuario: "refaca o formato de series, coloque como no netflix", acompanhado de captura de lista mobile de episodios. Mesma apresentacao do Gate autorizado, mesmos20 caminhos allowlisted, sem nova funcionalidade de download ou catalogo remoto.
+
+Interpretacao da referencia no shell phone: cabecalho de cada episodio com miniatura16:9 esquerda, titulo/numero e duracao direita; botao de reproducao circular sobre miniatura; sinopse abaixo em toda largura. Substitui a instrucao mobile anterior de miniatura em largura completa acima de tudo. Temporada via select acessivel que reutiliza IDs/estado/handler de selecao recebido; opcoes limitadas as temporadas locais. Preservar abas/acoes existentes, Assistir/Continuar/Preparando, foco/retorno, imagens opcionais e reserva de geometria. Sem alterar layout tablet/TV, PhoneSeriesDetail, trailer, player ou dados de autoridade.
+
+Antes do novo CSS/markup, RED geometrico na UI real para header lado a lado e sinopse abaixo. A suite UI sera atualizada para essa referencia e ampliada com seletor/retorno mobile: asserts antigos de identidade/cache/foco/estabilidade preservados. Troca de temporada no harness envia evento change real no select, e continua usando clique de tab em TV/tablet. Comparar screenshots sinteticos retrato/paisagem; nao alegar validacao fisica.
+
+Botao visualmente iconico conserva o MESMO button/data-series-episode-id/handler/key, com aria-label explicito identificando a acao e episodio. Novo recibo44 revisado, hashes/CANON/regressao/builds novamente, APK separado sem instalacao. A execucao intermediaria mobile anterior terminou PASS, mas somente a fonte final desta referencia integra a entrega.
+
+# Fallback horizontal da serie solicitado pelo usuario — 27/10/2026
+
+Pedido literal: "em serie que o tmdb nao fornecer a imagem, coloque a imagem horizontal fornecida pelo tbmb da serie". Mesma identidade publica confirmada e mesmo Gate/allowlist20.
+
+Quando nao houver still aplicavel do episodio, utilizar backdropUri horizontal da PROPRIA serie confirmada no TMDB; nao usar poster vertical ou outra serie/episodio. A imagem e generica da serie, nao e prova de correspondencia individual e nao altera MATCH_CONFIRMED/AMBIGUOUS/UNAVAILABLE nem os textos/IDs locais. E a substituicao expressa do requisito anterior de placeholder para esse caso, sem associacao falsa de cena individual.
+
+Prioridade: still do episodio confirmado; se ausente, backdrop horizontal publico da serie confirmada; sem ambos, imagem legitima da fonte ou placeholder. Para episodio ambiguo, nunca usar candidato de outro episodio: pode usar somente o backdrop generico da serie ou apresentacao local segura. Aguardar resolucao da consulta da temporada antes do fallback evita descarregar/baixar banner temporario durante carregamento e trocar por still logo depois. HTTP404/timeout da temporada tambem pode conservar a imagem da serie ja resolvida. Sem novo endpoint, cache, decoder ou credencial; normalizar w300 e reutilizar fila/cache/dedup recebidos.
+
+Marcar origem somente como dado de apresentacao (episode/series) e manter imagem decorativa. O hook fornece backdrop apenas se confirmEpisodeSeries validou a identidade atual; nada de inferir serie por titulo semelhante. Validacao local: RED antes do patch, unitarios para imagem ausente/ambiguidade/URI ou identidade invalidas e UI real com temporada sem stills; provar uma unica aquisicao compartilhada do banner visivel e mesmos episodios/IDs/acao. Revisar recibo44, hashes e relatorio final. Nao altera fonte, parental, C9, historia, trailer ou instalacao.
+
+RED_MOBILE_REFERENCE e RED_SERIES_BACKDROP exit1 antes do patch. GREEN39 unitarios/27 Chromium, incluindo uma aquisicao de banner compartilhada e seletor local nas duas orientacoes phone. O arranjo mobile anterior foi substituido pela referencia posterior do usuario; arquivos de evidencia intermediarios preservados. Escopo final20 inalterado, produto7,sem instalacao. Nova regressao final a seguir.
+
+
+Revisao visual da referencia detectou label textual junto ao icone na paisagem, devido ao font-size importante ja existente no shell. Imagens anteriores preservadas em visual-reference. Corrigido com span do label oculto apenas no phone e aria-label explicito no MESMO botao. Tablet/TV conservam texto; sem mudar handler/ID/foco. Teste mobile agora verifica display none do label em ambas orientacoes, sem enfraquecer os asserts de geometria/acao. Nova rodada final CANON depois do congelamento atual; rodada em andamento e intermediaria para esse detalhe visual.
+
+
+## P2.7 - Extensao de progresso da interface
+
+Pedido posterior do usuario: no tablet e Fire Stick, retirar o
+botao textual Assistir e apresentar progresso abaixo da miniatura.
+O celular mantem o botao circular existente.
+
+O metodo savedProgress consulta somente registros existentes:
+positionMs, durationMs e completed. Nao ha mudanca no armazenamento,
+sessao C9, parental, reproducao ou retomada.
+
+P2.3 e P2.4 foram aplicados antes desta revisao do recibo.
+A interrupcao CANON_PROTECTED_CONTENT_CHANGED foi registrada.
+Nao apresentar a atualizacao documental como autorizacao anterior
+aos patches.
+
+Origem canonica do historico: REFERENCE_BASELINE_NO_PRIOR_GRANT.
+Recibo corrente revisado sem editar recibos historicos.
+Nova allowlist: 21 caminhos; resultados anteriores nao certificam
+a interface modificada. Testes e APK permanecem pendentes.
+
+
+## CANON-01-P250-V139-CANONICAL-RECOVERY — recuperação isolada autorizada pelo usuário,28/10/2026
+
+Retomada após "continue" do usuário sobre a rota concreta do diagnóstico R0. Clone novo P2_50D_R1/workspace, root/candidatoC/congelado/1.0.38 e44 recibos preservados. Adoção formal dos bytes P2.43B+UnicodeC e versão39, sem novo patch de produto. Quatro fixtures do runner revisadas mantendo204 controles37 suítes; verificador/A22/workflows/package inalterados. Spec docs/architecture/P2_50_V139_CANONICAL_RECOVERY.md; evidência docs/evidence/P2_50_V139_CANONICAL_RECOVERY.md. Testes seguintes pendentes nesta inscrição. Sem build/Capacitor/Gradle/APK/aparelho/backend/Git remoto. CHAT_MASTER_REVIEW=PENDING; NEXT_GATE_STARTED=NAO.
+
+
+## P2.50D-R1 — interrupção na regressão,28/10/2026
+
+LATEST_REGRESSION_WINS: resultado global BLOQUEADO. O verificador original passou952 protegidos/45 recibos no clone real e C11 prévio passou. canon:test passou204 controles e34 suítes, mas test-series-episode-return.mjs falhou em TIMEOUT_CHROME antes dos cenários de retorno UI: DevToolsActivePort ausente na janela original100x30ms. A causa exata de inicialização do Chromium não foi determinada. Duas suítes restantes e todos os checks posteriores NÃO EXECUTADOS. Não aumentar timeout, editar suite, rerodar ou alegar37/37. Logs/FAIL e cópia atual preservados. A recuperação estrutural não está integralmente aprovada. Sem build/Capacitor/Gradle/APK/aparelho/Supabase/commit/push ou próximo Gate. Resultado P2_50D_R1_BLOCKED_REGRESSION_CHROME_STARTUP; CHAT_MASTER_REVIEW=PENDING; NEXT_GATE_STARTED=NAO.
+
+
+## CANON-01-TMDB-EPISODE-RUNTIME-RECOVERY — 2026-10-28
+
+Pedido do usuário e regra SxxExx expressamente confirmada. Spec docs/architecture/TMDB_EPISODE_RUNTIME_RECOVERY.md; evidência docs/evidence/TMDB_EPISODE_RUNTIME_RECOVERY.md. Novo clone isolado1.0.40; identidade/source/C9/parental/R4 inalterados. Testes e Fire em andamento; nenhuma conclusão física antecipada. Sem publicação/backend/reset/SET01.
+
+
+## CANON-01-EPISODE-ROW-ALIGNMENT — 2026-10-28
+
+New user presentation refinements and final APK request. Spec docs/architecture/EPISODE_ROW_ALIGNMENT.md; evidence docs/evidence/EPISODE_ROW_ALIGNMENT.md. Preview measured101px row/81px image and8px season gap. Final checks and APK41 pending; metadata fix retained. No backend/Git/reset/next gate.
+
+
+## CANON-01-EPISODE-GENERAL-IDENTITY — 2026-10-28
+
+Current user correction; spec docs/architecture/EPISODE_GENERAL_IDENTITY.md; evidence docs/evidence/EPISODE_GENERAL_IDENTITY.md. Correct work resolved but title proof lost on Turkish dotless letter/internal spacing, causing unrelated source cartoon fallback. Exact normalized title/poster only; incompatible distributions stay protected. Baseline/REDs retained; final tests/Fire pending. No backend/Git/reset/next gate.
+
+
+### Revisão2 do mesmo ciclo — nome público localizado
+
+Full Moon corresponde a Dolunay em pt-BR e Full Moon em en-US, confirmado publicamente73506/2017/TR. Fallback limitado exige pôster público exato e contexto/ano, sem associar homônimos. Regressão parcial R1 cancelada no helper host antes do build para incorporar o caso; arquivos parciais preservados fora do workspace. Recibo próprio ainda não fechado revisado com cópia anterior,47 históricos intactos. Regressão completa R2 obrigatória antes do APK42.
+
+
+### Revisão3 — regressão de adapter detectada e corrigida
+
+R2 canon:test falhou na compilação do harness series-episode-return por ausência da nova exportação normalizeArtworkIdentity em sua porta sintética. Acrescentada reexportação real; comparação reversa confirma todos os bytes anteriores/asserts preservados. FAIL/logs guardados; nova suite/regressão/build/Fire obrigatórios. Sem falha de app classificada e sem promover PASS anterior a entrega. Full Moon segue sem prova de pôster; rejeição preservada.
+
+
+### Revisão4 — teste de painel oculto alinhado ao marco correto
+
+FAIL R3 preservado: contagem absoluta0 incluía a nova imagem correta solicitada enquanto visível. Teste agora exige1 pedido correto antes de ocultar e nenhum adicional ao liberar resposta tardia depois de ocultar. Mesma proteção, marco temporal explícito; demais asserções/cenários/timeouts intactos. Produto não alterado; suíte afetada e regressão completa novamente obrigatórias.
+
+
+### Revisão5 — leitor de porta Windows
+
+R4 UI falhou antes dos cenários: EBUSY no DevToolsActivePort. Leitura agora ocorre dentro do polling recebido, somente ENOENT/EBUSY pendentes; prazos e asserts preservados. Logs de falha mantidos. Sem produto/dependência alterado; novas verificações completas exigidas.
+
+
+## CANON-01-DETAIL-HERO-REFINEMENT —2026-10-28
+
+Current user hero correction; docs/architecture/DETAIL_HERO_REFINEMENT.md; docs/evidence/DETAIL_HERO_REFINEMENT.md. Spec before code; inherited48 receipts preserved. No Git/backend/source change or next gate.
+
+
+## CANON-01-ACTOR-PROFILE —2026-10-28
+
+Isolated actor page authorized by current user; public biography, existing local titles only, retained focus/Back; inherited tests preserved. See ACTOR_PROFILE specification/evidence; physical status remains pending until measured. No next gate.
+
+
+## CANON-01-IDENTITY-HERO-RECOVERY —2026-10-29
+
+Current user authorizes isolated Friends public identity correction and hero-contained Back/Cast. See specification/evidence. Baseline204/41 preserved; first strict new identity RED, helper-path and toolbar mount/border fixture incidents retained in local logs. Physical result pending actual validation. No source/backend/Git changes or next gate.
+
+
+## CANON-01-TABLET-HERO-SPACING —2026-10-29
+
+Current user tablet-only hero controls and minimal top spacing; see spec/evidence. Initial verification started during dependency copy; proposed patch archived and bytes restored before fresh baseline47 canon/C11 PASS. Incomplete-dependency typecheck failure preserved; final focused21/typecheck PASS after preparation. Native Back/nonhero navigation preserved. Build/physical result pending, no other-device install/root promotion/Git/backend write/next gate.
+
+## User revision —12px
+
+Current explicit steering asks only a little more upper margin. Increase page-to-hero gap8→12px (4px extra), retain tablet-only controls and6px mobile header. Revision48 managed bytes/APK/evidence archived in REVISION1_V148_8PX before edits; dependencies remain physically isolated in current candidate. Android49 avoids distributing two different APKs with code48. Old47 and51 historical receipts untouched. No new gate, no other-device installation.
+
+48 installed and hash/runtime confirmed, but physical UI verification did not complete after connection/tool failures; no8px physical PASS claimed. Original47→48 private byte comparison unavailable. Proposed49/12px awaits final audits/physical validation.
+
+
+## CANON-01-MOBILE-HEADER-ALIGNMENT — 2026-10-29
+
+User mobile-only catalog header correction. Received49 baseline canon/C11/full204/42 passed. RED demonstrates duplicated positive safe-area in header; GREEN fixes only catalog phone padding. Existing internal/tablet/TV12px hero gap and controls preserved. Final build/audit result in isolated stage, no remote operation/device install/Git/root promotion/next gate.
+
+
+## CANON-01-MOBILE-DETAIL-HEADER-ALIGNMENT — 2026-10-29
+
+User reports internal mobile movie/series header still larger than browse/Live after catalog-only50. New scope fixes one phone hero-header top-padding declaration; RED reproduces internal32px safe-area padding, GREEN matches12px. Full baseline204/42 preserved and re-executed. Final build/physical limits in isolated report. No device install/backend/Git/root promotion/next gate.
+
+
+## CANON-01-CARD-TRAILER-AUDIO — 2026-10-29
+
+Current card path explicitly muted in Java frame and web adapter. REDs preserved; official unMute/setVolume100 before play, respecting autoplay failure and system volume. Existing R4 isolation/cleanup cases retained and expanded. Baseline/full protections unchanged; final build/Fire digital evidence and acoustic limits in isolated report. Two early read-only exploratory path misses corrected without mutation or mandatory-test failure. No reset/source/backend/Git/root promotion/other-device install/next gate.
+
+
+## CANON-01-SOURCE-SWITCH-ISOLATION — 05/11/2026
+
+Fonte verificada no boot e reconstruída por ativação independente, conforme pedido nominal do usuário; implementação isolada, validações finais e teste físico pendentes neste registro. Ver `docs/evidence/SOURCE_SWITCH_ISOLATION.md` e evidência externa SOURCE_SWITCH_ISOLATION_20261105. O 403 externo permanece separado; ambiguidades históricas preservadas. Sem publicação, backend administrativo ou próximo gate.
+
+
+## CANON-01-SOURCE-SWITCH-ISOLATION-CACHE-REVIEW
+
+Complemento do mesmo ciclo: limpar índices de apresentação da fonte antes da importação no novo runtime. Primeiro PASS 204/45 preservado nos logs; bytes finais exigem nova validação. Ver docs/evidence/SOURCE_SWITCH_ISOLATION_CACHE_REVIEW.md.

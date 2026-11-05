@@ -69,3 +69,59 @@
   html:not([data-web-validation="true"]):not([data-device-presentation="phone"]) #root :is(.app-shell--tablet, .app-shell--television) .settings-option-description { font-size: clamp(11px, 1.15vw, 13px); }
   html:not([data-web-validation="true"]):not([data-device-presentation="phone"]) #root :is(.app-shell--tablet, .app-shell--television) .settings-option-chevron { font-size: 24px; }
 }
+
+
+/* Settings: shared visual rhythm without changing controls or focus behavior. */
+#root .settings-page { padding: 24px; }
+#root .settings-page > .page-header { margin: 0 0 24px; padding: 0; }
+#root .settings-page > h1,
+#root .settings-page .page-title { margin: 0 0 10px; font-size: clamp(26px, 3vw, 34px); line-height: 1.18; letter-spacing: -.025em; }
+#root .settings-page .page-subtitle,
+#root .settings-page > p { margin: 10px 0 16px; max-width: 72ch; color: #b7c2d2; line-height: 1.65; overflow-wrap: anywhere; }
+#root .settings-option { background: linear-gradient(145deg, #151d2b, #101624); border-color: #ffffff1f; border-radius: 16px; }
+#root .settings-option-summary { min-height: 120px; padding: 20px; gap: 16px; border-radius: inherit; }
+#root .settings-option-copy { gap: 8px; }
+#root .settings-option-title { font-size: 19px; line-height: 1.35; letter-spacing: -.01em; }
+#root .settings-option-description { color: #aebbd0; line-height: 1.55; }
+#root .settings-option-chevron { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; color: #e1e8f3; background: #ffffff08; }
+#root .settings-window { border-color: #ffffff24; border-radius: 18px; background: #111927; }
+#root .settings-window-header { padding: 18px 24px; gap: 16px; background: #151e2d; }
+#root .settings-window-header h2 { min-width: 0; overflow-wrap: anywhere; font-size: 22px; line-height: 1.3; letter-spacing: -.015em; }
+#root .settings-window-close { margin: 0; min-height: 44px; border-radius: 10px; }
+#root .settings-window-body > :is(.settings-section, .network-settings) { display: grid; align-content: start; gap: 16px; min-width: 0; padding: 24px; border: 0; border-radius: 0; background: transparent; }
+#root .settings-window-body :is(p, h3, dl) { margin: 0; }
+#root .settings-window-body p { color: #bcc7d7; line-height: 1.65; overflow-wrap: anywhere; }
+#root .settings-window-body :is(form, label) { display: grid; gap: 10px; min-width: 0; }
+#root .settings-window-body form { gap: 16px; }
+#root .settings-window-body :is(input:not([type=checkbox]), select) { width: 100%; min-height: 48px; padding: 11px 14px; border: 1px solid #64748b; border-radius: 10px; background: #0a111d; color: #f1f5f9; font: inherit; }
+#root .settings-window-body button { min-height: 46px; margin: 0; padding: 11px 16px; border-radius: 10px; white-space: normal; line-height: 1.4; }
+#root .settings-window-body .settings-section > button { display: flex; align-items: center; justify-content: center; width: 100%; }
+#root .settings-window-body .network-test-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 0; }
+#root .settings-window-body .network-test-actions > button { flex: 1 1 180px; }
+#root .settings-window-body :is(pre, details) { max-width: 100%; overflow-wrap: anywhere; }
+#root .settings-window-body pre { overflow: auto; padding: 14px; border-radius: 10px; background: #080e18; }
+#root .settings-page .parental-panel { display: grid; gap: 24px; min-width: 0; margin: 24px 0 0; padding: 24px; border: 1px solid #ffffff24; border-radius: 16px; background: #111927; }
+#root .parental-panel > section { display: grid; gap: 12px; min-width: 0; }
+#root .parental-panel :is(h2, h3) { margin: 0; font-size: 22px; line-height: 1.3; letter-spacing: -.015em; }
+#root .parental-panel p { margin: 0; line-height: 1.65; }
+#root .parental-panel form { margin: 0; gap: 16px; }
+#root .parental-panel label { line-height: 1.5; }
+#root .parental-panel button { min-height: 46px; margin: 0; border-radius: 10px; padding: 11px 16px; line-height: 1.4; white-space: normal; }
+#root .parental-panel .parental-actions { gap: 10px; margin: 0; }
+#root .parental-panel .parental-actions > button { flex: 1 1 200px; }
+#root .parental-panel :is(input:not([type=checkbox]), select) { border-radius: 10px; }
+@media (max-width: 599px) {
+  #root .settings-page { padding: 20px 16px calc(100px + env(safe-area-inset-bottom, 0px)); }
+  #root .settings-page > .page-header { margin-bottom: 20px; }
+  #root .settings-sections { gap: 12px; }
+  #root .settings-option-summary { min-height: 104px; padding: 18px; }
+  #root .settings-option-title { font-size: 18px; }
+  #root .settings-window-header { padding: 16px; gap: 12px; }
+  #root .settings-window-header h2 { font-size: 20px; }
+  #root .settings-window-close { padding: 10px 12px; }
+  #root .settings-window-body > :is(.settings-section, .network-settings) { padding: 20px 16px; }
+  #root .settings-page .parental-panel { padding: 18px; gap: 22px; margin-top: 20px; }
+  #root .parental-panel :is(h2, h3) { font-size: 20px; }
+  #root .parental-panel .parental-actions { display: grid; grid-template-columns: minmax(0, 1fr); }
+  #root .parental-panel button { width: 100%; min-height: 48px; }
+}

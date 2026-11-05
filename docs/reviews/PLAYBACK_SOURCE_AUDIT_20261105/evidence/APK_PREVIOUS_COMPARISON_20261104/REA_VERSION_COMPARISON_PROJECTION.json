@@ -1,0 +1,3119 @@
+{
+  "projection": "Selected comparison fields; graph intentionally omitted from this local projection. Original REA Evidence retained in-session under evidence_id.",
+  "evidence_id": "ev_8a259121344b6335a1f1042277cbc9536836a8c29b92c96219d4f2889aaad10f",
+  "operation": "compare_application_versions",
+  "left": {
+    "evidence_id": "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+    "graph_id": "jag_fb1784926a26d709582341afd9d1c09060e2c21c44f4f2abc8c01090a6099bde",
+    "root_artifact_sha256": "9ec841404bef99e18e126ddc836508ca8cf3abf6708278cedb30a159af659cbd"
+  },
+  "right": {
+    "evidence_id": "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378",
+    "graph_id": "jag_1a10744cacd123be9cde753e326b4f92bfe5a33c278902c0e11f04bd3b397c62",
+    "root_artifact_sha256": "99e1310bb30e46f4db0ac6ab0d8bf2fff248785e45744db60a7b8675e0b9c30c"
+  },
+  "coverage": {
+    "left_graph_status": "partial",
+    "right_graph_status": "partial",
+    "left_graph_omitted_count": null,
+    "right_graph_omitted_count": null,
+    "status": "partial"
+  },
+  "summary": {
+    "unchanged": 0,
+    "added": 0,
+    "removed": 0,
+    "changed": 31,
+    "unknown": 92
+  },
+  "matching": {
+    "exact_node_identity": 0,
+    "exact_content_digest": 0,
+    "exact_module_source_digest": 0,
+    "source_map_identity": 0,
+    "structural_fingerprint": 0,
+    "semantic_key": 32,
+    "ambiguous": 12,
+    "unmatched": 79
+  },
+  "items": [
+    {
+      "item_id": "javc_item_00938523cca9966743b19af23d65f06fbaa67d138ad7ecf65d1414cf5e374519",
+      "node_kind": "worker",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_227daf568d4d08b611e2039c033c33b9d13c37354187328bd37cc96edb27c0ab",
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_01524bcdccdebb833c47d770599a2e68b57b6f5bfa58086ee8af9cc6e203f0f6",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_af92f2b78b3a705304a137af0ce58a087549260a7dbb0c6a83c3dea4ce611626",
+      "right_node_id": null,
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_01a483b4d181f975e0fb306e892f87f1a43573b5984b57309d0864285ea98de8",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_2e8ab06a5eb091e7c269dc07179659b4015702ffb7fe1b0cdd37c9f3a0fa64dc",
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_01efdad401b2b846872e685acfdb583afedaf136133b821a6caef5b54d6cdebd",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_76686d9bcfc892315a8dffab23aa44e13ac70d9eafa8aa46a4c4bd9778e94188",
+      "right_node_id": null,
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_04adb488d72805bb94f7708e35187e92a451f1332cd795c6cebb7b97c67846c4",
+      "node_kind": "storage",
+      "dimensions": [
+        "availability"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Multiple nodes share the same permitted match key; no cross-version pair was selected."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_93a086ff1bfdb494f0a68e79c0db1067f945ddddfa3964c4304e40750eac894a",
+      "right_node_id": null,
+      "match": {
+        "status": "ambiguous",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": [
+          "jag_node_2f5acac2636f6194fc783848c1652ec78593091bdef08ed3e8cec2390c82a06d",
+          "jag_node_7a29871732e162095a1e26507c7b1fb96e74aef8fe7c322076aded8322654bbd"
+        ]
+      }
+    },
+    {
+      "item_id": "javc_item_05581e6f59127f1391b9ca8d230b9ee48f167b71f9430067a110f5ace06fc7fb",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_9eaa0daa8b4776c44b889ac2ca833538263eb6357ad6581f992e4cbc2a7be2e3",
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_09029a5d1d8b5d131018a275069a474976afb78d745de15e64197978109e67a0",
+      "node_kind": "storage",
+      "dimensions": [
+        "availability"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Multiple nodes share the same permitted match key; no cross-version pair was selected."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_ff55650958b552451ce32e675e432e57fd2454fb189a6cfabbcc06566bc1b963",
+      "right_node_id": null,
+      "match": {
+        "status": "ambiguous",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": [
+          "jag_node_2f5acac2636f6194fc783848c1652ec78593091bdef08ed3e8cec2390c82a06d",
+          "jag_node_7a29871732e162095a1e26507c7b1fb96e74aef8fe7c322076aded8322654bbd"
+        ]
+      }
+    },
+    {
+      "item_id": "javc_item_0a163190e7d81cd5882ead6f727922aca262d0383a07bbb082b0f2450497c2ec",
+      "node_kind": "javascript-asset",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_7b349fc016c10eb03476b1057760ff300d20f10b59534e3e42b1cd82d1411f0f",
+      "right_node_id": null,
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_0a6beecb92907283da015b12b0b583553ba88dcc80f0315668aca9f93d918fd1",
+      "node_kind": "endpoint",
+      "dimensions": [
+        "location"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Semantic-key pairing is a deterministic inference and is never promoted to exact identity."
+      ],
+      "status": "changed",
+      "left_node_id": "jag_node_6c9e1e6fd89d31dd570fbf99e53b911a2f02547595babcc7fa62a847fac7a6f5",
+      "right_node_id": "jag_node_bf70dd3e7c494ce48e9c62d7ec7fb2a80e5183b7a5d9097618512a4a1a9d9212",
+      "match": {
+        "status": "matched",
+        "basis": "semantic-key",
+        "confidence": "medium",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_0ec9baef15ef66faf1b376429b3799637d5418510cdac779ae40b31a3580588f",
+      "node_kind": "storage",
+      "dimensions": [
+        "location"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Semantic-key pairing is a deterministic inference and is never promoted to exact identity."
+      ],
+      "status": "changed",
+      "left_node_id": "jag_node_f555314cd031968d7f4cd84c4deb47a2df3c1e46de1fd5928a36f1ca8503b3e6",
+      "right_node_id": "jag_node_79026e46e01fc639cc37487cd438d152d25283cd49eef89b8868a4c8c548a964",
+      "match": {
+        "status": "matched",
+        "basis": "semantic-key",
+        "confidence": "medium",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_15aa027b41b9b46f28d143a8a091d5e877d4b09ddc4815e89248caac39fea08c",
+      "node_kind": "endpoint",
+      "dimensions": [
+        "location"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Semantic-key pairing is a deterministic inference and is never promoted to exact identity."
+      ],
+      "status": "changed",
+      "left_node_id": "jag_node_947f71aa83f34d32ee4e0127a66a6fd58e2e5cc998623ef7c57eb6da2f7bdb81",
+      "right_node_id": "jag_node_6c2b3e1038dc13a459a506b7d4430c6195d2422ab1ea6993c8a836cc8535d5dc",
+      "match": {
+        "status": "matched",
+        "basis": "semantic-key",
+        "confidence": "medium",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_189cdcda4898ad5a7b422f0e77522620c679ee32da4ab21baa36acc06f7db893",
+      "node_kind": "storage",
+      "dimensions": [
+        "availability"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Multiple nodes share the same permitted match key; no cross-version pair was selected."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_10f0ebd8f265b279ab8b06e1ebd35e5659fedd9f8a465fbe7cc1b2c5d0c8a33d",
+      "right_node_id": null,
+      "match": {
+        "status": "ambiguous",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": [
+          "jag_node_e64cbc09af355f2d6b6b55a79cdf49f8ebedf0a66bb0c8f28e95887bcdae5824",
+          "jag_node_ea7425cafe5ccdc01ea8ef50f1b9a00e011cb60dab96b2cc7919416d83c9075b"
+        ]
+      }
+    },
+    {
+      "item_id": "javc_item_19862f715bb714246ed1bcc3563cc7dcee2acc88bd232c8053275e783c2e15ac",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_3504e21c16b2cea419a12748a628bb88dfd3f0e4c949142956a23517785f26c2",
+      "right_node_id": null,
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_1af8efb39cefdcc0afb9a26a5e1d01bfbef40a897f1f70b1b4aa67594ace314a",
+      "node_kind": "javascript-asset",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_ed24dc025229a394c9ff4410fd6450c61af077027d4ac15bff780e49945c6abd",
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_1d83fef4916ed17cbc436c60b0cfb79a8ef75aff49c122a1bb1f16413bdd35b9",
+      "node_kind": "javascript-asset",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_70309a044d3e428fab3759ba2762b4a6c00a9989bf431fa56a13f61a09195ff1",
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_1dde128e6a4a2c64460acfdcf28d92c6ed4da5dcda5bcd8c99c194dcc8061b8e",
+      "node_kind": "javascript-asset",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_3dc3b999aa977647495c53e10afdcda8291cacaf3e684b2305c372783e3d2d0c",
+      "right_node_id": null,
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_201feed6ec5d2c98043c6aa8158cd8d76da8ed58859da1e69cd9e0ca11696237",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_3f393b795ced6d67c0d675295f9a387a78abd1652737cbfdd0c792b67cf651f7",
+      "right_node_id": null,
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_254be81e825cdbcb3d82cdcad1cab173ebdfa8d2732713a3801dfa715f989a0b",
+      "node_kind": "unknown",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_3d83f1393cd3eb4b9661900061ad415653efbf466e5dccea48605979908b0fad",
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_296faf1fd97eb9cbc413c58a4c57fdfd8793d329a7123d522a25289a1644f62a",
+      "node_kind": "storage",
+      "dimensions": [
+        "location"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Semantic-key pairing is a deterministic inference and is never promoted to exact identity."
+      ],
+      "status": "changed",
+      "left_node_id": "jag_node_b2727324152ec869a4298f185400327cfe9059aeddc13a30cb43302b4d93f829",
+      "right_node_id": "jag_node_aa38d0406ffbcfd63c1e01e195515e06a923dc7ca88049cbb65f50ed72c81f0f",
+      "match": {
+        "status": "matched",
+        "basis": "semantic-key",
+        "confidence": "medium",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_2b9f2e5a40b3ad8808b3f3ddcb396f98d8fd817c8610ee71442521eb6ad1b71f",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_1bec15054198dff5638fbe4c3a5d53a2772b034af7c9a2dfd531555edc17d817",
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_2bd74148fe5eb72c261630d9b81624027f62fa072bd8414c8c93250a54bd5a42",
+      "node_kind": "endpoint",
+      "dimensions": [
+        "location"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Semantic-key pairing is a deterministic inference and is never promoted to exact identity."
+      ],
+      "status": "changed",
+      "left_node_id": "jag_node_eb60402fb941088fc22c59e5d370d8f8b06dbe468282670c1c5edc5f9775921e",
+      "right_node_id": "jag_node_252a917c36b7f304a69895406ddf90b4c29ab639dc27c0a9c48ac3aab4fb3731",
+      "match": {
+        "status": "matched",
+        "basis": "semantic-key",
+        "confidence": "medium",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_316486cc0fa9f23839a842c977e3bcc29c592c60da6ac08ee4133b03ced9476e",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_6ee07dba4b6abda3c351a1e75009d7744af464fc85604fb37b75b73a12e8eeb0",
+      "right_node_id": null,
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_3487406a593b39ad7e6c34ca51552128b42731568a51dfa187150d31abc4d6a1",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_c84d1bc211d52e1a2d85a642fdcbc8ccaecbe212734680832a7b502b9f35390e",
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_39a81ba56be9177cbf02c8738f074120f5b2536961f48e0fc6237c0bc88ddecd",
+      "node_kind": "storage",
+      "dimensions": [
+        "location"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Semantic-key pairing is a deterministic inference and is never promoted to exact identity."
+      ],
+      "status": "changed",
+      "left_node_id": "jag_node_66024b5595233c90ae442fef991b37a469fb51c72a6c676225e6b1e309e44188",
+      "right_node_id": "jag_node_53a1a71fd886c8dba71286c5cd2bf2123aa3fae32b81ba4c4f7e6f198c35c03f",
+      "match": {
+        "status": "matched",
+        "basis": "semantic-key",
+        "confidence": "medium",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_3ddf3d1621b27d9fff14feb1c90d6fb92bad24d0170ff2ea6d16eebc4b09153f",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_50f3a7d4be2ddb4c00bf3ea2f492fe1ce921741bd0af23ae8c110a0cf2d47a0c",
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_414b177298bf1aa0082d218b8cc8d2a9ff8927ea0ab6458812cc2f8b6dea68bb",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_faddc110c2a1f7baf17d895a199faed366a2af87ece6548ac4782d86940a9362",
+      "right_node_id": null,
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_456027ccd8b26084f9dc40e802655c502a69c91344f47b3e970503426c14fdfa",
+      "node_kind": "storage",
+      "dimensions": [
+        "location"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Semantic-key pairing is a deterministic inference and is never promoted to exact identity."
+      ],
+      "status": "changed",
+      "left_node_id": "jag_node_7dd26bc9d5445ffa174bd99b8834f4a6ea5c2882bebbb993b28c088b3440e005",
+      "right_node_id": "jag_node_167a9700afa58e9836945889bc3f1e4ce325a464f169b1a3fc2b708a4d4145ce",
+      "match": {
+        "status": "matched",
+        "basis": "semantic-key",
+        "confidence": "medium",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_459fdac6c935322612b0f1ee764136fadebda9f047da7dcb61c7b1433a89557b",
+      "node_kind": "endpoint",
+      "dimensions": [
+        "location"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Semantic-key pairing is a deterministic inference and is never promoted to exact identity."
+      ],
+      "status": "changed",
+      "left_node_id": "jag_node_b464e42e6fd7a5c61d935197a9dfd6309923d4cabe841451c953164f005de4ab",
+      "right_node_id": "jag_node_f717edda013dbce29ef1d3e78349a407f8da5c7247b92cfac85e77e5228653ee",
+      "match": {
+        "status": "matched",
+        "basis": "semantic-key",
+        "confidence": "medium",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_4e5fba5b2999ae84d4b859e02e3d56452291238f7d5fed9693c49a7fae4fb875",
+      "node_kind": "endpoint",
+      "dimensions": [
+        "location"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Semantic-key pairing is a deterministic inference and is never promoted to exact identity."
+      ],
+      "status": "changed",
+      "left_node_id": "jag_node_732c439a422cce9634bf285bb30cd779f445ec493c84e882c71af80537f1a1b0",
+      "right_node_id": "jag_node_8ae6c711ca5034013183c251809ef554a49a0d2a356ad62eb80e5291be54e03a",
+      "match": {
+        "status": "matched",
+        "basis": "semantic-key",
+        "confidence": "medium",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_5185bbdc7549365420fedc4c08655ce41f66e3a4c458ac1e32ab0386f72f5385",
+      "node_kind": "artifact",
+      "dimensions": [
+        "content",
+        "properties"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Semantic-key pairing is a deterministic inference and is never promoted to exact identity."
+      ],
+      "status": "changed",
+      "left_node_id": "jag_node_f6ed2534a6dd7d5f42df17ca41b08b0f67db07f8757e76a8e635f71f17c8dc71",
+      "right_node_id": "jag_node_b7b5084305cc75e6adbd7a9505b593131fcfa4d13487459fcaa2793fbcb0228e",
+      "match": {
+        "status": "matched",
+        "basis": "semantic-key",
+        "confidence": "medium",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_52976a2c745eec2c96ec2634d8b1fabd562a8585a02e9cf921838878d932bc6a",
+      "node_kind": "javascript-asset",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_f6b86fddda0dd6775aa4020bb8f1cc33956ec60da4dae9fe2c7c5ed1cfe28f28",
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_55995836393199fd8d38344681d45ed7528badc3e9467bf93d87fa6b66e0b6d2",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_8d08e719ed884807e334d01f548662d7f8bde529edc59b0e760af97695bdb762",
+      "right_node_id": null,
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_577e5ce5f4707c065a934f0f6dbcc4fc58b629eec9fb544a81862a9a12daacc7",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_189ad20114ff57df70ebf7e4a7375195ad70cf4a90642bb2861822523b33b406",
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_5850ceda8b8f3157c66571a885f6959724f7ebf049cb698cc2f7da84bd210bc8",
+      "node_kind": "endpoint",
+      "dimensions": [
+        "location"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Semantic-key pairing is a deterministic inference and is never promoted to exact identity."
+      ],
+      "status": "changed",
+      "left_node_id": "jag_node_d908b71eaffaf62eebcdae5ce7c2b483c572ec2208254b3519c4f99e7ea5f64e",
+      "right_node_id": "jag_node_4e84cb4799437e592a93500bb52f64af5e36d03927733db2aa9fb7f4495fb909",
+      "match": {
+        "status": "matched",
+        "basis": "semantic-key",
+        "confidence": "medium",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_6263475cb8c044bfe5cb4431469ecbe097565d56954f79571205b835ddc76cd9",
+      "node_kind": "endpoint",
+      "dimensions": [
+        "location"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Semantic-key pairing is a deterministic inference and is never promoted to exact identity."
+      ],
+      "status": "changed",
+      "left_node_id": "jag_node_23772d21d673a921985297b9f4ada3ded5875b9284878da6242cdd96567a6fc8",
+      "right_node_id": "jag_node_aeefb6745fc89170484c94210fe64b29df2c14b0dd46459f20084ff526724fab",
+      "match": {
+        "status": "matched",
+        "basis": "semantic-key",
+        "confidence": "medium",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_63e890c5da676e3268f0cc668b41e06bd8504b9bb3e8c3138a316ac4981d3a61",
+      "node_kind": "javascript-asset",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_52b6c5eddf15064d9744ce5402c937c0abcefedd9a4416f2a1aad4349c8d4c3c",
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_66bc5f7761c2a3ecf00b70734e1f0f0c9f028e075634b0b8f2c7c35cc84e305a",
+      "node_kind": "storage",
+      "dimensions": [
+        "availability"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Multiple nodes share the same permitted match key; no cross-version pair was selected."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_83249ea070d281170ead155097858b5857ac04dafe5999681d702c965c78ca5a",
+      "right_node_id": null,
+      "match": {
+        "status": "ambiguous",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": [
+          "jag_node_2011c0538e81b314eddd1c7a8464d19271d4eb6ad1aea5b49ecd4a298d8f2ceb",
+          "jag_node_c36cb4757e51e3d6baa5d919ec87d03c7c2bb0a52b545c65f463d9bba35ca6c0"
+        ]
+      }
+    },
+    {
+      "item_id": "javc_item_67dd3bce1ab2ad02b1692aa7bb5110d9164fddd67b31b02eb74598b2cd1ae68e",
+      "node_kind": "endpoint",
+      "dimensions": [
+        "location"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Semantic-key pairing is a deterministic inference and is never promoted to exact identity."
+      ],
+      "status": "changed",
+      "left_node_id": "jag_node_1789b21b386c77e7b6bc69a259ad496f51ce604173e5ccb68094389598db71b3",
+      "right_node_id": "jag_node_729dae64f5bf34bf5c2d6c531fafd61a4d3fc4a1a9fcd77c841e95731076d885",
+      "match": {
+        "status": "matched",
+        "basis": "semantic-key",
+        "confidence": "medium",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_69eea86569bcf6541d326d29ccc47a513b3bbf3521e73ffa304220cf667b39c5",
+      "node_kind": "endpoint",
+      "dimensions": [
+        "location"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Semantic-key pairing is a deterministic inference and is never promoted to exact identity."
+      ],
+      "status": "changed",
+      "left_node_id": "jag_node_0a226a1f2b49054a6e45a8cedf1ddd8ac552f2be685174adda4fdf7d488e812a",
+      "right_node_id": "jag_node_9ecdcef62d106b535dff1028fbf570610c29064446c925dbc28c62abf2299c83",
+      "match": {
+        "status": "matched",
+        "basis": "semantic-key",
+        "confidence": "medium",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_6af921b5beb24e7e289f2d12b2e6d53a2a04df6f1aa8e61924e6f6c67ef0628a",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_a41fe0994fc45394efd21a9002476239be3ee65140497784c9740ba4554ee997",
+      "right_node_id": null,
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_6c4c7c7a5f29d6326b3d1ff4036699ef21bdf0304c28e1d7a7ec5dab3e5144d3",
+      "node_kind": "javascript-asset",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_f9eef46a40aab1d90d70f63b755914c4f8b1b353d91a96e53242eeae012d6f0b",
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_6d1de599d88bf88747f802d3c11a4e2daaeb68c43e9aaa61363fa6ce1e34be0c",
+      "node_kind": "artifact",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_cba1cca6dadf7b550a3bcf383c05e5e02cfe747c9885fa1a6303846c7897d708",
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_6fe6a716b1bd48dc30281a9227ab8adffb54448f9dde7f3e4f5511921133475b",
+      "node_kind": "storage",
+      "dimensions": [
+        "location"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Semantic-key pairing is a deterministic inference and is never promoted to exact identity."
+      ],
+      "status": "changed",
+      "left_node_id": "jag_node_13c8e1d3b6bc49f264e4cd4fba2f5ca94be83a9c08e725bd31719b8b5b5b017a",
+      "right_node_id": "jag_node_c46daba5cd96cc892ea19d155818052ba5257abf37f67a5069bc939b369b4da9",
+      "match": {
+        "status": "matched",
+        "basis": "semantic-key",
+        "confidence": "medium",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_735b187e74ed71669a7265c931efb48bce6ec60b3e71267c3893babd51998aaf",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_dde5036c1105e5d03773f1a5e8bab1b9f5ce532c25575c95fca7dfd179713706",
+      "right_node_id": null,
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_7ac99975c6a13ebd2c2c950fba9ba4b3df14865be7910541b07a8acd3d552013",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_cb5284b8768828d4377026d9b320150aadf69313df2baec1ec62270604405ffc",
+      "right_node_id": null,
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_7ae64b5c2df05989b88f0818366a90c6146e1cfe0c1fbeb82036fb24fa8b07ce",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_40aa94d8fa937f53e375bf52664f0e859a4c9c2600bac37711a4842708f4bca0",
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_7b2406ad45a421f2c5c798dbbec2b2b980fde4437d1c3789872aee1aea375944",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_bf2a959e1b6df27abfb372d2e248a57d85be1616774b2b9d695c9c4d8755eb6d",
+      "right_node_id": null,
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_7bb448182f973f75f34ef86f6dab849f8c571131181082e2994c64b0241da582",
+      "node_kind": "worker",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_91979065ed2c0aadc673ee5b22568e571d3c0146f645409b5102acca4c6091a4",
+      "right_node_id": null,
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_7f39c5758b5b8acc1ad87dbdba1cc200226e2fb58ea43f93dc3f326aa980b5e8",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_dd82b9617bd7db20b6bd13f3500d8ba63447c36582458006b6a67d822b61181b",
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_7f5f76081037f0b445e11bcada245193fa585c2d41a4fbcf39585e73de8964d2",
+      "node_kind": "endpoint",
+      "dimensions": [
+        "location"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Semantic-key pairing is a deterministic inference and is never promoted to exact identity."
+      ],
+      "status": "changed",
+      "left_node_id": "jag_node_d911c31251a63298fc456c5126979f6a5a10b792d90cd89af47f4264f9f2927d",
+      "right_node_id": "jag_node_0c2b0a1885bbbea7618ae1808dc3fa765afa56f7c8794435ae19b50e3a465424",
+      "match": {
+        "status": "matched",
+        "basis": "semantic-key",
+        "confidence": "medium",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_8011cda9a07ee6625dcdf813baeff940f0b3989b2ea7d78535c51807a6660709",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_0171aac4d31ea12a923b255135b8eaac671c76d1e4f9ff4bcc578edcc5ae220c",
+      "right_node_id": null,
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_81503b1a5e6bf81e27fa30b5b043365d009acf49ca121fbbc1d67c643fddad4c",
+      "node_kind": "storage",
+      "dimensions": [
+        "availability"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Multiple nodes share the same permitted match key; no cross-version pair was selected."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_2f5acac2636f6194fc783848c1652ec78593091bdef08ed3e8cec2390c82a06d",
+      "match": {
+        "status": "ambiguous",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [
+          "jag_node_93a086ff1bfdb494f0a68e79c0db1067f945ddddfa3964c4304e40750eac894a",
+          "jag_node_ff55650958b552451ce32e675e432e57fd2454fb189a6cfabbcc06566bc1b963"
+        ],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_837d220d05f8a581bf87ef3ce408c6baffa7c5100b3ebd8547ffb427b1ab2fae",
+      "node_kind": "endpoint",
+      "dimensions": [
+        "location"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Semantic-key pairing is a deterministic inference and is never promoted to exact identity."
+      ],
+      "status": "changed",
+      "left_node_id": "jag_node_9697f0a9a562d5b50ed4a59f9f4c921616f851e3ad65ba9a703d3833e2fd94d2",
+      "right_node_id": "jag_node_2f6407d812d0602db0a7066c2472b73c60ba122ef3dd60965a22dcbe156f601a",
+      "match": {
+        "status": "matched",
+        "basis": "semantic-key",
+        "confidence": "medium",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_83fed718c9a4108f74d7e19d09059aedb11941ad402d062c310f4676d8620953",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_0be34653edd4bfe420739cba08a69f305e65a8e0cb837bf75ef80811492d363c",
+      "right_node_id": null,
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_8433863b0bd05734ce83b0f068ba345e6988d979949893fe348cf2fd3a10831e",
+      "node_kind": "storage",
+      "dimensions": [
+        "availability"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Multiple nodes share the same permitted match key; no cross-version pair was selected."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_7a29871732e162095a1e26507c7b1fb96e74aef8fe7c322076aded8322654bbd",
+      "match": {
+        "status": "ambiguous",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [
+          "jag_node_93a086ff1bfdb494f0a68e79c0db1067f945ddddfa3964c4304e40750eac894a",
+          "jag_node_ff55650958b552451ce32e675e432e57fd2454fb189a6cfabbcc06566bc1b963"
+        ],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_85fb3d21eee7645b18de726a485b3a613585e203438f5be7895332d1e9a1929f",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_0aef657a9056bfd6a91f6699a506d426a31fb8af16436811c6283676cfdca0aa",
+      "right_node_id": null,
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_89a741fa0f170b568f131aa77cd38a70170e1bc7029669153738cf5517343674",
+      "node_kind": "javascript-asset",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_2cd937cb0e420463a5004bb63abbf672897459b4413cdd2d6ac2075b0eb728c0",
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_89ab4c7284d3c11bb81cdb8e4b6729126d3383179e880f01e1d8c4aaae582fd4",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_d785cab10520b105fc6f3c9442e4e08b80bd7fb8b0b128a324eac29eca712059",
+      "right_node_id": null,
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_8c466d5a5565b21d73109aed9265c5391df66cd6ce8ec097634af6d64f6f9428",
+      "node_kind": "storage",
+      "dimensions": [
+        "availability"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Multiple nodes share the same permitted match key; no cross-version pair was selected."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_ea7425cafe5ccdc01ea8ef50f1b9a00e011cb60dab96b2cc7919416d83c9075b",
+      "match": {
+        "status": "ambiguous",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [
+          "jag_node_10f0ebd8f265b279ab8b06e1ebd35e5659fedd9f8a465fbe7cc1b2c5d0c8a33d",
+          "jag_node_2a9187952ae2d6af4b4f445da35b50f412e76cd6692965f1d4670a80a92f4ccb"
+        ],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_8d3ff115da512e6f0dc480ce92251dda48b435d54466cca1b2224e3b04d3a786",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_4caa465d61d4cfa7b7c8784e77a6371bafaca2ad21992f96cb51a6992d24413d",
+      "right_node_id": null,
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_8d68e4518527edb903dbe65205355660752f0edd02d4751d2904c2959d397d82",
+      "node_kind": "storage",
+      "dimensions": [
+        "availability"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Multiple nodes share the same permitted match key; no cross-version pair was selected."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_c36cb4757e51e3d6baa5d919ec87d03c7c2bb0a52b545c65f463d9bba35ca6c0",
+      "match": {
+        "status": "ambiguous",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [
+          "jag_node_23d381b169acc12da2478f1cb26084947ef7133d2cdb0e316ddbd78bb20a9fba",
+          "jag_node_83249ea070d281170ead155097858b5857ac04dafe5999681d702c965c78ca5a"
+        ],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_8fe17a26712c66ad885f5f57005342eabcf7742e47f2dc365cb2c4e9d4bee9aa",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_4aa9e4224051652bf812e8d64d045254d2e191e82afe4cf87954173ee6f05b78",
+      "right_node_id": null,
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_9538d37f8f7f273ca2097246a1836a80e83c8e79ff97a9272e11911cecc67464",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_e05bcbee5b51fc1d63c414eacdcc0569029fe044d9f06f883c2a2b307f7be552",
+      "right_node_id": null,
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_9681cd937cb5499debd5c823dacb3283d3760b84912d20664371fe62b80f2eab",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_7b4f881bcf388e27bfc01c0c397e53948126d204d8155a9efb27444b1bf8ce16",
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_97567abe2048bcd930cf95507dc36451f26bcc4a3679e457e508792ea64f92ea",
+      "node_kind": "artifact",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_75a814ecd311d2ae866f65d4f4f353fd7276e944d2a8d461605ab7bea798adbe",
+      "right_node_id": null,
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_99239e3a91189d3c0552924ed4ad49acb3c082c18bc8ce505a50d38321ca91ac",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_e69dae0bee5ce90201315bbd0aa3aa3fda5e7bc979ad039d181f51738131266b",
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_a0af662b2c9e586269ce45e35963829806a91c852c7cb90f78f2e2013d67028d",
+      "node_kind": "javascript-asset",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_979ecc5be7da6325961807a31219adb3c126e3ccf09fbe7564f5428fa055914b",
+      "right_node_id": null,
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_a24069bc9dbd93197a0cf8697c8fb22491c75892e5899968b136c4ac90374682",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_839f39dd3f6d6691746b204d0629c35f1d6f5a6f032f8809a99af8a7e565e6f9",
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_a2d96254773a4a83007a0fec77da5a6253d00b89bd444b05caceabd9180d921d",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_bf771ddede2c090a858aa099d198709e80370458be914090d17cbe9a5d3eee70",
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_a38b70fecefc1fb91a5b5b64784d30e2d2324ccd9b58b75a7322c440c49ecc1b",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_5a55ff31d66f0bdfd0d7228b3930694063531a3af0e7d2aaab02ac660114a3d0",
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_a3f450a5a5c109d5d2f68aa37e889e6947127aecb8acbfb178fbbce722e3da8e",
+      "node_kind": "electron-renderer",
+      "dimensions": [
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Semantic-key pairing is a deterministic inference and is never promoted to exact identity.",
+        "Incomplete graph coverage prevents a complete node-level conclusion."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_1d5ea1887ca305c667c42428f3fe2fba4f11f39879bfddb214d2cde9c1e3254f",
+      "right_node_id": "jag_node_74476a83b25142f7d27ecfd1aa3d7cdfd10bcfc0f849de7a7a6146f9c7f473b0",
+      "match": {
+        "status": "matched",
+        "basis": "semantic-key",
+        "confidence": "medium",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_a4498f75b4bae89677231d8c97fc1eb04d1f89027d53fefab20cabf204fe8b2e",
+      "node_kind": "unknown",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_15fffe298445bbe64ed9cbfd85173087f1581b26b9ff29636c2e50d3612ff4b0",
+      "right_node_id": null,
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_a7c4a0e6803c7ed3f1471ba6a1b9b88ccf0cce480d228a3415f060db4c46434c",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_e5a9cff6a0e3f79da510c8ef3f8bb4b91ba42907e2cf0d9f67c6d7cb4ff6db8d",
+      "right_node_id": null,
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_a8886aa2f0886cabacd58e9509c852392d646426b14ae7a75f0bae9c9d0d6ea9",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_a98afd24dd5f0599f0da847bffc1d1472faf9a591883b55a59e03c3e455926c2",
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_a9935bb6cdde83639ba35313be03a94a2ba409632f35bc64dca132b4ee1fb8e2",
+      "node_kind": "storage",
+      "dimensions": [
+        "location"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Semantic-key pairing is a deterministic inference and is never promoted to exact identity."
+      ],
+      "status": "changed",
+      "left_node_id": "jag_node_cf89754ab1c505b8bf9eb85fcddd52113035ae96a8c4efbf52d35b0db6146aad",
+      "right_node_id": "jag_node_e2c7ff0626a68ae7beee18513050b982e83163120c28f1de5ac7dd919c5cf44d",
+      "match": {
+        "status": "matched",
+        "basis": "semantic-key",
+        "confidence": "medium",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_a9c7e05d99d417e1fbc0c600500e1ec961d4afa9d45f4ab524ffb41475d149c2",
+      "node_kind": "endpoint",
+      "dimensions": [
+        "location"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Semantic-key pairing is a deterministic inference and is never promoted to exact identity."
+      ],
+      "status": "changed",
+      "left_node_id": "jag_node_69340585233103c61d243edd3a6e45bdaa04cb247bfdefb193be4a835fffcd64",
+      "right_node_id": "jag_node_5dbcf32d747a56b1096e0083ffee07dbe228014ea1fa57ad5f897c920e0da9b7",
+      "match": {
+        "status": "matched",
+        "basis": "semantic-key",
+        "confidence": "medium",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_ae1f09d6fc8bc1b7f350b9abdb20e1eb1d9d058f8b04fe3055bd96082c9eaa48",
+      "node_kind": "storage",
+      "dimensions": [
+        "location"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Semantic-key pairing is a deterministic inference and is never promoted to exact identity."
+      ],
+      "status": "changed",
+      "left_node_id": "jag_node_e431fb36ad78dd87981d4bf468ad7ba2da7a21bf5dbbdd4905af620c7fc4e951",
+      "right_node_id": "jag_node_358de084ea96ce86aefae0da40997c3c1c3cd0d7c6ade02513203c739eccf254",
+      "match": {
+        "status": "matched",
+        "basis": "semantic-key",
+        "confidence": "medium",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_ae3758f024e87c932c4113131d2f803adca21161d5de704065cab2e7f1f9c246",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_735df54cdda70dbf432666fd5a6730ee9e1a81e313afba65cd7b4f7f95bacd8f",
+      "right_node_id": null,
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_af06dde7b1e9e71b3b9b29d7268e9c660968c3a5f3ed3ffec0a2948fa6b35410",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_20020c6a2d2a7cf98d6df7588adadd54c7c3ee4dbe2cd2e552a4563fb8b258e8",
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_b064a42c71a588e3064f83ef90b5e1ad66ee8df7b49ea40f320b740499b4dc98",
+      "node_kind": "storage",
+      "dimensions": [
+        "location"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Semantic-key pairing is a deterministic inference and is never promoted to exact identity."
+      ],
+      "status": "changed",
+      "left_node_id": "jag_node_98e6cf78b00543bdf74cc37784a9427964f1dfe5d7ed6646f9d7bc84dce80454",
+      "right_node_id": "jag_node_c09afeee93925957b65e8a12725cba56928ab21427d87b5ac4ae8bc0774a6ade",
+      "match": {
+        "status": "matched",
+        "basis": "semantic-key",
+        "confidence": "medium",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_b1d31d3387f2fcdc1a008d11d46dabd510e2776e201f3a3eb161046143e6fb6f",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_a2ada46bb93022b644959ea0bfc1747e1f8f310fae3d34357e2499ba4b1e7cc2",
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_b472b0688c9fbe07d0a6f3fde100a5325421ab52af9b731b1f87277c7abc0321",
+      "node_kind": "endpoint",
+      "dimensions": [
+        "location"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Semantic-key pairing is a deterministic inference and is never promoted to exact identity."
+      ],
+      "status": "changed",
+      "left_node_id": "jag_node_5d0b98158105e797de988fac5f4d1456668dbfc27cc6df95c07ce9edca7364b7",
+      "right_node_id": "jag_node_acfc5f208c2885b3c24ce9e5ff55efddfb0069f9df37d193a5d3fa0664108637",
+      "match": {
+        "status": "matched",
+        "basis": "semantic-key",
+        "confidence": "medium",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_b64948c1f7027a6e630c736e660aad248fb8e72bc375ed039d5bd6a82c5e842d",
+      "node_kind": "endpoint",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_ca6a50fe667132068ca2a15c64dfc28fc299f21f3b2902ed253d370cfe47ed0f",
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_b727162cd428e21321bf6385f3ffac9846c40efb91eeb7381db751207aeff08f",
+      "node_kind": "endpoint",
+      "dimensions": [
+        "location"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Semantic-key pairing is a deterministic inference and is never promoted to exact identity."
+      ],
+      "status": "changed",
+      "left_node_id": "jag_node_e19ef710b94719007453b31be3bb1ed0f992c65b255e92d1487c650679b8ad74",
+      "right_node_id": "jag_node_d6b93315d01aa6e3d1330b8125d13757b73d69f8dcd73e5d6f38fb7e99bb7d6d",
+      "match": {
+        "status": "matched",
+        "basis": "semantic-key",
+        "confidence": "medium",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_bb6c36009af4e9a6a315858137a3b303806b394af936d565d430df6c9b6794e7",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_e591b7c265a7807defe85ece4cf1b9e034e4628c414c3f7ff0d7d8c0463d5198",
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_bc2b9bb065460d620952b8dd6f21b69da813f7116483d6663dac2c2dbb6dae3b",
+      "node_kind": "storage",
+      "dimensions": [
+        "availability"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Multiple nodes share the same permitted match key; no cross-version pair was selected."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_2011c0538e81b314eddd1c7a8464d19271d4eb6ad1aea5b49ecd4a298d8f2ceb",
+      "match": {
+        "status": "ambiguous",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [
+          "jag_node_23d381b169acc12da2478f1cb26084947ef7133d2cdb0e316ddbd78bb20a9fba",
+          "jag_node_83249ea070d281170ead155097858b5857ac04dafe5999681d702c965c78ca5a"
+        ],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_bd7a91b5842538ea561e9d585d620a816e729b01c60bf06480f0548558c942d5",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_7a4036006d278d1efbe2237a327f50b8841f6fd4cd44e9e75a8d1a5106636cd0",
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_be0d43db4d17ca8add43516996206da1e0b5af109c38f71d72ba0c7ac76abe41",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_6a631f77385ab1bd15e7a903381980fec60b6831464d29249617c9c4f64c2bca",
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_be27a1dce14f898a7dd408cd22e0a3a47669d9e06946083fd1ed2b7e174fbb76",
+      "node_kind": "storage",
+      "dimensions": [
+        "availability"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Multiple nodes share the same permitted match key; no cross-version pair was selected."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_23d381b169acc12da2478f1cb26084947ef7133d2cdb0e316ddbd78bb20a9fba",
+      "right_node_id": null,
+      "match": {
+        "status": "ambiguous",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": [
+          "jag_node_2011c0538e81b314eddd1c7a8464d19271d4eb6ad1aea5b49ecd4a298d8f2ceb",
+          "jag_node_c36cb4757e51e3d6baa5d919ec87d03c7c2bb0a52b545c65f463d9bba35ca6c0"
+        ]
+      }
+    },
+    {
+      "item_id": "javc_item_beda56d630ceb8c977fac9675b47a5664300a189ace878fe59733bde63b54253",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_e717610a612b724c6f4371e698ce3470806039d1dfe65df53d45be5428ae8f9b",
+      "right_node_id": null,
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_c10e1e22fae3e4f557ecfc67af3664f17021ecc4462af6541e9be4558bdf1ecd",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_b0805b2230e16e5c733304e4a3d39ea3c2f6fb3edd8e91faa96b0b8784e33dd9",
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_c4cbe3254de32f548a75ed7e0fdb69f1eb5f9c12c1bbb5970eb82794a2d2582e",
+      "node_kind": "storage",
+      "dimensions": [
+        "availability"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Multiple nodes share the same permitted match key; no cross-version pair was selected."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_e64cbc09af355f2d6b6b55a79cdf49f8ebedf0a66bb0c8f28e95887bcdae5824",
+      "match": {
+        "status": "ambiguous",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [
+          "jag_node_10f0ebd8f265b279ab8b06e1ebd35e5659fedd9f8a465fbe7cc1b2c5d0c8a33d",
+          "jag_node_2a9187952ae2d6af4b4f445da35b50f412e76cd6692965f1d4670a80a92f4ccb"
+        ],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_c5aeb712bd753a41f9855e86665145f707d437d5ac10beab87c3658e67688ee4",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_08ec0ac30d5324eb51943bb76cba3e586c1d25f7839a553e863ef0b66142f16d",
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_ca3e062dd0a9a388f2b4b3fe159926b2aa4e22e16791cf33714472c95e9ddbb9",
+      "node_kind": "endpoint",
+      "dimensions": [
+        "location",
+        "properties"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Semantic-key pairing is a deterministic inference and is never promoted to exact identity."
+      ],
+      "status": "changed",
+      "left_node_id": "jag_node_a676d98cdd9d11a8ab4d3eb419bf6ea0c4fa3d8c2fd9fba42faf42778520d7f9",
+      "right_node_id": "jag_node_dc356b3863beb9840839621705c5b691e8f82c90801bd3f2e2630f1d0e4b46dd",
+      "match": {
+        "status": "matched",
+        "basis": "semantic-key",
+        "confidence": "medium",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_ca6231f3bb394f6fc919ee169c8a062b16c8f326ffaf514df7e2a7ae92e0b34f",
+      "node_kind": "endpoint",
+      "dimensions": [
+        "location"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Semantic-key pairing is a deterministic inference and is never promoted to exact identity."
+      ],
+      "status": "changed",
+      "left_node_id": "jag_node_8f613e8ec85ae8c1c481aa38ebd3f7eab1039883d2ff57e575c5fab54cd95691",
+      "right_node_id": "jag_node_461430ee7f9bc31d1d0ff5340c283e8b0b3dce5b611a85ecf65db8d8de7a4bfd",
+      "match": {
+        "status": "matched",
+        "basis": "semantic-key",
+        "confidence": "medium",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_caf20bfcf384d89bbeace2276df4d430e2d1ba0bbe6ed174b342a581a7395391",
+      "node_kind": "javascript-asset",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_54192f1e8cb72f1add6fef33ab780d34325245739786eff7f7ea2fe615d1b8a5",
+      "right_node_id": null,
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_cd02698d9b9aa1222f6197951efec225cc236c1fcb5f9920fc81cab69f5fad12",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_e4e1354a16890317a754489c047e0132d3153bdfe2e3f5e88e9b00de7fb286ad",
+      "right_node_id": null,
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_d1db01ac829a2d9cf23e1674a1cd332707187596fa87edd8277abcdc6f15023a",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_59b42cfe24ca1d459ebdfe083930fc1ba96886d426f1180a40c21bb210d7a846",
+      "right_node_id": null,
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_d2119a272b9424579a3af42effcebb09fa94626c392d7e91a1c7d51c3400bb38",
+      "node_kind": "javascript-asset",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_3e42910b8595c2ff969cf34cfff1f8db3c47fbc46d83f641efa1bb771c624771",
+      "right_node_id": null,
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_d2cd086ed87d7b447dc3d0481f94235e1d5f1cfc304cf7e4c88e8ae06b745df3",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_b3cebbfdb8fdc04438ec45d7227e7d49ae7d6c05a7cb18653fe3a996789e1edc",
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_d322d887cbdeeb0641d9fbfe38b3617e2255b48ceffb2b12c3d13387b2477d84",
+      "node_kind": "endpoint",
+      "dimensions": [
+        "location"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Semantic-key pairing is a deterministic inference and is never promoted to exact identity."
+      ],
+      "status": "changed",
+      "left_node_id": "jag_node_743edb90856dc613cee050f3cd36049c42308df0d9e46c8ddab18c3859d8e8e5",
+      "right_node_id": "jag_node_454ec303b1de89c625e78e55b4fe856fa17f17f1df1576ee17428dc9622e5be4",
+      "match": {
+        "status": "matched",
+        "basis": "semantic-key",
+        "confidence": "medium",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_d3e9adf6c7f63d87e415e9468a83afb86640c5d9c70cb08e7ad046ab7e611565",
+      "node_kind": "endpoint",
+      "dimensions": [
+        "location"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Semantic-key pairing is a deterministic inference and is never promoted to exact identity."
+      ],
+      "status": "changed",
+      "left_node_id": "jag_node_bd41580d6fd1be6b14ff199ba10a3215bcc9538fa0fa76902339667604026223",
+      "right_node_id": "jag_node_d26f6f463eabc7f7a122b0b84dba61fdf6db4711f68a85483a056b0e7039d774",
+      "match": {
+        "status": "matched",
+        "basis": "semantic-key",
+        "confidence": "medium",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_d5054bbcec449235a51ec0c6cfdf6652f7b0f82379178e9e7e3e1014b184f34b",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_0e106c9d873275f090a9d5e9b742184c580bbf342f8a45094d85cd2d2be358be",
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_d5fcde2f209596fe3f300fac3d86fe1fd54ce1961c1480626a9ce7d9e58bf59b",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_20a960ed5ff0dac941984931e24935cb14deff10b142628aa818cc0723288ca7",
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_d987d7ede69d2ee8b30c3580c74428f26105456c838f5675a46ffb7122e870e5",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_c2cfdc52cb40844117f0b56b0e3263f4dd704ae01ac6023bc6c96250ee716dd7",
+      "right_node_id": null,
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_d9b8f27e1aa4446fe7a64cc9503978b250ce3e358ca4a5c1e73e0ddc59c06029",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_83cc6d8cc34c2876eb3bb0a3ae3f0d0465a1aff21b00f003cba54908e4782b86",
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_ddf44a2f00dd95789d3ae499a5389bde27548e2331ebea0a8b22c9d27689d043",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_9d8a39fcfed4ccc21519f2f88cd1bb4ea25a8ce95ef97231db996abc30431343",
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_e105fa770857f033768d6304b8e15d28606f79b82652d53261f5589d8b555d42",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_56b9f02287bbf8eb37019f3c075e8a230749e2eaa141158867d2c7653d96bc39",
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_e1f160a36101d99b44a9ea480a0987973f19e62dfdd643107d67615560eedf9d",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_e41ec8e03b04c36b0bbcbf4f74863231d39f56cf285ec56f49ff88fdfd19f337",
+      "right_node_id": null,
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_e2454079762e941a0debbb4a913a2e817d4a88a3b51470f001f134864010ac53",
+      "node_kind": "storage",
+      "dimensions": [
+        "location"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Semantic-key pairing is a deterministic inference and is never promoted to exact identity."
+      ],
+      "status": "changed",
+      "left_node_id": "jag_node_d7b0887489779b038a5f649909ec606a0e82e26e7d03b162b62091ed9298a729",
+      "right_node_id": "jag_node_a66a8ee867c84cfbd740932183f81b39af81006ff1bcd67e06c0d4e97eb0d213",
+      "match": {
+        "status": "matched",
+        "basis": "semantic-key",
+        "confidence": "medium",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_e41c8e8d27fe32510254c4bb58ea74bbda20194835732d31731fa53bc4a58b43",
+      "node_kind": "javascript-asset",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_b67e8d17a10ca3cfd7ac23ef29ad51a8771a96f0ffd14902808b66368712a093",
+      "right_node_id": null,
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_e503090c57c006cb35d5752a112bb81b548d8a316fadd00836b98617a7ccc453",
+      "node_kind": "endpoint",
+      "dimensions": [
+        "location"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Semantic-key pairing is a deterministic inference and is never promoted to exact identity."
+      ],
+      "status": "changed",
+      "left_node_id": "jag_node_def2a28cc6a3c3a191a48ebfd77fae629f81e7fcebe558e671142cd9d8a93e98",
+      "right_node_id": "jag_node_34800e6a01623b72c72f07c713ee70c7df248c9bfd91395c84bb760486aab306",
+      "match": {
+        "status": "matched",
+        "basis": "semantic-key",
+        "confidence": "medium",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_e854d544e9d5c121b8342e925aa8131c4e112649bc193a817afeb1b18b5ce69e",
+      "node_kind": "endpoint",
+      "dimensions": [
+        "location"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Semantic-key pairing is a deterministic inference and is never promoted to exact identity."
+      ],
+      "status": "changed",
+      "left_node_id": "jag_node_7a89d1cdabcff1cbe60d83c04385fd272840f7b169471865311a5d22f69b422d",
+      "right_node_id": "jag_node_dad84c2ab9f07681d3036daf837567f7487fba5cf60cf2acff4e228268ef9110",
+      "match": {
+        "status": "matched",
+        "basis": "semantic-key",
+        "confidence": "medium",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_e96657a89a288e408a7d50b5ab0d224f8532c480b1afcf6b8560e1202cf04e30",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_d47e4a735b1a5c999fe093c0f5869ed3e015a4e28a462ef6abb40b3d2aade7b6",
+      "right_node_id": null,
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_eb188bde3b6d373e536fd1ac1eaea60ec81214ddb02970befed0a0cac6038df5",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_23c6446dbf9b694bb8bebd2b167ef907a82b17627b75d7baf2def1ad525224f1",
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_ecc5587f52d8b0c64d094cb803d5fddea37bc25c487cbc830e364205f4fc91a2",
+      "node_kind": "javascript-asset",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_c216030a407321cf025b65d9459d0335b74e138125ca94208cf80bc5aa626f07",
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_f023dbc423b9a2a39d274b3f7244c45d0afb3c9cf210937018778e433c8082d3",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_93edd91b9142fa0b61eb22c2bc84ac307bbb2b1f11956e10ac5f356f75487995",
+      "right_node_id": null,
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_f65b0947e0a8d9d51e1224bcb1ab3c5f3f8b2c17cd977ab457dc84a3394e1bb6",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_20a328e087cc872b5ed371f4c4c17453f9c4e65d17854407a122a659c38563a0",
+      "right_node_id": null,
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_f717bdf8a9c6baa024e7a4f5a164749364be1c141b537de7411147e82379833f",
+      "node_kind": "javascript-asset",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_54c5eb59e0b2bde53334403e424ed1faba3821486328831486f1299231b1085e",
+      "right_node_id": null,
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_f87d55823b1a256f0fdc4157ef60323fcf95c63447e757337528bc8a8a7f4df2",
+      "node_kind": "endpoint",
+      "dimensions": [
+        "location"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Semantic-key pairing is a deterministic inference and is never promoted to exact identity."
+      ],
+      "status": "changed",
+      "left_node_id": "jag_node_bf42a54d6b0cd16597d258e73b9633c895c24ae828546c8c764fe68e51e2802c",
+      "right_node_id": "jag_node_41eca8092b4e2714513ed6eb30504ba7504ca18b0659c12aad7a89e6a3c91afc",
+      "match": {
+        "status": "matched",
+        "basis": "semantic-key",
+        "confidence": "medium",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_fd51d7825880993d4b6be819210d8b7ae8aebb8a44f29e9723c1d139d08bdca8",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_ecebbc592124990f4e6bfd1c75ab138196b4a0b08301f10859912ed19e10eb44",
+      "right_node_id": null,
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    },
+    {
+      "item_id": "javc_item_fdf758899520a58319b59e4440e87740977169d8285db15f6c4b2a2df1d9621c",
+      "node_kind": "storage",
+      "dimensions": [
+        "availability"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "Multiple nodes share the same permitted match key; no cross-version pair was selected."
+      ],
+      "status": "unknown",
+      "left_node_id": "jag_node_2a9187952ae2d6af4b4f445da35b50f412e76cd6692965f1d4670a80a92f4ccb",
+      "right_node_id": null,
+      "match": {
+        "status": "ambiguous",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": [
+          "jag_node_e64cbc09af355f2d6b6b55a79cdf49f8ebedf0a66bb0c8f28e95887bcdae5824",
+          "jag_node_ea7425cafe5ccdc01ea8ef50f1b9a00e011cb60dab96b2cc7919416d83c9075b"
+        ]
+      }
+    },
+    {
+      "item_id": "javc_item_fee150143e7b0d8f880d63835658acffb1061917fdbf04f1b3d790c6bd6df656",
+      "node_kind": "javascript-module",
+      "dimensions": [
+        "availability",
+        "coverage"
+      ],
+      "evidence_links": [
+        "ev_265a6a45fa90bab50b6e9b2b74d6b6ff9ca8aa2a1093da450d60c2c3d9d0e402",
+        "ev_e991768c96ff1842c62aa235ed0717a1729ee29424965cf407753d6150190378"
+      ],
+      "limitations": [
+        "The opposite graph is incomplete, so an unmatched node cannot be classified as added or removed."
+      ],
+      "status": "unknown",
+      "left_node_id": null,
+      "right_node_id": "jag_node_bb3bd66bbe063526bf14ae78355a129ade2b5cc162ead43e3f11bae081b82aa6",
+      "match": {
+        "status": "unmatched",
+        "basis": "none",
+        "confidence": "unknown",
+        "candidate_left_node_ids": [],
+        "candidate_right_node_ids": []
+      }
+    }
+  ],
+  "limitations": [
+    "Application comparison never uses bundler module ordinals as persistent identity and performs no fuzzy pairing.",
+    "At least one source graph is incomplete; unmatched entities on the opposite side remain unknown rather than added or removed.",
+    "Exact digest equality proves byte identity only; source-map, structural-fingerprint, and semantic-key matches retain inferred confidence.",
+    "Minified names and chunk locations are not assumed stable across versions.",
+    "Native Evidence is linked only by exact subject digest; provider snapshot reuse remains target/provider/profile exact.",
+    "The comparison reads retained graphs and Evidence only; it does not execute either application."
+  ]
+}

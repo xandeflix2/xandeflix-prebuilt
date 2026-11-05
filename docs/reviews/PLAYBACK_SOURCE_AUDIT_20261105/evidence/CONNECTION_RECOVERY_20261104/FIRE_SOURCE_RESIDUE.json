@@ -1,0 +1,52 @@
+{
+  "observedUTC": "2026-11-05T01:26:25.907Z",
+  "label": "FIRE",
+  "method": "READ_ONLY_ADB_RUN_AS_FILESYSTEM_METADATA",
+  "package": "com.xandeflix.prebuilt",
+  "prebuiltDirectoryExists": true,
+  "activePointer": {
+    "readState": "PARSED",
+    "present": true,
+    "kind": "REAL",
+    "sourceIdentityPresent": true,
+    "sourceVersion": 1,
+    "snapshotIdentityPresent": true
+  },
+  "recoveryJournal": {
+    "readState": "PARSED",
+    "present": true
+  },
+  "snapshots": {
+    "listState": "LISTED",
+    "entries": 1,
+    "safeNames": 1,
+    "examined": 1,
+    "parsed": 1,
+    "coverage": "ALL_LISTED_SAFE_NAMES",
+    "manifestStates": {
+      "PARSED": 1
+    },
+    "distinctSourceIdentities": 1,
+    "sourceVersions": [
+      1
+    ],
+    "sameSourceAsActive": 1,
+    "differentSourceFromActive": 0,
+    "activeManifest": {
+      "snapshotMatches": true,
+      "sourceMatches": true,
+      "versionMatches": true,
+      "kind": "REAL"
+    }
+  },
+  "staging": {
+    "listState": "LISTED",
+    "entries": 0
+  },
+  "limitations": [
+    "Reads metadata only; no media URLs or credentials exported.",
+    "Source identity/version equivalence is local; no remote authorization query performed.",
+    "No historical device snapshot or old source identity supplied for comparison.",
+    "Does not inspect encrypted source records, WebView history or live in-memory context."
+  ]
+}

@@ -1,0 +1,3 @@
+# CANON-01-CARD-TRAILER-AUDIO
+
+Current user reports silent card trailer. Received51 canon/C11/full204 controls42 suites PASS. Separate RED against real JS adapter and Java-generated frame HTML. GREEN adds five web audio/cancellation cases and one native family plus actual generated-HTML execution with synthetic official YouTube API. All18 received JS cases and12 native families retained. Native inline/modal and legacy PublicTrailerPolicy unchanged. Final digital playback/closure proof on same Fire, acoustic output limits, APK and preservation in CARD_TRAILER_AUDIO_20261029. No OS volume, source, backend, reset or other-device install.

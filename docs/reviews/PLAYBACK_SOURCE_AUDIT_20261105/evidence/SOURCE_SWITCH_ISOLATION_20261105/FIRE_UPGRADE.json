@@ -1,0 +1,65 @@
+{
+  "label": "FIRE",
+  "startedUTC": "2026-11-05T11:55:48.075Z",
+  "beforeVersion": {
+    "code": 52,
+    "name": "1.0.52"
+  },
+  "updateMode": "IN_PLACE_PRESERVE_DATA",
+  "states": [
+    {
+      "phase": "ABSENT",
+      "schema": null,
+      "hasEpoch": false,
+      "bodyHasCards": false,
+      "loadingScreen": false,
+      "visibility": "visible",
+      "observedUTC": "2026-11-05T11:55:58.719Z"
+    },
+    {
+      "phase": "ABSENT",
+      "schema": null,
+      "hasEpoch": false,
+      "bodyHasCards": false,
+      "loadingScreen": true,
+      "visibility": "visible",
+      "observedUTC": "2026-11-05T11:56:02.861Z"
+    },
+    {
+      "phase": "CLEANED",
+      "schema": 1,
+      "hasEpoch": true,
+      "bodyHasCards": false,
+      "loadingScreen": true,
+      "visibility": "visible",
+      "observedUTC": "2026-11-05T11:56:09.666Z"
+    },
+    {
+      "phase": "ACTIVE",
+      "schema": 1,
+      "hasEpoch": true,
+      "bodyHasCards": true,
+      "loadingScreen": false,
+      "visibility": "visible",
+      "observedUTC": "2026-11-05T11:58:02.888Z"
+    }
+  ],
+  "preservation": {
+    "identity": true,
+    "activationKey": true,
+    "installationIdentity": true,
+    "activationFields": true,
+    "authorized": true,
+    "sourceBindingSame": true,
+    "newSnapshot": true
+  },
+  "result": "PASS_MIGRATION_AND_PRESERVATION_NOT_PLAYBACK",
+  "installation": "SUCCESS",
+  "connectionRetries": 1,
+  "catalog": "ACTIVE_AND_RENDERED",
+  "afterVersion": {
+    "code": 53,
+    "name": "1.0.53"
+  },
+  "finishedUTC": "2026-11-05T11:58:03.930Z"
+}

@@ -1,0 +1,102 @@
+[
+  {
+    "name": "06_CANONICAL_AFTER",
+    "args": [
+      "scripts/verify-canonical-contract.mjs"
+    ],
+    "startedUTC": "2026-11-05T11:31:56.700Z",
+    "finishedUTC": "2026-11-05T11:31:59.462Z",
+    "exitCode": 0
+  },
+  {
+    "name": "07_TYPECHECK",
+    "args": [
+      "node_modules/typescript/bin/tsc",
+      "--noEmit"
+    ],
+    "startedUTC": "2026-11-05T11:31:59.463Z",
+    "finishedUTC": "2026-11-05T11:32:23.103Z",
+    "exitCode": 0
+  },
+  {
+    "name": "08_C11_AFTER",
+    "args": [
+      "scripts/test-c11-new-device-activation-lock.mjs"
+    ],
+    "startedUTC": "2026-11-05T11:32:23.104Z",
+    "finishedUTC": "2026-11-05T11:32:40.039Z",
+    "exitCode": 0
+  },
+  {
+    "name": "09_TARGET_ISOLATION",
+    "args": [
+      "scripts/test-source-replacement-isolation.mjs"
+    ],
+    "startedUTC": "2026-11-05T11:32:40.040Z",
+    "finishedUTC": "2026-11-05T11:32:40.767Z",
+    "exitCode": 0
+  },
+  {
+    "name": "10_TARGET_BOOTSTRAP",
+    "args": [
+      "scripts/test-source-replacement-bootstrap.mjs"
+    ],
+    "startedUTC": "2026-11-05T11:32:40.768Z",
+    "finishedUTC": "2026-11-05T11:32:42.507Z",
+    "exitCode": 0
+  },
+  {
+    "name": "11_TARGET_UI",
+    "args": [
+      "scripts/test-source-replacement-ui.mjs"
+    ],
+    "startedUTC": "2026-11-05T11:32:42.508Z",
+    "finishedUTC": "2026-11-05T11:32:45.145Z",
+    "exitCode": 0
+  },
+  {
+    "name": "12_NOVELTY",
+    "args": [
+      "scripts/test-c11-new-content-badge.mjs"
+    ],
+    "startedUTC": "2026-11-05T11:32:45.146Z",
+    "finishedUTC": "2026-11-05T11:32:46.609Z",
+    "exitCode": 0
+  },
+  {
+    "name": "13_ARTWORK_RECOVERY",
+    "args": [
+      "scripts/test-c11-artwork-visible-recovery.mjs"
+    ],
+    "startedUTC": "2026-11-05T11:32:46.610Z",
+    "finishedUTC": "2026-11-05T11:32:48.193Z",
+    "exitCode": 0
+  },
+  {
+    "name": "14_ARTWORK_PREPARATION",
+    "args": [
+      "scripts/test-c11-page-artwork-preparation.mjs"
+    ],
+    "startedUTC": "2026-11-05T11:32:48.194Z",
+    "finishedUTC": "2026-11-05T11:32:49.036Z",
+    "exitCode": 0
+  },
+  {
+    "name": "15_FULL_REGRESSION",
+    "args": [
+      "scripts/test-canonical-regression.mjs"
+    ],
+    "startedUTC": "2026-11-05T11:32:49.037Z",
+    "finishedUTC": "2026-11-05T11:37:03.684Z",
+    "exitCode": 0
+  },
+  {
+    "name": "16_CANONICAL_FINAL",
+    "args": [
+      "scripts/verify-canonical-contract.mjs"
+    ],
+    "startedUTC": "2026-11-05T11:37:03.684Z",
+    "finishedUTC": "2026-11-05T11:37:06.058Z",
+    "exitCode": 0
+  }
+]

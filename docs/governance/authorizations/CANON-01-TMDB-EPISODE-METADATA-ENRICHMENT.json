@@ -1,0 +1,187 @@
+{
+  "schema": 1,
+  "gate": "CANON-01-TMDB-EPISODE-METADATA-ENRICHMENT",
+  "parentGate": "CANON-01",
+  "amendment": "CANON-01-TMDB-EPISODE-METADATA-ENRICHMENT",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "EXPLICIT_CHAT_MASTER_ATTACHMENT_E6E2D547_2026_10_27; USER_MOBILE_IMAGE_TOP_2026_10_27; USER_MOBILE_REFERENCE_AND_SERIES_BACKDROP_2026_10_27; USER_P2_3_P2_4_PROGRESS_BAR_2026_10_27; USER_P2_13_ACCESSIBLE_CONTINUE_2026_10_27; P2_19_LEGACY_HARNESS_COMPATIBILITY_2026_10_27",
+  "authorizationRequestSha256": "a8d1361be001ddac26a199e4827976fe5a3acc9c9359b8f68576557c2d1eca6e",
+  "reason": "Optional public season metadata projected over existing source episodes; conservative confirmed identity, local authority preserved, shared stable episode UI and bounded existing image pipeline. Final user presentation amendments: phone image/play header with title and full-width synopsis below, local season dropdown, confirmed series horizontal backdrop when no episode still; image origin remains distinct from episode matching. Posterior user request: TV/tablet thumbnail playback control and true native watch progress presentation, with phone control preserved. P2.13 restores pre-existing accessible Continue semantics while keeping TV/tablet text visually hidden. P2.19 adds the missing savedProgress read-only mock to the existing C11 episode return fixture; all historical assertions remain byte-identical.",
+  "physicalImpact": "REQUIRED",
+  "physicalImpactJustification": "New web presentation requires later Fire/tablet/phone validation; current authorization expressly forbids automatic installation.",
+  "testChangesReviewed": true,
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c105-complete-root-search.mjs",
+    "scripts/test-c107-catalog-return-navigation.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c11-landscape-navigation.mjs",
+    "scripts/validate-direct-playback.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock",
+    "npm run typecheck",
+    "npm run playback:check",
+    "npm run security:check",
+    "npm run update:check",
+    "npm run build",
+    "npm run site:build",
+    "Gradle offline testDebugUnitTest assembleDebug; signature/native/dist audit",
+    "node scripts/test-series-episode-return.mjs",
+    "node scripts/test-c107-playback-pending-message.mjs",
+    "node scripts/test-c11-episode-continue-row.mjs",
+    "node scripts/test-trailer-containment-r4.mjs",
+    "node scripts/test-tmdb-episode-enrichment.mjs",
+    "node scripts/test-tmdb-episode-enrichment-ui.mjs",
+    "node scripts/test-c11-source-first-tmdb-artwork.mjs",
+    "node scripts/test-c11-episode-continue-row.mjs",
+    "node scripts/test-series-episode-return.mjs"
+  ],
+  "evidence": "docs/evidence/TMDB_EPISODE_METADATA_ENRICHMENT.md",
+  "compatibilityRisk": "Strict corroboration can intentionally leave generic or renumbered episodes unenriched. Metadata/image failure preserves source-backed playback. Source schemas, C9/parental, native and R4 trailer remain unchanged. Physical validation pending. Watch progress is read-only; exact percentage requires a valid recorded duration. Physical UI validation remains pending.",
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": true,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false,
+  "restrictions": [
+    "R4 complete1479 baseline and43 receipts preserved. Exactly21 allowlisted paths only in isolated stage; three required historical harness adapters extended, all received assertions unchanged.",
+    "Preserve204 controls36 inherited suites and257 Android tests39 suites; append one new suite.",
+    "No automatic installation, publication, promotion, device operation, reset, source change, Git/backend or next gate.",
+    "No integration of independent G2/G3 performance/DUB-LEG candidates or SET01.",
+    "Four normative documents append-only.",
+    "User steering: phone portrait and landscape episode scene on top, synopsis/action below; same CSS/product scope and no installation.",
+    "Latest mobile screenshot supersedes full-width image arrangement. Series backdrop is a generic same-series fallback, never episode corroboration; no vertical poster or foreign media."
+  ],
+  "previousGovernanceHashes": {
+    "docs/governance/CANON_CHANGE_AUTHORIZATION.json": "e73152f228cbb625c508062d70ef810e8342059a",
+    "docs/governance/CANON_01_LEGACY_TESTS_AUTHORIZATION.json": "e59e2d328db3d0dfd8c1d873b154e2e3f7900a0c",
+    "docs/governance/CANON_01_AUTHORIZATION_HARDENING.json": "766db763ee98aeeb33230c2828f050a8527555b7",
+    "docs/governance/authorizations/CANON-01-VERCEL-BUILD-A1.json": "7edaa32c4b13c8295fc0daa64abed1ef7a4b0c2d",
+    "docs/governance/authorizations/CANON-01-VERCEL-A2-ARTIFACT.json": "fb613a143676e3e32267ebacb3bec81123791823",
+    "docs/governance/authorizations/CANON-01-VERCEL-A22A.json": "c698fec429f4058118d4701a7f5208ece9a0b0d1",
+    "docs/governance/authorizations/CANON-01-A22A-CI-DIAG.json": "7d89451bf23a05fa1ba819b72b99b28025aa7a66",
+    "docs/governance/authorizations/CANON-01-A22A-WINDOWS-EOL.json": "73ffd5ed494cb87a7c0d22e4a8a3f94252cf321e",
+    "docs/governance/authorizations/CANON-01-SOURCE-OUTPUT.json": "a93d98a1022f99c0e0957dd8f4a2c7d078b8f588",
+    "docs/governance/authorizations/CANON-01-CATALOG-READ-DIAG.json": "169b19ee02a4c1cacbe575cded00ec02928fa3c7",
+    "docs/governance/authorizations/CANON-01-XUI-OPAQUE-RECOVERY.json": "cf4176d0007b4a04997bf2631558bd9d954fd6f7",
+    "docs/governance/authorizations/CANON-01-CATALOG-PHYSICAL-FIXES.json": "ea179b852518e2a14c7ee79b6c3c72e76c0df6a9",
+    "docs/governance/authorizations/CANON-01-SERIES-POSTER-COMPOSITION.json": "645dc8b2b5d4b822bc83d72e9f5ab9f4f4cb4347",
+    "docs/governance/authorizations/CANON-01-TMDB-CONTEXT-IDENTITY.json": "3ab236bab99175dcb5374047c2fc6565650d8945",
+    "docs/governance/authorizations/CANON-01-TMDB-SUBTITLE-PREVIEW.json": "5e50d1c29c33b5fe3455112818e978213d065e96",
+    "docs/governance/authorizations/CANON-01-CATALOG-RETENTION.json": "b3c18f01ba1e753597af3a162c2605669dcd4e6b",
+    "docs/governance/authorizations/CANON-01-DETAIL-BACKDROP-UI.json": "579097e952a7ddf142ba885aaf23e164c0241e54",
+    "docs/governance/authorizations/CANON-01-DETAIL-BACKDROP-TYPES.json": "da8c532e25e220040bba3c942bad41507d4b9245",
+    "docs/governance/authorizations/CANON-01-TV-SIDEBAR-COMPOSITION.json": "f5d43f845cd4e3fdb7947dc33e4f9b3df8669ab7",
+    "docs/governance/authorizations/CANON-01-A22A-WINDOWS-METADATA-EOL.json": "90d7db4a18e84221afa6fa9dda40c82d6dad6121",
+    "docs/governance/authorizations/CANON-01-VERCEL-PREBUILT-RECOVERY-01.json": "9cb685590481ba094ffbca2e2abe2f585aa3ae46",
+    "docs/governance/authorizations/CANON-01-OPAQUE-HLS-MIME-RECOVERY.json": "5a8c735b59f921a5d24be15f6c14f32541687719",
+    "docs/governance/authorizations/CANON-01-STREAMED-VOD-INVENTORY-RECOVERY.json": "a16dd131aa09b3027724ea94f49a6d841551a9cb",
+    "docs/governance/authorizations/CANON-01-TABLET-SIDEBAR-TRANSPARENCY.json": "ffcc5c6c6005e4fcd24ce40ba776950bf55a5dbe",
+    "docs/governance/authorizations/CANON-01-HERO-PLATFORM-COMPOSITION.json": "75f9ca539c1723ca1db6c2e8948a63a3a19d5264",
+    "docs/governance/authorizations/CANON-01-HERO-PLATFORM-ALIGNMENT.json": "66a112450541d8a038292d8b07d08cc5547ad51e",
+    "docs/governance/authorizations/CANON-01-LIVE-SINGLE-TRANSPORT.json": "039d22359310380cd79432efe17f9533c93fb6cb",
+    "docs/governance/authorizations/CANON-01-NETWORK-DIAGNOSTICS.json": "80a4d01348eb82b4a7cafd4836c3f221d97e02e5",
+    "docs/governance/authorizations/CANON-01-NETWORK-UI-POLISH.json": "2fc3ce79b3a78454e7ad15f1d06002a6bc69d594",
+    "docs/governance/authorizations/CANON-01-LIVE-NETWORK-ACTIONS.json": "e345e800a7a52d79241701cb5fd13f34bc699e01",
+    "docs/governance/authorizations/CANON-01-TV-CAST-SENDER-HIDDEN.json": "f1e466b249afac7a6dab2a62952dc83a4dd31540",
+    "docs/governance/authorizations/CANON-01-TMDB-RELEASE-TAGS.json": "30bcebd64ad85f8d981f09b320cbf3864b6bad7a",
+    "docs/governance/authorizations/CANON-01-VOD-DPAD-HIDDEN-CONTROLS.json": "f33a7c6510ca7fe14f22367d0da0344e285e754a",
+    "docs/governance/authorizations/CANON-01-DPAD-EXPANDED-CARDS-AUTOPREVIEW-01.json": "8d031488e5175dc1a0fbca3246345be638074fe7",
+    "docs/governance/authorizations/CANON-01-HOME-DPAD-CAROUSEL-PREVIEW-PAGINATION-02.json": "a91ff1c57b2c412e808fb79917fc00a1bfaa1e1e",
+    "docs/governance/authorizations/CANON-01-DPAD-CARD-SCOPE-SEEALL-GRID-01.json": "1be58b8db36f88a75e115fd1cb7bbb0d17f0bb71",
+    "docs/governance/authorizations/CANON-01-XANDEFLIX-UI-PERFORMANCE-RECOVERY-03.json": "88fa16477c0f94dad02f962d7a42e26dc19f2670",
+    "docs/governance/authorizations/CANON-01-XANDEFLIX-APP-INTRO-BRANDING-07.json": "b806f61070d8dc03652b310983c2e165a5ff5e5d",
+    "docs/governance/authorizations/CANON-01-XANDEFLIX-INTRO-VIDEO-ONLY-07-R1.json": "840c021999b13ea069997a62cbe8b112eefb0cc6",
+    "docs/governance/authorizations/CANON-01-MOBILE-CATALOG-HEADER-SPACING.json": "729b63034f78a4c383c00d0d8a9c78c36a4301ef",
+    "docs/governance/authorizations/CANON-01-PHONE-HEADER-REFINEMENT.json": "e1c0719e5b1e31ad63cc5c3947fcf12110f6f161",
+    "docs/governance/authorizations/CANON-01-SERIES-EPISODE-RETURN.json": "ce4ab2b42727b138e0cbc547c0efd59fbc976a90",
+    "docs/governance/authorizations/CANON-01-TRAILER-CONTAINMENT-R4.json": "2f8e69d57bf20e72f4a9e27308636e37e1f97fee"
+  },
+  "supersedes": {
+    "src/ui/pages/SeriesDetailPage.tsx": "CANON-01-SERIES-EPISODE-RETURN",
+    "scripts/test-canonical-regression.mjs": "CANON-01-TRAILER-CONTAINMENT-R4",
+    "scripts/test-c11-source-first-tmdb-artwork.mjs": "CANON-01-DPAD-CARD-SCOPE-SEEALL-GRID-01",
+    "scripts/test-c11-episode-continue-row.mjs": "CANON-01-SERIES-EPISODE-RETURN",
+    "scripts/test-series-episode-return.mjs": "CANON-01-SERIES-EPISODE-RETURN"
+  },
+  "changes": [
+    {
+      "path": "src/artwork/tmdb-season-episodes.service.ts",
+      "before": null,
+      "after": "34cc23ba464a4b6871848f412c85545bf2903356"
+    },
+    {
+      "path": "src/catalog/episode-presentation.ts",
+      "before": null,
+      "after": "7791f883e248073d54943918a7fb102c052dd579"
+    },
+    {
+      "path": "src/ui/hooks/useEpisodeMetadata.ts",
+      "before": null,
+      "after": "46d7ba286869ca7933653cc83a783f5c65ebf933"
+    },
+    {
+      "path": "src/ui/components/EpisodeListPresentation.tsx",
+      "before": null,
+      "after": "9cfc766698e062614421959a9d2d8fc255edeed0"
+    },
+    {
+      "path": "src/ui/components/EpisodeStill.tsx",
+      "before": null,
+      "after": "0f41e6e8e8ca011cf14c49014bb37f789f638d2b"
+    },
+    {
+      "path": "src/ui/components/EpisodeMetadata.css",
+      "before": null,
+      "after": "a2c402d0611bcfd28626f1eb69931c053d7b516e"
+    },
+    {
+      "path": "src/ui/pages/SeriesDetailPage.tsx",
+      "before": "f3f52a49abbf9cd4de4cda9fdf66d614dcce480e",
+      "after": "d1ec48dfeacac595ba918b568e2147a79fb818c8"
+    },
+    {
+      "path": "scripts/test-tmdb-episode-enrichment.mjs",
+      "before": null,
+      "after": "a0263d345a3afd05f5d159f7c96ae657b5b866f4"
+    },
+    {
+      "path": "scripts/test-tmdb-episode-enrichment-ui.mjs",
+      "before": null,
+      "after": "a53fba5f3dd2c0b209e64eb70b3fdb5aa62c0d82"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "b0906fa3bfd0ffde0f5238733cbaa6fd960f07f0",
+      "after": "005385917d2972875783e993a0a1aeaabb7bbeb6"
+    },
+    {
+      "path": "scripts/test-c11-source-first-tmdb-artwork.mjs",
+      "before": "7f56d65b196f82f0f31c20e403e3add9fb97a37c",
+      "after": "a82e335423fc6c8fa665d81f5ef159324e4b705b"
+    },
+    {
+      "path": "scripts/test-c11-episode-continue-row.mjs",
+      "before": "47270c5b536350e661e5a54733cb64bcf3014b39",
+      "after": "9c2e8f9a9395609fde629ccaee5b135f67ee1681"
+    },
+    {
+      "path": "scripts/test-series-episode-return.mjs",
+      "before": "6984fc7eea4e8d165d54d2d5c856e432eceb5243",
+      "after": "7fb584a7bc7a6d7f123cc1845b72507fefc50368"
+    },
+    {
+      "path": "src/playback/watch-history.ts",
+      "before": "c685c7e5dec470ce3344b1b473ae5964f0f7219c",
+      "after": "9ff486a5c294089259d274bb18c9c831825ebb43"
+    }
+  ]
+}

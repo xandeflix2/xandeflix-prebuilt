@@ -1,0 +1,31 @@
+{
+  "generatedUTC": "2026-11-05T18:05:00.752Z",
+  "project": "XANDEFLIX_PREBUILT",
+  "publicationBranch": "audit/playback-source-review-20261105",
+  "publicationPurpose": "EXTERNAL_REVIEW_ONLY_NOT_RELEASE",
+  "origin": "https://github.com/xandeflix2/xandeflix-prebuilt.git",
+  "receivedHead": "d8a74102124fbb8a3f013f6fd8a502519c1db4b8",
+  "remoteMainObserved": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "sourceWorkspace": "C:/Xandeflix/Audits/SOURCE_SWITCH_ISOLATION_20261105/workspace",
+  "publicationWorkspace": "C:/Xandeflix/Audits/EXTERNAL_ANALYSIS_HANDOFF_20261105/workspace",
+  "originalSourceSnapshot": {
+    "files": 9691,
+    "identicalBeforePreparation": 9691,
+    "differences": 0,
+    "missing": 0,
+    "extras": 0
+  },
+  "sourceFiles": 1560,
+  "evidenceFiles": 365,
+  "android": {
+    "packageId": "com.xandeflix.prebuilt",
+    "versionName": "1.0.53",
+    "versionCode": 53,
+    "apkSha256": "d849a27e0106006b324ea86b320909b455b11c92c774967b1189b3f8900e1caa",
+    "bundle": "index-CaKLtAjp.js"
+  },
+  "authorizationSha256": "035dfde0bac6e5974d460f47cdef5c15014954da2f40cf247d31ae47b8617d5f",
+  "productLogicChangedByPublication": false,
+  "previousDirtySourcePreserved": true,
+  "nextGateStarted": false
+}

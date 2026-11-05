@@ -5,6 +5,7 @@ import { heroArtworkIdentity, heroArtworkService, type HeroImageProfile } from '
 import { reserveHeroImageSlot } from '../../artwork/image-load-queue.ts';
 import { canShowParentalItem } from '../../parental/parental-content.ts';
 import { useParentalControl } from './useParentalControl.ts';
+import { warmPlatformLogos } from './useWatchProviders.ts';
 
 export function useHeroArtwork(items: readonly CatalogItemViewModel[], profile: HeroImageProfile, limit = 20, maxPerKind = 0) {
   useParentalControl();
@@ -20,6 +21,7 @@ export function useHeroArtwork(items: readonly CatalogItemViewModel[], profile: 
   const pending=pendingState.selection===selection?pendingState.pending:true;
   useEffect(()=>{
     const releaseHero=reserveHeroImageSlot();
+    void warmPlatformLogos(items.slice(0,20).flatMap(item=>item.categoryLabels.slice(0,4)));
     let active=true,retries=0,timer:ReturnType<typeof setTimeout>|undefined;
     const scan=async()=>{
       setPendingState({selection,pending:true});let index=0,found=0;const counts={movie:0,series:0};

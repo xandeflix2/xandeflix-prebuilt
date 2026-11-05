@@ -1,0 +1,76 @@
+{
+  "observedUTC": "2026-11-05T01:32:22.243Z",
+  "observerPresent": true,
+  "events": [
+    {
+      "event": "SOURCE_RESPONSE",
+      "kind": "get_series_info",
+      "success": true,
+      "status": "2XX",
+      "error": "UNKNOWN",
+      "stage": "FILE_WRITE",
+      "observedUTC": "2026-11-05T01:31:52.377Z"
+    },
+    {
+      "event": "OPEN",
+      "kind": "series",
+      "scheme": "http:",
+      "typedPath": "series",
+      "extension": "mp4",
+      "pathDepth": 4,
+      "hasQuery": false,
+      "headerNames": [
+        "User-Agent"
+      ],
+      "uaClass": "IPTV_SMARTERS_DEFAULT",
+      "observedUTC": "2026-11-05T01:32:01.004Z"
+    },
+    {
+      "event": "OPEN_RETURN",
+      "accepted": true,
+      "candidateCount": 1,
+      "observedUTC": "2026-11-05T01:32:01.178Z"
+    },
+    {
+      "event": "progress",
+      "positionMs": 0,
+      "durationMs": 0,
+      "ended": false,
+      "observedUTC": "2026-11-05T01:32:07.060Z"
+    },
+    {
+      "event": "progress",
+      "positionMs": 0,
+      "durationMs": 0,
+      "ended": false,
+      "observedUTC": "2026-11-05T01:32:07.162Z"
+    },
+    {
+      "event": "resume",
+      "positionMs": 0,
+      "ended": false,
+      "errorCode": "NATIVE_ERROR",
+      "errorCategory": "HTTP_ERROR",
+      "httpStatus": 404,
+      "media3ErrorCode": 2004,
+      "checkpoint": "DATASOURCE_OPEN",
+      "observedUTC": "2026-11-05T01:32:07.210Z"
+    },
+    {
+      "event": "progress",
+      "positionMs": 0,
+      "durationMs": 0,
+      "ended": false,
+      "observedUTC": "2026-11-05T01:32:07.267Z"
+    },
+    {
+      "event": "progress",
+      "positionMs": 0,
+      "durationMs": 0,
+      "ended": false,
+      "observedUTC": "2026-11-05T01:32:07.589Z"
+    }
+  ],
+  "privateRequestPresent": true,
+  "visibility": "visible"
+}

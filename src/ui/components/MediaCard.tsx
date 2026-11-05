@@ -11,6 +11,7 @@ import { artworkCategoryContext } from '../../artwork/tmdb-metadata.service.ts';
 import { useParentalClassification } from '../hooks/useParentalClassification.ts';
 
 interface MediaCardProps {
+  showKindBadge?: boolean;
   parentalEditor?: boolean;
   item: CatalogItemViewModel;
   onClick: (item: CatalogItemViewModel) => void;
@@ -18,16 +19,19 @@ interface MediaCardProps {
   onFocus?: () => void;
   prepareArtwork?: boolean;
   startupArtwork?: boolean;
+  railIndex?: number;
 }
 
 export const MediaCard = React.memo<MediaCardProps>(function MediaCard({
   item,
   onClick,
+  showKindBadge=false,
   className = '',
   onFocus,
   prepareArtwork=true,
   startupArtwork=false,
   parentalEditor=false,
+  railIndex,
 }) {
   const parental = useParentalControl();
   const badge = useContentBadge(item.kind, item.title);
@@ -49,11 +53,14 @@ export const MediaCard = React.memo<MediaCardProps>(function MediaCard({
       ref={ref}
       type="button"
       className={`focusable-item media-card ${className}`}
-      onClick={() => onClick(item)}
-      onFocus={()=>{const uri=displayArtworkUri(posterUri,'poster');if(uri)void loadImage(uri,true);onFocus?.();}}
+      onClick={event=>{event?.currentTarget?.dispatchEvent(new CustomEvent('xandeflix:card-leave',{bubbles:true}));onClick(item);}}
+      onFocus={event=>{const uri=displayArtworkUri(posterUri,'poster');if(uri)void loadImage(uri,true);onFocus?.();event?.currentTarget?.dispatchEvent(new CustomEvent('xandeflix:card-focus',{bubbles:true,detail:{item}}));}}
+      onBlur={event=>event.currentTarget.dispatchEvent(new CustomEvent('xandeflix:card-leave',{bubbles:true}))}
       aria-label={`${item.title}${item.yearFormatted ? ` (${item.yearFormatted})` : ''} - ${item.kind === 'movie' ? 'Filme' : 'Série'}${badge ? ` - ${badge}` : ''}`}
       data-startup-artwork={startupArtwork || undefined}
       data-catalog-item={`${item.kind}:${item.id}`}
+      data-rail-index={railIndex}
+      data-card-preview-identity={`${item.kind}:${item.id}:${item.externalIds?.tmdbId||''}:${item.title}:${item.yearFormatted||''}`}
     >
       <div className="media-card-poster-wrapper">
         <Artwork uri={posterUri} title={item.title} kind="poster" className="media-card-poster"
@@ -61,6 +68,7 @@ export const MediaCard = React.memo<MediaCardProps>(function MediaCard({
           startup={startupArtwork}
           identity={{ kind: item.kind, title: item.title, year: item.yearFormatted, tmdbId: item.externalIds?.tmdbId,
             ...(item.kind === 'series' ? artworkCategoryContext(item.categoryLabels, item.hasEpisodes) : {}) }} />
+        {showKindBadge && <span className="media-card-kind-badge">{item.kind==='movie'?'Filme':'Série'}</span>}
         {item.yearFormatted && <div className={`media-card-year${badge ? ' media-card-year--with-new' : ''}`}>{item.yearFormatted}</div>}
         {badge && <span className="media-card-new-badge" aria-hidden="true">{badge}</span>}
       </div>

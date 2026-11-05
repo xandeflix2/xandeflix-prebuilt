@@ -1,0 +1,107 @@
+{
+  "schema": 1,
+  "gate": "CANON-01-OPAQUE-HLS-MIME-RECOVERY",
+  "parentGate": "CANON-01",
+  "amendment": "CANON-01-OPAQUE-HLS-MIME-RECOVERY",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "EXPLICIT_USER_CONDITIONAL_P1_FUNCTIONAL_RECOVERY_AUTHORIZATION_AND_CURRENT_DEVICE_REGRESSION_REPORT_2026_10_23",
+  "authorizationRequestSha256": "92cd46c5247e1fa08746e5c36491e2d1f024ca577d52748bb53133edba47374f",
+  "reason": "Fix the physically reproduced opaque HLS Media3 extractor mismatch by supplying a strict transport MIME hint to preview and fullscreen without rewriting any source URL, credentials, catalog, activation or security control.",
+  "physicalImpact": "REQUIRED",
+  "physicalImpactJustification": "UnrecognizedInputFormatException reproduced on authorized Fire Stick through normal permitted-channel UI; patched APK must be tested physically after a separate installation authorization. Synthetic and JVM success do not certify physical recovery.",
+  "testChangesReviewed": true,
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c105-complete-root-search.mjs",
+    "scripts/test-c107-catalog-return-navigation.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c11-landscape-navigation.mjs",
+    "scripts/validate-direct-playback.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock",
+    "npm run typecheck",
+    "npm run update:check",
+    "npm run security:check",
+    "npm run playback:check",
+    "npm run build",
+    "npm run site:build",
+    "node scripts/test-site-build-contract.mjs",
+    "node scripts/test-vercel-artifact-contract.mjs",
+    "node scripts/verify-vercel-artifact.mjs inspect",
+    "node scripts/test-vercel-prebuilt-contract.mjs",
+    "gradlew.bat --no-daemon --max-workers=2 assembleDebug testDebugUnitTest"
+  ],
+  "evidence": "docs/evidence/OPAQUE_HLS_MIME_RECOVERY.md",
+  "compatibilityRisk": "Only explicit opaque HTTP(S) HLS paths get a MIME hint. Existing extension inference, TS/VOD/DASH, candidate URLs and headers are unchanged. Startup latency remains under investigation and is not claimed corrected.",
+  "restrictions": [
+    "Isolated conditional P1 only. Preserve active workspace L1 and all21 received receipts.",
+    "No device installation, removal, reset, manual catalog import/refresh, source/identity/license/parental change, backend write, Git publication or Vercel action.",
+    "Separate experimental APK allowed after canonical, C11, Android and signature/assets audits; no physical PASS before an authorized real test."
+  ],
+  "previousGovernanceHashes": {
+    "docs/governance/CANON_CHANGE_AUTHORIZATION.json": "e73152f228cbb625c508062d70ef810e8342059a",
+    "docs/governance/CANON_01_LEGACY_TESTS_AUTHORIZATION.json": "e59e2d328db3d0dfd8c1d873b154e2e3f7900a0c",
+    "docs/governance/CANON_01_AUTHORIZATION_HARDENING.json": "766db763ee98aeeb33230c2828f050a8527555b7",
+    "docs/governance/authorizations/CANON-01-VERCEL-BUILD-A1.json": "7edaa32c4b13c8295fc0daa64abed1ef7a4b0c2d",
+    "docs/governance/authorizations/CANON-01-VERCEL-A2-ARTIFACT.json": "fb613a143676e3e32267ebacb3bec81123791823",
+    "docs/governance/authorizations/CANON-01-VERCEL-A22A.json": "c698fec429f4058118d4701a7f5208ece9a0b0d1",
+    "docs/governance/authorizations/CANON-01-A22A-CI-DIAG.json": "7d89451bf23a05fa1ba819b72b99b28025aa7a66",
+    "docs/governance/authorizations/CANON-01-A22A-WINDOWS-EOL.json": "73ffd5ed494cb87a7c0d22e4a8a3f94252cf321e",
+    "docs/governance/authorizations/CANON-01-SOURCE-OUTPUT.json": "a93d98a1022f99c0e0957dd8f4a2c7d078b8f588",
+    "docs/governance/authorizations/CANON-01-CATALOG-READ-DIAG.json": "169b19ee02a4c1cacbe575cded00ec02928fa3c7",
+    "docs/governance/authorizations/CANON-01-XUI-OPAQUE-RECOVERY.json": "cf4176d0007b4a04997bf2631558bd9d954fd6f7",
+    "docs/governance/authorizations/CANON-01-CATALOG-PHYSICAL-FIXES.json": "ea179b852518e2a14c7ee79b6c3c72e76c0df6a9",
+    "docs/governance/authorizations/CANON-01-SERIES-POSTER-COMPOSITION.json": "645dc8b2b5d4b822bc83d72e9f5ab9f4f4cb4347",
+    "docs/governance/authorizations/CANON-01-TMDB-CONTEXT-IDENTITY.json": "3ab236bab99175dcb5374047c2fc6565650d8945",
+    "docs/governance/authorizations/CANON-01-TMDB-SUBTITLE-PREVIEW.json": "5e50d1c29c33b5fe3455112818e978213d065e96",
+    "docs/governance/authorizations/CANON-01-CATALOG-RETENTION.json": "b3c18f01ba1e753597af3a162c2605669dcd4e6b",
+    "docs/governance/authorizations/CANON-01-DETAIL-BACKDROP-UI.json": "579097e952a7ddf142ba885aaf23e164c0241e54",
+    "docs/governance/authorizations/CANON-01-DETAIL-BACKDROP-TYPES.json": "da8c532e25e220040bba3c942bad41507d4b9245",
+    "docs/governance/authorizations/CANON-01-TV-SIDEBAR-COMPOSITION.json": "f5d43f845cd4e3fdb7947dc33e4f9b3df8669ab7",
+    "docs/governance/authorizations/CANON-01-A22A-WINDOWS-METADATA-EOL.json": "90d7db4a18e84221afa6fa9dda40c82d6dad6121",
+    "docs/governance/authorizations/CANON-01-VERCEL-PREBUILT-RECOVERY-01.json": "9cb685590481ba094ffbca2e2abe2f585aa3ae46"
+  },
+  "supersedes": {
+    "scripts/test-canonical-regression.mjs": "CANON-01-VERCEL-PREBUILT-RECOVERY-01"
+  },
+  "changes": [
+    {
+      "path": "android/app/src/main/java/com/xandeflix/prebuilt/player/NativeStreamRequest.java",
+      "before": "2e78d54d7826cf4b88bd124c2d7625b8bcd01a20",
+      "after": "0ac304a18040b23647313761949bc581834a055d"
+    },
+    {
+      "path": "android/app/src/main/java/com/xandeflix/prebuilt/player/NativeAndroidPlayerPlugin.java",
+      "before": "d3cd81116a6c84c7796137f89825ca9fa5b12043",
+      "after": "dcf2c27419f9d80fbe43da2c5e4e78dd44884c91"
+    },
+    {
+      "path": "android/app/src/main/java/com/xandeflix/prebuilt/player/NativePlayerActivity.java",
+      "before": "2b2c82bceb3f8e767a0d9a87eb6e0f2e88359d20",
+      "after": "3c4ade24ad659b00185d2de1434dfa5741da3920"
+    },
+    {
+      "path": "android/app/src/test/java/com/xandeflix/prebuilt/player/OpaqueHlsMimeRecoveryTest.java",
+      "before": null,
+      "after": "eaecea2381e8268dcff09fee38f3949136c347c7"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "8eac191359942b8cb8e5f4838cbfca55b299bf14",
+      "after": "d752c9915c36f25582a961f63a100025e6ceddf5"
+    }
+  ],
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": true,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false
+}

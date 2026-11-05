@@ -880,15 +880,13 @@ public class NativeAndroidPlayerPlugin extends Plugin {
         }
 
         NativeStreamRequest request = previewCandidateRequests.get(index);
-        if (SecurePlaybackDiagnosticProbe.enabled(getSafeContext())) {
-            final String diagnosticAttemptId = SecurePlaybackDiagnosticProbe.newAttemptId();
-            new Thread(() -> SecurePlaybackDiagnosticProbe.run(request, diagnosticAttemptId), "secure-live-probe").start();
-        }
+        // Diagnostics observe the Media3 transport below; do not open an extra source connection.
         DefaultMediaSourceFactory mediaSourceFactory = new DefaultMediaSourceFactory(getSafeContext())
                 .setDataSourceFactory(NativePlayerActivity.buildHttpDataSourceFactory(request, SecurePlaybackDiagnosticProbe.enabled(getSafeContext())));
         PlaybackBufferPolicy.forDevice(getSafeContext(), currentPreviewKind).configureMediaSource(mediaSourceFactory);
         MediaItem mediaItem = new MediaItem.Builder()
                 .setUri(android.net.Uri.parse(request.getMediaUrl()))
+                .setMimeType(request.getMediaMimeTypeHint())
                 .build();
         previewPlayer.setMediaSource(mediaSourceFactory.createMediaSource(mediaItem));
         previewPlayer.setPlayWhenReady(true);

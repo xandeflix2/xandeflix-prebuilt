@@ -1,3 +1,5 @@
+import * as actualArtworkMetadata from '../src/artwork/tmdb-metadata.service.ts';
+import {railWindow} from '../src/ui/rail-pagination.ts';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import React from 'react';
@@ -29,7 +31,10 @@ const dispose=prepareStartupArtwork(options),late=job;dispose();time=50000;late(
 console.log('PASS_STARTUP40_BOUNDED_LAYOUT_READS_REAL_READY_DISTINCT_FALLBACK_STABILITY_TIMEOUT_CANCEL');
 
 const passive={...React,useRef:v=>({current:v}),useState:v=>[typeof v==='function'?v():v,()=>{}],useEffect:()=>{},useLayoutEffect:()=>{},useMemo:f=>f()};
-function load(file,imports){const module={exports:{}};const code=ts.transpileModule(readFileSync(new URL('../'+file,import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.React,target:ts.ScriptTarget.ES2022}}).outputText;new Function('require','module','exports',code)(name=>{const parental=parentalFixtureBindings(name);if(parental)return parental;for(const [key,value]of Object.entries(imports))if(name.includes(key))return value;throw Error('Uncontrolled dependency '+name);},module,module.exports);return module.exports;}
+function load(file,imports){const module={exports:{}};const code=ts.transpileModule(readFileSync(new URL('../'+file,import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.React,target:ts.ScriptTarget.ES2022}}).outputText;new Function('require','module','exports',code)(name=>{const parental=parentalFixtureBindings(name);if(parental)return parental;for(const [key,value]of Object.entries(imports))if(name.includes(key))return value;if(name.endsWith('/tmdb-metadata.service.ts'))return actualArtworkMetadata;
+    if(name.endsWith('/rail-pagination.ts'))return{railWindow};
+    if(name.endsWith('/ProgressiveCategoryRail.tsx'))return{ProgressiveCategoryRail:()=>null};
+    throw Error('Uncontrolled dependency '+name);},module,module.exports);return module.exports;}
 function elements(tree){const result=[];function walk(n){if(!React.isValidElement(n))return;result.push(n);React.Children.forEach(n.props.children,walk);}walk(tree);return result;}
 const Card=()=>null,Artwork=()=>null;
 const {MediaRail}=load('src/ui/components/MediaRail.tsx',{react:{default:passive,...passive},'category-presentation':{createPresentationSeed:()=>1,orderCategoryItems:x=>x,isReleaseCategory:()=>false},MediaCard:{MediaCard:Card},useRailArtworkPreparation:{useRailArtworkPreparation:()=>({root:{current:null},prepare:false})}});

@@ -15,7 +15,7 @@ assert.equal(parseSeriesPresentation({id:1399,content_ratings:{results:[{iso_316
 assert.equal(parseSeriesPresentation({id:1399,content_ratings:{results:[{iso_3166_1:'BR',rating:'Livre'}]},last_episode_to_air:{runtime:42}},1399).ageRating,'L');
 let now=1000,calls=0,active=0,peak=0;
 const service=new SeriesPresentationService({credential:()=> 'synthetic-only',now:()=>now,fetchImpl:async url=>{
-  calls++;active++;peak=Math.max(peak,active);const parsed=new URL(url);assert.equal(parsed.hostname,'api.themoviedb.org');assert.equal(parsed.searchParams.get('append_to_response'),'videos,content_ratings');
+  calls++;active++;peak=Math.max(peak,active);const parsed=new URL(url);assert.equal(parsed.hostname,'api.themoviedb.org');assert.equal(parsed.searchParams.get('append_to_response'),'videos,content_ratings,aggregate_credits');
   await new Promise(r=>setTimeout(r,5));active--;return new Response(JSON.stringify({...raw,id:Number(parsed.pathname.split('/').at(-1))}));
 }});
 const one=service.resolve(1399),two=service.resolve(1399);assert.equal(one,two);await Promise.all([one,two]);assert.equal(calls,1);await service.resolve(1399);assert.equal(calls,1);

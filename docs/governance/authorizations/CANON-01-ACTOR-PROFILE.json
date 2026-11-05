@@ -1,0 +1,131 @@
+{
+  "schema": 1,
+  "gate": "CANON-01-ACTOR-PROFILE",
+  "parentGate": "CANON-01-DETAIL-HERO-REFINEMENT",
+  "amendment": "CANON-01-ACTOR-PROFILE",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "CURRENT_USER_ACTOR_PORTRAIT_BIOGRAPHY_TOP_LOCAL_COVERS_BELOW_2026_10_28; NOT_NEW_MASTER_ATTACHMENT",
+  "authorizationRequestSha256": "55d75135557a265dfd76ad2a8ef13ee3e9801b5370c580578afedfe1347505bc",
+  "reason": "Actor portrait page with validated public biography and local-only filmography; retain existing source and authorization boundaries. Current user also requests refined focus contours across all device profiles. Final user: Fire0.8 portrait/text, normal shell/sidebar available, no top Back, full-width actor grid with optional Filme/Serie badge.",
+  "physicalImpact": "REQUIRED",
+  "physicalImpactJustification": "Same Fire update under standing autonomous test authorization; browser phone/tablet layouts, no other physical update.",
+  "testChangesReviewed": true,
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c105-complete-root-search.mjs",
+    "scripts/test-c107-catalog-return-navigation.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c11-landscape-navigation.mjs",
+    "scripts/validate-direct-playback.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock",
+    "npm run typecheck",
+    "node scripts/test-actor-profile.mjs",
+    "official production build and artifact audits",
+    "offline native257/39",
+    "same Fire actor page validation"
+  ],
+  "evidence": "docs/evidence/ACTOR_PROFILE.md",
+  "compatibilityRisk": "Optional public person metadata, bounded request/cache and local snapshot scan. No search, source, player or authorization logic changes.",
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": true,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false,
+  "supersedes": {
+    "src/ui/components/TitleCast.tsx": "CANON-01-DETAIL-HERO-REFINEMENT",
+    "src/ui/components/SeriesDetailSections.tsx": "CANON-01-DETAIL-HERO-REFINEMENT",
+    "src/index.css": "CANON-01-DETAIL-HERO-REFINEMENT",
+    "android/app/build.gradle": "CANON-01-DETAIL-HERO-REFINEMENT",
+    "scripts/test-canonical-regression.mjs": "CANON-01-DETAIL-HERO-REFINEMENT",
+    "scripts/test-detail-hero-refinement.mjs": "CANON-01-DETAIL-HERO-REFINEMENT",
+    "scripts/test-series-episode-return.mjs": "CANON-01-DETAIL-HERO-REFINEMENT",
+    "scripts/test-tmdb-episode-enrichment-ui.mjs": "CANON-01-DETAIL-HERO-REFINEMENT",
+    "src/ui/components/MediaCard.tsx": "CANON-01-HOME-DPAD-CAROUSEL-PREVIEW-PAGINATION-02",
+    "src/ui/components/CatalogGrid.tsx": "CANON-01-DPAD-CARD-SCOPE-SEEALL-GRID-01"
+  },
+  "changes": [
+    {
+      "path": "src/artwork/tmdb-person.service.ts",
+      "before": null,
+      "after": "c906f9b8a10ec4135fd76d76700853c4c7e1336c"
+    },
+    {
+      "path": "src/catalog/actor-titles.service.ts",
+      "before": null,
+      "after": "daa8863464ee1716bb9f2bb6c0a61a7401eb5124"
+    },
+    {
+      "path": "src/ui/components/ActorDetailPage.tsx",
+      "before": null,
+      "after": "1d9f190cb045fb523756eaf013d6155e4e2e1811"
+    },
+    {
+      "path": "src/ui/components/TitleCast.tsx",
+      "before": "596a4f1c3ab633208bb7d1673d34b872046018e4",
+      "after": "611fe8e235aeb6988499d95f6adee63b2727f38d"
+    },
+    {
+      "path": "src/ui/components/SeriesDetailSections.tsx",
+      "before": "1e8e4454f513aac56ea0779dfb6f8e0034e3d32d",
+      "after": "292adafe5b3d348b5ce4d2e48c07fc45785f9db9"
+    },
+    {
+      "path": "src/index.css",
+      "before": "3846d8265bcca044965cab5d0479bf1a562586cd",
+      "after": "8a9795956b1d9e555e8c028090b3373d4374c398"
+    },
+    {
+      "path": "android/app/build.gradle",
+      "before": "8b8ecc4377cd08c573b7ee2b9f78e03f68710ee0",
+      "after": "b0814c0e8e32a36f19f03773c695d8615c9ad4f9"
+    },
+    {
+      "path": "scripts/test-actor-profile.mjs",
+      "before": null,
+      "after": "dabfd38aaf737939adbf727af97f8dfdd848586f"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "7895460e328d60e3bba27ca05b2dcdce23c5f463",
+      "after": "9614c03be6ca7be7429bd59b94c492dee257bf6d"
+    },
+    {
+      "path": "scripts/test-detail-hero-refinement.mjs",
+      "before": "ecb802ad4134ff96c9bdf8edd0bcc59ab22c5e80",
+      "after": "dcd23cff7b5901e504e0cc79b4908bebe318ab6d"
+    },
+    {
+      "path": "scripts/test-series-episode-return.mjs",
+      "before": "a5a39d0fc7a86e058ee1dfe14598e838dffda796",
+      "after": "e4b1592d3f3e12d3bb965f2d4104150857295e5a"
+    },
+    {
+      "path": "scripts/test-tmdb-episode-enrichment-ui.mjs",
+      "before": "340373af953e3702ddf5b5f27d3c33273b1a09e2",
+      "after": "556eeffb7951d8216cbd8ca134e8bb3cc66f2c39"
+    },
+    {
+      "path": "src/ui/components/MediaCard.tsx",
+      "before": "b93159d9370f4380edae0733c5f05649f0b10266",
+      "after": "0fb153dcc2fe6aaf590ec65e117af45d6bffc0c3"
+    },
+    {
+      "path": "src/ui/components/CatalogGrid.tsx",
+      "before": "1907b7744ff01e34c87179ee7d21cb81dbda4c70",
+      "after": "4b7bd4dfc2808531c3fd84c862d83dc61237ac2e"
+    }
+  ],
+  "restrictions": [
+    "Preserve49 received receipts and204controls40suites; controlled optional page IO in old focused test, all assertions unchanged.",
+    "No source/backend/Git/reset/other-device installation/next gate."
+  ]
+}

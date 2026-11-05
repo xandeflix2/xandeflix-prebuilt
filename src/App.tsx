@@ -49,7 +49,7 @@ import { MoviesPage } from './ui/pages/MoviesPage.tsx';
 import { SeriesPage } from './ui/pages/SeriesPage.tsx';
 import { SearchPage } from './ui/pages/SearchPage.tsx';
 import { MovieDetailPage } from './ui/pages/MovieDetailPage.tsx';
-import { SeriesDetailPage } from './ui/pages/SeriesDetailPage.tsx';
+import { SeriesDetailPage, type SeriesEpisodeReturnState } from './ui/pages/SeriesDetailPage.tsx';
 import { LocalSourceProvisioningPage } from './ui/pages/LocalSourceProvisioningPage.tsx';
 import { ActivationPage } from './ui/pages/ActivationPage.tsx';
 import { SettingsPage } from './ui/pages/SettingsPage.tsx';
@@ -69,6 +69,7 @@ import {
 } from './playback/native-android-player.bridge.ts';
 import { defaultPlaybackService } from './playback/playback.service.ts';
 import { AutomaticSourceRefresh, canRefreshCatalog } from './bootstrap/automatic-source-refresh.ts';
+import { canUseSourceCatalog, finishSourceRestart } from './bootstrap/source-replacement.ts';
 import { GoogleCast, hasGoogleCast } from './playback/google-cast.ts';
 import { handleNativePlayerReturn, getNativePlaybackErrorNotice } from './playback/native-playback-error-notice.ts';
 import { capturePlaybackSupportDiagnostic } from './playback/playback-support-diagnostic.ts';
@@ -112,10 +113,19 @@ export default function App(): React.JSX.Element {
     getBootSyncCoordinator().getProgress()
   );
   const [bootSyncError, setBootSyncError] = useState<string | undefined>();
+  const [sourceReadiness, setSourceReadiness] = useState(() => getBootSyncCoordinator().getSourceReadiness());
+  const sourceRestartRef = useRef(false);
   const [nativePlaybackErrorNotice, setNativePlaybackErrorNotice] = useState<string | null>(null);
   const [playbackSupportDiagnostic, setPlaybackSupportDiagnostic] = useState<string | null>(null);
 
   const [routeState, setRouteState] = useState<NavigationState>(createInitialRoute());
+  // Survive the parental gate's temporary unmount, only within this catalog/route.
+  const seriesEpisodeReturnRef = useRef<{ model: NonNullable<typeof readModel>; seriesId: string; position: SeriesEpisodeReturnState } | null>(null);
+  if (routeState.current.view !== 'series-detail' || !routeState.current.itemId || !readModel) {
+    seriesEpisodeReturnRef.current = null;
+  } else if (seriesEpisodeReturnRef.current?.model !== readModel || seriesEpisodeReturnRef.current.seriesId !== routeState.current.itemId) {
+    seriesEpisodeReturnRef.current = { model: readModel, seriesId: routeState.current.itemId, position: {} };
+  }
   const sourceRefreshView = useRef(routeState.current.view);
   sourceRefreshView.current = routeState.current.view;
   const [authorizationGate, setAuthorizationGate] = useState<'CHECKING' | 'UNAUTHORIZED' | 'AUTHORIZED'>('CHECKING');
@@ -362,12 +372,30 @@ export default function App(): React.JSX.Element {
     if (authorizationGate !== 'AUTHORIZED') return;
     const coordinator = getBootSyncCoordinator();
     const unsubscribe = coordinator.subscribe((state, result, progress) => {
+      setSourceReadiness(coordinator.getSourceReadiness());
       setBootSyncState(state);
       if (progress) {
         setBootSyncProgress(progress);
       }
       if (result?.error) {
         setBootSyncError(result.error);
+      }
+      if (result?.outcome === 'SOURCE_RESET_REQUIRED' && !sourceRestartRef.current) {
+        sourceRestartRef.current = true;
+        void (async () => {
+          // Close through the normal C9/player APIs before discarding this runtime.
+          await beforeLiveLeaveRef.current?.();
+          await defaultPlaybackService.stopPlayback('SOURCE_CHANGED');
+          if (Capacitor.isNativePlatform()) {
+            await NativeAndroidPlayer.stopPreview();
+            await NativeAndroidPlayer.stopPlayback();
+          }
+          finishSourceRestart(window.localStorage, () => window.location.reload());
+        })().catch(() => {
+          sourceRestartRef.current = false;
+          setBootSyncState('ERROR');
+          setBootSyncError('Não foi possível preparar a troca da fonte. Tente novamente.');
+        });
       }
       if (result?.outcome === 'PROMOTED') {
         setRouteState(current => ({ ...current, history: current.history.filter(route => route.view !== 'movie-detail' && route.view !== 'series-detail') }));
@@ -492,7 +520,7 @@ export default function App(): React.JSX.Element {
 
   if (routeState.current.view === 'settings' || routeState.current.view === 'parental-control') {
     return <AppShell currentView={routeState.current.view} onNavigate={handleNavigate} onBack={handleBack} canGoBack={canGoBack}>
-      {routeState.current.view === 'parental-control' ? <ParentalControlPage readModel={readModel} onBack={handleBack} onOpenAdult={() => handleNavigate('adult')}/>
+      {routeState.current.view === 'parental-control' ? <ParentalControlPage readModel={canUseSourceCatalog(sourceReadiness, summary?.activePointer) ? readModel : null} onBack={handleBack} onOpenAdult={() => handleNavigate('adult')}/>
         : <SettingsPage onOpenActivation={() => handleNavigate('activation')} onOpenParental={() => handleNavigate('parental-control')} onOpenAdult={() => handleNavigate('adult')}/>}
     </AppShell>;
   }
@@ -518,7 +546,7 @@ export default function App(): React.JSX.Element {
     );
   }
 
-  const isExistingRealCatalog = summary?.activePointer?.kind === 'REAL';
+  const isExistingRealCatalog = canUseSourceCatalog(sourceReadiness, summary?.activePointer);
 
   // 2. Determinação de estado de catálogo da primeira sincronização real
   const getFirstRealSyncCatalogState = (): FirstRealSyncCatalogState => {
@@ -532,8 +560,10 @@ export default function App(): React.JSX.Element {
   };
 
   // First sync is a dedicated screen; a usable local catalog still opens immediately.
-  if (!isExistingRealCatalog && ['home', 'movies', 'series', 'search', 'live'].includes(routeState.current.view)) {
+  if (!isExistingRealCatalog && ['home', 'movies', 'series', 'search', 'live', 'movie-detail', 'series-detail', 'adult'].includes(routeState.current.view)) {
+    if (sourceReadiness.state === 'CHECKING') return <StartupLoadingScreen stage="checking" previewEnabled={false}/>;
     return <FirstRealSyncState catalogState={getFirstRealSyncCatalogState()} progress={bootSyncProgress}
+      errorMessage={bootSyncError}
       onOpenActivation={() => handleNavigate('activation')} onOpenPortal={() => handleNavigate('portal')}
       onRetry={() => { setBootSyncError(undefined); getBootSyncCoordinator().startNonBlockingSync(); }}/>;
   }
@@ -669,6 +699,7 @@ export default function App(): React.JSX.Element {
           <SeriesDetailPage
             key={itemId}
             seriesId={itemId || ''}
+            returnState={seriesEpisodeReturnRef.current?.position}
             readModel={readModel}
             onBack={handleBack}
             onSelectItem={handleSelectItem}
@@ -696,7 +727,7 @@ export default function App(): React.JSX.Element {
   // Se já há catálogo REAL ativo mas legitimamente vazio
   if (isExistingRealCatalog && isValidEmptyCatalog) {
     return (
-      <NewContentProvider model={authorizationGate === 'AUTHORIZED' ? readModel : null}>
+      <NewContentProvider model={authorizationGate === 'AUTHORIZED' && isExistingRealCatalog ? readModel : null}>
       <AppShell
         currentView={routeState.current.view}
         onNavigate={handleNavigate}

@@ -1,0 +1,84 @@
+{
+  "observedUTC": "2026-11-04T19:31:09.183Z",
+  "viewport": {
+    "width": 1365,
+    "height": 775
+  },
+  "headings": [
+    "Nova versão pronta para instalar",
+    "Silo (2023)",
+    "Título original: Silo",
+    "O que achou desta série?"
+  ],
+  "headers": [
+    {
+      "tag": "HEADER",
+      "className": "app-header",
+      "top": 0,
+      "height": 775.4667358398438,
+      "width": 80.00000762939453,
+      "display": "grid",
+      "visibility": "visible"
+    }
+  ],
+  "hero": [
+    {
+      "tag": "DIV",
+      "className": "app-shell app-shell--hero-top app-shell--tablet app-shell--side-nav app-shell--phone-header-back app-shell--phone-detail-page",
+      "top": 0,
+      "height": 775.4667358398438,
+      "width": 1365.3333740234375,
+      "display": "flex",
+      "visibility": "visible"
+    },
+    {
+      "tag": "DIV",
+      "className": "detail-hero-wide hero-with-navigation",
+      "top": 12.000000953674316,
+      "height": 508.0000305175781,
+      "width": 1269.3333740234375,
+      "display": "block",
+      "visibility": "visible"
+    },
+    {
+      "tag": "DIV",
+      "className": "detail-actions series-detail-hero-actions",
+      "top": 402.5000305175781,
+      "height": 52.000003814697266,
+      "width": 924.2667236328125,
+      "display": "flex",
+      "visibility": "visible"
+    },
+    {
+      "tag": "DIV",
+      "className": "hero-top-actions",
+      "top": 20.533334732055664,
+      "height": 44.000003814697266,
+      "width": 129.2166748046875,
+      "display": "flex",
+      "visibility": "visible"
+    }
+  ],
+  "controls": [
+    {
+      "label": "Voltar para a tela anterior",
+      "tag": "BUTTON",
+      "className": "focusable-item btn-back",
+      "top": 20.533334732055664,
+      "height": 44.000003814697266,
+      "width": 76.1500015258789,
+      "display": "flex",
+      "visibility": "visible"
+    },
+    {
+      "label": "Transmitir pelo Google Cast",
+      "tag": "BUTTON",
+      "className": "focusable-item btn-secondary cast-button",
+      "top": 20.533334732055664,
+      "height": 44.000003814697266,
+      "width": 45.06666946411133,
+      "display": "flex",
+      "visibility": "visible"
+    }
+  ]
+}

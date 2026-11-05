@@ -14,12 +14,13 @@ interface ArtworkProps {
   priority?: 'high' | 'normal'; tmdbBackdropOnly?: boolean;
   immersiveArtwork?: 'backdrop' | 'poster'; prepare?: boolean;
   startup?: boolean;
+  preview?: boolean;
   detailBackdrop?: boolean;
   hideEmpty?: boolean;
   onReadyChange?: (ready: boolean) => void;
 }
 
-function ArtworkImage({ uri, fallbackUri, identity, title, kind = 'poster', className = '', priority = 'normal', tmdbBackdropOnly = false, immersiveArtwork, startup = false, detailBackdrop = false, hideEmpty = false, onReadyChange }: ArtworkProps) {
+function ArtworkImage({ uri, fallbackUri, identity, title, kind = 'poster', className = '', priority = 'normal', tmdbBackdropOnly = false, immersiveArtwork, startup = false, preview = false, detailBackdrop = false, hideEmpty = false, onReadyChange }: ArtworkProps) {
   const high = priority === 'high';
   const [failed, setFailed] = useState<Set<string>>(() => new Set());
   const [retried] = useState<Set<string>>(() => new Set());
@@ -29,7 +30,7 @@ function ArtworkImage({ uri, fallbackUri, identity, title, kind = 'poster', clas
   const [ready, setReady] = useState<{ uri: string; src: string }>();
   const [attempt, setAttempt] = useState(0);
   const [sharedSource, setSharedSource] = useState(false);
-  const source = displayArtworkUri(uri, kind, high), fallback = displayArtworkUri(fallbackUri, kind, high);
+  const source = displayArtworkUri(uri, kind, high, preview), fallback = displayArtworkUri(fallbackUri, kind, high, preview);
   const near = visibility.near || visibility.visible || startup;
   const urgent = visibility.visible || (high && near);
   const seriesPoster = kind === 'poster' && identity?.kind === 'series';
@@ -47,7 +48,7 @@ function ArtworkImage({ uri, fallbackUri, identity, title, kind = 'poster', clas
     ? { ...identity, title: identity.title.replace(/\s+\(L\)\s*$/i, ''), posterPath: undefined,
       sourcePosterUri: independentLookup ? undefined : identity.sourcePosterUri } : identity;
   const { metadata, pending: metadataPending } = useArtworkMetadataState(metadataIdentity, near && (missingSource || externalPoster || sharedSource), urgent ? 'high' : 'normal', detailBackdrop);
-  const provider = displayArtworkUri(detailBackdrop ? chooseDetailBackdropUri(metadata, failed) : kind === 'backdrop' ? metadata?.backdropUri : metadata?.posterUri, kind, high);
+  const provider = displayArtworkUri(detailBackdrop ? chooseDetailBackdropUri(metadata, new Set([...failed].flatMap(uri=>[uri,uri.replace('/w780/','/w1280/')])) ) : kind === 'backdrop' ? metadata?.backdropUri : metadata?.posterUri, kind, high, preview);
   const sourcePath = tmdbPosterPath(source);
   const verifiedSource = Boolean(sourcePath && metadata && [metadata.posterUri, ...(metadata.heroPosterUris || [])].some(uri => tmdbPosterPath(uri) === sourcePath));
   const untrustedSource = sharedSource && !verifiedSource;

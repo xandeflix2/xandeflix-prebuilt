@@ -1,0 +1,19 @@
+{
+  "observedUTC": "2026-11-05T11:34:51.768Z",
+  "originalSource": {
+    "passed": 1581,
+    "different": []
+  },
+  "originalGit": {
+    "passed": 41,
+    "different": []
+  },
+  "originalDependencies": {
+    "passed": 6760,
+    "different": []
+  },
+  "candidateDependencies": {
+    "passed": 6760,
+    "different": []
+  }
+}

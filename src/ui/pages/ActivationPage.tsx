@@ -52,6 +52,7 @@ import { publicDeviceActivationUrl, publicActivationHandoffUrl } from '../activa
 import { getPublicDeviceActivationService } from '../../control-plane/client/public-device-activation.service.ts';
 import './ActivationPage.css';
 import { ActivationHandoff } from '../components/ActivationHandoff.tsx';
+import { StartupLoadingScreen } from '../components/StartupLoadingScreen.tsx';
 import { isPublicConsumerWeb } from '../../web-production/session-context.ts';
 import { WebAccessStatus } from '../../web-production/WebAccessStatus.tsx';
 
@@ -724,6 +725,9 @@ const NativeActivationPage: React.FC<ActivationPageProps> = ({
         fontFamily: 'sans-serif',
       }}
     >
+      <div className="activation-page__artwork" aria-hidden="true">
+        <StartupLoadingScreen stage="checking" previewEnabled={false}/>
+      </div>
       <div style={{ maxWidth: '750px', margin: '0 auto' }}>
         {onOpenSettings && <button type="button" className="focusable-item btn-secondary" onClick={onOpenSettings}>Configurações</button>}
         {/* Cabeçalho */}

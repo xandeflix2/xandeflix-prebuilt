@@ -412,64 +412,6 @@ demais Gates nao iniciados. Adjudicacao/publicacao continuam pendentes.
 }
 ```
 
-## CANON-01-VERCEL-BUILD-A1 — especificacao aprovada antes do codigo — 2026-10-20
-
-GATE=CANON-01; AMENDMENT=CANON-01-VERCEL-BUILD-A1.
-Autorizacao nominal no anexo CHAT MESTRE — CANON-01 VERCEL BUILD VALIDATION,
-SHA-256 89fa9dbf8a83b6662c0ef4e5d5de4cdc36930e9cd0a0b2558538bfb4b49b1b86.
-Workspace C11, branch governance/canon-01-hardening, HEAD
-3a418ac42bf0794624efc9aef2d41e5f6162fa71. Main permanece b3fc8d1;
-PR #1 OPEN_DRAFT e CI canonico Windows/Linux PASS no preflight.
-Arvore/index inicialmente limpos; 1278 arquivos rastreados, 28 arquivos
-revisados e 140 artefatos Android capturados antes da alteracao.
-canon:check, canon:test (95 controles/11 suites) e lock C11 passaram antes.
-
-Allowlist FECHADA desta emenda:
-- Novos: .github/workflows/site-build-validation.yml;
-  scripts/test-site-build-contract.mjs;
-  docs/governance/authorizations/CANON-01-VERCEL-BUILD-A1.json;
-  docs/evidence/CANON_01_VERCEL_BUILD_A1.md.
-- Alteracoes controladas: scripts/verify-canonical-contract.mjs e
-  scripts/test-canonical-regression.mjs.
-- Somente append: este documento, docs/STATUS.md, docs/EVOLUTION_REPORT.md
-  e docs/ERRORS_AND_BLOCKERS.md.
-Saidas usuais de testes/build/auditoria ficam em tmp ignorado pelo Git.
-
-Workflow independente, pull_request e push, matriz ubuntu-latest/windows-latest,
-Node 24, contents: read, actions oficiais fixadas nos mesmos SHAs revisados do
-CI existente, checkout fetch-depth: 0 e persist-credentials: false.
-Sequencia obrigatoria: npm ci; npm run canon:check; npm run canon:test;
-npm run c11:new-device:lock; npm run typecheck; npm run site:build.
-O passo site:build recebe somente vars.VITE_SUPABASE_URL e
-vars.VITE_SUPABASE_PUBLISHABLE_KEY, configuracao intencionalmente publica do
-cliente. Nenhum valor e incluido nesta emenda, nenhuma variavel e cadastrada
-remotamente e nao ha fallback sintetico. Ausencia/invalidez deve bloquear o
-build real; referencias secrets ou valores fixos alternativos sao rejeitados.
-Sem condicoes de skip, continue-on-error, secrets, deploy, APIs de publicacao,
-tokens Vercel, permissoes de escrita, workflow reutilizavel ou release.
-canonical-regression.yml permanece byte a byte igual ao HEAD recebido.
-Contrato exato do novo workflow, tolerando apenas LF/CRLF, e verificado
-independentemente do hash autorizado; revisao futura exige emenda de governanca.
-
-Novo workflow e teste dedicado sao obrigatorios e protegidos nominalmente por
-hash. Recibo novo append-registrado, before/after exatos e supersedes dos dois
-scripts apontando para CANON-01-AUTHORIZATION-HARDENING. Nao substituir recibos
-G10FIX, LEGACYTESTS ou AUTHORIZATION-HARDENING. Preservar os 95 controles e
-11 suites; ajustar somente fixtures sinteticas para carregar a nova emenda
-ativa e seu predecessor real. Acrescentar contrato dedicado executado como
-suite adicional e negativos de remocao de checks, shallow checkout, secrets,
-deploy, falta de site:build, mutacao silenciosa, recibos e baseline ausente.
-Fixtures negativas exercitam o verificador real; nao substituem testes oficiais.
-
-Aceitacao: os nove comandos obrigatorios mais o teste dedicado com exit 0,
-95 controles anteriores identificados e 11 suites preservadas, diff restrito,
-prefixos documentais/recibos/Android/Supabase intactos e auditoria de segredos.
-Sem commit/push/merge/PR write, deploy/redeploy, alteracao de Vercel/dominos,
-package.json/vercel.json/.vercelignore, runtime/Android/versao, dados ou migrations.
-A1 valida build; nao corrige nem declara PASS dos deployments Vercel existentes.
-A2, publicacao, protecao remota da main e demais Gates exigem nova autorizacao.
-CHAT_MASTER_REVIEW=PENDING; SOURCE_FORMAT_01_STARTED=NAO; NEXT_GATE_STARTED=NAO.
-
 <!-- CANON-01:AUTHORIZATION -->
 ```json
 {
@@ -479,13 +421,6 @@ CHAT_MASTER_REVIEW=PENDING; SOURCE_FORMAT_01_STARTED=NAO; NEXT_GATE_STARTED=NAO.
   "hash": "7edaa32c4b13c8295fc0daa64abed1ef7a4b0c2d"
 }
 ```
-
-## CANON-01 VERCEL A2.1 — local-only artifact verifier
-
-Operator authorized local implementation by PowerShell. Preserve CANON-01 and A1.
-A2.1 checks deterministic SHA-256 file integrity, identity claims, routes and headers.
-No manifest or fixture is a trusted GitHub attestation; actual Vercel prebuilt NOT verified.
-No deploy or Git writes authorized. Publishing requires separate A2.2 gate.
 
 <!-- CANON-01:AUTHORIZATION -->
 ```json
@@ -497,75 +432,6 @@ No deploy or Git writes authorized. Publishing requires separate A2.2 gate.
 }
 ```
 
-
-## CANON-01-VERCEL-A22A - Vercel Prebuilt attested build-only - 2026-10-20
-
-Authorization: latest express Chat Mestre A2.2A request, local implementation only.
-Required branch governance/canon-01-hardening; received HEAD
-a27d7cd4a74bd447221bba2851ee0af033d0a2fd. Main remains b3fc8d1.
-Preflight clean; canonical check, 115 controls/13 suites and C11 passed.
-
-Closed allowlist, defined BEFORE implementation:
-- .github/workflows/vercel-prebuilt-attested.yml (new manual workflow);
-- scripts/vercel-prebuilt-contract.mjs (new build/output/provenance boundary);
-- scripts/test-vercel-prebuilt-contract.mjs (new executable negative suite);
-- scripts/verify-canonical-contract.mjs and scripts/test-canonical-regression.mjs;
-- docs/governance/authorizations/CANON-01-VERCEL-A22A.json (new receipt);
-- docs/evidence/CANON_01_VERCEL_A22A.md (new evidence);
-- append-only: this architecture document, docs/STATUS.md,
-  docs/EVOLUTION_REPORT.md and docs/ERRORS_AND_BLOCKERS.md.
-Existing A2.1 scripts, historical receipts, workflows, package.json, lockfile,
-vercel.json, runtime, Android and Supabase remain unchanged. Audit/build logs
-are confined to ignored tmp/canon-01-a22a and existing ignored build outputs.
-
-Architecture and acceptance:
-Manual workflow_dispatch only, immutable input SHA equal to GitHub event SHA,
-review branch only, full Git history, baseline and received HEAD ancestry,
-clean tracked source, exact repository and workflow identity. Node 24/npm ci;
-all nine official canonical/C11/type/update/security/playback/web commands
-plus existing site/A2 tests and the new dedicated suite, without skips.
-Separate build and signing jobs on GitHub-hosted Ubuntu. Build has contents
-read only; Vercel token is scoped to authenticated read-only project inspection.
-CLI vercel@64.7.0, no deploy/redeploy/production invocation. Explicit local
-link only to existing project prj_OJcEZDNVPI3NV8Z1GfHOB02v20TF,
-team_gHZGQz2zRhEWsyK2jfOLLD5t (xandeflix-prebuilt-nm3x), Preview.
-No environment pull: inspect settings in memory, validate canonical settings,
-write only whitelisted local project settings. Build receives public client
-variables only. Missing/invalid token, public vars, settings or permissions
-blocks; never create a project or modify a remote integration.
-
-Only the real CLI build creates .vercel/output. Inspect actual config.json
-(version 3) and static payload, byte hashes, exact generated route/header
-contract, file types and absence of private credentials/symlinks/maps.
-CLI diagnostics and builds.json are NOT Build Output API payload and are
-excluded explicitly; no output config/static content is fabricated or patched.
-Package deterministic regular-file-only TAR with exact file list and manifest
-(repository/SHA/baseline/workflow/run/attempt/project/team/Preview/CLI).
-Signing job needs successful build, authenticates same-run staging artifact,
-rechecks manifest/output before actions/attest with pinned SHA, then invokes
-gh attestation verify with exact repo/workflow/source/signer digest/ref/issuer
-and hosted-runner policy. Verify certificate-bound run ID/attempt and subject
-digest before uploading the final artifact and Sigstore bundle. No manifest
-or fixture grants trusted provenance; no deploy authorization is implemented.
-
-New receipt supersedes only the two governance grants from
-CANON-01-VERCEL-A2-ARTIFACT, preserving every historical receipt and control.
-New workflow is protected both by grant hash and exact execution template.
-Negatives cover identity changes, no Git/baseline, dirty source, missing
-credentials/permissions, wrong settings, route/header changes, sensitive
-files, archive traversal/links/duplicates, adulterated bytes, invalid/missing
-signature, untrusted issuer/runner/workflow/run/repository and missing evidence.
-Synthetic policy fixtures are not real signed GitHub attestations.
-
-Remote execution is NOT authorized here. Workflow dispatch availability
-requires the workflow on the default branch, plus later publication/approval;
-this step does not change main, trigger Actions or configure secrets.
-Real .vercel/output and GitHub attestation remain pending remote execution
-when local authorized credentials are absent. No fake positive substitution.
-All CI actions are pinned to reviewed official SHAs. No merge, commit, push,
-PR readiness, Vercel publication or SOURCE-FORMAT-01.
-CHAT_MASTER_REVIEW=PENDING; NEXT_GATE_STARTED=NAO.
-
 <!-- CANON-01:AUTHORIZATION -->
 ```json
 {
@@ -575,33 +441,6 @@ CHAT_MASTER_REVIEW=PENDING; NEXT_GATE_STARTED=NAO.
   "hash": "c698fec429f4058118d4701a7f5208ece9a0b0d1"
 }
 ```
-
-## A2.2A-R1 - local compatibility amendment - 2026-10-20
-Reviewed actions/attest@v4 requires artifact-metadata: write in attest job.
-Pinned vercel build target changed to --target=preview; no --prod/deploy.
-Offline .vercel/.env.preview.local is blocked: cannot persist potentially private Preview variables under this authorization.
-No vercel pull/env pull; actual CLI Preview build remains unproven and potentially blocked without an approved credential-safe configuration mechanism.
-GitHub workflow_dispatch still needs default-branch registration; main unchanged and remote execution not authorized.
-A2.2A-R1: local corrective implementation only. Existing receipts unchanged; new A22 receipt and registry rehashed.
-
-## CANON-01-A22A-CI-DIAG — diagnostico fail-closed Windows CI — 2026-10-20
-
-Autorizacao de implementacao LOCAL de diagnostico apos falha do job Windows
-no commit 2d430d2aae64118ca7e92824c794e32549024ece. Ubuntu PASS, Windows FAIL na suite
-scripts/test-vercel-prebuilt-contract.mjs; Windows local PASS 111 controles.
-Objetivo exclusivo: emitir ultimo controle PASS e categorias codificadas da
-falha na regressao; jamais imprimir stdout/stderr bruto, credenciais ou URL.
-Falha continua bloqueando o job, sem continue-on-error ou bypass.
-
-Allowlist fechada: scripts/test-canonical-regression.mjs, este documento
-(append-only), docs/evidence/CANON_01_A22A_CI_DIAG.md e
-docs/governance/authorizations/CANON-01-A22A-CI-DIAG.json.
-Registro SHA de recibo e grant exato para o runner; antecessor nominal
-CANON-01-VERCEL-A22A. Todos os 125 controles e 14 suites anteriores
-continuam obrigatorios, mais tres controles negativos de diagnostico.
-Nenhum recibo historico, workflow, Android, Supabase, Vercel ou runtime
-foi modificado. Commit/push e reteste remoto exigem autorizacao separada.
-A execucao local nao representa sucesso do Windows CI nem assinatura GitHub.
 
 <!-- CANON-01:AUTHORIZATION -->
 ```json
@@ -613,35 +452,6 @@ A execucao local nao representa sucesso do Windows CI nem assinatura GitHub.
 }
 ```
 
-
-## CANON-01-A22A-WINDOWS-EOL - approved autonomous correction - 2026-10-20
-
-Latest explicit user authorization (attachment SHA-256
-dc9feae1e4dddb0cc8950d1df1cb93d840d99bc8446f68897e7b91b9681bf854)
-authorizes technical decisions, isolated review-branch commits/push after tests,
-and local functional diagnosis without repeated Chat Mestre approval. Main,
-remote backend/integrations, release/deploy and Android artifacts stay protected.
-This stage is CI-only; functional recovery will have a separate branch/commit.
-Received clean HEAD 4a19e23da4aff7dc8e39ba789f22ffddff08a21e; PR #1 Draft.
-Pre-edit canon check, 128 controls/14 suites and C11 passed. Windows CI failed
-with A22_WORKFLOW_CHANGED immediately after REVIEWED_WORKFLOW_REQUIRED; pure
-in-memory reproduction confirms LF-to-CRLF on CRLF input creates CRCRLF.
-
-Closed allowlist before code: scripts/test-vercel-prebuilt-contract.mjs
-(idempotent test fixture plus positive/negative EOL cases),
-scripts/test-canonical-regression.mjs (only new amendment identity in future
-fixture), docs/governance/authorizations/CANON-01-A22A-WINDOWS-EOL.json (new),
-docs/evidence/CANON_01_A22A_WINDOWS_EOL.md (new), and append-only this document,
-docs/STATUS.md, docs/EVOLUTION_REPORT.md, docs/ERRORS_AND_BLOCKERS.md.
-Do not modify verifier, workflow, production code or old receipts. New grants
-chain test to CANON-01-VERCEL-A22A and runner to CANON-01-A22A-CI-DIAG.
-Keep exact workflow hash, all 128 existing controls/14 suites and 111 dedicated
-checks; add LF, already-CRLF, mixed and repeated conversion tests, retaining
-rejection of malformed CRCRLF. Run canonical/C11 and nine official checks,
-dedicated tests and real Windows/Linux remote checks when publication is safe.
-No remote PASS without confirmed jobs. No force/merge/main push, APK/AAB,
-Supabase or private-source access. Evidence in ignored tmp/codex-source-recovery.
-
 <!-- CANON-01:AUTHORIZATION -->
 ```json
 {
@@ -651,16 +461,6 @@ Supabase or private-source access. Evidence in ignored tmp/codex-source-recovery
   "hash": "73ffd5ed494cb87a7c0d22e4a8a3f94252cf321e"
 }
 ```
-
-## CANON-01 - explicit test APK delivery authorization - 2026-10-20
-
-Subsequent explicit user request: generate an APK for tests directly on devices. This supersedes only prior prohibitions on local APK generation. Preserve Android 1.0.37 / versionCode 37, package com.xandeflix.prebuilt, historical APKs and all 140 inventoried Android artifacts. No source-code/configuration/version changes or device installation authorized by this request.
-
-Allowlist: append-only authorization here, ignored tmp/codex-source-recovery reports/build sandbox, ordinary ignored dist/TypeScript output, and a new separately named ignored APK. Run canonical checks, C11 lock, typecheck/build and native unit tests; package the verified dist in an isolated Android copy so historical outputs are not overwritten. Verify package, version, signature, assets and SHA-256. No commit/push/deploy/merge as part of APK delivery. Real provider and physical playback remain unverified until tested on the devices.
-
-## CANON-01-SOURCE-OUTPUT - explicit functional recovery - 2026-10-20
-
-User-authorized separate functional branch fix/source-output-format-recovery. Pre-code specification, exact allowlist, confirmed mpegts-to-HLS mismatch, safe TS-checkpoint recovery and acceptance tests: docs/architecture/SOURCE_OUTPUT_FORMAT_RECOVERY.md. Preserve all previous receipts, Android 1.0.37, main and data. This repairs an existing format alias; SOURCE-FORMAT-01 is not started. No push/deploy/merge/backend changes.
 
 <!-- CANON-01:AUTHORIZATION -->
 ```json
@@ -672,11 +472,6 @@ User-authorized separate functional branch fix/source-output-format-recovery. Pr
 }
 ```
 
-
-## CANON-01-CATALOG-READ-DIAG - local diagnostic test APK - 2026-10-20
-
-User-confirmed current import timestamp and matching source provenance with no movie/Live items. Specification and closed allowlist before code: docs/architecture/CATALOG_LOCAL_READ_DIAGNOSTIC.md. Existing autonomous recovery and test APK authorization permits a separate local diagnostic delivery. It does not establish or bypass the remaining physical cause. Preserve all prior receipts, main, Android identity/artifacts and the format fix. No publication, backend or installation.
-
 <!-- CANON-01:AUTHORIZATION -->
 ```json
 {
@@ -686,11 +481,6 @@ User-confirmed current import timestamp and matching source provenance with no m
   "hash": "169b19ee02a4c1cacbe575cded00ec02928fa3c7"
 }
 ```
-
-
-## CANON-01-XUI-OPAQUE-RECOVERY - confirmed existing M3U recovery - 2026-10-21
-
-Explicit autonomous recovery and test APK authorization; source attachment and read-only device/API evidence confirm the opaque XUI classification cause. Pre-code specification, closed allowlist and acceptance: [XUI_OPAQUE_M3U_RECOVERY](XUI_OPAQUE_M3U_RECOVERY.md). Preserve all previous diagnostic changes and receipts. Keep both output=mpegts and output=hls, original media URLs, same-source IDs, 16 MiB cap, licensing, C9 and parental guards. No commit/push/deploy/install/backend/version change or SOURCE-FORMAT-01. Physical installed-app restoration remains pending.
 
 <!-- CANON-01:AUTHORIZATION -->
 ```json
@@ -702,16 +492,6 @@ Explicit autonomous recovery and test APK authorization; source attachment and r
 }
 ```
 
-
-## CANON-01-XUI-OPAQUE-RECOVERY - explicit physical installation authorization - 2026-10-21
-
-User now explicitly authorizes in-place installation and functional tests on all three connected canonical devices (AFTSS, SM_X610, SM_S926B). Approved APK SHA-256 0fa7e55a22b64848a56d9f870fed01608a89080dc0adceb092cfb0d5c1e0ea93, unchanged 1.0.37/code37/package/signature. This supersedes only no-install restrictions for this APK. Scope, privacy/preservation checks and UI-only test plan: docs/evidence/XUI_OPAQUE_M3U_PHYSICAL_TESTS.md. No uninstall/reset, source/security/backend/runtime/old receipt/Git changes or next Gate. Results pending actual evidence.
-
-
-## CANON-01-CATALOG-PHYSICAL-FIXES - user-authorized physical refinements - 2026-10-21
-
-Pre-code specification and closed allowlist: [CATALOG_PHYSICAL_REFINEMENTS](CATALOG_PHYSICAL_REFINEMENTS.md). Exact provider types override ambiguous numeric/chapter titles without shifting genuine content IDs; bounded adult loading and phone action geometry retain protection. Explicit source-recovery autonomy and in-place installation/testing authorization apply to the same three devices. Preserve all old receipts, main and Android1.0.37. No Git/backend/deploy/next Gate.
-
 <!-- CANON-01:AUTHORIZATION -->
 ```json
 {
@@ -721,11 +501,6 @@ Pre-code specification and closed allowlist: [CATALOG_PHYSICAL_REFINEMENTS](CATA
   "hash": "ea179b852518e2a14c7ee79b6c3c72e76c0df6a9"
 }
 ```
-
-
-## CANON-01-SERIES-POSTER-COMPOSITION - automatic series posters - 2026-10-21
-
-Explicit user source-to-TMDB rule and screenshot confirm invalid horizontal/shared generic source artwork. Specification/closed scope: [SERIES_POSTER_COMPOSITION_RECOVERY](SERIES_POSTER_COMPOSITION_RECOVERY.md). Bounded RAM evidence triggers conservative TV lookup; valid official source variants remain first. No catalog/source/identity/parental/native/backend/version changes. Existing three-device in-place testing authorization applies; no Git publication or next Gate.
 
 <!-- CANON-01:AUTHORIZATION -->
 ```json
@@ -737,11 +512,6 @@ Explicit user source-to-TMDB rule and screenshot confirm invalid horizontal/shar
 }
 ```
 
-
-## CANON-01-TMDB-CONTEXT-IDENTITY - user requested known TMDB works - 2026-10-21
-
-Pre-code specification and closed allowlist: [TMDB_CONTEXT_IDENTITY_RECOVERY](TMDB_CONTEXT_IDENTITY_RECOVERY.md). Source country/network and declared episodes distinguish official TV homonyms, without counts/IDs/catalog/source changes. Exact compact full-title normalization repairs provider spacing. Match7 isolates context and old misses, preserving offline unqualified positives. Source-first rendering, authorization and old receipts remain. Existing local APK/three-device testing authorization applies; no Git/backend publication or next Gate.
-
 <!-- CANON-01:AUTHORIZATION -->
 ```json
 {
@@ -751,11 +521,6 @@ Pre-code specification and closed allowlist: [TMDB_CONTEXT_IDENTITY_RECOVERY](TM
   "hash": "3ab236bab99175dcb5374047c2fc6565650d8945"
 }
 ```
-
-
-## CANON-01-TMDB-SUBTITLE-PREVIEW — recurring subtitle poster recovery — 2026-10-21
-
-Explicit user screenshot and tablet/Fire source/UI proof; autonomous local recovery applies. Pre-code closed scope and acceptance: [TMDB_SUBTITLE_PREVIEW_RECOVERY](TMDB_SUBTITLE_PREVIEW_RECOVERY.md). Preserve declared episodic presentation through optional preview migration, normalize narrow suffixes and exclude only confirmed unaired Planned homonyms. Earlier network-only test rule superseded explicitly; missing proof and real homonyms remain blocked. Existing receipts/main/source/data/parental/native preserved; no Git/backend publication or next Gate.
 
 <!-- CANON-01:AUTHORIZATION -->
 ```json
@@ -767,21 +532,6 @@ Explicit user screenshot and tablet/Fire source/UI proof; autonomous local recov
 }
 ```
 
-
-## CANON-01-TMDB-SUBTITLE-PREVIEW — validated local delivery — 2026-10-21
-
-Nine official checks/prebuilt contract and128 controls/21 suites PASS;206 native tests PASS. New separate1.0.37 APK fed49d854b34b67837c18adad3f1bfcc84d008ccfc81f5f85e589b52bec157a9. Tablet/phone in-place updates preserve all nine private records; user explicitly reauthorized phone tests. Actual two-title search and three reported Home posters pass on both; tablet screenshot inspected. Optional preview migrated to version3 without changing active catalog counts. Fire is unavailable to ADB and remains on preceding APK; reconnection/IP requested, no full three-device or playback PASS. Initial metadata-timing/cache-path harness failure and evidence-header rejection retained with corrected rechecks; no verifier bypass. Old receipts/main/Android native/data/parental/backend preserved; no Git publication or next Gate.
-
-
-## CANON-01-TMDB-SUBTITLE-PREVIEW ? Fire follow-up ? 2026-10-21
-
-The authorized Fire AFTSS debug connection was recovered through an ephemeral USB-phone loopback ADB bridge. Streaming installation failed; explicit no-streaming in-place installation then passed. Installed APK SHA256 fed49d854b34b67837c18adad3f1bfcc84d008ccfc81f5f85e589b52bec157a9 verified; all nine private-state comparisons including active catalog and parental preferences are unchanged. Actual decoded own-WebView checks pass for Lovesick and LoveSick [L] and all three reported Home posters. Latest poster APK is therefore installed and poster-tested on all three devices. These checks do not certify video/next-navigation playback. Read-only storage audit independently found unbounded historical catalog generations; no catalog cleanup occurred during this poster amendment. Previous failed results retained. No Git/backend/native/version changes or next Gate.
-
-
-## CANON-01-CATALOG-RETENTION — automatic catalog retention — 2026-10-21
-
-Explicit user request for automatic obsolete-data cleanup in updated installations. Pre-code closed scope and safety: [CATALOG_SNAPSHOT_RETENTION](CATALOG_SNAPSHOT_RETENTION.md). Preserve active/previous/last-known-good, fail closed on inconsistent records/digests, serialize filesystem readers/writers, and yield between bounded proofs/deletions. Startup and successful import schedule background maintenance; no identity/source/parental/staging purge. Existing128 controls/21 suites preserved, new suite22. Separate same-version APK/tests authorized; no Git/backend publication, native/version changes or next Gate.
-
 <!-- CANON-01:AUTHORIZATION -->
 ```json
 {
@@ -791,16 +541,6 @@ Explicit user request for automatic obsolete-data cleanup in updated installatio
   "hash": "b3c18f01ba1e753597af3a162c2605669dcd4e6b"
 }
 ```
-
-
-## Local validation checkpoint ? 2026-10-21
-
-All nine official commands and prebuilt contract exited0; canonical128 controls/22 suites, C11 and typecheck PASS. Dedicated retention29 scenarios and unchanged promotion27 tests PASS. No Android APK or device cleanup performed for this amendment yet. Latest explicit user priority pauses queued work for detail backdrops and transparent sidebar, then APK/device delivery. Retention implementation/receipt are frozen; no physical reclamation PASS claimed. Historical receipts unchanged; no Git/backend/native/version change.
-
-
-## CANON-01-DETAIL-BACKDROP-UI — detail artwork and TV navigation — 2026-10-21
-
-Explicit priority before queued cast/flicker: [DETAIL_BACKDROP_UI_RECOVERY](DETAIL_BACKDROP_UI_RECOVERY.md). Same-identity bounded horizontal alternatives, poster composition, transparent lateral menu and TV-only compact glyphs; no global zoom or phone/tablet size changes. Existing128 controls/22 suites preserved, new suite23. Same-version separate APK/in-place three-device tests authorized. Frozen retention/receipts preserved; no Git/backend/native/version or next Gate changes.
 
 <!-- CANON-01:AUTHORIZATION -->
 ```json
@@ -812,11 +552,6 @@ Explicit priority before queued cast/flicker: [DETAIL_BACKDROP_UI_RECOVERY](DETA
 }
 ```
 
-
-## CANON-01-DETAIL-BACKDROP-TYPES ? compilation-only follow-up ? 2026-10-21
-
-TS6133: explicit React.ReactElement return annotations, no runtime behavior change. Preserve the prior UI receipt and128 controls/23 suites. Same local APK/user-prioritized installation scope, no next phase.
-
 <!-- CANON-01:AUTHORIZATION -->
 ```json
 {
@@ -826,11 +561,6 @@ TS6133: explicit React.ReactElement return annotations, no runtime behavior chan
   "hash": "da8c532e25e220040bba3c942bad41507d4b9245"
 }
 ```
-
-
-## CANON-01-TV-SIDEBAR-COMPOSITION — physical sidebar correction — 2026-10-21
-
-User continuity audit first, then TV-only background composition and spacing. [TV_SIDEBAR_COMPOSITION_RECOVERY](TV_SIDEBAR_COMPOSITION_RECOVERY.md) documents the confirmed Fire causes and reversible pixel/geometry proof. Preserve128 controls/23 suites/18 prior receipts and all77 incoming dirty paths. CSS-only patch, no new feature. Separate same-version APK, Fire-only in-place install; other devices manual. No Git/backend/native/version/reset or next Gate changes.
 
 <!-- CANON-01:AUTHORIZATION -->
 ```json
@@ -842,26 +572,6 @@ User continuity audit first, then TV-only background composition and spacing. [T
 }
 ```
 
-
-## TV sidebar installed-APK acceptance — 2026-10-21
-
-All10 official commands exit0; canonical128 controls/23 suites, C11, typecheck, update, security, playback and both web builds PASS. Capacitor/Gradle exit0; native206 tests/35 suites, zero failures/errors/skips. Separate Xandeflix-v1.0.37-tv-menu-20261021.apk:11,800,536 bytes, SHA256a071e4f0bc9a9098d2f411e9a307ff4deb3c0c4e5d74fddeab7d82566a07ef07. Same package1.0.37/code37/certificate,8 web assets verified, standalone HTTPS, no private credential pattern.
-
-Installed ONLY on Fire AFTSS with in-place update; exact installed SHA confirmed. Ten identity/activation/source/parental/active/recovery files byte-identical during update. No uninstall/reset/restore. Actual packaged CSS, without preview injection: nav252px,44x36 targets,36px pitch,16px icons; transparent rail follows page palette. Native screenshot inspected; rail/page RGB delta0 at all5 sampled rows. Actual ADB D-pad Down traverses all6 subsequent controls with visible focus, without entering PIN or protected content. Phone/tablet APK installation remains manual; no new phone physical test claimed. Tablet temporary CSS dimensions unchanged.
-
-Preservation audit:1339 baseline files checked, only6 allowlisted existing paths changed;18 prior receipts and140 old APK/AAB artifacts unchanged. Build stage158 of159 files identical; only auto-generated capacitor.settings.gradle relocates4 module references to the same root node_modules during cap sync. Root native files unchanged;14 native APK entries (DEX/libraries/manifest/resources) identical to previous UI APK. Initial broad stage-equality diagnostic stopped on that generated relocation; exact content/real-path verification resolved it without modifying production or test assertions. Old UI APK preserved. HEAD/main/index unchanged; source branch unpublished. Evidence and report:tmp/codex-source-recovery/tv-sidebar-composition-20261021/.
-
-User now reports playback starts then stalls repeatedly on slow connections. Buffer policy is wired to full-screen and preview players, but this visual APK does not change it or certify a slow-network fix. Actual network/bitrate diagnosis remains pending; no player/backend/source/parental/license change. Before this update only2 snapshots existed (~555MB); automatic reclamation is not proven by this update, and earlier clean-install savings remain attributable to user uninstall. GIT_COMMIT=NAO; GIT_PUSH=NAO; SUPABASE_CHANGED=NAO; NEXT_GATE_STARTED=NAO.
-
-
-## CANON-01-A22A-WINDOWS-METADATA-EOL — Windows CI metadata EOL regex normalization — 2026-10-22
-
-Explicit autonomous user instruction authorizes controlled CI fix for Windows workflow failures in Canonical regression #13 and Site build validation #9. Root cause: scripts/test-vercel-prebuilt-contract.mjs asserted ATTEST_ARTIFACT_METADATA_PERMISSION using a multi-line LF regex against raw workflow string, which contains CRLF (\r\n) on Windows git checkouts, causing regex failure despite lfWorkflow already existing.
-
-Closed allowlist before code: scripts/test-vercel-prebuilt-contract.mjs (minimal patch: assert against lfWorkflow), scripts/test-canonical-regression.mjs (only new amendment identity in future fixture), docs/governance/authorizations/CANON-01-A22A-WINDOWS-METADATA-EOL.json (new receipt), docs/evidence/CANON_01_A22A_WINDOWS_METADATA_EOL.md (new evidence), and append-only this document, docs/STATUS.md, docs/EVOLUTION_REPORT.md, docs/ERRORS_AND_BLOCKERS.md.
-
-Chaining: supersedes scripts/test-vercel-prebuilt-contract.mjs from CANON-01-A22A-WINDOWS-EOL and scripts/test-canonical-regression.mjs from CANON-01-TV-SIDEBAR-COMPOSITION. All 19 historical/prior receipts, 128 canonical controls / 23 suites, Android 1.0.37 / versionCode 37, package com.xandeflix.prebuilt, signing certificate, Supabase, Vercel and production workflows remain strictly preserved. No git commit, push, PR or deployment.
-
 <!-- CANON-01:AUTHORIZATION -->
 ```json
 {
@@ -869,5 +579,427 @@ Chaining: supersedes scripts/test-vercel-prebuilt-contract.mjs from CANON-01-A22
   "gate": "CANON-01-A22A-WINDOWS-METADATA-EOL",
   "path": "docs/governance/authorizations/CANON-01-A22A-WINDOWS-METADATA-EOL.json",
   "hash": "90d7db4a18e84221afa6fa9dda40c82d6dad6121"
+}
+```
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-VERCEL-PREBUILT-RECOVERY-01",
+  "path": "docs/governance/authorizations/CANON-01-VERCEL-PREBUILT-RECOVERY-01.json",
+  "hash": "9cb685590481ba094ffbca2e2abe2f585aa3ae46"
+}
+```
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-OPAQUE-HLS-MIME-RECOVERY",
+  "path": "docs/governance/authorizations/CANON-01-OPAQUE-HLS-MIME-RECOVERY.json",
+  "hash": "5a8c735b59f921a5d24be15f6c14f32541687719"
+}
+```
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-STREAMED-VOD-INVENTORY-RECOVERY",
+  "path": "docs/governance/authorizations/CANON-01-STREAMED-VOD-INVENTORY-RECOVERY.json",
+  "hash": "a16dd131aa09b3027724ea94f49a6d841551a9cb"
+}
+```
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-TABLET-SIDEBAR-TRANSPARENCY",
+  "path": "docs/governance/authorizations/CANON-01-TABLET-SIDEBAR-TRANSPARENCY.json",
+  "hash": "ffcc5c6c6005e4fcd24ce40ba776950bf55a5dbe"
+}
+```
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-HERO-PLATFORM-COMPOSITION",
+  "path": "docs/governance/authorizations/CANON-01-HERO-PLATFORM-COMPOSITION.json",
+  "hash": "75f9ca539c1723ca1db6c2e8948a63a3a19d5264"
+}
+```
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-HERO-PLATFORM-ALIGNMENT",
+  "path": "docs/governance/authorizations/CANON-01-HERO-PLATFORM-ALIGNMENT.json",
+  "hash": "66a112450541d8a038292d8b07d08cc5547ad51e"
+}
+```
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-LIVE-SINGLE-TRANSPORT",
+  "path": "docs/governance/authorizations/CANON-01-LIVE-SINGLE-TRANSPORT.json",
+  "hash": "039d22359310380cd79432efe17f9533c93fb6cb"
+}
+```
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-NETWORK-DIAGNOSTICS",
+  "path": "docs/governance/authorizations/CANON-01-NETWORK-DIAGNOSTICS.json",
+  "hash": "80a4d01348eb82b4a7cafd4836c3f221d97e02e5"
+}
+```
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-NETWORK-UI-POLISH",
+  "path": "docs/governance/authorizations/CANON-01-NETWORK-UI-POLISH.json",
+  "hash": "2fc3ce79b3a78454e7ad15f1d06002a6bc69d594"
+}
+```
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-LIVE-NETWORK-ACTIONS",
+  "path": "docs/governance/authorizations/CANON-01-LIVE-NETWORK-ACTIONS.json",
+  "hash": "e345e800a7a52d79241701cb5fd13f34bc699e01"
+}
+```
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-TV-CAST-SENDER-HIDDEN",
+  "path": "docs/governance/authorizations/CANON-01-TV-CAST-SENDER-HIDDEN.json",
+  "hash": "f1e466b249afac7a6dab2a62952dc83a4dd31540"
+}
+```
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-TMDB-RELEASE-TAGS",
+  "path": "docs/governance/authorizations/CANON-01-TMDB-RELEASE-TAGS.json",
+  "hash": "30bcebd64ad85f8d981f09b320cbf3864b6bad7a"
+}
+```
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-VOD-DPAD-HIDDEN-CONTROLS",
+  "path": "docs/governance/authorizations/CANON-01-VOD-DPAD-HIDDEN-CONTROLS.json",
+  "hash": "f33a7c6510ca7fe14f22367d0da0344e285e754a"
+}
+```
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-DPAD-EXPANDED-CARDS-AUTOPREVIEW-01",
+  "path": "docs/governance/authorizations/CANON-01-DPAD-EXPANDED-CARDS-AUTOPREVIEW-01.json",
+  "hash": "8d031488e5175dc1a0fbca3246345be638074fe7"
+}
+```
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-HOME-DPAD-CAROUSEL-PREVIEW-PAGINATION-02",
+  "path": "docs/governance/authorizations/CANON-01-HOME-DPAD-CAROUSEL-PREVIEW-PAGINATION-02.json",
+  "hash": "a91ff1c57b2c412e808fb79917fc00a1bfaa1e1e"
+}
+```
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-DPAD-CARD-SCOPE-SEEALL-GRID-01",
+  "path": "docs/governance/authorizations/CANON-01-DPAD-CARD-SCOPE-SEEALL-GRID-01.json",
+  "hash": "1be58b8db36f88a75e115fd1cb7bbb0d17f0bb71"
+}
+```
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-XANDEFLIX-UI-PERFORMANCE-RECOVERY-03",
+  "path": "docs/governance/authorizations/CANON-01-XANDEFLIX-UI-PERFORMANCE-RECOVERY-03.json",
+  "hash": "88fa16477c0f94dad02f962d7a42e26dc19f2670"
+}
+```
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-XANDEFLIX-APP-INTRO-BRANDING-07",
+  "path": "docs/governance/authorizations/CANON-01-XANDEFLIX-APP-INTRO-BRANDING-07.json",
+  "hash": "b806f61070d8dc03652b310983c2e165a5ff5e5d"
+}
+```
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-XANDEFLIX-INTRO-VIDEO-ONLY-07-R1",
+  "path": "docs/governance/authorizations/CANON-01-XANDEFLIX-INTRO-VIDEO-ONLY-07-R1.json",
+  "hash": "157db2ab2a80de7c6270510fbf4416a88bba3b84"
+}
+```
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-MOBILE-CATALOG-HEADER-SPACING",
+  "path": "docs/governance/authorizations/CANON-01-MOBILE-CATALOG-HEADER-SPACING.json",
+  "hash": "729b63034f78a4c383c00d0d8a9c78c36a4301ef"
+}
+```
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-PHONE-HEADER-REFINEMENT",
+  "path": "docs/governance/authorizations/CANON-01-PHONE-HEADER-REFINEMENT.json",
+  "hash": "e1c0719e5b1e31ad63cc5c3947fcf12110f6f161"
+}
+```
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-SERIES-EPISODE-RETURN",
+  "path": "docs/governance/authorizations/CANON-01-SERIES-EPISODE-RETURN.json",
+  "hash": "ce4ab2b42727b138e0cbc547c0efd59fbc976a90"
+}
+```
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-TRAILER-CONTAINMENT-R4",
+  "path": "docs/governance/authorizations/CANON-01-TRAILER-CONTAINMENT-R4.json",
+  "hash": "2f8e69d57bf20e72f4a9e27308636e37e1f97fee"
+}
+```
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-TMDB-EPISODE-METADATA-ENRICHMENT",
+  "path": "docs/governance/authorizations/CANON-01-TMDB-EPISODE-METADATA-ENRICHMENT.json",
+  "hash": "acdf5f45d207b92d029d5a5b89f7078716ee2773"
+}
+```
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-P250-V139-CANONICAL-RECOVERY",
+  "path": "docs/governance/authorizations/CANON-01-P250-V139-CANONICAL-RECOVERY.json",
+  "hash": "8d1f7c31171f9416156bd0f72dd32373bc051b8a"
+}
+```
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-TMDB-EPISODE-RUNTIME-RECOVERY",
+  "path": "docs/governance/authorizations/CANON-01-TMDB-EPISODE-RUNTIME-RECOVERY.json",
+  "hash": "01c5efd692633f8ebeaacf49c736ba0237c5dba2"
+}
+```
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-EPISODE-ROW-ALIGNMENT",
+  "path": "docs/governance/authorizations/CANON-01-EPISODE-ROW-ALIGNMENT.json",
+  "hash": "f99c60d770270dc50a8856117027642b2cae6a76"
+}
+```
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-EPISODE-GENERAL-IDENTITY",
+  "path": "docs/governance/authorizations/CANON-01-EPISODE-GENERAL-IDENTITY.json",
+  "hash": "25d48691e9a5623c4a5b0f288ff59bea4a8d3160"
+}
+```
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-DETAIL-HERO-REFINEMENT",
+  "path": "docs/governance/authorizations/CANON-01-DETAIL-HERO-REFINEMENT.json",
+  "hash": "4cc3ddb820835f5c33c7bcdb541f6d1bbe2f5602"
+}
+```
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-ACTOR-PROFILE",
+  "path": "docs/governance/authorizations/CANON-01-ACTOR-PROFILE.json",
+  "hash": "17035097e5048656cf1e1b8822283d104219de35"
+}
+```
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-IDENTITY-HERO-RECOVERY",
+  "path": "docs/governance/authorizations/CANON-01-IDENTITY-HERO-RECOVERY.json",
+  "hash": "79f5d7b4d9e963eabb67549fbed7168514a9fddf"
+}
+```
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-TABLET-HERO-SPACING",
+  "path": "docs/governance/authorizations/CANON-01-TABLET-HERO-SPACING.json",
+  "hash": "b3645c1985eb1fb039fff5738d9381f75f63c752"
+}
+```
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-MOBILE-HEADER-ALIGNMENT",
+  "path": "docs/governance/authorizations/CANON-01-MOBILE-HEADER-ALIGNMENT.json",
+  "hash": "005491090fe850e199abd47ed69d9cd68207cb1f"
+}
+```
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-MOBILE-DETAIL-HEADER-ALIGNMENT",
+  "path": "docs/governance/authorizations/CANON-01-MOBILE-DETAIL-HEADER-ALIGNMENT.json",
+  "hash": "5c8391ed0664792d0ee876ead7696bf4b8c65926"
+}
+```
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-CARD-TRAILER-AUDIO",
+  "path": "docs/governance/authorizations/CANON-01-CARD-TRAILER-AUDIO.json",
+  "hash": "6ef43ff4e349ab846da7c158270854bf7ebc9cd6"
+}
+```
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-NEXT-EPISODE-G2-R2",
+  "path": "docs/governance/authorizations/CANON-01-NEXT-EPISODE-G2-R2.json",
+  "hash": "05a539b5464384098006c7e7a9f5e5c7e8485636"
+}
+```
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-NEXT-EPISODE-G2-R4-REGRESSION-RECOVERY",
+  "path": "docs/governance/authorizations/CANON-01-NEXT-EPISODE-G2-R4-REGRESSION-RECOVERY.json",
+  "hash": "c7e4cfd2d94ce0aedbd6982f0c8fa7bde2aa82d1"
+}
+```
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-NEXT-EPISODE-G3-MARKERS",
+  "path": "docs/governance/authorizations/CANON-01-NEXT-EPISODE-G3-MARKERS.json",
+  "hash": "2c0323cf9d15f511f309715b67c6228ab71763d8"
+}
+```
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-NEXT-EPISODE-G3-REGRESSION-EXPECTATION",
+  "path": "docs/governance/authorizations/CANON-01-NEXT-EPISODE-G3-REGRESSION-EXPECTATION.json",
+  "hash": "c67441cc13c926c2ebc50169b019a977318dda39"
+}
+```
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-PERF-PARENTAL-HERO-REFINEMENT",
+  "path": "docs/governance/authorizations/CANON-01-PERF-PARENTAL-HERO-REFINEMENT.json",
+  "hash": "5812b66d26b9f61e78a6ba823f0f4ffbe63330b2"
+}
+```
+
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-SOURCE-SWITCH-ISOLATION",
+  "path": "docs/governance/authorizations/CANON-01-SOURCE-SWITCH-ISOLATION.json",
+  "hash": "75484688091261560504250e6428f0f08863164b"
+}
+```
+
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "CANON-01-SOURCE-SWITCH-ISOLATION-CACHE-REVIEW",
+  "path": "docs/governance/authorizations/CANON-01-SOURCE-SWITCH-ISOLATION-CACHE-REVIEW.json",
+  "hash": "99a5a618006283fcf3ba8a753440021dee765c65"
 }
 ```
