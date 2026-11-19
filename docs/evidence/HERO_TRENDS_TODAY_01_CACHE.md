@@ -1,0 +1,5 @@
+# HERO-TRENDS-TODAY-01-CACHE — complemento de desempenho do mesmo gate
+
+Durante a revisão de desempenho após a primeira regressão 204/46 PASS, verificou-se que alternar entre Home, Filmes e Séries releria os segmentos completos da mesma fonte. O complemento mantém em RAM, por instância do modelo local, storage, fonte, snapshot, tipo de ranking e hora, o cruzamento já verificado. Cada acesso ao cache confirma o ponteiro ativo antes do retorno. Nova hora, fonte, snapshot ou modelo exige novo cruzamento. O cache é limitado a seis entradas por modelo e não grava títulos/URLs da fonte no backend ou disco.
+
+Teste do serviço acrescenta prova de que a visita repetida na mesma hora não relê segmentos e que a hora seguinte reconstrói a seleção. Alterações limitadas a `daily-trending-hero.service.ts`, `test-daily-trending-hero.mjs` e inclusão estrita deste recibo na lista canônica do runner. Nenhum teste negativo foi removido. Este complemento não declara resultado final sem nova regressão completa.

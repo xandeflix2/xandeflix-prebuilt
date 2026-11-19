@@ -1003,3 +1003,179 @@ demais Gates nao iniciados. Adjudicacao/publicacao continuam pendentes.
   "hash": "99a5a618006283fcf3ba8a753440021dee765c65"
 }
 ```
+
+
+## TABLET-CATALOG-HERO-BACK-01 — 2026-11-17
+
+# TABLET-CATALOG-HERO-BACK-01 — especificação anterior ao patch
+Autorização: usuário esclareceu que deseja retirar Voltar do hero das páginas Filmes e Séries (catálogo), mantendo o botão nos detalhes. Também pediu atualização em tempo real no tablet e reiterou prossiga. Registro dessa autorização não constitui adjudicação independente.
+Base: clone independente de 81a1702 em main; código de produto igual à origem do APK 1.0.53, diferenças de assets gerados serão regeneradas. Workspaces existentes preservados.
+Alteração funcional única: CSS restrito a #root .app-shell--tablet :is(.movies-page,.series-page) .hero-banner > .hero-top-actions > .btn-back com display:none. Cast e botões fora do hero não entram no seletor. Retorno Android permanece existente.
+Allowlist: src/index.css; scripts/test-canonical-regression.mjs somente inclusão estrita do recibo antes da concessão sintética ANDROID-38; docs/governance/authorizations/TABLET-CATALOG-HERO-BACK-01.json; docs/evidence/TABLET_CATALOG_HERO_BACK_01.md; append em docs/architecture/XANDEFLIX_PREBUILT_PHASED_EXPANSION.md, docs/STATUS.md, docs/EVOLUTION_REPORT.md, docs/ERRORS_AND_BLOCKERS.md.
+Build de teste mantém versão 1.0.53, identificado por hash próprio; assets gerados e android/local.properties apenas no novo workspace. Dependências físicas copiadas da origem íntegra sem instalação ou atualização. C11/cânone/regressão obrigatórios; teste CSS por perfis e verificação física do tablet.
+Instalação -r somente no tablet SM-X610 RX2X301Q3KY, package/assinatura iguais; comparar identidade/chave/instalação/ativação/token antes/depois. Não limpar dados nem mudar fonte. Nenhum commit/push/main merge/backend ou outro dispositivo.
+
+Correção de escopo recebida antes de editar código: retirar o botão das páginas de catálogo Filmes/Séries; detalhes mantêm o retorno. Prévia inicial de detalhes é temporária e será substituída, não é a entrega final.
+
+Preparação de baseline: reproduzir somente os bytes exatos de src/main.tsx da origem 1.0.53, após comprovar igualdade normalizada LF. Checkout novo apresentou CRLF e o teste histórico exige SHA-256 bruto LF; nenhum teste/verificador foi alterado. Falha e hashes preservados em EOL_REPRODUCTION.json.
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "TABLET-CATALOG-HERO-BACK-01",
+  "path": "docs/governance/authorizations/TABLET-CATALOG-HERO-BACK-01.json",
+  "hash": "c141a37d7cf2f1eca7543127904e17f85aaa14b8"
+}
+```
+
+
+## SEARCH-RETURN-01 — 2026-11-17
+
+# SEARCH-RETURN-01 — especificação anterior ao código
+Autorização atual: corrigir persistência da busca ao visitar conteúdo e retornar; contexto atual mantém atualização in-place do tablet para visualização. Sem publicação ou backend.
+Base: workspace independente em main, HEAD81a1702, contendo o ajuste visual do tablet já instalado; não recriar clone nem reverter o dirty governado. APK anterior de teste SHA25661940088dd13f87b16ab218525acf9f5b64713e51b08ded96afc61097254fd1d.
+Comportamento: manter uma única instância da busca durante navegação Busca→detalhes de filme/série ou canal e respectivas visitas de conteúdo→Voltar. Ocultar subtree fora de Busca, sem foco ou acessibilidade no conteúdo oculto. Preservar query, filtro, resultados atuais, rolagem e card selecionado. Restaurar foco sem abrir teclado. Descartar ao sair para Home/Filmes/Séries/configurações/outras seções, desautorização ou mudança de fonte/snapshot. Nada persistido em disco/backend; nenhuma concessão de autorização.
+Allowlist: src/App.tsx, src/ui/pages/SearchPage.tsx; novo src/ui/navigation/search-return.ts; novo scripts/test-search-return.mjs; scripts/test-canonical-regression.mjs apenas expectativa estrita do novo recibo. Recibo docs/governance/authorizations/SEARCH-RETURN-01.json, docs/evidence/SEARCH_RETURN_01.md e append em docs/architecture/XANDEFLIX_PREBUILT_PHASED_EXPANSION.md, docs/STATUS.md, docs/EVOLUTION_REPORT.md, docs/ERRORS_AND_BLOCKERS.md.
+Verificação: cânone e C11 antes; baseline completa anterior 204/45 ligada aos mesmos bytes funcionais, sem mudança posterior de produto. Depois: testes de trilha de navegação, retenção/remontagem/limpeza/foco/rolagem/cancelamento e casos negativos; TypeScript, C11, cânone e regressão completa original; revisão React. Reproduzir fisicamente bug antes e correção depois via retorno da UI e Back nativo; fonte/snapshot invalidados por testes controlados, sem alterar fonte real.
+Build incremental web/Android com configurações públicas selecionadas em memória; sem dependências novas. Manter versão de teste1.0.53 e registrar hash único; cap sync e outputs gerados usuais no workspace existente isolado. Instalar somente tablet RX2X301Q3KY, mesma assinatura/package e preservação privada, sem reset nem limpeza. Nenhum Git commit/push/merge, player/backend/C9/licença/fonte ou próximo gate.
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "SEARCH-RETURN-01",
+  "path": "docs/governance/authorizations/SEARCH-RETURN-01.json",
+  "hash": "1d52645bbc56ddeafafceb934e7b07f0829573fd"
+}
+```
+
+
+## LIVE-AUTO-RECOVERY-01 — 2026-11-17
+
+# LIVE-AUTO-RECOVERY-01 — especificação antes do código
+
+Autorização: pedido explícito atual para avançar automaticamente quando um canal cair ou permanecer em buffer por mais de cinco segundos. Gate SEARCH-RETURN-01 encerrado tecnicamente; suas mudanças e o ajuste do hero do tablet são preservados. Implementação no candidato independente existente em main/81a1702. Sem Git commit/push/PR, backend, nova fonte ou reset.
+
+Comportamento Android inline/fullscreen: após erro terminal de mídia (esgotado o fallback existente), término inesperado do canal ou BUFFERING contínuo por >5000ms com intenção de tocar, selecionar o próximo canal da categoria do canal em reprodução, na ordem local existente. Inclui carregamento inicial travado; não somar buffers separados. Não circular no fim da categoria nem repetir automaticamente o mesmo canal. Se não houver próximo, ou se exigir autorização parental, parar e informar; nunca contornar parentalidade, licença/C9 ou revogação. Seleção automática reaproveita a troca de mídia/superfície existente e nova aquisição C9. Falhas de autorização/superfície não são queda de mídia.
+
+IPC aditivo: requestId opaco novo por tentativa além de previewId (superfície pode ser reutilizada). Estado nativo sanitizado IDLE/BUFFERING/READY/ENDED, playWhenReady, foreground, suppressed e obscured, sem URL/headers/conteúdo. Timer local monotônico cancelado em READY, pausa manual, supressão, segundo plano/PiP, obscurecimento, saída, seleção manual e mudança de fonte/snapshot. Erros legados sem correlação mantêm aviso/cleanup antigo, sem avanço automático. Evento antigo nunca muda canal novo. Uma transição por tentativa; próxima tentativa pode falhar e avançar adiante, sem wrap.
+
+Recuperação aguarda suspensão/fechamento da mídia e liberação da sessão anterior pelo fluxo existente, depois lê o próximo com verificação de snapshot e revalida parentalidade. Intervenção manual ou revogação cancela callback pendente; falha de cleanup interrompe avanço. Nenhuma URL é reaproveitada fora do fluxo normal. Falha C9 bloqueia abertura e não dispara nova recuperação. Sessão nova não pode ser liberada por evento velho.
+
+Allowlist exata: src/ui/pages/LiveTvPage.tsx; src/playback/native-android-player.bridge.ts; novo src/playback/live-auto-recovery.ts; android/app/src/main/java/com/xandeflix/prebuilt/player/NativeAndroidPlayerPlugin.java; novo scripts/test-live-auto-recovery.mjs; scripts/test-canonical-regression.mjs (somente expectativa estrita do recibo). Governança: docs/governance/authorizations/LIVE-AUTO-RECOVERY-01.json, docs/evidence/LIVE_AUTO_RECOVERY_01.md, append no contrato de expansão, STATUS, EVOLUTION_REPORT, ERRORS_AND_BLOCKERS. Não alterar transporte, codecs, PlayerControls, NativePlayerActivity, sequência VOD, fontes ou contratos de autoridade. Harness de teste novo pode gerar fixtures e compilar Java em tmp próprio.
+
+Testes: política real com relógio controlado para 4999/5000/5001, buffers intermitentes, pausa/foreground/supressão, contexto antigo, erro+timer duplicado, ENDED e intervenção manual; coordenador real com cleanup lento/falho, cancelamento, categoria final, snapshot e parentalidade. Validação nativa do payload com produção extraída em harness JVM, além de build real. TypeScript, busca, C11 e regressão original completa (204 controles/45 suítes), sem relaxamento. Baseline completa SEARCH-RETURN-01 já passou com os bytes atuais; cânone/C11 reconferidos antes do patch.
+
+Build incremental 1.0.53/code53 de teste, hash novo e assinatura existente. Atualizar in-place somente tablet RX2X301Q3KY, sem apagar dados e conferindo digests de identidade. Validar canal real normal, pausa manual >5s, inline/fullscreen; injetar eventos de estado/erro controlados pelo bridge no aparelho para conferir recuperação ponta a ponta sem alterar rede/fonte; distinguir esses eventos controlados de falha real do servidor. Não atribuir cobertura física ao Fire/celular sem testar. Sem publicação ou início de outro gate.
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "LIVE-AUTO-RECOVERY-01",
+  "path": "docs/governance/authorizations/LIVE-AUTO-RECOVERY-01.json",
+  "hash": "2d277bc5d2f7e726b6a5ab4466fbf991a65a0226"
+}
+```
+
+
+## LIVE-AUTO-RECOVERY-01-VALIDATION — complemento de validação do mesmo gate
+
+Expand the new live recovery test to execute actual LiveTvPage lifecycle callbacks and preserve seven native/C9 exit assertions in RAM. Do not alter legacy CSS assertions or source tests. Update only strict authorization list. Nenhuma alteração da fixture legada; discrepância CSS antiga documentada externamente.
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "LIVE-AUTO-RECOVERY-01-VALIDATION",
+  "path": "docs/governance/authorizations/LIVE-AUTO-RECOVERY-01-VALIDATION.json",
+  "hash": "ee0b6ce5412adea919f98be3d43a4f12f0f8ead3"
+}
+```
+
+## HERO-TRENDS-TODAY-01 — 2026-11-18
+
+Pedido atual: os heroes de Home, Filmes e Séries usam somente a ordem pública de Tendências Hoje do TMDB cruzada com títulos listados no snapshot local da fonte ativa. A presença no catálogo não comprova acesso HTTP à mídia. Especificação e limites em `docs/evidence/HERO_TRENDS_TODAY_01.md`. Nenhum outro carrossel, player, fonte, backend ou autorização é alterado. O executor registra resultado técnico; revisão independente permanece separada.
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "HERO-TRENDS-TODAY-01",
+  "path": "docs/governance/authorizations/HERO-TRENDS-TODAY-01.json",
+  "hash": "c214ae190f0055ed610ddd26dea7e30729d84091"
+}
+```
+
+## HERO-TRENDS-TODAY-01-CACHE — complemento do mesmo gate
+
+Cache efêmero por modelo, fonte, snapshot, modo e hora para evitar releitura integral dos segmentos ao revisitar o hero. Escopo e teste em `docs/evidence/HERO_TRENDS_TODAY_01_CACHE.md`. A primeira regressão passou antes deste complemento; a nova regressão final deve validar os bytes atuais.
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "HERO-TRENDS-TODAY-01-CACHE",
+  "path": "docs/governance/authorizations/HERO-TRENDS-TODAY-01-CACHE.json",
+  "hash": "ae7a65ddbd9d41ce943fc5ba74e9259a17346378"
+}
+```
+
+## HERO-TRENDS-TODAY-01-R1 — regra de hero não vazio
+
+Pedido posterior do usuário: adaptar o seletor ao comportamento atual que não admite espaço vazio com aviso de indisponibilidade. Consultar Hoje, Semana, 2026 e 2025 por prioridade e manter seleção local da fonte ativa durante a consulta e como último fallback. Essa seleção não equivale a prova de reprodução HTTP; a verificação de mídia permanece bloqueada no registro próprio. Spec e testes em `docs/evidence/HERO_TRENDS_TODAY_01_R1.md`.
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "HERO-TRENDS-TODAY-01-R1",
+  "path": "docs/governance/authorizations/HERO-TRENDS-TODAY-01-R1.json",
+  "hash": "b4904d52c74cfa9039574da01b154982d950fbf0"
+}
+```
+
+
+## TABLET-PIP-LIVE-01 — 2026-11-19
+
+Autorização do usuário para prosseguir com as duas correções e a instalação de teste no tablet após a proposta nominal. A especificação, a base isolada, a allowlist fechada e os critérios físicos estão em docs/evidence/TABLET_PIP_LIVE_01.md. Atualização exclusiva do tablet, com o mesmo pacote, assinatura e dados. Revisão independente permanece separada do resultado técnico.
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "TABLET-PIP-LIVE-01",
+  "path": "docs/governance/authorizations/TABLET-PIP-LIVE-01.json",
+  "hash": "26ba381d04fe7aab23526a271998c2c7691c1bba"
+}
+```
+
+
+## TABLET-PIP-LIVE-01-VALIDATION — complemento de validação
+
+Validar a correlação que já era obrigatória antes das leituras do player. Preservar as suítes, a regra parental e os eventos de tentativas válidas. A suíte Java completa detectou o caso legado. O diagnóstico e o escopo pertencem ao mesmo gate.
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "TABLET-PIP-LIVE-01-VALIDATION",
+  "path": "docs/governance/authorizations/TABLET-PIP-LIVE-01-VALIDATION.json",
+  "hash": "16a4ebefb7ae65009002f0c0933c580c2ffa6861"
+}
+```
+
+
+## TABLET-PIP-LIVE-01-CONTINUOUS — lista contínua em tela cheia
+
+O pedido explícito após a primeira instalação autoriza a revisão da lista lateral no mesmo gate. A rolagem cobre a categoria inteira e o transporte local continua limitado por blocos. A instalação de teste é exclusiva do tablet.
+
+<!-- CANON-01:AUTHORIZATION -->
+```json
+{
+  "schema": 1,
+  "gate": "TABLET-PIP-LIVE-01-CONTINUOUS",
+  "path": "docs/governance/authorizations/TABLET-PIP-LIVE-01-CONTINUOUS.json",
+  "hash": "ca3917248afe936a747a9d4c9d6f7376202b9e13"
+}
+```

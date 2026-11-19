@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.content.Intent;
+import android.graphics.Rect;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -54,11 +56,38 @@ public class MainActivity extends BridgeActivity {
                 : ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
     }
 
+    static int smallestNormalWindowDp(int widthPixels, int heightPixels, float density, int fallbackDp) {
+        if (widthPixels <= 0 || heightPixels <= 0 || !(density > 0) || Float.isInfinite(density)) {
+            return fallbackDp;
+        }
+        return (int) (Math.min(widthPixels, heightPixels) / density);
+    }
+
+    private static int smallestNormalWindowDp(Activity activity, Configuration configuration) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return configuration.smallestScreenWidthDp;
+        Rect bounds = activity.getWindowManager().getMaximumWindowMetrics().getBounds();
+        return smallestNormalWindowDp(bounds.width(), bounds.height(),
+                activity.getResources().getDisplayMetrics().density, configuration.smallestScreenWidthDp);
+    }
+
+    private static boolean isWindowed(Activity activity) {
+        // Android includes picture-in-picture in multi-window mode.
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && activity.isInMultiWindowMode();
+    }
+
+    static boolean shouldReleaseTabletOrientation(int smallestDp, int uiMode, int requested) {
+        return smallestDp >= 600
+                && (uiMode & Configuration.UI_MODE_TYPE_MASK) != Configuration.UI_MODE_TYPE_TELEVISION
+                && requested != ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
+    }
+
     public static void applyPhoneUiOrientation(Activity activity, boolean fullscreen) {
         if (activity == null) return;
         try {
+            if (isWindowed(activity)) return;
             Configuration configuration = activity.getResources().getConfiguration();
-            int orientation = phoneUiOrientation(configuration.smallestScreenWidthDp, configuration.uiMode, fullscreen);
+            int orientation = phoneUiOrientation(smallestNormalWindowDp(activity, configuration),
+                    configuration.uiMode, fullscreen);
             if (orientation != ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
                     && activity.getRequestedOrientation() != orientation) {
                 activity.setRequestedOrientation(orientation);
@@ -232,9 +261,33 @@ public class MainActivity extends BridgeActivity {
         DebugProvisioner.handleIntent(this, intent);
     }
 
+    private void restoreUiOrientation() {
+        if (!appIntroComplete || isWindowed(this)) return;
+        try {
+            Configuration configuration = getResources().getConfiguration();
+            int smallestDp = smallestNormalWindowDp(this, configuration);
+            if (smallestDp >= 600) {
+                if (shouldReleaseTabletOrientation(smallestDp, configuration.uiMode, getRequestedOrientation())) {
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+                }
+                return;
+            }
+            NativeAndroidPlayerPlugin player = nativePlayerPlugin();
+            applyPhoneUiOrientation(this, player != null && player.isPreviewFullscreen());
+        } catch (RuntimeException ignored) {
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration configuration) {
+        super.onConfigurationChanged(configuration);
+        if (hasWindowFocus()) restoreUiOrientation();
+    }
+
     @Override
     public void onResume() {
         super.onResume();
+        restoreUiOrientation();
         applyAppSystemUiPolicy(getWindow(), !appIntroComplete);
         if (appIntro != null && !appIntroComplete) appIntro.onResume();
         if (getBridge() != null && getBridge().getWebView() != null) {
@@ -246,6 +299,7 @@ public class MainActivity extends BridgeActivity {
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         if (hasFocus) {
+            restoreUiOrientation();
             applyAppSystemUiPolicy(getWindow(), !appIntroComplete);
         }
     }
@@ -289,6 +343,7 @@ public class MainActivity extends BridgeActivity {
     @Override public void onPictureInPictureModeChanged(boolean pip, Configuration configuration) {
         super.onPictureInPictureModeChanged(pip,configuration);
         NativeAndroidPlayerPlugin plugin=nativePlayerPlugin();if(plugin!=null)plugin.onPipModeChanged(pip);
+        if (!pip && hasWindowFocus()) restoreUiOrientation();
     }
     @Override public void onStop() {
         if (appIntro != null && !appIntroComplete) appIntro.background();

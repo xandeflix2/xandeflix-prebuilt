@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "gate": "HERO-TRENDS-TODAY-01-CACHE",
+  "parentGate": "HERO-TRENDS-TODAY-01",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "CURRENT_USER_DAILY_TRENDS_REQUEST_AND_SPECIFIED_HOURLY_IN_MEMORY_RESULTS; THIS_COMPLEMENT_IS_AN_EXECUTOR_PERFORMANCE_REFINEMENT_WITHIN_THE_SAME_GATE_NOT_INDEPENDENT_ADJUDICATION",
+  "reason": "Bound repeated local catalog scans when navigating the three heroes within one hour while retaining source and snapshot checks before returning cached matches; add a regression assertion without weakening existing controls.",
+  "physicalImpact": "REQUIRED",
+  "physicalImpactJustification": "The cache affects response time during navigation on tablet and Fire and must be observed with the same hero gate.",
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c105-complete-root-search.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "node scripts/test-daily-trending-hero.mjs",
+    "node node_modules/typescript/bin/tsc --noEmit",
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock"
+  ],
+  "evidence": "docs/evidence/HERO_TRENDS_TODAY_01_CACHE.md",
+  "compatibilityRisk": "RAM cache does not prove media access and may retain at most six public-rank intersections per read-model until that model is garbage collected. Scope and pointer validation prevent known source/snapshot mixing.",
+  "changes": [
+    { "path": "src/catalog/daily-trending-hero.service.ts", "before": "693f1bc88173ce795e52462a5db184e8ffc64766", "after": "abdd2a931aed2d99ae10407679bf91d01a337a53" },
+    { "path": "scripts/test-daily-trending-hero.mjs", "before": "62f8881f1a24e35265ce3915c8cf0cdd605c3d0b", "after": "6c8f6869fc91e29ea4a364d0f9fc984c5acef0b2" },
+    { "path": "scripts/test-canonical-regression.mjs", "before": "609df4539c52e157e2c6f7f6dc5ab09a47a73067", "after": "5843de6d3e43a8b4c154527d1ecc4ebed85d341c" }
+  ],
+  "supersedes": {
+    "src/catalog/daily-trending-hero.service.ts": "HERO-TRENDS-TODAY-01",
+    "scripts/test-daily-trending-hero.mjs": "HERO-TRENDS-TODAY-01",
+    "scripts/test-canonical-regression.mjs": "HERO-TRENDS-TODAY-01"
+  },
+  "testChangesReviewed": true,
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": true,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false,
+  "restrictions": [
+    "No changes outside the three protected paths in changes plus additive governance.",
+    "No cache persistence, source media probing, backend or Git publication."
+  ]
+}

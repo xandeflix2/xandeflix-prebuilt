@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "gate": "TABLET-PIP-LIVE-01-CONTINUOUS",
+  "parentGate": "TABLET-PIP-LIVE-01",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "Express follow-up on 2026-11-19: PRECISO QUE SEJA UMA LISTA CONTINUA SEM PAGINAÇÃO. The user already authorized the named tablet update. The scope remains TABLET-PIP-LIVE-01, and the schema status records operator approval.",
+  "authorizationRequestSha256": "b95880c54135a23a3d7f4d330d7a38648a676757e9662c66041e33fa1d8181fd",
+  "reason": "Use one scrolling list for the selected Live category in the native fullscreen sidebar, retaining bounded local reads and independent scroll state.",
+  "physicalImpact": "REQUIRED",
+  "physicalImpactJustification": "Verify the continuous list through its last channel and return from Live picture in picture on the designated tablet.",
+  "requiredTests": [
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock",
+    "node node_modules/typescript/bin/tsc --noEmit",
+    "node scripts/test-c11-live-player-controls.mjs",
+    "node scripts/test-live-auto-recovery.mjs",
+    "gradlew.bat --offline :app:testDebugUnitTest"
+  ],
+  "evidence": "docs/evidence/TABLET_PIP_LIVE_01.md",
+  "compatibilityRisk": "Only the fullscreen channels panel uses the scroll range. Channel selection continues through the existing authorized local catalog and playback flow.",
+  "changes": [
+    {
+      "path": "src/ui/pages/LiveTvPage.tsx",
+      "before": "0513c579c55d0efa4affd02d18eb693d9b667cf4",
+      "after": "f7d760fca8ed4a3b5a7b3da8154fd5edd50df0b8"
+    },
+    {
+      "path": "src/playback/native-android-player.bridge.ts",
+      "before": "f19859e42487af474dee23e22861c15403c2da40",
+      "after": "3a59fe65af164b4ac93419201ab30ec05f6c03e8"
+    },
+    {
+      "path": "android/app/src/main/java/com/xandeflix/prebuilt/player/LivePlayerControls.java",
+      "before": "8fd67cc137a72350be6ec958506a29236a6c2e7e",
+      "after": "55ead1346e38ec6eaafa37355886650015801630"
+    },
+    {
+      "path": "android/app/src/test/java/com/xandeflix/prebuilt/player/LivePlayerControlsTest.java",
+      "before": "ab99bc0b81e329c6dd6867800cdedfdf71d13c9a",
+      "after": "cf5182957c6a24c7ae996db574a92a7511b467cd"
+    },
+    {
+      "path": "scripts/test-c11-live-player-controls.mjs",
+      "before": "709fac910f30c6df9142b1afd122b75c89c7a333",
+      "after": "69b70d00bd2726f19398bb64e12e4b7b3c60216e"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "64180cf8904ccfe37000faabf93145340bec27a7",
+      "after": "278147cb442b31c28fdf96e827df23db0baf9f84"
+    }
+  ],
+  "supersedes": {
+    "src/ui/pages/LiveTvPage.tsx": "TABLET-PIP-LIVE-01",
+    "src/playback/native-android-player.bridge.ts": "TABLET-PIP-LIVE-01",
+    "android/app/src/main/java/com/xandeflix/prebuilt/player/LivePlayerControls.java": "TABLET-PIP-LIVE-01",
+    "android/app/src/test/java/com/xandeflix/prebuilt/player/LivePlayerControlsTest.java": "TABLET-PIP-LIVE-01",
+    "scripts/test-c11-live-player-controls.mjs": "TABLET-PIP-LIVE-01",
+    "scripts/test-canonical-regression.mjs": "TABLET-PIP-LIVE-01-VALIDATION"
+  },
+  "testChangesReviewed": true,
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": true,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false,
+  "restrictions": [
+    "In-place update solely on the designated Samsung tablet.",
+    "Preserve identity, activation, license and the local source.",
+    "No publication."
+  ]
+}

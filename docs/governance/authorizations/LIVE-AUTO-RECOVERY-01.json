@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "gate": "LIVE-AUTO-RECOVERY-01",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "EXPLICIT_CURRENT_USER_LIVE_ERROR_AND_BUFFER_OVER_FIVE_SECONDS_REQUEST_WITH_EXISTING_TABLET_UPDATE_AUTHORIZATION_NOT_INDEPENDENT_ADJUDICATION",
+  "authorizationRequestSha256": "3d0294056235665cda7ecc1f532c0036042223d8dcc52c0e07f9ccb08f591703",
+  "reason": "Recover failed or continuously buffering (>5000ms) live channel by selecting the next in the same category. Correlate each tune separately from reused view; cancel on pause/background/obscuration/manual selection. Await native/C9 cleanup, check snapshot/parental authority, then use existing tune/acquire path. No wrap, VOD, source or transport change.",
+  "physicalImpact": "REQUIRED",
+  "physicalImpactJustification": "Update tablet in-place for user preview and exercise controlled native events plus real live playback; preserve activation/data.",
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "node scripts/test-live-auto-recovery.mjs",
+    "node scripts/test-search-return.mjs",
+    "node node_modules/typescript/bin/tsc --noEmit",
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock"
+  ],
+  "evidence": "docs/evidence/LIVE_AUTO_RECOVERY_01.md",
+  "compatibilityRisk": "Only Android LiveTvPage native preview gains automatic channel selection. Additive sanitized state and opaque requestId IPC, no new requests/probes except normal next-channel playback. User pause/C9/license denial must not trigger transitions; no production publication.",
+  "changes": [
+    {
+      "path": "src/ui/pages/LiveTvPage.tsx",
+      "before": "27ea84a66549d2f1f07b7452adbc63c5f4370543",
+      "after": "41176e3503682c94d199077f4896f6e6fbd8ed3f"
+    },
+    {
+      "path": "src/playback/native-android-player.bridge.ts",
+      "before": "29e855e7067002d71cfd1d6b6cde65056d6e5e39",
+      "after": "50481d2de9c4ac9e86b5132e37cc3edea306c65e"
+    },
+    {
+      "path": "src/playback/live-auto-recovery.ts",
+      "before": null,
+      "after": "43a3ee255789720eee98708181136cd383e4005c"
+    },
+    {
+      "path": "android/app/src/main/java/com/xandeflix/prebuilt/player/NativeAndroidPlayerPlugin.java",
+      "before": "77d3e1eea97a5e7a1faeb498e9fe8651c41383ea",
+      "after": "d5331ce363f818058017cac3f092f955923a66a4"
+    },
+    {
+      "path": "scripts/test-live-auto-recovery.mjs",
+      "before": null,
+      "after": "e1beb43f6821266838194a71a492fb43399809a1"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "8ed68945912f9a267c2c6643373f77a16b6a13f6",
+      "after": "8b297552be7a68ec02bd3cb9ea53deaae79fd0f5"
+    }
+  ],
+  "supersedes": {
+    "src/ui/pages/LiveTvPage.tsx": "CANON-01-TV-CAST-SENDER-HIDDEN",
+    "android/app/src/main/java/com/xandeflix/prebuilt/player/NativeAndroidPlayerPlugin.java": "CANON-01-LIVE-SINGLE-TRANSPORT",
+    "scripts/test-canonical-regression.mjs": "SEARCH-RETURN-01"
+  },
+  "testChangesReviewed": true,
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": true,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false,
+  "restrictions": [
+    "No independent adjudication or production homologation implied.",
+    "Only tablet installation in-place; preserve identity/source/data; no backend or Git publication.",
+    "No VOD/Next Episode G4, codecs, Media3 transport, stream candidate fallback, source or authority modifications."
+  ],
+  "parentGate": "SEARCH-RETURN-01"
+}

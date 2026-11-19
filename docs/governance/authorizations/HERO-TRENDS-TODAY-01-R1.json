@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "gate": "HERO-TRENDS-TODAY-01-R1",
+  "parentGate": "HERO-TRENDS-TODAY-01-CACHE",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "CURRENT_USER_EXPLICIT_REQUEST_TO_ADAPT_TREND_HERO_TO_EXISTING_NONEMPTY_RULE_AND_PRIOR_FALLBACK_ORDER; THIS_RECEIPT_RECORDS_EXECUTOR_SCOPE_NOT_INDEPENDENT_ADJUDICATION",
+  "reason": "Keep active-source hero content visible while resolving TMDB day, week, 2026 and 2025 rankings, and remove the empty unavailability notice. Preserve the existing local-source fallback when rankings fail or have no match.",
+  "physicalImpact": "REQUIRED",
+  "physicalImpactJustification": "The change affects hero content and loading on Fire and tablet; physical observation is required before distribution.",
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c105-complete-root-search.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "node scripts/test-daily-trending-hero.mjs",
+    "node scripts/test-c11-browse-dynamic-hero.mjs",
+    "node node_modules/typescript/bin/tsc --noEmit",
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock"
+  ],
+  "evidence": "docs/evidence/HERO_TRENDS_TODAY_01_R1.md",
+  "compatibilityRisk": "The fallback is source-catalog eligible but not network playback verified. A listed item may still receive HTTP 403. If the active catalog is truly empty the boot/catalog gate, not a fabricated hero item, must handle it.",
+  "changes": [
+    { "path": "src/catalog/daily-trending-hero.service.ts", "before": "abdd2a931aed2d99ae10407679bf91d01a337a53", "after": "71e89240296facff2fe85d9ec47fd60a76b812fb" },
+    { "path": "src/ui/hooks/useHomeHero.ts", "before": "6de211e5094d5f464179b4fdfa23031a2c192e94", "after": "4e6183cad60972219e06c3058d7b26e36341b28d" },
+    { "path": "src/ui/components/HomeHero.tsx", "before": "15b1b53d2c750b5182bd59d01d0c0fdfca4b8322", "after": "ed60108412e3f828d2f74a9084f75e85170d0bb2" },
+    { "path": "scripts/test-daily-trending-hero.mjs", "before": "6c8f6869fc91e29ea4a364d0f9fc984c5acef0b2", "after": "927f79b31e601b2ef4b736d41f00ddcf56812178" },
+    { "path": "scripts/test-c11-browse-dynamic-hero.mjs", "before": "0049dbcd4f8439b1a1ae9f839d608cabdde7c807", "after": "3af6f265ec91324c496d517ac62cc82119d7e6ce" },
+    { "path": "scripts/test-canonical-regression.mjs", "before": "5843de6d3e43a8b4c154527d1ecc4ebed85d341c", "after": "7fa67cddf667d79cae628a9a11c7cd05d8a0d243" }
+  ],
+  "supersedes": {
+    "src/catalog/daily-trending-hero.service.ts": "HERO-TRENDS-TODAY-01-CACHE",
+    "src/ui/hooks/useHomeHero.ts": "HERO-TRENDS-TODAY-01",
+    "src/ui/components/HomeHero.tsx": "HERO-TRENDS-TODAY-01",
+    "scripts/test-daily-trending-hero.mjs": "HERO-TRENDS-TODAY-01-CACHE",
+    "scripts/test-c11-browse-dynamic-hero.mjs": "HERO-TRENDS-TODAY-01",
+    "scripts/test-canonical-regression.mjs": "HERO-TRENDS-TODAY-01-CACHE"
+  },
+  "testChangesReviewed": true,
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": true,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false,
+  "restrictions": [
+    "No source media probe or claim of guaranteed playback.",
+    "No player, C9, parental, Supabase or source replacement changes.",
+    "No Git publication or production homologation by this receipt."
+  ]
+}

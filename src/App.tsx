@@ -48,6 +48,7 @@ import { HomeCollectionPage, isHomeCollectionId } from './ui/pages/HomeCollectio
 import { MoviesPage } from './ui/pages/MoviesPage.tsx';
 import { SeriesPage } from './ui/pages/SeriesPage.tsx';
 import { SearchPage } from './ui/pages/SearchPage.tsx';
+import { isSearchReturnRoute } from './ui/navigation/search-return.ts';
 import { MovieDetailPage } from './ui/pages/MovieDetailPage.tsx';
 import { SeriesDetailPage, type SeriesEpisodeReturnState } from './ui/pages/SeriesDetailPage.tsx';
 import { LocalSourceProvisioningPage } from './ui/pages/LocalSourceProvisioningPage.tsx';
@@ -634,19 +635,8 @@ export default function App(): React.JSX.Element {
         return <LiveTvPage initialChannelId={itemId} onBack={handleBack} onHome={() => handleNavigate('home')} onOpenSourceSetup={() => handleNavigate('debug-source-setup')} registerBeforeLeave={registerBeforeLiveLeave} />;
 
       case 'search':
-        if (!isExistingRealCatalog) {
-          return (
-            <FirstRealSyncState
-              catalogState={getFirstRealSyncCatalogState()}
-              progressText="A busca estará disponível assim que a indexação for concluída."
-              errorMessage={bootSyncError}
-              onOpenActivation={() => handleNavigate('activation')}
-              onOpenPortal={() => handleNavigate('portal')}
-            />
-          );
-        }
-        if (!readModel) return <EmptyState />;
-        return <SearchPage readModel={readModel} onSelectItem={handleSelectItem} onSelectLive={handleSelectLive} />;
+        // The search visit is mounted separately while its content is open.
+        return null;
 
       case 'activation':
         return (
@@ -769,7 +759,12 @@ export default function App(): React.JSX.Element {
       warningNotice={importWarning}
     >
       <PlaybackErrorNotice message={nativePlaybackErrorNotice} diagnostic={playbackSupportDiagnostic} onDismiss={() => setNativePlaybackErrorNotice(null)} />
-      {renderCurrentView()}
+      {readModel && isExistingRealCatalog && isSearchReturnRoute(routeState) ? (
+        <SearchPage key={activeCatalog?.metadata.snapshotId} readModel={readModel}
+          active={routeState.current.view === 'search'}
+          onSelectItem={handleSelectItem} onSelectLive={handleSelectLive} />
+      ) : null}
+      {routeState.current.view === 'search' ? null : renderCurrentView()}
     </AppShell>
     </NewContentProvider>
   );

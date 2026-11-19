@@ -4691,3 +4691,42 @@ Fonte verificada no boot e reconstruída por ativação independente, conforme p
 ## CANON-01-SOURCE-SWITCH-ISOLATION-CACHE-REVIEW
 
 Complemento do mesmo ciclo: limpar índices de apresentação da fonte antes da importação no novo runtime. Primeiro PASS 204/45 preservado nos logs; bytes finais exigem nova validação. Ver docs/evidence/SOURCE_SWITCH_ISOLATION_CACHE_REVIEW.md.
+
+
+## TABLET-CATALOG-HERO-BACK-01 — 2026-11-17
+Current user authorized tablet hero Back removal, test build and tablet in-place preview. Implemented in independent main clone; verification/physical result pending externally. No Git publication. Prior CI/HTTP403 limitations retained.
+
+
+### TABLET-CATALOG-HERO-BACK-01 — fechamento técnico local
+APK de teste instalado exclusivamente no SM-X610: SHA-256 61940088dd13f87b16ab218525acf9f5b64713e51b08ded96afc61097254fd1d. Verificação física: Back oculto em Filmes/Séries do catálogo; visível em detalhes. Identidade/ativação preservadas. Cânone/C11/typecheck e regressão204/45 PASS. Teste suplementar legado de detalhes falha igualmente na base por harness sem ActorDetailPage; limitação externa documentada, sem alteração do teste. Falhas remotas de CI permanecem; revisão independente e publicação não realizadas. NEXT_GATE_STARTED=NAO.
+
+
+## SEARCH-RETURN-01 — 2026-11-17
+User requested search state retention across content/back. Cause: SearchPage unmount and reinitialize. One scoped mounted visit, RAM-only scroll/focus; verification pending. Prior tablet catalog Back fix retained; no Git publication.
+
+
+## SEARCH-RETURN-01 — fechamento técnico local
+Busca preservada ao visitar conteúdo: texto, filtro, resultados, card e rolagem. Saída para outra seção reinicia a visita. Tablet atualizado in-place, identidade/ativação preservadas. Testes específicos10 PASS, TypeScript/C11/cânone e regressão204/45 PASS. Verificação física UI Back/Android Back e saída para Home PASS. APK SHA256 a3a300ba06b2444a575d6c2b53fd5733e9b35527f8e83332ea12a6dc36fb9e5e. Sem Git publicação/backend. Recuperação Live é próximo escopo explicitamente solicitado pelo usuário; ainda não implementada nesta entrega.
+
+
+## LIVE-AUTO-RECOVERY-01 — 2026-11-17
+Explicit user request: automatic next channel on exhausted live media error, unexpected end or continuous buffer >5000ms. Same category, pause/background cancellation, per-tune correlation and serialized native/C9 cleanup. Verification pending; previous search/hero fixes preserved. No Git publication/backend/source change.
+
+
+## Fechamento técnico LIVE-AUTO-RECOVERY-01 — 18/11/2026
+33 casos novos/focados PASS, sete asserções de saída preservadas, busca 10 PASS, TypeScript, C11 e regressão original 204 controles/45 suítes PASS. APK de teste a27d167ee74797f823da1969cd7fbe501788fe418a6b503d5c7279f351f04dbb instalado in-place no tablet com os cinco digests privados preservados. Seis verificações físicas de Live PASS: erro/buffer/ENDED controlados nos callbacks, mídia e pausa reais. Buffer prolongado gerou nova abertura após aproximadamente 6149,8ms incluindo cleanup/autorização; sem promessa de SLA. Busca reconferida no mesmo binário: 50 resultados, filtro, texto, foco e rolagem retidos; sair da seção limpa a visita.
+Índice apresentou diferença binária de causa não comprovada; exceção semântica delimitada G2-R4 reaplicada com 1945 entradas e 1903 blobs/flags, demais metadados preservados. Nenhuma normalização ou restauração de índice. Teste legado C106 completo continua com pressuposto CSS que falha no HEAD; seu arquivo original foi preservado e não é declarado PASS, enquanto os sete casos de teardown são executados com novas portas em RAM. Logs/drafts rejeitados e primeiras falhas físicas de sincronização preservados na evidência externa.
+Evidência: C:/Xandeflix/Audits/LIVE_AUTO_RECOVERY_20261117/REPORT.md. Revisão independente pendente; sem Git publicação, backend administrativo, troca de fonte ou próximo gate. Fire/celular não atualizados neste ciclo.
+
+## HERO-TRENDS-TODAY-01 — 18/11/2026
+
+O seletor local de Tendências Hoje foi desenvolvido para títulos listados no catálogo ativo, com cache em RAM por fonte/snapshot/hora. A validação automatizada alcançou 204 controles e 46 suítes, mas o usuário alterou o requisito durante a validação: cada título exibido precisa ser assistível. O seletor não comprova reprodução e pode incluir títulos que retornam HTTP 403. O gate não é aceito para instalação ou publicação. Os recibos e a especificação originais permanecem como histórico; a mudança e o bloqueio estão documentados em `docs/evidence/HERO_TRENDS_TODAY_01.md`.
+
+## HERO-PLAYABLE-VERIFICATION-01 — 18/11/2026
+
+Foi autorizado o gate de verificação de mídia. A auditoria identificou a observação nativa de primeiro quadro e a ausência de canal seguro de disponibilidade para seleção antecipada. Fallback Hoje → Semana → 2026 → 2025 → títulos aleatórios da fonte foi documentado. A implementação parou na checagem arquitetural pelo conflito de requisitos quando nenhuma mídia é acessível e pela falta de prova de limites/cancelamento de probes. Nenhum arquivo de produto foi alterado neste gate; ver `docs/evidence/HERO_PLAYABLE_VERIFICATION_01.md`.
+
+
+## TABLET-PIP-LIVE-01 — 19/11/2026
+
+A política de orientação do tablet usa a janela de tamanho normal e libera o bloqueio transitório ao retornar do PiP. Canais em tela cheia usa uma lista contínua com carregamento local por blocos e escopo próprio. C11, TypeScript, 262 testes Java e 204 controles em 46 suítes de regressão passaram. Evidência em docs/evidence/TABLET_PIP_LIVE_01.md.

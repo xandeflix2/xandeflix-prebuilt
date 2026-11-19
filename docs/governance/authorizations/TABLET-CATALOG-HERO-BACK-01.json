@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "gate": "TABLET-CATALOG-HERO-BACK-01",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "EXPLICIT_CURRENT_SESSION_USER_TABLET_UI_AND_INSTALL_REQUEST_NOT_INDEPENDENT_ADJUDICATION",
+  "authorizationRequestSha256": "0a1ed24670b424be2a6b834b49202f84afde588baab44bc3f9fa4c1c750c7f65",
+  "reason": "User clarified removal of the upper-right hero Back button on tablet Movies/Series catalog pages; detail page Back remains and live visualization by in-place tablet update. CSS scopes the existing tablet profile and movie/series catalog hero. Strict runner expectation adds only this legitimate receipt before synthetic ANDROID-38; all controls and suites preserved.",
+  "physicalImpact": "REQUIRED",
+  "physicalImpactJustification": "Tablet-only visual verification and in-place update explicitly requested by user.",
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock",
+    "node node_modules/typescript/bin/tsc --noEmit"
+  ],
+  "evidence": "docs/evidence/TABLET_CATALOG_HERO_BACK_01.md",
+  "compatibilityRisk": "Tablet catalog visual selector only; detail hero Back preserved; no runtime navigation/authorization/source/player changes. Desktop/phone/TV remain outside selector. Historical CI failures retained; physical preview is not production release.",
+  "changes": [
+    {
+      "path": "src/index.css",
+      "before": "186a8c9c303226a9891d660ae52f362192e88840",
+      "after": "b52b35f1f74a9c0e10dd64f66a42d792ef98a0ec"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "23d6ad5fe63d6a993d427e232d410d3296ac40bd",
+      "after": "6266e188449d6001d63c0e7e11870373762bcc4a"
+    }
+  ],
+  "supersedes": {
+    "src/index.css": "CANON-01-PERF-PARENTAL-HERO-REFINEMENT",
+    "scripts/test-canonical-regression.mjs": "CANON-01-SOURCE-SWITCH-ISOLATION-CACHE-REVIEW"
+  },
+  "testChangesReviewed": true,
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": true,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false,
+  "restrictions": [
+    "Authorization provenance is the current user request, not independent master adjudication.",
+    "Update only tablet SM-X610; preserve identity, activation and local data.",
+    "No backend, source change, player change, publish, main merge or other gate."
+  ]
+}

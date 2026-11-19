@@ -23,8 +23,10 @@ import { getClientSearchService } from '../../search/search-client.ts';
 import { SearchInput } from '../components/SearchInput.tsx';
 import { SearchResults } from '../components/SearchResults.tsx';
 import { SearchState } from '../components/SearchState.tsx';
+import { captureSearchPosition, restoreSearchPosition, type SearchReturnPosition } from '../navigation/search-return.ts';
 
 interface SearchPageProps {
+  active?: boolean;
   parentalEditor?: boolean;
   readModel: CatalogReadModel;
   onSelectItem: (item: CatalogItemViewModel) => void;
@@ -38,6 +40,7 @@ export const SearchPage: React.FC<SearchPageProps> = ({
   onSelectLive,
   searchServiceOverride,
   parentalEditor = false,
+  active = true,
 }) => {
   const searchService = useMemo(
     () => searchServiceOverride || getClientSearchService(),
@@ -49,6 +52,38 @@ export const SearchPage: React.FC<SearchPageProps> = ({
   const [status, setStatus] = useState<SearchStatus>('SEARCH_INDEX_LOADING');
   const [results, setResults] = useState<SearchResultItem[]>([]);
   const pendingQuery = useRef({ query: '', kind: 'all' as 'all' | 'movie' | 'series' });
+
+  const rootRef = useRef<HTMLDivElement>(null);
+  const selectedRef = useRef<HTMLElement | null>(null);
+  const returnPosition = useRef<SearchReturnPosition | null>(null);
+  const initialAutoFocus = useRef(active);
+
+  const rememberPosition = useCallback(() => {
+    if (rootRef.current) returnPosition.current = captureSearchPosition(rootRef.current, selectedRef.current);
+  }, []);
+
+  useEffect(() => {
+    if (!active || !returnPosition.current) return;
+    const position = returnPosition.current;
+    let frame = 0;
+    const cancel = () => {
+      cancelAnimationFrame(frame);
+      for (const event of ['pointerdown', 'keydown', 'wheel']) window.removeEventListener(event, cancel, true);
+      if (returnPosition.current === position) returnPosition.current = null;
+    };
+    // Other page focus effects run first; search owns focus on its return.
+    frame = requestAnimationFrame(() => {
+      frame = requestAnimationFrame(() => {
+        if (rootRef.current) restoreSearchPosition(rootRef.current, position);
+        cancel();
+      });
+    });
+    for (const event of ['pointerdown', 'keydown', 'wheel']) window.addEventListener(event, cancel, true);
+    return () => {
+      cancel();
+      for (const event of ['pointerdown', 'keydown', 'wheel']) window.removeEventListener(event, cancel, true);
+    };
+  }, [active]);
 
   // Inicializa o SearchService
   useEffect(() => {
@@ -104,10 +139,16 @@ export const SearchPage: React.FC<SearchPageProps> = ({
     if (searchService.isSearchReady()) searchService.search('');
   }, [searchService]);
 
-  const showResults = status === 'SEARCH_RESULTS' && results.length > 0;
+  const showResults = query.trim().length > 0 && status === 'SEARCH_RESULTS' && results.length > 0;
 
   return (
-    <div className="search-page-container">
+    <div ref={rootRef} className="search-page-container" hidden={!active}
+      style={active ? undefined : { display: 'none' }} aria-hidden={!active || undefined}
+      onClickCapture={event => {
+        const card = (event.target as Element).closest<HTMLElement>('.media-card');
+        if (card && event.currentTarget.contains(card)) selectedRef.current = card;
+      }}
+      onFocusCapture={event => { selectedRef.current = event.target as HTMLElement; }}>
       <div className="search-page-top">
         <h1 className="search-page-heading">Busca Local</h1>
         <p className="search-page-subheading">
@@ -117,6 +158,7 @@ export const SearchPage: React.FC<SearchPageProps> = ({
         <div className="search-controls-container">
           <SearchInput
             query={query}
+            autoFocus={initialAutoFocus.current}
             onChange={handleQueryChange}
             onClear={handleClear}
             disabled={status === 'SEARCH_INDEX_UNAVAILABLE' || status === 'SEARCH_INDEX_INVALID'}
@@ -168,8 +210,8 @@ export const SearchPage: React.FC<SearchPageProps> = ({
             parentalEditor={parentalEditor}
             results={results}
             readModel={readModel}
-            onSelectItem={onSelectItem}
-            onSelectLive={onSelectLive}
+            onSelectItem={item => { rememberPosition(); onSelectItem(item); }}
+            onSelectLive={onSelectLive ? id => { rememberPosition(); onSelectLive(id); } : undefined}
           />
         ) : (
           <SearchState status={status} query={query} />

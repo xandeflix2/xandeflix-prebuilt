@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "gate": "TABLET-PIP-LIVE-01",
+  "parentGate": "LIVE-AUTO-RECOVERY-01",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "User message on 2026-11-19: PROSSIGA COM A INSTALAÇAO NO TABLET. The response followed the named TABLET-PIP-LIVE-01 proposal for two repairs and a test APK installed on the tablet, in the specified isolated main workspace. The schema status records operator authorization without independent adjudication.",
+  "authorizationRequestSha256": "3fef9d3ca8c5aa4c276f4e20dcae089b1242afd2bd3395a8d8ec9e44d5248bac",
+  "reason": "Release stale orientation requests on tablet after PiP or window resizing, and make every authorized channel reachable in the fullscreen channel panel.",
+  "physicalImpact": "REQUIRED",
+  "physicalImpactJustification": "Check update, activation preservation, rotation after PiP and the real channel panel on SM-X610.",
+  "requiredTests": [
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock",
+    "node node_modules/typescript/bin/tsc --noEmit",
+    "node scripts/test-c11-live-player-controls.mjs",
+    "node scripts/test-live-auto-recovery.mjs",
+    "gradlew.bat --offline :app:testDebugUnitTest"
+  ],
+  "evidence": "docs/evidence/TABLET_PIP_LIVE_01.md",
+  "compatibilityRisk": "Listing stays local and bounded to 48 per page. Snapshot and category changes discard stale responses. PiP surface and C9 lifecycle keep their current ownership.",
+  "changes": [
+    {
+      "path": "android/app/src/main/java/com/xandeflix/prebuilt/MainActivity.java",
+      "before": "d2c4a8fbdb29b148e715fd45566270ec1ef57906",
+      "after": "4f5b1f62a86d9e4db7697884f7f0cf4964a01b5f"
+    },
+    {
+      "path": "android/app/src/main/java/com/xandeflix/prebuilt/player/LivePlayerControls.java",
+      "before": "0e97714b66574cd11ff59cc4a7051e49712852b6",
+      "after": "8fd67cc137a72350be6ec958506a29236a6c2e7e"
+    },
+    {
+      "path": "src/ui/pages/LiveTvPage.tsx",
+      "before": "41176e3503682c94d199077f4896f6e6fbd8ed3f",
+      "after": "0513c579c55d0efa4affd02d18eb693d9b667cf4"
+    },
+    {
+      "path": "src/playback/native-android-player.bridge.ts",
+      "before": "50481d2de9c4ac9e86b5132e37cc3edea306c65e",
+      "after": "f19859e42487af474dee23e22861c15403c2da40"
+    },
+    {
+      "path": "android/app/src/test/java/com/xandeflix/prebuilt/PhoneUiOrientationPolicyTest.java",
+      "before": "cdf3bbc8e88c5844668a07c74e852b135e8509c3",
+      "after": "5a78ca449d8f0b2793bd16097bd558b5cf4bf456"
+    },
+    {
+      "path": "android/app/src/test/java/com/xandeflix/prebuilt/player/LivePlayerControlsTest.java",
+      "before": "90e927683808240df49ef9c2d93e28a9c39ad883",
+      "after": "ab99bc0b81e329c6dd6867800cdedfdf71d13c9a"
+    },
+    {
+      "path": "scripts/test-c11-live-player-controls.mjs",
+      "before": "970eff86e1f0cc11cf92b2be2edbef9030190717",
+      "after": "709fac910f30c6df9142b1afd122b75c89c7a333"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "7fa67cddf667d79cae628a9a11c7cd05d8a0d243",
+      "after": "22952154233d671e553500b0c3527481fe13bfc5"
+    }
+  ],
+  "supersedes": {
+    "android/app/src/main/java/com/xandeflix/prebuilt/MainActivity.java": "CANON-01-XANDEFLIX-APP-INTRO-BRANDING-07",
+    "src/ui/pages/LiveTvPage.tsx": "LIVE-AUTO-RECOVERY-01",
+    "src/playback/native-android-player.bridge.ts": "LIVE-AUTO-RECOVERY-01",
+    "scripts/test-canonical-regression.mjs": "HERO-TRENDS-TODAY-01-R1"
+  },
+  "testChangesReviewed": true,
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": true,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false,
+  "restrictions": [
+    "In-place update solely on the designated Samsung tablet.",
+    "Preserve identity, activation, license and the local source.",
+    "No publication."
+  ]
+}

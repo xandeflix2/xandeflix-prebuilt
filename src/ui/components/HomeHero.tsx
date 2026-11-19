@@ -18,6 +18,7 @@ interface HomeHeroProps {
   displayed: (option: HomeHeroOption) => void;
   contentKind?: 'movie' | 'series';
   headingLevel?: 1 | 2;
+  selectionPending?: boolean;
 }
 
 export function heroSwipeDirection(dx: number, dy: number, elapsed: number, width: number): 'next' | 'previous' | undefined {
@@ -27,7 +28,7 @@ export function heroSwipeDirection(dx: number, dy: number, elapsed: number, widt
   return dx < 0 ? 'next' : 'previous';
 }
 
-export const HomeHero: React.FC<HomeHeroProps> = ({ options: incoming, onSelect, onPlay, playbackBusy, playbackMessage, nextBatch, displayed, contentKind, headingLevel = 1 }) => {
+export const HomeHero: React.FC<HomeHeroProps> = ({ options: incoming, onSelect, onPlay, playbackBusy, playbackMessage, nextBatch, displayed, contentKind, headingLevel = 1, selectionPending = false }) => {
   const phone = useHeroLayout();
   const fireStick = typeof navigator !== 'undefined' && isFireTvPresentation(navigator.userAgent);
   const webValidation = isWebValidation();
@@ -126,7 +127,7 @@ export const HomeHero: React.FC<HomeHeroProps> = ({ options: incoming, onSelect,
     }, 10000);
     return () => { clearTimeout(timer); if (webValidation && root.current) root.current.dataset.webHeroTimer = 'STOPPED'; };
   }, [canRotate, item?.key, rotateWhileFocused, webValidation, gesturing, interacting, hovered, visible, hidden, reduced, loading, playbackBusy]);
-  if (!item) return <div ref={root} className="home-hero-carousel"><HeroPreparing pending={artwork.pending} vertical={phone}/></div>;
+  if (!item) return <div ref={root} className="home-hero-carousel"><HeroPreparing pending={selectionPending || artwork.pending} vertical={phone}/></div>;
   return <div ref={root} className="home-hero-carousel" aria-roledescription="carrossel" aria-label={contentKind === 'movie' ? 'Destaques de filmes' : contentKind === 'series' ? 'Destaques de séries' : 'Destaques de filmes e séries'}
     data-web-hero-state={webValidation ? rotationState : undefined} data-web-hero-count={webValidation ? options.length : undefined} data-web-hero-position={webValidation ? index + 1 : undefined}
     onFocusCapture={() => setInteracting(true)} onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setInteracting(false); }}

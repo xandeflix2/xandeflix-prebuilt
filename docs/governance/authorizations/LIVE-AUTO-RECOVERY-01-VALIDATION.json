@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "gate": "LIVE-AUTO-RECOVERY-01-VALIDATION",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "EXPLICIT_CURRENT_USER_LIVE_ERROR_AND_BUFFER_OVER_FIVE_SECONDS_REQUEST_WITH_EXISTING_TABLET_UPDATE_AUTHORIZATION_NOT_INDEPENDENT_ADJUDICATION",
+  "authorizationRequestSha256": "3d0294056235665cda7ecc1f532c0036042223d8dcc52c0e07f9ccb08f591703",
+  "reason": "Expand the new live recovery test to execute actual LiveTvPage lifecycle callbacks and preserve seven native/C9 exit assertions in RAM. Do not alter legacy CSS assertions or source tests. Update only strict authorization list.",
+  "physicalImpact": "NOT_REQUIRED_JUSTIFIED",
+  "physicalImpactJustification": "Test-only follow-up inside the already-authorized live gate; physical obligation remains on parent receipt.",
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "node scripts/test-live-auto-recovery.mjs",
+    "node scripts/test-search-return.mjs",
+    "node node_modules/typescript/bin/tsc --noEmit",
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock"
+  ],
+  "evidence": "docs/evidence/LIVE_AUTO_RECOVERY_01.md",
+  "compatibilityRisk": "Only Android LiveTvPage native preview gains automatic channel selection. Additive sanitized state and opaque requestId IPC, no new requests/probes except normal next-channel playback. User pause/C9/license denial must not trigger transitions; no production publication.",
+  "changes": [
+    {
+      "path": "scripts/test-live-auto-recovery.mjs",
+      "before": "e1beb43f6821266838194a71a492fb43399809a1",
+      "after": "44ac3ea39a01bbd93c0daa2e4a7bbf8ef91b1635"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "8b297552be7a68ec02bd3cb9ea53deaae79fd0f5",
+      "after": "fcd20e309eff51da25d0fc9a7768ff0cc5d6feb2"
+    }
+  ],
+  "supersedes": {
+    "scripts/test-live-auto-recovery.mjs": "LIVE-AUTO-RECOVERY-01",
+    "scripts/test-canonical-regression.mjs": "LIVE-AUTO-RECOVERY-01"
+  },
+  "testChangesReviewed": true,
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": true,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false,
+  "restrictions": [
+    "No independent adjudication or production homologation implied.",
+    "Only tablet installation in-place; preserve identity/source/data; no backend or Git publication.",
+    "No VOD/Next Episode G4, codecs, Media3 transport, stream candidate fallback, source or authority modifications."
+  ],
+  "parentGate": "LIVE-AUTO-RECOVERY-01"
+}

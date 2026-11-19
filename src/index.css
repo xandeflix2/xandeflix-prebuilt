@@ -3931,3 +3931,8 @@ html, body {
     animation: none;
   }
 }
+
+/* TABLET-CATALOG-HERO-BACK-01: hide the tablet movie/series catalog hero Back action; keep detail Back. */
+#root .app-shell--tablet :is(.movies-page,.series-page) .hero-banner > .hero-top-actions > .btn-back {
+  display: none !important;
+}
