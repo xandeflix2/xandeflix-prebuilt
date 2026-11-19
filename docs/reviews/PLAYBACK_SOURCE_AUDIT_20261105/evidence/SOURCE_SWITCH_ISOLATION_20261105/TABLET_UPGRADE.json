@@ -1,0 +1,55 @@
+{
+  "label": "TABLET",
+  "startedUTC": "2026-11-05T11:51:02.541Z",
+  "beforeVersion": {
+    "code": 52,
+    "name": "1.0.52"
+  },
+  "updateMode": "IN_PLACE_PRESERVE_DATA",
+  "states": [
+    {
+      "phase": "ABSENT",
+      "schema": null,
+      "hasEpoch": false,
+      "bodyHasCards": false,
+      "loadingScreen": true,
+      "visibility": "visible",
+      "observedUTC": "2026-11-05T11:51:25.377Z"
+    },
+    {
+      "phase": "CLEANED",
+      "schema": 1,
+      "hasEpoch": true,
+      "bodyHasCards": false,
+      "loadingScreen": true,
+      "visibility": "visible",
+      "observedUTC": "2026-11-05T11:51:28.697Z"
+    },
+    {
+      "phase": "ACTIVE",
+      "schema": 1,
+      "hasEpoch": true,
+      "bodyHasCards": true,
+      "loadingScreen": false,
+      "visibility": "visible",
+      "observedUTC": "2026-11-05T11:52:05.352Z"
+    }
+  ],
+  "preservation": {
+    "identity": true,
+    "activationKey": true,
+    "installationIdentity": true,
+    "activationFields": true,
+    "authorized": true,
+    "sourceBindingSame": true,
+    "newSnapshot": true
+  },
+  "result": "PASS_MIGRATION_AND_PRESERVATION_NOT_PLAYBACK",
+  "installation": "SUCCESS",
+  "catalog": "ACTIVE_AND_RENDERED",
+  "afterVersion": {
+    "code": 53,
+    "name": "1.0.53"
+  },
+  "finishedUTC": "2026-11-05T11:52:06.169Z"
+}

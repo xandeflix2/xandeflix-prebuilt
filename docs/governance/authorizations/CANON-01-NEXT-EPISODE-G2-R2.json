@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "gate": "CANON-01-NEXT-EPISODE-G2-R2",
+  "parentGate": "CANON-01-CARD-TRAILER-AUDIO",
+  "amendment": "CANON-01-NEXT-EPISODE-G2-R2",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "EXPLICIT_CURRENT_USER_NEXT_EPISODE_G2_R2_ORDER; LOCAL_GATE_AUTHORIZATION; INDEPENDENT_CHAT_MASTER_REVIEW_PENDING",
+  "authorizationRequestSha256": "56396e7571b30e02f63af2466e2004d311397d065e180c7204b7faeef794166d",
+  "reason": "Create an isolated locally testable episode successor resolver and synthetic tests without integration or changes to existing player behavior.",
+  "physicalImpact": "NOT_REQUIRED_JUSTIFIED",
+  "physicalImpactJustification": "Pure isolated function; no player wiring, APK, external requests or device operations are authorized.",
+  "requiredTests": [
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "node scripts/test-next-episode-resolver.mjs",
+    "node node_modules/typescript/bin/tsc --noEmit",
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock"
+  ],
+  "evidence": "docs/evidence/NEXT_EPISODE_G2_R2.md",
+  "compatibilityRisk": "No integration; caller-provided scoped observations are not durable authorization and require revalidation at playback.",
+  "testChangesReviewed": true,
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": false,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false,
+  "changes": [
+    {
+      "path": "src/playback/next-episode-resolver.ts",
+      "before": null,
+      "after": "7fff516f596331c99b33c21fc0a6e17be9e774ae"
+    },
+    {
+      "path": "scripts/test-next-episode-resolver.mjs",
+      "before": null,
+      "after": "44ae3210921b42e2defcf8f24566b82668234a9b"
+    }
+  ],
+  "restrictions": [
+    "No modification to player, automatic advance, history, credentials, Supabase or historical authorizations."
+  ]
+}

@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "gate": "CANON-01-XUI-OPAQUE-RECOVERY",
+  "parentGate": "CANON-01",
+  "amendment": "CANON-01-XUI-OPAQUE-RECOVERY",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "EXPLICIT_AUTONOMOUS_SOURCE_RECOVERY_WITH_USER_SOURCE_ATTACHMENT_DEVICE_READ_ONLY_EVIDENCE_AND_TEST_APK_REQUEST",
+  "authorizationRequestSha256": "dc9feae1e4dddb0cc8950d1df1cb93d840d99bc8446f68897e7b91b9681bf854",
+  "reason": "Confirmed opaque XUI M3U classification drops movies and Live. Resolve exact authenticated provider category/stream IDs without changing source or URLs; retain atomic last-known-good.",
+  "physicalImpact": "REQUIRED",
+  "physicalImpactJustification": "Separately named test APK preserving 1.0.37/code37 and signature; installed-app refresh/playback remain pending. No automatic install.",
+  "testChangesReviewed": true,
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c105-complete-root-search.mjs",
+    "scripts/test-c107-catalog-return-navigation.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c11-landscape-navigation.mjs",
+    "scripts/validate-direct-playback.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock",
+    "npm run typecheck",
+    "npm run update:check",
+    "npm run security:check",
+    "npm run playback:check",
+    "npm run build",
+    "npm run site:build",
+    "node scripts/test-vercel-prebuilt-contract.mjs",
+    "node scripts/test-c105-directory-import.mjs",
+    "node scripts/test-c105-directory-details.mjs",
+    "node scripts/test-c105-directory-orchestration.mjs",
+    "node scripts/test-c11-automatic-source-refresh.mjs",
+    "node scripts/test-catalog-read-diagnostic.mjs",
+    "node scripts/test-xui-m3u-kind-recovery.mjs",
+    "node scripts/test-c157-web-source-https.mjs"
+  ],
+  "evidence": "docs/evidence/XUI_OPAQUE_M3U_RECOVERY.md",
+  "compatibilityRisk": "One-time eligible M3U checkpoint rebuild; new source inventory may prefer directory, same-source IDs preserved. API ambiguity/unavailability rejects candidate and retains active generation. Provider APIs may change and are not universally guaranteed. Successful API absence retains explicit unresolved count and legacy exclusion; never invent a type. Metadata/auth/transport failures still block publication.",
+  "restrictions": [
+    "Preserve all previous receipts, diagnostic files except explicit runner succession, historical Android artifacts and source output fix.",
+    "No source URL or sealed configuration mutation, broad VOD API limit increase, auth/parental/C9 bypass, native Android/player/backend/version change.",
+    "Preserve 128 canonical controls and 16 suites; add suite 17.",
+    "No commit/push/merge/deploy/install/reset or SOURCE-FORMAT-01."
+  ],
+  "supersedes": {
+    "src/source/real-source-importer.service.ts": "CANON-01-SOURCE-OUTPUT",
+    "scripts/test-canonical-regression.mjs": "CANON-01-CATALOG-READ-DIAG"
+  },
+  "changes": [
+    {
+      "path": "src/source/xui-m3u-kind-resolver.ts",
+      "before": null,
+      "after": "b27e7dbbc5fca0f5dc64f11ebe8492a2320d7278"
+    },
+    {
+      "path": "src/source/real-source-importer.service.ts",
+      "before": "b3bdc54eefa1141dac417e21c8fda602c28b7842",
+      "after": "31f0e934f96f20885ef0e78fd13e4303f98b53f6"
+    },
+    {
+      "path": "src/bootstrap/boot-sync-coordinator.ts",
+      "before": "f841279c3eb40dbf70cd777024321f6d515147bc",
+      "after": "3f25ad0e991cbe790826685a0605b7c5e190c7cc"
+    },
+    {
+      "path": "src/ui/settings/active-source-status.ts",
+      "before": "dc33b570ee92e2c3bd457ebd27d23adac5d0ea2a",
+      "after": "a0327b6d0d57d66e233f4e446c636bf60ef8fafe"
+    },
+    {
+      "path": "scripts/test-xui-m3u-kind-recovery.mjs",
+      "before": null,
+      "after": "3dfdf9db19bfa2de492a27a4acf0c93b106d7326"
+    },
+    {
+      "path": "scripts/test-c105-directory-orchestration.mjs",
+      "before": "3ad115853fc669c0f8ca4962f50aff30552c17e6",
+      "after": "ffa392a60003e9b12722ac3e89069e713cf660d7"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "7ae5b7a3a78feddf116eb4a215f71e73d5302bf3",
+      "after": "83a9c702646ca795ab5a8e9dc028f0c548898391"
+    },
+    {
+      "path": "scripts/test-c157-web-source-https.mjs",
+      "before": "674dab1ced3611f47635d21f23d88856189e17c2",
+      "after": "1b672fda09f6843851e9ca317bb478bd697f648a"
+    }
+  ],
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": true,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false
+}

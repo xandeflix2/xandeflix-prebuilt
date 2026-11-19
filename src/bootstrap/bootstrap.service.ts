@@ -28,6 +28,9 @@ export class BootstrapService {
   private storage: LocalCatalogStorage;
   private importer: PackageImporter;
   private stateManager: BootstrapStateManager;
+  private maintenanceTimer: ReturnType<typeof setTimeout> | undefined;
+  private maintenanceRunning = false;
+  private maintenanceRequested = false;
 
   constructor(storage: LocalCatalogStorage) {
     this.storage = storage;
@@ -39,7 +42,26 @@ export class BootstrapService {
    * Inicializa o serviço verificando se há um catálogo ativo persistido.
    */
   async initialize(): Promise<BootstrapSummary> {
-    return this.stateManager.sync();
+    const summary = await this.stateManager.sync();
+    if (summary.isReady) this.scheduleStorageMaintenance();
+    return summary;
+  }
+
+  private scheduleStorageMaintenance(): void {
+    if (!this.storage.maintainCatalogSnapshots) return;
+    this.maintenanceRequested = true;
+    if (this.maintenanceTimer || this.maintenanceRunning) return;
+    this.maintenanceTimer = setTimeout(() => {
+      this.maintenanceTimer = undefined;
+      this.maintenanceRunning = true;
+      this.maintenanceRequested = false;
+      void this.storage.maintainCatalogSnapshots!().then(result => {
+        if (result.removed) console.log(`[CATALOG_RETENTION] removed=${result.removed} preserved=${result.preserved} status=${result.status}`);
+      }).catch(() => { /* Maintenance cannot invalidate bootstrap readiness. */ }).finally(() => {
+        this.maintenanceRunning = false;
+        if (this.maintenanceRequested) this.scheduleStorageMaintenance();
+      });
+    }, 1000);
   }
 
   /**
@@ -60,6 +82,7 @@ export class BootstrapService {
       } else {
         this.stateManager.setImportFailed();
       }
+      this.scheduleStorageMaintenance();
     } else {
       this.stateManager.setImportFailed();
     }
@@ -106,6 +129,7 @@ export class BootstrapService {
       } else {
         this.stateManager.setImportFailed();
       }
+      this.scheduleStorageMaintenance();
     } else {
       this.stateManager.setImportFailed();
     }

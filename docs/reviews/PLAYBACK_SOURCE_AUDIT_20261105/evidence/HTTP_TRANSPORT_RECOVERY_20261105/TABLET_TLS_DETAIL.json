@@ -1,0 +1,22 @@
+{
+  "observedUTC": "2026-11-05T17:21:15.201Z",
+  "status": "TLS_EXCEPTION_CLASSIFIED",
+  "errorClass": "SSLHandshakeException",
+  "hostIsIp": false,
+  "classifiers": {
+    "trust_anchor": true,
+    "expired": false,
+    "not_yet_valid": false,
+    "certificate": false,
+    "validation": false,
+    "chain": false,
+    "hostname": false,
+    "protocol": false,
+    "handshake": false,
+    "timed_out": false,
+    "unable_to_find_valid_certification_path": false,
+    "connection_refused": false
+  },
+  "credentialsSent": false,
+  "certificateValidationBypassed": false
+}

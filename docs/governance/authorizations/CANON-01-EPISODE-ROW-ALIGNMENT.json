@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "gate": "CANON-01-EPISODE-ROW-ALIGNMENT",
+  "parentGate": "CANON-01-TMDB-EPISODE-RUNTIME-RECOVERY",
+  "amendment": "CANON-01-EPISODE-ROW-ALIGNMENT",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "CURRENT_USER_COMPACT_EPISODE_ROWS_REMOVE_DUPLICATE_HEADING_ADJACENT_SEASONS_AND_GENERATE_APK_2026_10_28; USER_NOT_NEW_MASTER_ATTACHMENT",
+  "authorizationRequestSha256": "76397668f8445a66400075f4bf453a0a01fee2cadb7b7e875df5b15091de869c",
+  "reason": "Minimal series presentation refinement after the confirmed metadata fix; compact stable TV/tablet rows, retain mobile layout, remove duplicate heading and reduce season-control spacing.",
+  "physicalImpact": "REQUIRED",
+  "physicalImpactJustification": "CSS preview measured on same Fire; final exact APK41 to be verified before distribution. Other devices pending.",
+  "testChangesReviewed": true,
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c105-complete-root-search.mjs",
+    "scripts/test-c107-catalog-return-navigation.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c11-landscape-navigation.mjs",
+    "scripts/validate-direct-playback.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock",
+    "npm run typecheck",
+    "node scripts/test-tmdb-episode-enrichment.mjs",
+    "node scripts/test-tmdb-episode-runtime-recovery.mjs",
+    "official production build with existing isolated public config wrapper",
+    "Gradle offline testDebugUnitTest assembleDebug; artifact/signature/config/CRC audits; Fire final metadata/geometry/season tabs"
+  ],
+  "evidence": "docs/evidence/EPISODE_ROW_ALIGNMENT.md",
+  "compatibilityRisk": "CSS reserve reduced deliberately to scene81+progress8+padding12=101px; title one line on TV/tablet, accessible full label unchanged; mobile two lines and synopsis layout explicitly restored. No source/IDs/handlers/journal/API/native logic changes.",
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": true,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false,
+  "supersedes": {
+    "src/ui/components/EpisodeMetadata.css": "CANON-01-TMDB-EPISODE-METADATA-ENRICHMENT",
+    "src/ui/pages/SeriesDetailPage.tsx": "CANON-01-TMDB-EPISODE-METADATA-ENRICHMENT",
+    "android/app/build.gradle": "CANON-01-TMDB-EPISODE-RUNTIME-RECOVERY",
+    "scripts/test-canonical-regression.mjs": "CANON-01-TMDB-EPISODE-RUNTIME-RECOVERY"
+  },
+  "changes": [
+    {
+      "path": "src/ui/components/EpisodeMetadata.css",
+      "before": "a2c402d0611bcfd28626f1eb69931c053d7b516e",
+      "after": "6327485a9d5619de3a33ec5f9329f6d6066ad0c1"
+    },
+    {
+      "path": "src/ui/pages/SeriesDetailPage.tsx",
+      "before": "d1ec48dfeacac595ba918b568e2147a79fb818c8",
+      "after": "6d40ac05226bcd80ea4f8aa5b617d4476f1cf722"
+    },
+    {
+      "path": "android/app/build.gradle",
+      "before": "488bd676d305a72ab09fd2ae75dfb04a63cf04bb",
+      "after": "669aa5f87413b3f4da6779861431b2c1c3c31d68"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "2ef0b1f77d9a5b87de9d93abc4226174612b8c19",
+      "after": "56bf95e0e3077cf96145b8b57d9cf92ff7cd2d91"
+    }
+  ],
+  "restrictions": [
+    "Preserve46 inherited receipts and204controls38suites; verifier unchanged.",
+    "Only CSS, duplicate h2 removal and version41; four normative prefixes append-only.",
+    "No reset/source/backend/Git/deploy/other-device install/SET01/next gate."
+  ]
+}

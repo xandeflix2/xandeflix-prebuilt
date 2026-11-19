@@ -1,0 +1,121 @@
+/* Fixed scene/text slots keep the existing Assistir/Continuar target stable during optional enrichment. */
+#root .episode-card.episode-card--metadata { align-items: flex-start; min-height: 166px; }
+#root .episode-card--metadata .episode-scene { flex: 0 0 144px; width: 144px; height: 81px; overflow: hidden; border-radius: 6px; background: #111726; }
+#root .episode-scene-image { display: block; width: 100%; height: 100%; object-fit: cover; }
+#root .episode-scene-placeholder { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; color: #9ca6b7; font-size: 11px; text-align: center; }
+#root .episode-card--metadata .episode-info { min-width: 0; }
+#root .episode-card--metadata .episode-header { align-items: flex-start; min-height: 2.8em; }
+#root .episode-card--metadata .episode-title { flex: 1; min-width: 0; margin: 0; line-height: 1.4; height: 2.8em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+#root .episode-card--metadata .episode-duration { flex-shrink: 0; margin-left: 8px; min-width: 52px; text-align: right; }
+#root .episode-card--metadata .episode-overview { margin: 0; line-height: 1.4; height: 4.2em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+/* Phone episode list: image/play header, title beside it, full-width synopsis below. */
+#root .series-phone-panel .series-season-select { max-width: 100%; margin-bottom: 12px; padding: 10px 34px 10px 12px; border: 0; border-radius: 4px; background: #252525; color: #fff; font: inherit; font-weight: 600; }
+#root .series-phone-panel .episodes-list { gap: 28px; }
+#root .series-phone-panel .episode-card.episode-card--metadata { display: grid; grid-template-columns: minmax(0, 38%) minmax(0, 1fr); align-items: start; gap: 14px 16px; padding: 0; min-height: 0; border: 0; border-radius: 0; background: transparent; }
+#root .series-phone-panel .episode-card--metadata .episode-scene { grid-column: 1; grid-row: 1; width: 100%; height: auto; aspect-ratio: 16 / 9; border-radius: 4px; }
+#root .series-phone-panel .episode-card--metadata .episode-info,
+#root .series-phone-panel .episode-card--metadata .episode-playback-action { display: contents; }
+#root .series-phone-panel .episode-card--metadata .episode-header { grid-column: 2; grid-row: 1; flex-direction: column; justify-content: center; align-items: flex-start; align-self: center; min-height: 0; }
+#root .series-phone-panel .episode-card--metadata .episode-title { flex: none; width: 100%; font-size: 16px; font-weight: 700; }
+#root .series-phone-panel .episode-card--metadata .episode-duration { margin: 0; min-width: 0; text-align: left; color: #aaa; font-size: 14px; }
+#root .series-phone-panel .episode-card--metadata .episode-overview { grid-column: 1 / -1; grid-row: 2; height: 5.8em; font-size: 14px; line-height: 1.45; -webkit-line-clamp: 4; color: #b6b6b6; }
+#root .series-phone-panel .episode-card--metadata .episode-resume-notice { grid-column: 1 / -1; grid-row: 3; }
+#root .series-phone-panel .episode-card--metadata .btn-episode-play { grid-column: 1; grid-row: 1; align-self: center; justify-self: center; z-index: 1; min-width: 48px; width: 48px; min-height: 48px; height: 48px; padding: 0; border: 2px solid #fff; border-radius: 50%; background: rgb(0 0 0 / 45%); color: #fff; font-size: 0; box-shadow: none; }
+#root .series-phone-panel .episode-card--metadata .btn-episode-play::before { content: '▶'; font-size: 22px; line-height: 1; }
+#root .series-phone-panel .episode-card--metadata .episode-play-label { display: none; }
+#root .series-phone-panel .episode-card--metadata .btn-episode-play.btn-resolving::before { content: '…'; }
+
+/* P2.4: miniatura acionavel no tablet e TV. */
+#root .episode-card--metadata .episode-visual {
+  position: relative;
+  flex: 0 0 144px;
+  width: 144px;
+  align-self: flex-start;
+}
+
+#root .episode-card--metadata .episode-visual .episode-scene {
+  width: 100%;
+  height: 81px;
+  flex: none;
+}
+
+#root .episode-card--metadata .episode-scene-action {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 81px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+}
+
+#root .episode-card--metadata .episode-scene-action:focus {
+  outline: 2px solid #ff636c;
+  outline-offset: -2px;
+}
+
+#root .episode-card--metadata .episode-scene-action-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+#root .episode-card--metadata .episode-progress {
+  display: block;
+  width: 100%;
+  height: 4px;
+  margin-top: 4px;
+  border: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  background: #444;
+}
+
+#root .episode-card--metadata .episode-progress::-webkit-progress-bar {
+  background: #444;
+  border-radius: 4px;
+}
+
+#root .episode-card--metadata .episode-progress::-webkit-progress-value {
+  background: #e53935;
+  border-radius: 4px;
+}
+
+/* Celular: preservar o layout e botao circular existentes. */
+#root .series-phone-panel .episode-card--metadata .episode-visual {
+  display: contents;
+}
+
+/* P2.9: mobile geometry — restore responsive 16:9 still. */
+#root .series-phone-panel .episode-card--metadata .episode-visual .episode-scene {
+  grid-column: 1;
+  grid-row: 1;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+}
+
+/* Compact episode rows: scene, text and progress define the row height. */
+#root .episode-card.episode-card--metadata { min-height: 0; }
+#root .episode-card--metadata .episode-visual { min-height: 89px; }
+#root .episode-card--metadata .episode-info { height: 81px; gap: 4px; justify-content: center; }
+#root .episode-card--metadata .episode-header { min-height: 1.4em; }
+#root .episode-card--metadata .episode-title { height: 1.4em; -webkit-line-clamp: 1; }
+/* The phone retains its existing two-line title and full-width synopsis. */
+#root .series-phone-panel .episode-card--metadata .episode-visual { min-height: 0; }
+#root .series-phone-panel .episode-card--metadata .episode-info { height: auto; }
+#root .series-phone-panel .episode-card--metadata .episode-title { height: 2.8em; -webkit-line-clamp: 2; }
+/* Keep season controls directly below the two content tabs. */
+#root .series-detail-panel,
+#root .series-phone-panel { padding-top: 8px; }
+#root .series-detail-panel .seasons-section,
+#root .series-phone-panel .seasons-section { margin-top: 0 !important; padding-top: 0 !important; border-top: 0; }
+#root .seasons-section .season-selector-tabs { margin-top: 0; margin-bottom: 8px !important; }

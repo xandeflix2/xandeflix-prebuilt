@@ -3,6 +3,30 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class PublicTrailerPolicyTest {
+    @org.junit.Test public void cardModeIsExplicitAndAcceptsRemoteAndHybridDevices() {
+        org.junit.Assert.assertTrue(PublicTrailerPolicy.presentation(960,4,"card"));
+        org.junit.Assert.assertTrue(PublicTrailerPolicy.presentation(800,1,"card"));
+        org.junit.Assert.assertTrue(PublicTrailerPolicy.presentation(360,1,"card"));
+        org.junit.Assert.assertFalse(PublicTrailerPolicy.presentation(0,4,"card"));
+        org.junit.Assert.assertFalse(PublicTrailerPolicy.presentation(960,4,"CARD"));
+    }
+    @org.junit.Test public void cardViewportHasMinimumTwoHundredPixels() {
+        org.junit.Assert.assertTrue(PublicTrailerPolicy.cardBounds(356,200));
+        org.junit.Assert.assertFalse(PublicTrailerPolicy.cardBounds(356,199));
+        org.junit.Assert.assertFalse(PublicTrailerPolicy.cardBounds(199,240));
+        org.junit.Assert.assertFalse(PublicTrailerPolicy.cardBounds(Double.NaN,240));
+    }
+    @org.junit.Test public void cardHtmlMutedFiniteAndBlockedAutoplayReturnsToImage() {
+        String html=PublicTrailerPolicy.html("abc_DEF-123",true);
+        org.junit.Assert.assertTrue(html.contains("mute:1"));
+        org.junit.Assert.assertTrue(html.contains("e.target.mute()"));
+        org.junit.Assert.assertTrue(html.contains("disablekb:1"));
+        org.junit.Assert.assertTrue(html.contains("45000"));
+        org.junit.Assert.assertTrue(html.contains("XANDE_PUBLIC_TRAILER:ended"));
+        org.junit.Assert.assertTrue(html.contains("onAutoplayBlocked"));
+        org.junit.Assert.assertFalse(PublicTrailerPolicy.html("abc_DEF-123").contains("mute:1"));
+        org.junit.Assert.assertEquals(PublicTrailerPolicy.html("abc_DEF-123"),PublicTrailerPolicy.html("abc_DEF-123",false));
+    }
     @Test public void validatesPublicIDWithoutURLsOrMarkup() {
         assertTrue(PublicTrailerPolicy.videoId("abc_DEF-123"));
         for(String id:new String[]{"", "https://youtube.com/watch?v=abc_DEF-123", "abc'<script", "../12345678", "abc_DEF-1235"}) assertFalse(PublicTrailerPolicy.videoId(id));

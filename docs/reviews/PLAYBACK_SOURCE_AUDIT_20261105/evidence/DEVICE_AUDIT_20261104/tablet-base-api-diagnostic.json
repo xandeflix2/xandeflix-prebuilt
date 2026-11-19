@@ -1,0 +1,21 @@
+[
+  {
+    "protocol": "http:",
+    "customPort": false,
+    "headerNames": [
+      "Accept"
+    ],
+    "pathDepth": 1
+  },
+  {
+    "transport": "base-api",
+    "failed": true,
+    "exceptionClasses": [],
+    "ssl": false,
+    "certificate": false,
+    "reset": true,
+    "timeout": false,
+    "cleartext": false,
+    "protocol": false
+  }
+]

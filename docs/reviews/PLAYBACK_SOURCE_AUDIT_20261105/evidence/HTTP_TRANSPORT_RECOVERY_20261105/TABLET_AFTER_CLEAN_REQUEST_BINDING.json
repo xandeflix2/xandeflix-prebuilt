@@ -1,0 +1,11 @@
+{
+  "observedUTC": "2026-11-05T17:44:34.804Z",
+  "status": "LOCAL_REQUEST_BINDING_COMPARED",
+  "sourceOriginMatches": true,
+  "sourceUsernameMatches": true,
+  "sourcePasswordMatches": true,
+  "typedPathSeries": true,
+  "episodeIdMatchesFreshApi": true,
+  "containerMatchesFreshApi": true,
+  "currentRequestUnchanged": true
+}

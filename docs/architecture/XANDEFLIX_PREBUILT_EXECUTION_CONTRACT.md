@@ -82,3 +82,15 @@ Rodar `npm run c11:new-device:lock` antes/depois de alteracoes no escopo do lock
 e antes de entrega de APK. Prebuild obrigatorio; nao contornar lifecycle nem
 reduzir criterios sem autorizacao expressa e emenda. Falhas bloqueiam entrega.
 O relato de sucesso em ativacao/catalogo nao prova reproducao de midia.
+
+## 2.21. Consolidacao canonica e evolucao controlada - CANON-01
+
+Ler [XANDEFLIX_PREBUILT_PHASED_EXPANSION](XANDEFLIX_PREBUILT_PHASED_EXPANSION.md).
+`npm run canon:check` e `npm run canon:test` acrescentam protecao ao lock C11,
+sem substitui-lo. Suite/contrato/dependencia ausente ou verificacao enfraquecida
+falha de forma bloqueante. Evolucao de versoes exige Gate nominal e regressao
+conforme impacto, sem congelar1.0.37. Homologacao fisica e evidencia distinta
+de teste automatizado; adjudicacao final pertence ao Chat Mestre.
+CANON-01 permite somente documentacao/governanca/testes/CI na allowlist,
+commit/push na branch de revisao autorizada e nenhum merge/PR/main push.
+Sem Supabase write, runtime novo, APK/AAB, instalacao/reset ou proximo Gate.

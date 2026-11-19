@@ -1,0 +1,81 @@
+{
+  "observedUTC": "2026-11-05T17:40:47.335Z",
+  "kind": "movie",
+  "startUTC": "2026-11-05T17:40:26.059Z",
+  "nativeEvents": [
+    {
+      "time": "2026-11-05T17:40:26.364Z",
+      "event": "STATE",
+      "value": "BUFFERING"
+    },
+    {
+      "time": "2026-11-05T17:40:27.400Z",
+      "event": "DATASOURCE_OPEN_SUCCESS"
+    },
+    {
+      "time": "2026-11-05T17:40:31.564Z",
+      "event": "FIRST_FRAME"
+    },
+    {
+      "time": "2026-11-05T17:40:31.589Z",
+      "event": "STATE",
+      "value": "READY"
+    },
+    {
+      "time": "2026-11-05T17:40:32.371Z",
+      "event": "POSITION_ADVANCED"
+    }
+  ],
+  "events": [
+    {
+      "event": "OPEN",
+      "kind": "movie",
+      "scheme": "http:",
+      "typedPath": "movie",
+      "extension": "mp4",
+      "pathDepth": 4,
+      "hasQuery": false,
+      "headerNames": [
+        "User-Agent"
+      ],
+      "uaClass": "IPTV_SMARTERS_DEFAULT",
+      "observedUTC": "2026-11-05T17:40:26.059Z"
+    },
+    {
+      "event": "OPEN_RETURN",
+      "accepted": true,
+      "candidateCount": 1,
+      "observedUTC": "2026-11-05T17:40:26.101Z"
+    },
+    {
+      "event": "progress",
+      "positionMs": 0,
+      "durationMs": 5448683,
+      "ended": false,
+      "observedUTC": "2026-11-05T17:40:31.441Z"
+    },
+    {
+      "event": "progress",
+      "positionMs": 4622,
+      "durationMs": 5448683,
+      "ended": false,
+      "observedUTC": "2026-11-05T17:40:36.375Z"
+    },
+    {
+      "event": "progress",
+      "positionMs": 9625,
+      "durationMs": 5448683,
+      "ended": false,
+      "observedUTC": "2026-11-05T17:40:41.388Z"
+    },
+    {
+      "event": "progress",
+      "positionMs": 14637,
+      "durationMs": 5448683,
+      "ended": false,
+      "observedUTC": "2026-11-05T17:40:46.395Z"
+    }
+  ],
+  "visibility": "hidden",
+  "audibleOutputVerified": false
+}

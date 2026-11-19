@@ -129,6 +129,9 @@ export interface LocalCatalogStorage {
    */
   cleanupStaging(snapshotId?: string): Promise<void>;
 
+  /** Optional, fail-closed removal of obsolete permanent catalog generations. */
+  maintainCatalogSnapshots?(): Promise<import('./snapshot-retention.ts').SnapshotRetentionResult>;
+
   /**
    * Verifica se há um catálogo ativo e íntegro presente.
    */

@@ -1,0 +1,61 @@
+{
+  "observedUTC": "2026-11-04T18:56:57.521Z",
+  "devices": [
+    {
+      "serial": "G071CQ070344374G",
+      "label": "fire",
+      "model": "AFTSS",
+      "android": "9",
+      "sdk": "28",
+      "metadata": [
+        "versionCode=52 minSdk=23 targetSdk=35",
+        "versionName=1.0.52",
+        "firstInstallTime=2026-10-23 14:38:21",
+        "lastUpdateTime=2026-11-03 07:42:10"
+      ],
+      "apkPath": "/data/app/com.xandeflix.prebuilt-iQqeY1Z7alXpsAeoOkZfaA==/base.apk",
+      "installedSha256": "f1eb668de79aebd0384424c67a289eea9c5206fa8db901020789f52a8a079358",
+      "localSha256": "0146a2fc05d3e45f5670f4c5aba0fa0d0ba1cd25bd0086f7ac00de4cb6ab8c29",
+      "sameAsLocal": false,
+      "pulledSha256": "f1eb668de79aebd0384424c67a289eea9c5206fa8db901020789f52a8a079358"
+    },
+    {
+      "serial": "RX2X301Q3KY",
+      "label": "tablet",
+      "model": "SM-X610",
+      "android": "16",
+      "sdk": "36",
+      "metadata": [
+        "versionCode=52 minSdk=23 targetSdk=35",
+        "versionName=1.0.52",
+        "lastUpdateTime=2026-11-03 20:21:35",
+        "firstInstallTime=2026-10-23 14:48:22",
+        "firstInstallTime=2026-10-01 18:24:49"
+      ],
+      "apkPath": "/data/app/~~Y8fDzlV6meRH-HGvyEjSPg==/com.xandeflix.prebuilt-4wFan_IV65-IvZEVwDrD_g==/base.apk",
+      "installedSha256": "0146a2fc05d3e45f5670f4c5aba0fa0d0ba1cd25bd0086f7ac00de4cb6ab8c29",
+      "localSha256": "0146a2fc05d3e45f5670f4c5aba0fa0d0ba1cd25bd0086f7ac00de4cb6ab8c29",
+      "sameAsLocal": true,
+      "pulledSha256": "0146a2fc05d3e45f5670f4c5aba0fa0d0ba1cd25bd0086f7ac00de4cb6ab8c29"
+    },
+    {
+      "serial": "RXGYB03FL4W",
+      "label": "phone",
+      "model": "SM-S926B",
+      "android": "17",
+      "sdk": "37",
+      "metadata": [
+        "versionCode=52 minSdk=23 targetSdk=35",
+        "versionName=1.0.52",
+        "lastUpdateTime=2026-11-03 16:23:48",
+        "firstInstallTime=2026-10-23 14:55:32",
+        "firstInstallTime=1969-12-31 21:00:00"
+      ],
+      "apkPath": "/data/app/~~s3XZd0-LD97uSgplsTE0Ew==/com.xandeflix.prebuilt-tfCswkCDh7FMzhB40u8ewg==/base.apk",
+      "installedSha256": "0146a2fc05d3e45f5670f4c5aba0fa0d0ba1cd25bd0086f7ac00de4cb6ab8c29",
+      "localSha256": "0146a2fc05d3e45f5670f4c5aba0fa0d0ba1cd25bd0086f7ac00de4cb6ab8c29",
+      "sameAsLocal": true,
+      "pulledSha256": "0146a2fc05d3e45f5670f4c5aba0fa0d0ba1cd25bd0086f7ac00de4cb6ab8c29"
+    }
+  ]
+}

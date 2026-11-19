@@ -1,6 +1,7 @@
 package com.xandeflix.prebuilt.player;
 
 import androidx.media3.common.PlaybackException;
+import androidx.media3.common.MimeTypes;
 import androidx.media3.datasource.DefaultHttpDataSource;
 import androidx.media3.datasource.HttpDataSource;
 
@@ -151,6 +152,25 @@ public final class NativeStreamRequest {
 
     public String getMediaUrl() {
         return mediaUrl;
+    }
+
+    /** Explicit HLS only for the provider's unambiguous opaque transport path. */
+    public String getMediaMimeTypeHint() {
+        try {
+            URI uri = new URI(mediaUrl);
+            String scheme = uri.getScheme();
+            if (!("http".equalsIgnoreCase(scheme) || "https".equalsIgnoreCase(scheme))
+                    || uri.getHost() == null || uri.getRawUserInfo() != null) {
+                return null;
+            }
+            String path = uri.getRawPath();
+            if (path != null && path.matches("/play/[A-Za-z0-9_=-]+/(?:hls|m3u8)")) {
+                return MimeTypes.APPLICATION_M3U8;
+            }
+        } catch (Exception ignored) {
+            // An uncertain hint must leave the existing format inference unchanged.
+        }
+        return null;
     }
 
     public String getMaskedUrl() {

@@ -15,14 +15,16 @@ public class ArtworkCachePlugin extends Plugin {
     private ArtworkDiskCache cache;
     @PluginMethod public void get(PluginCall call) {
         String uri=call.getString("uri");
+        String scope=call.getString("scope", "legacy");
+        if(scope==null || !(scope.equals("legacy") || scope.matches("s_[A-Za-z0-9_-]{8,80}"))) {call.reject("CACHE_INVALID_SCOPE");return;}
         if(uri==null || !(uri.startsWith("https://") || uri.startsWith("http://"))) {call.reject("CACHE_INVALID_URI");return;}
         synchronized(this) { if(cache==null)cache=new ArtworkDiskCache(new File(getContext().getCacheDir(),"artwork-v1"),
                 150L*1024*1024,1000,30L*24*60*60*1000,8L*1024*1024); }
-        try {File hit=cache.getCached(uri,System.currentTimeMillis());if(hit!=null){resolve(call,hit);return;}}
+        try {File hit=cache.getCached(uri,scope,System.currentTimeMillis());if(hit!=null){resolve(call,hit);return;}}
         catch(IOException ignored){call.reject("CACHE_UNAVAILABLE");return;}
         try { executor.execute(() -> {
             try {
-                File file=cache.get(uri,System.currentTimeMillis(),ArtworkCachePlugin::fetch,image -> {
+                File file=cache.get(uri,scope,System.currentTimeMillis(),ArtworkCachePlugin::fetch,image -> {
                     BitmapFactory.Options options=new BitmapFactory.Options(); options.inJustDecodeBounds=true;
                     BitmapFactory.decodeFile(image.getAbsolutePath(),options);
                     return options.outWidth>0 && options.outHeight>0 && (long)options.outWidth*options.outHeight<=80_000_000;

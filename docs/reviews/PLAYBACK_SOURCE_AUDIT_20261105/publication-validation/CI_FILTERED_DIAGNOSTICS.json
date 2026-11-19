@@ -1,0 +1,71 @@
+{
+  "observedUTC": "2026-11-05T18:28:36.669Z",
+  "data": [
+    {
+      "run": "42083181697",
+      "scope": "Filtered safe diagnostic/error lines only; child-suite full log not uploaded by original workflow",
+      "lines": [
+        "canonical (windows-latest)\tRun npm run canon:test\t2026-11-05T18:20:32.2838862Z PASS CI_DIAG_RECEIPT_REQUIRED",
+        "canonical (windows-latest)\tRun npm run canon:test\t2026-11-05T18:20:32.2983429Z PASS CI_DIAG_RECEIPT_IMMUTABLE",
+        "canonical (windows-latest)\tRun npm run canon:test\t2026-11-05T18:20:32.4486489Z PASS CI_DIAG_RUNNER_SILENT_CHANGE",
+        "canonical (windows-latest)\tRun npm run canon:test\t2026-11-05T18:21:34.6743799Z REGRESSION_LOCK=FAIL scripts/test-app-intro-branding-07.mjs",
+        "canonical (windows-latest)\tRun npm run canon:test\t2026-11-05T18:21:34.6748708Z CI_DIAG_FAILED_SUITE=scripts/test-app-intro-branding-07.mjs",
+        "canonical (windows-latest)\tRun npm run canon:test\t2026-11-05T18:21:34.6749406Z CI_DIAG_EXIT_CODE=1",
+        "canonical (windows-latest)\tRun npm run canon:test\t2026-11-05T18:21:34.6749924Z CI_DIAG_SIGNAL=NONE",
+        "canonical (windows-latest)\tRun npm run canon:test\t2026-11-05T18:21:34.6752454Z CI_DIAG_LAST_PASS=PASS WEB_ENTRY_HAS_NO_NATIVE_WAIT|PASS NATIVE_BOOT_WAIT_AND_SHARED_COMPLETION|PASS SKIP_AND_LIFECYCLE_REASONS_RELEASE_SAME_ORIGINAL_ENTRY|PASS MISSING_OR_THROWING_BRIDGE_CANNOT_BLOCK_BOOT|PASS HUNG_BRIDGE_TIMEOUT_AND_LATE_CALLBACK_ARE_BOUNDED",
+        "canonical (windows-latest)\tRun npm run canon:test\t2026-11-05T18:21:34.6754463Z CI_DIAG_ERROR_CODES=ERR_ASSERTION",
+        "canonical (windows-latest)\tRun npm run canon:test\t2026-11-05T18:21:34.6754989Z CI_DIAG_ERROR_KINDS=AssertionError",
+        "canonical (windows-latest)\tRun npm run canon:test\t2026-11-05T18:21:34.6811838Z AssertionError [ERR_ASSERTION]: SUITE_FAILED scripts/test-app-intro-branding-07.mjs",
+        "canonical (windows-latest)\tRun npm run canon:test\t2026-11-05T18:21:34.6815538Z   code: 'ERR_ASSERTION',",
+        "canonical (ubuntu-latest)\tRun npm run canon:test\t2026-11-05T18:20:07.9510160Z PASS CI_DIAG_RECEIPT_REQUIRED",
+        "canonical (ubuntu-latest)\tRun npm run canon:test\t2026-11-05T18:20:07.9596682Z PASS CI_DIAG_RECEIPT_IMMUTABLE",
+        "canonical (ubuntu-latest)\tRun npm run canon:test\t2026-11-05T18:20:08.0246977Z PASS CI_DIAG_RUNNER_SILENT_CHANGE",
+        "canonical (ubuntu-latest)\tRun npm run canon:test\t2026-11-05T18:21:00.9533800Z REGRESSION_LOCK=FAIL scripts/test-episode-general-identity.mjs",
+        "canonical (ubuntu-latest)\tRun npm run canon:test\t2026-11-05T18:21:00.9539337Z CI_DIAG_FAILED_SUITE=scripts/test-episode-general-identity.mjs",
+        "canonical (ubuntu-latest)\tRun npm run canon:test\t2026-11-05T18:21:00.9540127Z CI_DIAG_EXIT_CODE=1",
+        "canonical (ubuntu-latest)\tRun npm run canon:test\t2026-11-05T18:21:00.9540607Z CI_DIAG_SIGNAL=NONE",
+        "canonical (ubuntu-latest)\tRun npm run canon:test\t2026-11-05T18:21:00.9549696Z CI_DIAG_LAST_PASS=PASS DISTINCT_SERIES_NOT_FIXED_TO_ONE_PUBLIC_TITLE_OR_ID|PASS MISMATCHED_DISTRIBUTION_USES_SERIES_BACKDROP_NO_CARTOON_OR_FALSE_SYNOPSIS|PASS PARENT_BACKDROP_READY_BEFORE_SEASON_OR_ON_HTTP_FAILURE|PASS EDIT_COMBINATION_DUPLICATES_DURATION_AND_EPISODE_ID_REJECTED|PASS FULL_RELEASE_PREFIX_REQUIRED_AND_LOCAL_NUMBER_CONFLICT_BLOCKED|PASS NO_BACKDROP_USED_AS_EPISODE_PROOF_OR_UNSAFE_ARTWORK|PASS REAL_SERVICE_LOCALIZED_EN_TITLE_REQUIRES_PUBLIC_POSTER_YEAR_CONTEXT|PASS LOCALIZED_WRONG_PUBLIC_POSTER_YEAR_COUNTRY_ID_NETWORK_OR_HTTP_REJECTED|PASS LOCALIZED_HOMONYMS_AND_MORE_THAN_TWO_CANDIDATES_FAIL_CLOSED|PASS NO_NEW_LOCALIZED_REQUEST_WITHOUT_EPISODIC_CONTEXT_POSTER_YEAR_OR_FOR_MOVIES|PASS EXISTING_LOCAL_MATCH_HAS_NO_ADDITIONAL_ENGLISH_REQUEST|PASS NEW_LOCALIZED_KEY_ESCAPES_PREVIOUS_NEGATIVE_CACHE",
+        "canonical (ubuntu-latest)\tRun npm run canon:test\t2026-11-05T18:21:00.9555129Z CI_DIAG_ERROR_CODES=",
+        "canonical (ubuntu-latest)\tRun npm run canon:test\t2026-11-05T18:21:00.9555797Z CI_DIAG_ERROR_KINDS=ENOENT",
+        "canonical (ubuntu-latest)\tRun npm run canon:test\t2026-11-05T18:21:00.9581645Z AssertionError [ERR_ASSERTION]: SUITE_FAILED scripts/test-episode-general-identity.mjs",
+        "canonical (ubuntu-latest)\tRun npm run canon:test\t2026-11-05T18:21:00.9589631Z   code: 'ERR_ASSERTION',"
+      ]
+    },
+    {
+      "run": "42083181589",
+      "scope": "Filtered safe diagnostic/error lines only; child-suite full log not uploaded by original workflow",
+      "lines": [
+        "site-build (ubuntu-latest)\tRun npm run canon:test\t2026-11-05T18:20:11.4170981Z PASS CI_DIAG_RECEIPT_REQUIRED",
+        "site-build (ubuntu-latest)\tRun npm run canon:test\t2026-11-05T18:20:11.4240256Z PASS CI_DIAG_RECEIPT_IMMUTABLE",
+        "site-build (ubuntu-latest)\tRun npm run canon:test\t2026-11-05T18:20:11.4740309Z PASS CI_DIAG_RUNNER_SILENT_CHANGE",
+        "site-build (ubuntu-latest)\tRun npm run canon:test\t2026-11-05T18:20:50.3858968Z REGRESSION_LOCK=FAIL scripts/test-series-episode-return.mjs",
+        "site-build (ubuntu-latest)\tRun npm run canon:test\t2026-11-05T18:20:50.3862806Z CI_DIAG_FAILED_SUITE=scripts/test-series-episode-return.mjs",
+        "site-build (ubuntu-latest)\tRun npm run canon:test\t2026-11-05T18:20:50.3884335Z CI_DIAG_EXIT_CODE=1",
+        "site-build (ubuntu-latest)\tRun npm run canon:test\t2026-11-05T18:20:50.3884658Z CI_DIAG_SIGNAL=NONE",
+        "site-build (ubuntu-latest)\tRun npm run canon:test\t2026-11-05T18:20:50.3884958Z CI_DIAG_LAST_PASS=",
+        "site-build (ubuntu-latest)\tRun npm run canon:test\t2026-11-05T18:20:50.3885219Z CI_DIAG_ERROR_CODES=",
+        "site-build (ubuntu-latest)\tRun npm run canon:test\t2026-11-05T18:20:50.3885512Z CI_DIAG_ERROR_KINDS=",
+        "site-build (ubuntu-latest)\tRun npm run canon:test\t2026-11-05T18:20:50.3896235Z AssertionError [ERR_ASSERTION]: SUITE_FAILED scripts/test-series-episode-return.mjs",
+        "site-build (ubuntu-latest)\tRun npm run canon:test\t2026-11-05T18:20:50.3900440Z   code: 'ERR_ASSERTION',",
+        "site-build (windows-latest)\tRun npm run canon:test\t2026-11-05T18:20:41.3148158Z PASS CI_DIAG_RECEIPT_REQUIRED",
+        "site-build (windows-latest)\tRun npm run canon:test\t2026-11-05T18:20:41.3326561Z PASS CI_DIAG_RECEIPT_IMMUTABLE",
+        "site-build (windows-latest)\tRun npm run canon:test\t2026-11-05T18:20:41.4898858Z PASS CI_DIAG_RUNNER_SILENT_CHANGE",
+        "site-build (windows-latest)\tRun npm run canon:test\t2026-11-05T18:21:44.2044742Z REGRESSION_LOCK=FAIL scripts/test-app-intro-branding-07.mjs",
+        "site-build (windows-latest)\tRun npm run canon:test\t2026-11-05T18:21:44.2049087Z CI_DIAG_FAILED_SUITE=scripts/test-app-intro-branding-07.mjs",
+        "site-build (windows-latest)\tRun npm run canon:test\t2026-11-05T18:21:44.2049835Z CI_DIAG_EXIT_CODE=1",
+        "site-build (windows-latest)\tRun npm run canon:test\t2026-11-05T18:21:44.2050409Z CI_DIAG_SIGNAL=NONE",
+        "site-build (windows-latest)\tRun npm run canon:test\t2026-11-05T18:21:44.2053211Z CI_DIAG_LAST_PASS=PASS WEB_ENTRY_HAS_NO_NATIVE_WAIT|PASS NATIVE_BOOT_WAIT_AND_SHARED_COMPLETION|PASS SKIP_AND_LIFECYCLE_REASONS_RELEASE_SAME_ORIGINAL_ENTRY|PASS MISSING_OR_THROWING_BRIDGE_CANNOT_BLOCK_BOOT|PASS HUNG_BRIDGE_TIMEOUT_AND_LATE_CALLBACK_ARE_BOUNDED",
+        "site-build (windows-latest)\tRun npm run canon:test\t2026-11-05T18:21:44.2055417Z CI_DIAG_ERROR_CODES=ERR_ASSERTION",
+        "site-build (windows-latest)\tRun npm run canon:test\t2026-11-05T18:21:44.2055955Z CI_DIAG_ERROR_KINDS=AssertionError",
+        "site-build (windows-latest)\tRun npm run canon:test\t2026-11-05T18:21:44.2090863Z AssertionError [ERR_ASSERTION]: SUITE_FAILED scripts/test-app-intro-branding-07.mjs",
+        "site-build (windows-latest)\tRun npm run canon:test\t2026-11-05T18:21:44.2094418Z   code: 'ERR_ASSERTION',"
+      ]
+    }
+  ],
+  "eol": {
+    "localRawSha256": "aefd904186e289cd4dc56b21ee40ccc876909991099e50dcf2f904e38e9269c7",
+    "lfSha256": "aefd904186e289cd4dc56b21ee40ccc876909991099e50dcf2f904e38e9269c7",
+    "crlfSha256": "e14d521cf6c88d5b3dfeb44fa6f29c7abc92dd6a01f2361bf1eed443a8bff603",
+    "scope": "Computed in memory; no source file altered. Does not attest actual CI checkout bytes."
+  }
+}

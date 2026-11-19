@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "gate": "CANON-01-TMDB-EPISODE-RUNTIME-RECOVERY",
+  "parentGate": "CANON-01",
+  "amendment": "CANON-01-TMDB-EPISODE-RUNTIME-RECOVERY",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "CURRENT_USER_FIRE_EPISODE_METADATA_BUG_AND_EXPLICIT_NUMBERED_RELEASE_POLICY_REPLY_2026_10_28; USER_LIVE_FIRE_PREVIEW_BEFORE_FINAL_PACKAGING; ORIGIN_IS_USER_NOT_NEW_MASTER_ATTACHMENT",
+  "authorizationRequestSha256": "d1f045956382c0af5d44a4ffdba6941a87f849fe026ab4a8d09769bed2b15289",
+  "reason": "Repair missing isolated-build TMDB configuration and allow explicitly qualified series SxxExx presentation mapping under exact title/poster proof, without source mutations or number/index-only guessing.",
+  "physicalImpact": "REQUIRED",
+  "physicalImpactJustification": "Validate transient web assets on connected Fire, then exact final APK; other devices remain pending.",
+  "testChangesReviewed": true,
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c105-complete-root-search.mjs",
+    "scripts/test-c107-catalog-return-navigation.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c11-landscape-navigation.mjs",
+    "scripts/validate-direct-playback.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock",
+    "npm run typecheck",
+    "node scripts/test-c135-active-source.mjs",
+    "node scripts/test-c11-automatic-source-refresh.mjs",
+    "node scripts/test-tmdb-episode-enrichment.mjs",
+    "node scripts/test-tmdb-episode-runtime-recovery.mjs",
+    "npm run security:check",
+    "npm run playback:check",
+    "npm run update:check",
+    "official production npm run build with isolated public config wrapper",
+    "Gradle offline testDebugUnitTest assembleDebug; APK audits; Fire preview/final UI"
+  ],
+  "evidence": "docs/evidence/TMDB_EPISODE_RUNTIME_RECOVERY.md",
+  "compatibilityRisk": "Matching is additive only for full series name and exact anchored SxxExx under title/poster confirmation; no year/id/season/distribution/edition conflict is accepted. Generic numbering remains ambiguous. Source authority and availability unchanged.",
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": true,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false,
+  "supersedes": {
+    "src/catalog/episode-presentation.ts": "CANON-01-TMDB-EPISODE-METADATA-ENRICHMENT",
+    "src/ui/hooks/useEpisodeMetadata.ts": "CANON-01-TMDB-EPISODE-METADATA-ENRICHMENT",
+    "android/app/build.gradle": "CANON-01-P250-V139-CANONICAL-RECOVERY",
+    "scripts/test-canonical-regression.mjs": "CANON-01-P250-V139-CANONICAL-RECOVERY"
+  },
+  "changes": [
+    {
+      "path": "src/catalog/episode-presentation.ts",
+      "before": "7791f883e248073d54943918a7fb102c052dd579",
+      "after": "7a2777f1856506e889d79cf4a6d5c1737ea15ad2"
+    },
+    {
+      "path": "src/ui/hooks/useEpisodeMetadata.ts",
+      "before": "46d7ba286869ca7933653cc83a783f5c65ebf933",
+      "after": "d7dfe05be943a3168f55cd6c036f58110d6c5fad"
+    },
+    {
+      "path": "android/app/build.gradle",
+      "before": "bd2883c2d64c0821e1ed2467d753ac294218c177",
+      "after": "488bd676d305a72ab09fd2ae75dfb04a63cf04bb"
+    },
+    {
+      "path": "scripts/build-isolated-public-config.mjs",
+      "before": null,
+      "after": "05076bf0acf2b43af212c649653e9542bf03ab83"
+    },
+    {
+      "path": "scripts/test-tmdb-episode-runtime-recovery.mjs",
+      "before": null,
+      "after": "2f20376a9ad42863162e21eae5481b99c4f141e1"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "0da6ebc6cabdb9833a78ea0d0ee9d556e71660bd",
+      "after": "2ef0b1f77d9a5b87de9d93abc4226174612b8c19"
+    }
+  ],
+  "restrictions": [
+    "No root/old workspace/old receipt/verifier edits; four normative prefixes append-only.",
+    "No Git publication, administrative backend, source change, reset or device other than same Fire.",
+    "Only final packaging after preview and regressions; no SET01 or next gate."
+  ]
+}

@@ -1,0 +1,67 @@
+PASS C11_NEW_DEVICE_ACTIVATION_AND_CATALOG_LOCK_V1_STATIC_INVARIANTS
+PASS LOCK_NEGATIVE_CONTROLS=9
+PASS SHA256_native
+PASS SHA256_absent
+PASS SHA256_rejected
+PASS SHA256_stalled
+PASS CONCURRENT_LOCAL_VALUES_AND_RELOAD_STABLE
+PASS TWO_CLEAN_DEVICES_ISOLATED_ACTIVATION_AND_RELOAD
+PASS OFFLINE_STILL_GENERATES_LOCAL_KEY
+PASS NATIVE_FAILURE_LOCALSTORAGE_VERIFIED
+PASS LOCALSTORAGE_FAILURE_NATIVE_VERIFIED
+PASS FAILED_PERSISTENCE_RETRY_DOES_NOT_ROTATE
+PASS HUNG_READ_NEVER_OVERWRITES_UNKNOWN_KEY
+PASS HUNG_READ_USES_EXISTING_LOCAL_COPY
+PASS DENIED_READ_IS_NOT_ABSENT_AND_NEVER_ROTATES
+PASS EXISTING_NATIVE_KEY_READ_ONLY_PRESERVED
+PASS BOOT_AND_UI_SHARE_ONE_A1_REQUEST_AND_PORTAL_HASH
+PASS INDETERMINATE_STATUS_PRESERVES_PENDING_SESSION
+PASS DELETED_PENDING_REQUEST_RECREATED_WITH_SAME_LOCAL_IDENTITY_AND_KEY
+PASS DELETION_RECOVERY_FAILURE_PRESERVES_OLD_CAPABILITY_UNTIL_SUCCESS
+PASS CAPABILITY_OR_UNKNOWN_FAILURE_NEVER_RECREATES_PENDING_REQUEST
+PASS DELETION_RECOVERY_REGISTER_FAILURE_RETRIES_NEW_REQUEST_WITHOUT_ROTATION
+PASS FAILED_REGISTER_IS_NOT_READY_AND_RETRY_REUSES_SESSION
+PASS HUNG_REPORT_IS_BOUNDED_LOCAL_KEY_REMAINS_READY
+PASS AUTHORIZED_STATE_PRESERVED_NO_NEW_REQUEST
+PASS CLEAN_BOOT_IDLES_WITHOUT_SOURCE_LOOKUP_OR_LICENSE_ERROR
+PASS BACKUP_EXCLUDES_IDENTITY_AND_WEBVIEW_COPIES
+[BOOT_TELEMETRY] T7_SOURCE_RESOLUTION_READY reached at +-1793901959987ms
+PASS AUTHORIZED_BOOT_STILL_RESOLVES_AND_PRESERVES_REAL_CATALOG
+RESULT=26_TESTS_PASSED (isolated mocks; no live backend writes)
+PASS fresh install: mkdir parent then rename, read model ready
+PASS actual stageArtifacts -> rename -> Bootstrap read model
+PASS actual stageArtifacts -> copy -> Bootstrap read model
+PASS existing directories native: stat-confirmed and old snapshot preserved
+PASS existing directories web: stat-confirmed and old snapshot preserved
+PASS existing directories posix: stat-confirmed and old snapshot preserved
+PASS rename unavailable: fallback creates target and canonical segments before pointer
+PASS fallback on fresh install: full Bootstrap -> storage -> active read model
+PASS fallback on update: keeps previous generation
+PASS existing non-active partial target: fallback recovers without changing old generation
+PASS mkdir OS-PLUG-FILE-0007: propagated, active and identities intact
+PASS mkdir ENOSPC: propagated, active and identities intact
+PASS mkdir BRIDGE_UNAVAILABLE: propagated, active and identities intact
+PASS target mkdir failure: old pointer and snapshot intact
+PASS segments mkdir failure: incomplete target cleaned, old active intact
+PASS already exists but is a file: reject, never delete file
+PASS already exists but stat fails: do not swallow I/O error
+PASS copy failure /manifest.json: cleanup candidate only, preserve old active
+PASS copy failure /catalog.json: cleanup candidate only, preserve old active
+PASS copy failure /segments/streams_000001.json: cleanup candidate only, preserve old active
+PASS same active snapshot repeat: reject before deleting data
+PASS same active snapshot hash conflict: reject before deleting data
+PASS staging and binary index mkdir idempotence: existing data unchanged
+PASS concurrent mkdir for index writes: existing-directory race tolerated
+PASS negative control no-op ensureDir rename: reproduces reported failure
+PASS negative control no-op ensureDir copy: reproduces reported failure
+PASS negative control no-op with existing parent: explains device-dependent success
+C11_CATALOG_PROMOTION_DIRECTORY_TESTS=27/27_PASS
+ANDROID_BRIDGE_MODEL_ONLY_PHYSICAL_REVALIDATION=PENDING
+PASS Vercel POSIX root survives chained imports
+PASS POSIX spaces, Unicode, hash and literal percent
+PASS POSIX relative dot segments
+PASS Windows C drive
+PASS Windows D drive with special characters
+PASS Windows UNC share
+C153_ACTIVATION_LOADER_PATHS=6/6_PASS
+C11_NEW_DEVICE_ACTIVATION_AND_CATALOG_LOCK_V1=PASS

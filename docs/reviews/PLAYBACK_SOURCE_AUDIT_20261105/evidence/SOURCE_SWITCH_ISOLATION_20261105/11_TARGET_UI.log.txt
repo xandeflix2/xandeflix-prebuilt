@@ -1,0 +1,5 @@
+PASS only exact authorized ready snapshot is eligible for UI exposure
+PASS App wires actual readiness before pages and novelty; reset closes normal playback then reloads
+PASS failed final cleanup never calls runtime reload
+ARTWORK_SCOPE_ISOLATION=PASS
+SOURCE_REPLACEMENT_UI=PASS 4 (readiness execution, static App wiring, real Java disk cache; physical UI pending)

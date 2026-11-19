@@ -1,0 +1,189 @@
+{
+  "schema": 1,
+  "gate": "CANON-01-HOME-DPAD-CAROUSEL-PREVIEW-PAGINATION-02",
+  "parentGate": "CANON-01",
+  "amendment": "CANON-01-HOME-DPAD-CAROUSEL-PREVIEW-PAGINATION-02",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "EXPLICIT_USER_ATTACHED_HOME_DPAD_CAROUSEL_PREVIEW_PAGINATION_02_2026_10_25",
+  "authorizationRequestSha256": "64cd3527d66926b1455727d27bac239c1b061723849c28d5aa4b3b318ad36380",
+  "reason": "Reuse validated details trailer when optional official flag is missing, fixed D-pad rail focus anchor and local cursor-based category continuation with20 initial/batch, prefetch6,24 mounted cards. Native playback proof remains independent. Physical isolated native public player showed buffering past8s and real muted progression at13-17s. Card startup bounded25s, shared class default8s preserved, initial paused state ignored until playing.",
+  "physicalImpact": "REQUIRED",
+  "physicalImpactJustification": "Real embedded trailer and low-resource D-pad/virtual window responsiveness need hardware evidence; fixtures alone cannot certify playback.",
+  "testChangesReviewed": true,
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c105-complete-root-search.mjs",
+    "scripts/test-c107-catalog-return-navigation.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c11-landscape-navigation.mjs",
+    "scripts/validate-direct-playback.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock",
+    "npm run typecheck",
+    "npm run playback:check",
+    "npm run build",
+    "node scripts/test-home-dpad-carousel-preview-pagination.mjs",
+    "gradlew.bat --offline --no-daemon --max-workers=2 --console=plain testDebugUnitTest"
+  ],
+  "evidence": "docs/evidence/HOME_DPAD_CAROUSEL_PREVIEW_PAGINATION_02.md",
+  "compatibilityRisk": "Actual candidate session/adapter bundled only in RAM on Fire Stick played the matched public trailer muted after3s wait and beyond8s native buffering; time progression confirmed. Full newly installed carousel APK is still pending. Anchor logic is centralized after a browser race was detected; no performance SLA or universal autoplay claim.",
+  "restrictions": [
+    "Only paths in the preceding closed candidate allowlist; actual grants are the changed subset. Preserve34 receipts/185 controls30 suites and every previous assertion.",
+    "No main/source/Live player, source delivery/import/storage/auth/parental rules/activation/Supabase/PostgreSQL/version/dependency/manifest/workflow/verifier or Git/remote/publication changes.",
+    "Home category seed20 stays a first-fold cache, not total. Real local loadPage cursor20 count:false, prefetch6, deduplicated single job, explicit retry, abort on exit/generation; stable order/identity.",
+    "Virtualized rails at most24 mounted cards, logical indices and spacers; actual D-pad only anchor, touch dimensions preserved. One optional public trailer lease, no full source content.",
+    "Real playback only if playing and progress observed. No APK/new device installation/reset in this implementation cycle. No next implementation."
+  ],
+  "previousGovernanceHashes": {
+    "docs/governance/CANON_CHANGE_AUTHORIZATION.json": "e73152f228cbb625c508062d70ef810e8342059a",
+    "docs/governance/CANON_01_LEGACY_TESTS_AUTHORIZATION.json": "e59e2d328db3d0dfd8c1d873b154e2e3f7900a0c",
+    "docs/governance/CANON_01_AUTHORIZATION_HARDENING.json": "766db763ee98aeeb33230c2828f050a8527555b7",
+    "docs/governance/authorizations/CANON-01-VERCEL-BUILD-A1.json": "7edaa32c4b13c8295fc0daa64abed1ef7a4b0c2d",
+    "docs/governance/authorizations/CANON-01-VERCEL-A2-ARTIFACT.json": "fb613a143676e3e32267ebacb3bec81123791823",
+    "docs/governance/authorizations/CANON-01-VERCEL-A22A.json": "c698fec429f4058118d4701a7f5208ece9a0b0d1",
+    "docs/governance/authorizations/CANON-01-A22A-CI-DIAG.json": "7d89451bf23a05fa1ba819b72b99b28025aa7a66",
+    "docs/governance/authorizations/CANON-01-A22A-WINDOWS-EOL.json": "73ffd5ed494cb87a7c0d22e4a8a3f94252cf321e",
+    "docs/governance/authorizations/CANON-01-SOURCE-OUTPUT.json": "a93d98a1022f99c0e0957dd8f4a2c7d078b8f588",
+    "docs/governance/authorizations/CANON-01-CATALOG-READ-DIAG.json": "169b19ee02a4c1cacbe575cded00ec02928fa3c7",
+    "docs/governance/authorizations/CANON-01-XUI-OPAQUE-RECOVERY.json": "cf4176d0007b4a04997bf2631558bd9d954fd6f7",
+    "docs/governance/authorizations/CANON-01-CATALOG-PHYSICAL-FIXES.json": "ea179b852518e2a14c7ee79b6c3c72e76c0df6a9",
+    "docs/governance/authorizations/CANON-01-SERIES-POSTER-COMPOSITION.json": "645dc8b2b5d4b822bc83d72e9f5ab9f4f4cb4347",
+    "docs/governance/authorizations/CANON-01-TMDB-CONTEXT-IDENTITY.json": "3ab236bab99175dcb5374047c2fc6565650d8945",
+    "docs/governance/authorizations/CANON-01-TMDB-SUBTITLE-PREVIEW.json": "5e50d1c29c33b5fe3455112818e978213d065e96",
+    "docs/governance/authorizations/CANON-01-CATALOG-RETENTION.json": "b3c18f01ba1e753597af3a162c2605669dcd4e6b",
+    "docs/governance/authorizations/CANON-01-DETAIL-BACKDROP-UI.json": "579097e952a7ddf142ba885aaf23e164c0241e54",
+    "docs/governance/authorizations/CANON-01-DETAIL-BACKDROP-TYPES.json": "da8c532e25e220040bba3c942bad41507d4b9245",
+    "docs/governance/authorizations/CANON-01-TV-SIDEBAR-COMPOSITION.json": "f5d43f845cd4e3fdb7947dc33e4f9b3df8669ab7",
+    "docs/governance/authorizations/CANON-01-A22A-WINDOWS-METADATA-EOL.json": "90d7db4a18e84221afa6fa9dda40c82d6dad6121",
+    "docs/governance/authorizations/CANON-01-VERCEL-PREBUILT-RECOVERY-01.json": "9cb685590481ba094ffbca2e2abe2f585aa3ae46",
+    "docs/governance/authorizations/CANON-01-OPAQUE-HLS-MIME-RECOVERY.json": "5a8c735b59f921a5d24be15f6c14f32541687719",
+    "docs/governance/authorizations/CANON-01-STREAMED-VOD-INVENTORY-RECOVERY.json": "a16dd131aa09b3027724ea94f49a6d841551a9cb",
+    "docs/governance/authorizations/CANON-01-TABLET-SIDEBAR-TRANSPARENCY.json": "ffcc5c6c6005e4fcd24ce40ba776950bf55a5dbe",
+    "docs/governance/authorizations/CANON-01-HERO-PLATFORM-COMPOSITION.json": "75f9ca539c1723ca1db6c2e8948a63a3a19d5264",
+    "docs/governance/authorizations/CANON-01-HERO-PLATFORM-ALIGNMENT.json": "66a112450541d8a038292d8b07d08cc5547ad51e",
+    "docs/governance/authorizations/CANON-01-LIVE-SINGLE-TRANSPORT.json": "039d22359310380cd79432efe17f9533c93fb6cb",
+    "docs/governance/authorizations/CANON-01-NETWORK-DIAGNOSTICS.json": "80a4d01348eb82b4a7cafd4836c3f221d97e02e5",
+    "docs/governance/authorizations/CANON-01-NETWORK-UI-POLISH.json": "2fc3ce79b3a78454e7ad15f1d06002a6bc69d594",
+    "docs/governance/authorizations/CANON-01-LIVE-NETWORK-ACTIONS.json": "e345e800a7a52d79241701cb5fd13f34bc699e01",
+    "docs/governance/authorizations/CANON-01-TV-CAST-SENDER-HIDDEN.json": "f1e466b249afac7a6dab2a62952dc83a4dd31540",
+    "docs/governance/authorizations/CANON-01-TMDB-RELEASE-TAGS.json": "30bcebd64ad85f8d981f09b320cbf3864b6bad7a",
+    "docs/governance/authorizations/CANON-01-VOD-DPAD-HIDDEN-CONTROLS.json": "f33a7c6510ca7fe14f22367d0da0344e285e754a",
+    "docs/governance/authorizations/CANON-01-DPAD-EXPANDED-CARDS-AUTOPREVIEW-01.json": "8d031488e5175dc1a0fbca3246345be638074fe7"
+  },
+  "supersedes": {
+    "src/ui/components/MediaCard.tsx": "CANON-01-DPAD-EXPANDED-CARDS-AUTOPREVIEW-01",
+    "src/ui/expanded-card-controller.ts": "CANON-01-DPAD-EXPANDED-CARDS-AUTOPREVIEW-01",
+    "src/ui/components/CardExpansion.tsx": "CANON-01-DPAD-EXPANDED-CARDS-AUTOPREVIEW-01",
+    "src/ui/components/CardExpansion.css": "CANON-01-DPAD-EXPANDED-CARDS-AUTOPREVIEW-01",
+    "src/artwork/series-presentation.service.ts": "CANON-01-DPAD-EXPANDED-CARDS-AUTOPREVIEW-01",
+    "scripts/test-canonical-regression.mjs": "CANON-01-DPAD-EXPANDED-CARDS-AUTOPREVIEW-01",
+    "src/ui/card-preview-media.ts": "CANON-01-DPAD-EXPANDED-CARDS-AUTOPREVIEW-01",
+    "src/ui/card-preview-session.ts": "CANON-01-DPAD-EXPANDED-CARDS-AUTOPREVIEW-01",
+    "scripts/test-c11-artwork-visible-recovery.mjs": "CANON-01-DETAIL-BACKDROP-UI"
+  },
+  "changes": [
+    {
+      "path": "src/ui/rail-pagination.ts",
+      "before": null,
+      "after": "5ceaefc0ddbcd3608c93f04d961ff7f4277ae7aa"
+    },
+    {
+      "path": "src/ui/components/ProgressiveCategoryRail.tsx",
+      "before": null,
+      "after": "8cda9f58f8cfed14aab9092ee259c32707824c9b"
+    },
+    {
+      "path": "src/ui/components/MediaRail.tsx",
+      "before": "22b36698d677fb25bc6e2b29acb02f9a48fc3e2a",
+      "after": "4636dc98fe8d4f0063c173f3251f763284ac8b15"
+    },
+    {
+      "path": "src/ui/components/MediaCard.tsx",
+      "before": "3a6893525c8e7f2e1d732310174c9a8aa9d269c6",
+      "after": "b93159d9370f4380edae0733c5f05649f0b10266"
+    },
+    {
+      "path": "src/ui/components/AsyncCategoryRail.tsx",
+      "before": "c747b41baa7b3592404bfa993c838b0606107531",
+      "after": "45332874482370afb519dedeccf2c95b02781129"
+    },
+    {
+      "path": "src/ui/pages/HomePage.tsx",
+      "before": "8efe89c34bbad34fbe9691ec142d68c7c1f0cae9",
+      "after": "501743dc21f72395a0482d3836aa4620af729cad"
+    },
+    {
+      "path": "src/ui/hooks/useDpadNavigation.ts",
+      "before": "2ba9ccabb6be70ede64075b26c8e3e26c42102de",
+      "after": "f3c89d0e587d8eb504e2d54f22c0cc7b6e851608"
+    },
+    {
+      "path": "src/ui/expanded-card-controller.ts",
+      "before": "c70279c6f573e426c6b6935aa225e62375a811a2",
+      "after": "5b8a46fb17ff65bd6f115d18a1fc19853db2aafa"
+    },
+    {
+      "path": "src/ui/components/CardExpansion.tsx",
+      "before": "11e55e9fe7c693171297c8ccbc2e173e1a239f10",
+      "after": "08093c695eaae378b6ee8df691c9a2667855ffbc"
+    },
+    {
+      "path": "src/ui/components/CardExpansion.css",
+      "before": "808a36ec9004f6821eceb5e35b3dbd56250370d0",
+      "after": "76a299e08816f8d7d6a582a70934b1cd7e8bb8da"
+    },
+    {
+      "path": "src/artwork/series-presentation.service.ts",
+      "before": "a1a60eef635108626c038d4f1b42f60c7c033d48",
+      "after": "b4f3d4e16d3746b01afbcb4b8358ed6d3c0242f5"
+    },
+    {
+      "path": "src/ui/card-preview-media.ts",
+      "before": "a9412a780f64c5768e5de032d677ebac6a4aea92",
+      "after": "ab5cd9c6586650ebbe3aa6ba1381f92864c1b531"
+    },
+    {
+      "path": "src/ui/card-preview-session.ts",
+      "before": "b2a1b920d9b28adcd64a8deac925425fd68c4236",
+      "after": "74064c250c9b2993c001121bec647d9bcaf4db67"
+    },
+    {
+      "path": "scripts/test-home-dpad-carousel-preview-pagination.mjs",
+      "before": null,
+      "after": "e98a3d955f8f03d37e39c8f91e931a7c7c97d60c"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "12d3d273276a07b50c643fd66247bf110b319b96",
+      "after": "d87957f48cd8fed535844646f921e3af4d3fd4dd"
+    },
+    {
+      "path": "scripts/test-c11-artwork-visible-recovery.mjs",
+      "before": "6cf789021d220e96f295c098fbb99ca6bd53c842",
+      "after": "c22dfde42f7fece7f019506fcd4496b7b3be6be0"
+    },
+    {
+      "path": "scripts/test-c11-category-rails.mjs",
+      "before": "c5a18b131679dc590cd5dda7229b5bd6af241d47",
+      "after": "39d16cd6bf08272ce740874d553115efa061230d"
+    },
+    {
+      "path": "scripts/test-c11-startup-artwork.mjs",
+      "before": "edbff2692dfa87b9d3258ffafa7b51eed9ed7353",
+      "after": "77300d3379cbe84524fe16003fdeabee926d3909"
+    }
+  ],
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": true,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false
+}

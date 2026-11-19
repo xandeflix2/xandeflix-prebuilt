@@ -1,0 +1,28 @@
+{
+  "observedUTC": "2026-11-04T19:06:21.530Z",
+  "label": "tablet",
+  "query": "Matéria Escura",
+  "elapsedMs": 3689,
+  "state": {
+    "text": "SÉRIE\n2024\n0 Temporadas\nMatéria Escura (2024)\nTítulo original: Dark Matter\nSci-Fi & Fantasy\nDrama\nSinopse\n\nJason Dessen é sequestrado para uma versão alternativa de sua vida. Em busca de voltar para sua verdadeira família, ele embarca em uma jornada angustiante para salvá-los do inimigo mais terrível que se possa imaginar: ele mesmo.\n\n▶ Assistir trailer\nAvaliar\nFavoritos\nCompartilhar\n← Voltar\nEpisódios\nTítulos semelhantes\nElenco\n\nNão foi possível carregar os episódios.\n\nTentar novamente",
+    "loading": false,
+    "events": [
+      {
+        "method": "startDownload",
+        "success": false,
+        "errorCode": "UNKNOWN_TRANSPORT_ERROR",
+        "stage": "HTTP_RESPONSE",
+        "httpStatusClass": "UNKNOWN",
+        "httpResponseReceived": "NAO",
+        "retryable": false,
+        "bytesWritten": 0
+      }
+    ],
+    "headings": [
+      "Nova versão pronta para instalar",
+      "Matéria Escura (2024)",
+      "Título original: Dark Matter",
+      "O que achou desta série?"
+    ]
+  }
+}

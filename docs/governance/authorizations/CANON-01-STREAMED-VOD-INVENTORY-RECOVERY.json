@@ -1,0 +1,119 @@
+{
+  "schema": 1,
+  "gate": "CANON-01-STREAMED-VOD-INVENTORY-RECOVERY",
+  "parentGate": "CANON-01",
+  "amendment": "CANON-01-STREAMED-VOD-INVENTORY-RECOVERY",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "EXPLICIT_USER_STREAMING_EXCEPTION_FIRE_CLEAN_INSTALL_AND_ACTIVATION_ARTWORK_REGRESSION_2026_10_23",
+  "authorizationRequestSha256": "083f0fc139d66586010a9d73abc7859ca0e610850377f3aa8982daafbc4cc304",
+  "reason": "Restore complete DIRECTORY_ROOTS with one same-origin global VOD transfer. Keep conventional materialization at16MiB and switch above it to approved64MiB raw/256KiB row/depth32/200000 raw rows/16MiB retained projection. Exact-content identities preserve all category memberships; conflicting identities fail. Overlap only two heavy roots requests, drain both on failure, and preserve public activation artwork without touching authority.",
+  "physicalImpact": "REQUIRED",
+  "physicalImpactJustification": "User authorizes clean reinstall only canonical package on identified Fire Stick, then legitimate manual activation and first-load measurement. No physical performance claim until measured.",
+  "testChangesReviewed": true,
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c105-complete-root-search.mjs",
+    "scripts/test-c107-catalog-return-navigation.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c11-landscape-navigation.mjs",
+    "scripts/validate-direct-playback.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock",
+    "npm run typecheck",
+    "npm run update:check",
+    "npm run security:check",
+    "npm run playback:check",
+    "npm run build",
+    "npm run site:build",
+    "node scripts/test-site-build-contract.mjs",
+    "node scripts/test-vercel-artifact-contract.mjs",
+    "node scripts/verify-vercel-artifact.mjs inspect",
+    "node scripts/test-vercel-prebuilt-contract.mjs",
+    "node scripts/test-c115-startup-trending.mjs",
+    "node scripts/test-c165-post-activation-startup.mjs",
+    "gradlew.bat --no-daemon --max-workers=2 assembleDebug testDebugUnitTest"
+  ],
+  "evidence": "docs/evidence/STREAMED_VOD_INVENTORY_RECOVERY.md",
+  "compatibilityRisk": "Small VOD documents retain original metadata/digests and all other readers retain16MiB. Large documents preserve every unique provider root and all matching-content categories. Conflicting duplicate metadata, invalid documents or any bound fail; PREFER may use the old slow fallback. Read-only API timing is not a first-install SLA or physical playback result.",
+  "restrictions": [
+    "Isolated local patch only. Preserve active L1 and all22 previous receipts.",
+    "Prior16MiB response restriction superseded only for the new streamed VOD reader under specifically approved64MiB/256KiB ceilings. Conventional fetchDirectoryJson stays16MiB.",
+    "Preserve140 previous canonical controls/23 suites,127 Prebuilt controls,215 JVM and HLS MIME recovery; no fabricated or skipped PASS.",
+    "ActivationPage change is decorative import/composition/CSS only. Identity, source, activation, license, polling, handlers and private values are unchanged. Public artwork receives no private props.",
+    "After full tests and APK audits, clean reinstall only AFTSS/package com.xandeflix.prebuilt. Do not restore/inject identity/source/activation; user activates through normal panel.",
+    "No other-device install/reset, backend administrative write, Vercel, Git publication/main, version change or next Gate."
+  ],
+  "previousGovernanceHashes": {
+    "docs/governance/CANON_CHANGE_AUTHORIZATION.json": "e73152f228cbb625c508062d70ef810e8342059a",
+    "docs/governance/CANON_01_LEGACY_TESTS_AUTHORIZATION.json": "e59e2d328db3d0dfd8c1d873b154e2e3f7900a0c",
+    "docs/governance/CANON_01_AUTHORIZATION_HARDENING.json": "766db763ee98aeeb33230c2828f050a8527555b7",
+    "docs/governance/authorizations/CANON-01-VERCEL-BUILD-A1.json": "7edaa32c4b13c8295fc0daa64abed1ef7a4b0c2d",
+    "docs/governance/authorizations/CANON-01-VERCEL-A2-ARTIFACT.json": "fb613a143676e3e32267ebacb3bec81123791823",
+    "docs/governance/authorizations/CANON-01-VERCEL-A22A.json": "c698fec429f4058118d4701a7f5208ece9a0b0d1",
+    "docs/governance/authorizations/CANON-01-A22A-CI-DIAG.json": "7d89451bf23a05fa1ba819b72b99b28025aa7a66",
+    "docs/governance/authorizations/CANON-01-A22A-WINDOWS-EOL.json": "73ffd5ed494cb87a7c0d22e4a8a3f94252cf321e",
+    "docs/governance/authorizations/CANON-01-SOURCE-OUTPUT.json": "a93d98a1022f99c0e0957dd8f4a2c7d078b8f588",
+    "docs/governance/authorizations/CANON-01-CATALOG-READ-DIAG.json": "169b19ee02a4c1cacbe575cded00ec02928fa3c7",
+    "docs/governance/authorizations/CANON-01-XUI-OPAQUE-RECOVERY.json": "cf4176d0007b4a04997bf2631558bd9d954fd6f7",
+    "docs/governance/authorizations/CANON-01-CATALOG-PHYSICAL-FIXES.json": "ea179b852518e2a14c7ee79b6c3c72e76c0df6a9",
+    "docs/governance/authorizations/CANON-01-SERIES-POSTER-COMPOSITION.json": "645dc8b2b5d4b822bc83d72e9f5ab9f4f4cb4347",
+    "docs/governance/authorizations/CANON-01-TMDB-CONTEXT-IDENTITY.json": "3ab236bab99175dcb5374047c2fc6565650d8945",
+    "docs/governance/authorizations/CANON-01-TMDB-SUBTITLE-PREVIEW.json": "5e50d1c29c33b5fe3455112818e978213d065e96",
+    "docs/governance/authorizations/CANON-01-CATALOG-RETENTION.json": "b3c18f01ba1e753597af3a162c2605669dcd4e6b",
+    "docs/governance/authorizations/CANON-01-DETAIL-BACKDROP-UI.json": "579097e952a7ddf142ba885aaf23e164c0241e54",
+    "docs/governance/authorizations/CANON-01-DETAIL-BACKDROP-TYPES.json": "da8c532e25e220040bba3c942bad41507d4b9245",
+    "docs/governance/authorizations/CANON-01-TV-SIDEBAR-COMPOSITION.json": "f5d43f845cd4e3fdb7947dc33e4f9b3df8669ab7",
+    "docs/governance/authorizations/CANON-01-A22A-WINDOWS-METADATA-EOL.json": "90d7db4a18e84221afa6fa9dda40c82d6dad6121",
+    "docs/governance/authorizations/CANON-01-VERCEL-PREBUILT-RECOVERY-01.json": "9cb685590481ba094ffbca2e2abe2f585aa3ae46",
+    "docs/governance/authorizations/CANON-01-OPAQUE-HLS-MIME-RECOVERY.json": "5a8c735b59f921a5d24be15f6c14f32541687719"
+  },
+  "supersedes": {
+    "src/source/real-source-importer.service.ts": "CANON-01-CATALOG-PHYSICAL-FIXES",
+    "scripts/test-canonical-regression.mjs": "CANON-01-OPAQUE-HLS-MIME-RECOVERY"
+  },
+  "changes": [
+    {
+      "path": "src/source/source-streamed-vod-inventory.ts",
+      "before": null,
+      "after": "e6b2939976e44a150464827b28bc0c19c819c909"
+    },
+    {
+      "path": "src/source/real-source-importer.service.ts",
+      "before": "1ca46d9658b11d3a290206da12fd0b6892744b88",
+      "after": "662562db833c93c192703cd3f15b394ae1cc57f5"
+    },
+    {
+      "path": "scripts/test-streamed-vod-inventory.mjs",
+      "before": null,
+      "after": "aa45b21d1c22659801d960612fff323eb4fde77e"
+    },
+    {
+      "path": "src/ui/pages/ActivationPage.tsx",
+      "before": "611c2be793792abf3cc378235ba41b626f67f287",
+      "after": "e2d3f1b854dbfbf60c20fb47842fdc8c350f7c4a"
+    },
+    {
+      "path": "src/ui/pages/ActivationPage.css",
+      "before": "77622641076122d7afe12e8cac9c8145f1f1d442",
+      "after": "d6503d335067dce24f1624c4505491604f844aeb"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "d752c9915c36f25582a961f63a100025e6ceddf5",
+      "after": "4aa9f24b83f2080008396cefc8d3d0a8867a3cd7"
+    }
+  ],
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": true,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false
+}

@@ -35,6 +35,28 @@ public class PhoneUiOrientationPolicyTest {
         assertEquals(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,
                 MainActivity.phoneUiOrientation(0, Configuration.UI_MODE_TYPE_NORMAL, false));
     }
+    @Test public void tabletUsesNormalWindowDimensionsInsteadOfPipBounds() {
+        int smallestDp = MainActivity.smallestNormalWindowDp(2560, 1600, 1.875f, 546);
+        assertEquals(853, smallestDp);
+        assertEquals(853, MainActivity.smallestNormalWindowDp(1600, 2560, 1.875f, 546));
+        assertEquals(546, MainActivity.smallestNormalWindowDp(0, 1600, 1.875f, 546));
+        assertEquals(360, MainActivity.smallestNormalWindowDp(1080, 2400, 3f, 300));
+        assertEquals(360, MainActivity.smallestNormalWindowDp(1080, 2400, Float.NaN, 360));
+        assertEquals(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,
+                MainActivity.phoneUiOrientation(smallestDp, Configuration.UI_MODE_TYPE_NORMAL, false));
+    }
+    @Test public void tabletHostReleasesStaleRequestAndLeavesPhoneAndTvPolicyIntact() {
+        assertTrue(MainActivity.shouldReleaseTabletOrientation(853, Configuration.UI_MODE_TYPE_NORMAL,
+                ActivityInfo.SCREEN_ORIENTATION_PORTRAIT));
+        assertTrue(MainActivity.shouldReleaseTabletOrientation(600, Configuration.UI_MODE_TYPE_NORMAL,
+                ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE));
+        assertFalse(MainActivity.shouldReleaseTabletOrientation(853, Configuration.UI_MODE_TYPE_NORMAL,
+                ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED));
+        assertFalse(MainActivity.shouldReleaseTabletOrientation(599, Configuration.UI_MODE_TYPE_NORMAL,
+                ActivityInfo.SCREEN_ORIENTATION_PORTRAIT));
+        assertFalse(MainActivity.shouldReleaseTabletOrientation(853, Configuration.UI_MODE_TYPE_TELEVISION,
+                ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE));
+    }
     @Test public void nullActivityDoesNotThrow() {
         MainActivity.applyPhoneUiOrientation(null, false);
         MainActivity.applyPhoneUiOrientation(null, true);

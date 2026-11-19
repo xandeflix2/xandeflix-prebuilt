@@ -1,0 +1,89 @@
+{
+  "observedUTC": "2026-11-05T10:24:54.143Z",
+  "label": "PHONE_5G",
+  "scope": "Current app PID recent log window; event order retained. Previous attempts in same PID may be included; correlate with observer timestamps.",
+  "events": [
+    {
+      "event": "CHECKPOINT",
+      "value": "NATIVE_ACTIVITY_STARTED"
+    },
+    {
+      "event": "CHECKPOINT",
+      "value": "DATASOURCE_OPEN"
+    },
+    {
+      "event": "STATE",
+      "value": "BUFFERING"
+    },
+    {
+      "event": "CHECKPOINT",
+      "value": "FIRST_FRAME"
+    },
+    {
+      "event": "RENDERED_FIRST_FRAME"
+    },
+    {
+      "event": "STATE",
+      "value": "READY"
+    },
+    {
+      "event": "CHECKPOINT",
+      "value": "PLAYER_READY"
+    },
+    {
+      "event": "POSITION_ADVANCED"
+    },
+    {
+      "event": "CHECKPOINT",
+      "value": "NATIVE_ACTIVITY_STARTED"
+    },
+    {
+      "event": "CHECKPOINT",
+      "value": "DATASOURCE_OPEN"
+    },
+    {
+      "event": "STATE",
+      "value": "BUFFERING"
+    },
+    {
+      "event": "CHECKPOINT",
+      "value": "DATASOURCE_OPEN"
+    },
+    {
+      "event": "PLAYER_ERROR",
+      "category": "HTTP_ERROR",
+      "code": "2004",
+      "http": "403",
+      "checkpoint": "DATASOURCE_OPEN"
+    },
+    {
+      "event": "STATE",
+      "value": "IDLE"
+    }
+  ],
+  "audio": {
+    "dumpAvailable": true,
+    "standbyNo": false,
+    "standbyYes": true
+  },
+  "metrics": {
+    "available": true,
+    "codecTypes": [
+      "c2.exynos.hevc.decoder",
+      "video/hevc",
+      "audio/ogg",
+      "audio/mpeg",
+      "video/avc",
+      "c2.exynos.h264.decoder",
+      "audio/x-wav",
+      "c2.exynos.av1.decoder",
+      "video/av01",
+      "c2.exynos.vp9.decoder",
+      "video/x-vnd.on2.vp9",
+      "c2.android.aac.decoder",
+      "audio/mp4a-latm",
+      "audio/mp4"
+    ],
+    "scope": "Device-wide codec type observations, not proof of audible output or current session attribution"
+  }
+}

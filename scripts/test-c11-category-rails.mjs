@@ -1,8 +1,12 @@
+import * as actualAdultPolicy from '../src/playback/content-adult-policy.ts';
+import {railWindow} from '../src/ui/rail-pagination.ts';
+import {acceptDpadRepeat} from '../src/ui/dpad-repeat.ts';
 import {parentalFixtureBindings} from './lib/parental-fixture-bindings.mjs';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import ts from 'typescript';
 import React from 'react';
+import {categoryGridSeed} from '../src/ui/catalog-grid-window.ts';
 import { CatalogReadModel } from '../src/catalog/catalog-read-model.ts';
 import * as selectors from '../src/catalog/catalog-selectors.ts';
 import { SegmentedBrowseService } from '../src/catalog/segmented-browse.service.ts';
@@ -66,10 +70,17 @@ function load(file, imports) {
   new Function('require', 'module', 'exports', code)((name => parentalFixtureBindings(name) ?? (name => {
     if(name.includes('useHeroPlayback'))return {useHeroPlayback:()=>({})};
     if(name.includes('BrowseHero'))return {BrowseHero:Hero};
+    if(name.includes('CardExpansion'))return {CardExpansionHost:()=>null};
+    if(name.includes('VirtualCatalogGrid'))return {VirtualCatalogGrid:Grid};
     if(name.includes('FavoriteTitles'))return {FavoriteTitles:()=>null};
     if(name.includes('startup-catalog-preview'))return {selectStartupPosters:()=>[]};
     if(name.includes('useFeaturedRotation'))return {useFeaturedRotation:model=>({movies:model.catalog.movies.slice(0,20).map(row=>selectors.movieToViewModel(model,row)),series:model.catalog.series.slice(0,20).map(row=>selectors.seriesToViewModel(model,row))})};
     for (const [key, value] of Object.entries(imports)) if (name.includes(key)) return value;
+    if(name.endsWith('/content-adult-policy.ts'))return actualAdultPolicy;
+    if(name.endsWith('/rail-pagination.ts'))return{railWindow};
+    if(name.endsWith('/dpad-repeat.ts'))return{acceptDpadRepeat};
+    if(name.endsWith('/catalog-grid-window.ts'))return{categoryGridSeed};
+    if(name.endsWith('/ProgressiveCategoryRail.tsx'))return{ProgressiveCategoryRail:()=>null};
     throw Error('Uncontrolled component dependency: ' + name);
   })(name)), module, module.exports);
   return module.exports;

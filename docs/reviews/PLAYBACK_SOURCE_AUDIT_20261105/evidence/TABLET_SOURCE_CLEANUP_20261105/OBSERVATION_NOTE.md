@@ -1,0 +1,9 @@
+# Limite da primeira verificação
+
+O helper RESULT.json preserva PENDING_OR_FAILED: exclusão física, catálogo novo, mesma fonte, identidade/chave/instalação/ativação foram confirmados, porém o epoch final foi diferente do planejado. O primeiro poll depois do encerramento observou ACTIVE ainda sem catálogo, seguido de CLEANED e novo ACTIVE. A origem exata da divergência de estado entre a escrita PREPARED observada na WebView anterior e o runtime reiniciado não foi comprovada; não atribuir conclusivamente a flush de Chromium, corrida do coordenador ou corrupção. Não houve alteração de fonte, licença nem identidade.
+
+Não foi feita correção artificial do resultado, reatribuição de registros pessoais a outro namespace nem alteração do APK. O catálogo e o cache físico antigos foram removidos por caminhos privados verificados, e a nova importação ficou ativa com somente um snapshot REAL da mesma fonte, staging vazio. A finalidade de limpeza do catálogo foi observada; a expectativa adicional de manter o epoch não foi cumprida. O novo epoch é isolado e não reutiliza caches do anterior.
+
+O matcher de dados pessoais do helper não incluía as chaves recent-watched/watch-positions/watch-sessions e encontrou zero chaves correspondentes. Portanto personalStorageKeysUnchanged=true com contagem zero não certifica integralmente o histórico. A limpeza não executou removeItem nessas chaves, nem em favoritos/PIN, mas a associação visual ao namespace anterior não foi homologada. Não declarar preservação byte a byte de todos os dados pessoais com base nesse matcher.
+
+O filme pós-limpeza produziu DATASOURCE_OPEN_SUCCESS, FIRST_FRAME, READY e avanço real. A limpeza não equivale à resolução de todas as recusas de mídia da fonte. O diagnóstico HTTP e os testes pós-limpeza ficam em ../HTTP_TRANSPORT_RECOVERY_20261105.

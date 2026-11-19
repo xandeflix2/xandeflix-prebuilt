@@ -21,6 +21,8 @@ export interface CatalogItemViewModel {
   id: string;
   externalIds?: Pick<ExternalIds, 'tmdbId'>;
   kind: ContentType;
+  /** Presentation-only evidence; never a TMDB episode-count assumption. */
+  hasEpisodes?: boolean;
   title: string;
   originalTitle?: string;
   yearFormatted?: string;

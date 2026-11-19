@@ -1,0 +1,20 @@
+import fs from'node:fs';import path from'node:path';import crypto from'node:crypto';import{createRequire}from'node:module';
+const root='C:/Xandeflix/Audits/CONNECTION_RECOVERY_20261104';const require=createRequire('C:/Xandeflix/xandeflix-prebuilt-c11-main/package.json');const esbuild=require('esbuild'),ts=require('typescript');
+const oldPath=root+'/fire-usb-public/assets/public/assets/main-CVrNAYHJ.js';const latestPath='C:/Xandeflix/Audits/APK_PREVIOUS_COMPARISON_20261104/v152/assets/public/assets/main-CvPs0nkG.js';
+const hash=s=>crypto.createHash('sha256').update(s).digest('hex');
+const sources={fire:fs.readFileSync(oldPath,'utf8'),latest:fs.readFileSync(latestPath,'utf8')};
+const parsed={};
+function normalized(node,sf){const ids=new Map();function walk(n){if(ts.isIdentifier(n)){const p=n.parent;const prop=ts.isPropertyAccessExpression(p)&&p.name===n||((ts.isPropertyAssignment(p)||ts.isMethodDeclaration(p)||ts.isPropertyDeclaration(p))&&p.name===n);if(prop)return['property',n.text];if(!ids.has(n.text))ids.set(n.text,ids.size);return['identifier',ids.get(n.text)];}const kids=[];n.forEachChild(c=>{kids.push(walk(c))});return kids.length?[n.kind,...kids]:[n.kind,n.getText(sf)];}return hash(JSON.stringify(walk(node)));}
+for(const v of ['fire','latest']){
+ const code=esbuild.transformSync(sources[v],{loader:'js',minify:false,legalComments:'none',target:'esnext',format:'esm'}).code;
+ const file=path.join(root,`${v}-main.formatted.js`);fs.writeFileSync(file,code);
+ const sf=ts.createSourceFile(file,code,ts.ScriptTarget.Latest,true,ts.ScriptKind.JS);
+ parsed[v]={code,sf,records:sf.statements.map(s=>({line:sf.getLineAndCharacterOfPosition(s.getStart(sf)).line+1,end:sf.getLineAndCharacterOfPosition(s.end).line+1,name:s.name?.text??(ts.isVariableStatement(s)?s.declarationList.declarations.map(d=>d.name.getText(sf)).join(','):null),kind:ts.SyntaxKind[s.kind],hash:normalized(s,sf),text:s.getText(sf)}))};
+}
+const matched=[];
+for(const a of parsed.fire.records){const aa=parsed.fire.records.filter(x=>x.hash===a.hash),bs=parsed.latest.records.filter(x=>x.hash===a.hash);if(aa.length===1&&bs.length===1)matched.push({a,b:bs[0]});}
+const relevant=x=>x.line>14500&&x.line<19500||/DIRECTORY_SERIES_DETAILS_INVALID|class .* extends .*Error/.test(x.text);
+const strip=r=>({name:r.name,line:r.line,end:r.end,kind:r.kind,hash:r.hash});
+const out={method:'Top-level AST candidate correspondence using properties/literals and consistent identifier spelling normalization. This is static candidate matching; not proof of runtime or global binding equivalence.',sourceFiles:{fire:{path:oldPath,sha256:hash(sources.fire),bytes:Buffer.byteLength(sources.fire)},latest:{path:latestPath,sha256:hash(sources.latest),bytes:Buffer.byteLength(sources.latest)}},statementCounts:{fire:parsed.fire.records.length,latest:parsed.latest.records.length},uniquePairs:matched.length,pairs:matched.filter(m=>relevant(m.a)).map(m=>({fire:strip(m.a),latest:strip(m.b)})),unmatchedRelevant:{fire:parsed.fire.records.filter(relevant).filter(s=>!matched.some(m=>m.a===s)).map(strip),latest:parsed.latest.records.filter(relevant).filter(s=>!matched.some(m=>m.b===s)).map(strip)}};
+fs.writeFileSync(path.join(root,'FIRE_LATEST_JS_COMPARISON.json'),JSON.stringify(out,null,2));console.log(JSON.stringify({uniquePairs:matched.length,unmatchedRelevant:out.unmatchedRelevant}));
+const inv=n=>JSON.parse(fs.readFileSync(n,'utf8').replace(/^\uFEFF/,''));const left=inv(root+'/FIRE_USB_ZIP_INVENTORY.json'),right=inv('C:/Xandeflix/Audits/APK_PREVIOUS_COMPARISON_20261104/v152-inventory.json');const lm=new Map(left.map(x=>[x.Path,x])),rm=new Map(right.map(x=>[x.Path,x]));const same=[],changed=[],oldOnly=[],newOnly=[];for(const[p,a]of lm){const b=rm.get(p);if(!b)oldOnly.push(p);else if(a.Sha256===b.Sha256&&a.Bytes===b.Bytes)same.push(p);else changed.push(p);}for(const p of rm.keys())if(!lm.has(p))newOnly.push(p);fs.writeFileSync(root+'/FIRE_LATEST_ZIP_COMPARISON.json',JSON.stringify({counts:{fire:left.length,latest:right.length,same:same.length,changed:changed.length,fireOnly:oldOnly.length,latestOnly:newOnly.length},changed,oldOnly,newOnly},null,2));

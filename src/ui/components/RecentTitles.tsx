@@ -48,7 +48,7 @@ export function RecentTitles({readModel,presentation='rail',onViewAll}:{readMode
       ? <CatalogGrid items={resolved} onItemClick={item=>{void resume(item);}} autoLoadMore
           getItemKey={item=>`${item.kind}:${item.id}`}
           emptyMessage={resolving?'Carregando títulos recentes…':'Nenhum título recente disponível no catálogo atual.'}/>
-      : <MediaRail id="rail-recent-watched" title="Recentes" items={resolved} preserveOrder onItemClick={item=>{void resume(item);}} onViewAll={onViewAll}/>}
+      : <MediaRail enlargedDpad id="rail-recent-watched" title="Recentes" items={resolved} preserveOrder onItemClick={item=>{void resume(item);}} onViewAll={onViewAll}/>}
     {status && <p role="status" aria-live="polite">{status}</p>}
   </section>;
 }

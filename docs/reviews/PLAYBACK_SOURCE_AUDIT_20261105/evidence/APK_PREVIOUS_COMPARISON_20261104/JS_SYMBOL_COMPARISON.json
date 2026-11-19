@@ -1,0 +1,2635 @@
+{
+  "method": "Candidate AST pairs checked using TypeScript symbols. Paired top-level references must resolve to corresponding declarations, local symbols bijective. Unpaired and dynamic references remain unknown. Static comparison does not establish runtime behavior.",
+  "globalBindingPairs": 1559,
+  "conflicts": [],
+  "results": [
+    {
+      "old": "tC,hD",
+      "oldLine": 14746,
+      "oldEnd": 14746,
+      "new": "SC,ML",
+      "newLine": 14746,
+      "newEnd": 14746,
+      "issues": [],
+      "unknowns": [
+        {
+          "old": "Ys",
+          "new": "Js",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        }
+      ]
+    },
+    {
+      "old": "rC",
+      "oldLine": 14747,
+      "oldEnd": 14749,
+      "new": "AC",
+      "newLine": 14747,
+      "newEnd": 14749,
+      "issues": [],
+      "unknowns": [
+        {
+          "old": "bt",
+          "new": "bt",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        }
+      ]
+    },
+    {
+      "old": "pD,mD,gD,vD,yD",
+      "oldLine": 14750,
+      "oldEnd": 14750,
+      "new": "$L,VL,FL,BL,zL",
+      "newLine": 14750,
+      "newEnd": 14750,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "ED",
+      "oldLine": 14751,
+      "oldEnd": 14760,
+      "new": "HL",
+      "newLine": 14751,
+      "newEnd": 14760,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "_D",
+      "oldLine": 14761,
+      "oldEnd": 14763,
+      "new": "GL",
+      "newLine": 14761,
+      "newEnd": 14763,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "wD",
+      "oldLine": 14764,
+      "oldEnd": 14772,
+      "new": "qL",
+      "newLine": 14764,
+      "newEnd": 14772,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "SD",
+      "oldLine": 14773,
+      "oldEnd": 14775,
+      "new": "WL",
+      "newLine": 14773,
+      "newEnd": 14775,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "ID",
+      "oldLine": 14776,
+      "oldEnd": 14783,
+      "new": "KL",
+      "newLine": 14776,
+      "newEnd": 14783,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "BS",
+      "oldLine": 14784,
+      "oldEnd": 14788,
+      "new": "rA",
+      "newLine": 14784,
+      "newEnd": 14788,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "AD",
+      "oldLine": 14789,
+      "oldEnd": 14791,
+      "new": "YL",
+      "newLine": 14789,
+      "newEnd": 14791,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "bD",
+      "oldLine": 14792,
+      "oldEnd": 14796,
+      "new": "XL",
+      "newLine": 14792,
+      "newEnd": 14796,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "sC",
+      "oldLine": 14797,
+      "oldEnd": 14799,
+      "new": "IC",
+      "newLine": 14797,
+      "newEnd": 14799,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "nC",
+      "oldLine": 14800,
+      "oldEnd": 14802,
+      "new": "bC",
+      "newLine": 14800,
+      "newEnd": 14802,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "CD",
+      "oldLine": 14803,
+      "oldEnd": 14840,
+      "new": "JL",
+      "newLine": 14803,
+      "newEnd": 14840,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "RD",
+      "oldLine": 14841,
+      "oldEnd": 14843,
+      "new": "ZL",
+      "newLine": 14841,
+      "newEnd": 14843,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "TD",
+      "oldLine": 14844,
+      "oldEnd": 14846,
+      "new": "QL",
+      "newLine": 14844,
+      "newEnd": 14846,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "Br",
+      "oldLine": 14847,
+      "oldEnd": 14850,
+      "new": "Gr",
+      "newLine": 14847,
+      "newEnd": 14850,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "Ff",
+      "oldLine": 14851,
+      "oldEnd": 14853,
+      "new": "Zf",
+      "newLine": 14851,
+      "newEnd": 14853,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "iC",
+      "oldLine": 14854,
+      "oldEnd": 14857,
+      "new": "CC",
+      "newLine": 14854,
+      "newEnd": 14857,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "ND",
+      "oldLine": 14858,
+      "oldEnd": 14861,
+      "new": "eD",
+      "newLine": 14858,
+      "newEnd": 14861,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "xD",
+      "oldLine": 14862,
+      "oldEnd": 14864,
+      "new": "tD",
+      "newLine": 14862,
+      "newEnd": 14864,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "OD",
+      "oldLine": 14865,
+      "oldEnd": 14867,
+      "new": "rD",
+      "newLine": 14865,
+      "newEnd": 14867,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "kD",
+      "oldLine": 14868,
+      "oldEnd": 14876,
+      "new": "sD",
+      "newLine": 14868,
+      "newEnd": 14876,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "rv",
+      "oldLine": 14877,
+      "oldEnd": 14887,
+      "new": "uv",
+      "newLine": 14877,
+      "newEnd": 14887,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "sv",
+      "oldLine": 14888,
+      "oldEnd": 14899,
+      "new": "dv",
+      "newLine": 14888,
+      "newEnd": 14899,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "Dp",
+      "oldLine": 14900,
+      "oldEnd": 15005,
+      "new": "zp",
+      "newLine": 14900,
+      "newEnd": 15005,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "DD,LD,PD,jD,UD,$D",
+      "oldLine": 15006,
+      "oldEnd": 15006,
+      "new": "nD,iD,aD,oD,cD,lD",
+      "newLine": 15006,
+      "newEnd": 15006,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "MD",
+      "oldLine": 15007,
+      "oldEnd": 15019,
+      "new": "uD",
+      "newLine": 15007,
+      "newEnd": 15019,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "VD",
+      "oldLine": 15020,
+      "oldEnd": 15032,
+      "new": "dD",
+      "newLine": 15020,
+      "newEnd": 15032,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "FD",
+      "oldLine": 15033,
+      "oldEnd": 15064,
+      "new": "fD",
+      "newLine": 15033,
+      "newEnd": 15064,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "BD",
+      "oldLine": 15065,
+      "oldEnd": 15074,
+      "new": "hD",
+      "newLine": 15065,
+      "newEnd": 15074,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "eE",
+      "oldLine": 15075,
+      "oldEnd": 15077,
+      "new": "hE",
+      "newLine": 15075,
+      "newEnd": 15077,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "cu",
+      "oldLine": 15078,
+      "oldEnd": 15085,
+      "new": "Eu",
+      "newLine": 15078,
+      "newEnd": 15085,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "aC",
+      "oldLine": 15086,
+      "oldEnd": 15090,
+      "new": "RC",
+      "newLine": 15086,
+      "newEnd": 15090,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "zD",
+      "oldLine": 15091,
+      "oldEnd": 15099,
+      "new": "pD",
+      "newLine": 15091,
+      "newEnd": 15099,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "tE,uy,oC",
+      "oldLine": 15100,
+      "oldEnd": 15100,
+      "new": "pE,_y,TC",
+      "newLine": 15100,
+      "newEnd": 15100,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "HD",
+      "oldLine": 15102,
+      "oldEnd": 15106,
+      "new": "mD",
+      "newLine": 15102,
+      "newEnd": 15106,
+      "issues": [],
+      "unknowns": [
+        {
+          "old": "zS",
+          "new": "sA",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        },
+        {
+          "old": "nv",
+          "new": "fv",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        }
+      ]
+    },
+    {
+      "old": "GD",
+      "oldLine": 15107,
+      "oldEnd": 15109,
+      "new": "gD",
+      "newLine": 15107,
+      "newEnd": 15109,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "qD",
+      "oldLine": 15110,
+      "oldEnd": 15116,
+      "new": "vD",
+      "newLine": 15110,
+      "newEnd": 15116,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "iv",
+      "oldLine": 15117,
+      "oldEnd": 15120,
+      "new": "hv",
+      "newLine": 15117,
+      "newEnd": 15120,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "HS",
+      "oldLine": 15121,
+      "oldEnd": 15130,
+      "new": "nA",
+      "newLine": 15121,
+      "newEnd": 15130,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "dy",
+      "oldLine": 15131,
+      "oldEnd": 15131,
+      "new": "Sy",
+      "newLine": 15131,
+      "newEnd": 15131,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "GS",
+      "oldLine": 15132,
+      "oldEnd": 15135,
+      "new": "iA",
+      "newLine": 15132,
+      "newEnd": 15135,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "WD",
+      "oldLine": 15136,
+      "oldEnd": 15152,
+      "new": "yD",
+      "newLine": 15136,
+      "newEnd": 15152,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "KD,YD",
+      "oldLine": 15153,
+      "oldEnd": 15153,
+      "new": "ED,wD",
+      "newLine": 15153,
+      "newEnd": 15153,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "qr",
+      "oldLine": 15154,
+      "oldEnd": 15156,
+      "new": "Yr",
+      "newLine": 15154,
+      "newEnd": 15156,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "wi",
+      "oldLine": 15157,
+      "oldEnd": 15167,
+      "new": "zn",
+      "newLine": 15157,
+      "newEnd": 15167,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "Lc",
+      "oldLine": 15168,
+      "oldEnd": 15171,
+      "new": "Mc",
+      "newLine": 15168,
+      "newEnd": 15171,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "fy,rE",
+      "oldLine": 15172,
+      "oldEnd": 15172,
+      "new": "Ay,mE",
+      "newLine": 15172,
+      "newEnd": 15172,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "sa,cC",
+      "oldLine": 15173,
+      "oldEnd": 15173,
+      "new": "oa,NC",
+      "newLine": 15173,
+      "newEnd": 15173,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "XD",
+      "oldLine": 15175,
+      "oldEnd": 15178,
+      "new": "_D",
+      "newLine": 15175,
+      "newEnd": 15178,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "lC",
+      "oldLine": 15179,
+      "oldEnd": 15185,
+      "new": "xC",
+      "newLine": 15179,
+      "newEnd": 15185,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "uC",
+      "oldLine": 15186,
+      "oldEnd": 15192,
+      "new": "OC",
+      "newLine": 15186,
+      "newEnd": 15192,
+      "issues": [],
+      "unknowns": [
+        {
+          "old": "lu",
+          "new": "wu",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        }
+      ]
+    },
+    {
+      "old": "qS",
+      "oldLine": 15193,
+      "oldEnd": 15195,
+      "new": "aA",
+      "newLine": 15193,
+      "newEnd": 15195,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "WS",
+      "oldLine": 15196,
+      "oldEnd": 15198,
+      "new": "oA",
+      "newLine": 15196,
+      "newEnd": 15198,
+      "issues": [],
+      "unknowns": [
+        {
+          "old": "lu",
+          "new": "wu",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        }
+      ]
+    },
+    {
+      "old": "JD,ZD,KS",
+      "oldLine": 15199,
+      "oldEnd": 15199,
+      "new": "SD,AD,cA",
+      "newLine": 15199,
+      "newEnd": 15199,
+      "issues": [],
+      "unknowns": [
+        {
+          "old": "lu",
+          "new": "wu",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        }
+      ]
+    },
+    {
+      "old": "eL",
+      "oldLine": 15205,
+      "oldEnd": 15209,
+      "new": "bD",
+      "newLine": 15205,
+      "newEnd": 15209,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "bc,Wh,tL,rL,dC",
+      "oldLine": 15210,
+      "oldEnd": 15210,
+      "new": "Oc,rp,CD,RD,kC",
+      "newLine": 15210,
+      "newEnd": 15210,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "ca",
+      "oldLine": 15211,
+      "oldEnd": 15227,
+      "new": "fa",
+      "newLine": 15211,
+      "newEnd": 15227,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "fC",
+      "oldLine": 15228,
+      "oldEnd": 15232,
+      "new": "LC",
+      "newLine": 15228,
+      "newEnd": 15232,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "hy",
+      "oldLine": 15233,
+      "oldEnd": 15237,
+      "new": "Iy",
+      "newLine": 15233,
+      "newEnd": 15237,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "wh",
+      "oldLine": 15238,
+      "oldEnd": 15274,
+      "new": "Oh",
+      "newLine": 15238,
+      "newEnd": 15274,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "Ql,sL",
+      "oldLine": 15275,
+      "oldEnd": 15275,
+      "new": "lu,TD",
+      "newLine": 15275,
+      "newEnd": 15275,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "Dt",
+      "oldLine": 15276,
+      "oldEnd": 15278,
+      "new": "Dt",
+      "newLine": 15276,
+      "newEnd": 15278,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "nL",
+      "oldLine": 15279,
+      "oldEnd": 15351,
+      "new": "ND",
+      "newLine": 15279,
+      "newEnd": 15351,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "iL",
+      "oldLine": 15352,
+      "oldEnd": 15389,
+      "new": "xD",
+      "newLine": 15352,
+      "newEnd": 15389,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "aL",
+      "oldLine": 15390,
+      "oldEnd": 15415,
+      "new": "OD",
+      "newLine": 15390,
+      "newEnd": 15415,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "oL,cL,lL,uL,dL",
+      "oldLine": 15416,
+      "oldEnd": 15416,
+      "new": "kD,LD,DD,PD,jD",
+      "newLine": 15416,
+      "newEnd": 15416,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "hC",
+      "oldLine": 15417,
+      "oldEnd": 15421,
+      "new": "DC",
+      "newLine": 15417,
+      "newEnd": 15421,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "Ss",
+      "oldLine": 15422,
+      "oldEnd": 15424,
+      "new": "Cs",
+      "newLine": 15422,
+      "newEnd": 15424,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "Bf",
+      "oldLine": 15425,
+      "oldEnd": 15428,
+      "new": "Qf",
+      "newLine": 15425,
+      "newEnd": 15428,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "zf",
+      "oldLine": 15429,
+      "oldEnd": 15431,
+      "new": "eh",
+      "newLine": 15429,
+      "newEnd": 15431,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "av",
+      "oldLine": 15432,
+      "oldEnd": 15444,
+      "new": "pv",
+      "newLine": 15432,
+      "newEnd": 15444,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "fL",
+      "oldLine": 15445,
+      "oldEnd": 15510,
+      "new": "UD",
+      "newLine": 15445,
+      "newEnd": 15510,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "sE",
+      "oldLine": 15511,
+      "oldEnd": 15513,
+      "new": "gE",
+      "newLine": 15511,
+      "newEnd": 15513,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "hL",
+      "oldLine": 15514,
+      "oldEnd": 15517,
+      "new": "MD",
+      "newLine": 15514,
+      "newEnd": 15517,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "Kh,YS,Sh,bu,ov,pL,XS",
+      "oldLine": 15518,
+      "oldEnd": 15522,
+      "new": "sp,lA,kh,Mu,mv,$D,uA",
+      "newLine": 15518,
+      "newEnd": 15522,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "Zi",
+      "oldLine": 15523,
+      "oldEnd": 15525,
+      "new": "ra",
+      "newLine": 15523,
+      "newEnd": 15525,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "uc",
+      "oldLine": 15526,
+      "oldEnd": 15528,
+      "new": "gc",
+      "newLine": 15526,
+      "newEnd": 15528,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "py",
+      "oldLine": 15529,
+      "oldEnd": 15532,
+      "new": "by",
+      "newLine": 15529,
+      "newEnd": 15532,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "mL",
+      "oldLine": 15533,
+      "oldEnd": 15542,
+      "new": "VD",
+      "newLine": 15533,
+      "newEnd": 15542,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "pC",
+      "oldLine": 15543,
+      "oldEnd": 15546,
+      "new": "PC",
+      "newLine": 15543,
+      "newEnd": 15546,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "Yh",
+      "oldLine": 15868,
+      "oldEnd": 15870,
+      "new": "np",
+      "newLine": 15868,
+      "newEnd": 15870,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "vL",
+      "oldLine": 15871,
+      "oldEnd": 15876,
+      "new": "BD",
+      "newLine": 15871,
+      "newEnd": 15876,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "yL",
+      "oldLine": 15877,
+      "oldEnd": 15880,
+      "new": "zD",
+      "newLine": 15877,
+      "newEnd": 15880,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "JS,ZS,QS,EL,Hr,Ln,zs",
+      "oldLine": 15881,
+      "oldEnd": 15881,
+      "new": "dA,fA,hA,HD,Xt,$n,fs",
+      "newLine": 15881,
+      "newEnd": 15881,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "Cu",
+      "oldLine": 15882,
+      "oldEnd": 15887,
+      "new": "$u",
+      "newLine": 15882,
+      "newEnd": 15887,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "ds",
+      "oldLine": 15888,
+      "oldEnd": 15899,
+      "new": "$r",
+      "newLine": 15888,
+      "newEnd": 15899,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "Xh,_L,wL,SL,Hf",
+      "oldLine": 15900,
+      "oldEnd": 15903,
+      "new": "ip,GD,qD,WD,hc",
+      "newLine": 15900,
+      "newEnd": 15903,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "IL",
+      "oldLine": 15904,
+      "oldEnd": 15918,
+      "new": "KD",
+      "newLine": 15904,
+      "newEnd": 15918,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "Mn",
+      "oldLine": 15919,
+      "oldEnd": 15922,
+      "new": "Xr",
+      "newLine": 15919,
+      "newEnd": 15922,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "AL",
+      "oldLine": 15927,
+      "oldEnd": 15934,
+      "new": "YD",
+      "newLine": 15927,
+      "newEnd": 15934,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "Ba",
+      "oldLine": 15940,
+      "oldEnd": 15955,
+      "new": "on",
+      "newLine": 15940,
+      "newEnd": 15955,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "mC",
+      "oldLine": 15956,
+      "oldEnd": 15970,
+      "new": "jC",
+      "newLine": 15956,
+      "newEnd": 15970,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "oc",
+      "oldLine": 15971,
+      "oldEnd": 15973,
+      "new": "io",
+      "newLine": 15971,
+      "newEnd": 15973,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "CL",
+      "oldLine": 15974,
+      "oldEnd": 15985,
+      "new": "JD",
+      "newLine": 15974,
+      "newEnd": 15985,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "Tl",
+      "oldLine": 15986,
+      "oldEnd": 15992,
+      "new": "Ul",
+      "newLine": 15986,
+      "newEnd": 15992,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "gC",
+      "oldLine": 15993,
+      "oldEnd": 15996,
+      "new": "UC",
+      "newLine": 15993,
+      "newEnd": 15996,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "cv",
+      "oldLine": 15997,
+      "oldEnd": 16003,
+      "new": "Ml",
+      "newLine": 15997,
+      "newEnd": 16003,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "TL",
+      "oldLine": 16241,
+      "oldEnd": 16243,
+      "new": "QD",
+      "newLine": 16287,
+      "newEnd": 16289,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "cs,Cc,Ih",
+      "oldLine": 16244,
+      "oldEnd": 16244,
+      "new": "Mr,ha,uu",
+      "newLine": 16290,
+      "newEnd": 16290,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "nE",
+      "oldLine": 16245,
+      "oldEnd": 16250,
+      "new": "vE",
+      "newLine": 16291,
+      "newEnd": 16296,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "vC",
+      "oldLine": 16257,
+      "oldEnd": 16260,
+      "new": "VC",
+      "newLine": 16318,
+      "newEnd": 16321,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "Ru",
+      "oldLine": 16349,
+      "oldEnd": 16353,
+      "new": "$c",
+      "newLine": 16410,
+      "newEnd": 16414,
+      "issues": [],
+      "unknowns": [
+        {
+          "old": "Rr",
+          "new": "Ir",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        },
+        {
+          "old": "EC",
+          "new": "BC",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        }
+      ]
+    },
+    {
+      "old": "_C",
+      "oldLine": 16354,
+      "oldEnd": 16354,
+      "new": "zC",
+      "newLine": 16415,
+      "newEnd": 16415,
+      "issues": [],
+      "unknowns": [
+        {
+          "old": "yC",
+          "new": "FC",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        }
+      ]
+    },
+    {
+      "old": "Tu",
+      "oldLine": 16355,
+      "oldEnd": 16359,
+      "new": "Vc",
+      "newLine": 16416,
+      "newEnd": 16420,
+      "issues": [],
+      "unknowns": [
+        {
+          "old": "Rr",
+          "new": "Ir",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        }
+      ]
+    },
+    {
+      "old": null,
+      "oldLine": 16360,
+      "oldEnd": 16360,
+      "new": null,
+      "newLine": 16421,
+      "newEnd": 16421,
+      "issues": [],
+      "unknowns": [
+        {
+          "old": "OL",
+          "new": "sP",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        },
+        {
+          "old": "ze",
+          "new": "ze",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        }
+      ]
+    },
+    {
+      "old": "iE",
+      "oldLine": 16361,
+      "oldEnd": 16368,
+      "new": "yE",
+      "newLine": 16422,
+      "newEnd": 16429,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "Nu",
+      "oldLine": 16369,
+      "oldEnd": 16372,
+      "new": "Vu",
+      "newLine": 16430,
+      "newEnd": 16433,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "xu",
+      "oldLine": 16373,
+      "oldEnd": 16376,
+      "new": "Fu",
+      "newLine": 16434,
+      "newEnd": 16437,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "Lp",
+      "oldLine": 16377,
+      "oldEnd": 16384,
+      "new": "Hp",
+      "newLine": 16438,
+      "newEnd": 16445,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "wC",
+      "oldLine": 16385,
+      "oldEnd": 16391,
+      "new": "HC",
+      "newLine": 16446,
+      "newEnd": 16452,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "aE",
+      "oldLine": 16392,
+      "oldEnd": 16395,
+      "new": "EE",
+      "newLine": 16453,
+      "newEnd": 16456,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "Jh",
+      "oldLine": 16396,
+      "oldEnd": 16399,
+      "new": "ap",
+      "newLine": 16457,
+      "newEnd": 16460,
+      "issues": [],
+      "unknowns": [
+        {
+          "old": "ze",
+          "new": "ze",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        }
+      ]
+    },
+    {
+      "old": "gn",
+      "oldLine": 16400,
+      "oldEnd": 16406,
+      "new": "_n",
+      "newLine": 16461,
+      "newEnd": 16467,
+      "issues": [],
+      "unknowns": [
+        {
+          "old": "ze",
+          "new": "ze",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        }
+      ]
+    },
+    {
+      "old": "Rc",
+      "oldLine": 16407,
+      "oldEnd": 16411,
+      "new": "_u",
+      "newLine": 16468,
+      "newEnd": 16472,
+      "issues": [],
+      "unknowns": [
+        {
+          "old": "Rr",
+          "new": "Ir",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        },
+        {
+          "old": "EC",
+          "new": "BC",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        },
+        {
+          "old": "ze",
+          "new": "ze",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        }
+      ]
+    },
+    {
+      "old": "oE",
+      "oldLine": 16412,
+      "oldEnd": 16414,
+      "new": "wE",
+      "newLine": 16473,
+      "newEnd": 16475,
+      "issues": [],
+      "unknowns": [
+        {
+          "old": "ze",
+          "new": "ze",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        }
+      ]
+    },
+    {
+      "old": "Gs",
+      "oldLine": 16415,
+      "oldEnd": 16418,
+      "new": "Ys",
+      "newLine": 16476,
+      "newEnd": 16479,
+      "issues": [],
+      "unknowns": [
+        {
+          "old": "ze",
+          "new": "ze",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        }
+      ]
+    },
+    {
+      "old": "kL",
+      "oldLine": 16419,
+      "oldEnd": 16422,
+      "new": "nP",
+      "newLine": 16480,
+      "newEnd": 16483,
+      "issues": [],
+      "unknowns": [
+        {
+          "old": "ze",
+          "new": "ze",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        }
+      ]
+    },
+    {
+      "old": "gy",
+      "oldLine": 16423,
+      "oldEnd": 16426,
+      "new": "Ry",
+      "newLine": 16484,
+      "newEnd": 16487,
+      "issues": [],
+      "unknowns": [
+        {
+          "old": "ze",
+          "new": "ze",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        }
+      ]
+    },
+    {
+      "old": "SC,DL,Gf",
+      "oldLine": 16427,
+      "oldEnd": 16427,
+      "new": "GC,iP,th",
+      "newLine": 16488,
+      "newEnd": 16488,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "IC",
+      "oldLine": 16428,
+      "oldEnd": 16456,
+      "new": "qC",
+      "newLine": 16489,
+      "newEnd": 16517,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "vy",
+      "oldLine": 16457,
+      "oldEnd": 16483,
+      "new": "Ty",
+      "newLine": 16518,
+      "newEnd": 16544,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "AC",
+      "oldLine": 16484,
+      "oldEnd": 16501,
+      "new": "WC",
+      "newLine": 16545,
+      "newEnd": 16562,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "bC",
+      "oldLine": 16502,
+      "oldEnd": 16522,
+      "new": "KC",
+      "newLine": 16563,
+      "newEnd": 16583,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "rr",
+      "oldLine": 16523,
+      "oldEnd": 16668,
+      "new": "sr",
+      "newLine": 16584,
+      "newEnd": 16729,
+      "issues": [],
+      "unknowns": [
+        {
+          "old": "qe",
+          "new": "qe",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        },
+        {
+          "old": "jt",
+          "new": "Ut",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        },
+        {
+          "old": "It",
+          "new": "At",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        },
+        {
+          "old": "ze",
+          "new": "ze",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        }
+      ]
+    },
+    {
+      "old": null,
+      "oldLine": 16669,
+      "oldEnd": 16669,
+      "new": null,
+      "newLine": 16730,
+      "newEnd": 16730,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "LL,Ah",
+      "oldLine": 16670,
+      "oldEnd": 16670,
+      "new": "aP,Lh",
+      "newLine": 16731,
+      "newEnd": 16731,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "eI",
+      "oldLine": 16671,
+      "oldEnd": 16779,
+      "new": "pA",
+      "newLine": 16732,
+      "newEnd": 16840,
+      "issues": [],
+      "unknowns": [
+        {
+          "old": "qe",
+          "new": "qe",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        },
+        {
+          "old": "jt",
+          "new": "Ut",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        },
+        {
+          "old": "It",
+          "new": "At",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        },
+        {
+          "old": "yt",
+          "new": "yt",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        }
+      ]
+    },
+    {
+      "old": "PL",
+      "oldLine": 16780,
+      "oldEnd": 16780,
+      "new": "oP",
+      "newLine": 16841,
+      "newEnd": 16841,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "tI",
+      "oldLine": 16781,
+      "oldEnd": 16783,
+      "new": "mA",
+      "newLine": 16842,
+      "newEnd": 16844,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "jL",
+      "oldLine": 16784,
+      "oldEnd": 16786,
+      "new": "cP",
+      "newLine": 16845,
+      "newEnd": 16847,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "UL",
+      "oldLine": 16787,
+      "oldEnd": 16799,
+      "new": "lP",
+      "newLine": 16848,
+      "newEnd": 16860,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "Da",
+      "oldLine": 16800,
+      "oldEnd": 16808,
+      "new": "Ma",
+      "newLine": 16861,
+      "newEnd": 16869,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "CC",
+      "oldLine": 16809,
+      "oldEnd": 17091,
+      "new": "YC",
+      "newLine": 16870,
+      "newEnd": 17152,
+      "issues": [],
+      "unknowns": [
+        {
+          "old": "yt",
+          "new": "yt",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        }
+      ]
+    },
+    {
+      "old": "$L",
+      "oldLine": 17093,
+      "oldEnd": 17095,
+      "new": "uP",
+      "newLine": 17154,
+      "newEnd": 17156,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "ML",
+      "oldLine": 17096,
+      "oldEnd": 17098,
+      "new": "dP",
+      "newLine": 17157,
+      "newEnd": 17159,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "VL",
+      "oldLine": 17099,
+      "oldEnd": 17103,
+      "new": "fP",
+      "newLine": 17160,
+      "newEnd": 17164,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "rI",
+      "oldLine": 17104,
+      "oldEnd": 17108,
+      "new": "gA",
+      "newLine": 17165,
+      "newEnd": 17169,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "FL",
+      "oldLine": 17109,
+      "oldEnd": 17112,
+      "new": "hP",
+      "newLine": 17170,
+      "newEnd": 17173,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "RC",
+      "oldLine": 17113,
+      "oldEnd": 17200,
+      "new": "XC",
+      "newLine": 17174,
+      "newEnd": 17261,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "BL",
+      "oldLine": 17201,
+      "oldEnd": 17203,
+      "new": "pP",
+      "newLine": 17262,
+      "newEnd": 17264,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "zL",
+      "oldLine": 17204,
+      "oldEnd": 17211,
+      "new": "mP",
+      "newLine": 17265,
+      "newEnd": 17272,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "sI",
+      "oldLine": 17212,
+      "oldEnd": 17221,
+      "new": "vA",
+      "newLine": 17273,
+      "newEnd": 17282,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "nI",
+      "oldLine": 17222,
+      "oldEnd": 17236,
+      "new": "yA",
+      "newLine": 17283,
+      "newEnd": 17297,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "iI",
+      "oldLine": 17237,
+      "oldEnd": 17251,
+      "new": "EA",
+      "newLine": 17298,
+      "newEnd": 17312,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "HL",
+      "oldLine": 17252,
+      "oldEnd": 17254,
+      "new": "gP",
+      "newLine": 17313,
+      "newEnd": 17315,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "an",
+      "oldLine": 17255,
+      "oldEnd": 17352,
+      "new": "ln",
+      "newLine": 17316,
+      "newEnd": 17413,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": null,
+      "oldLine": 17353,
+      "oldEnd": 17353,
+      "new": null,
+      "newLine": 17414,
+      "newEnd": 17414,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "GL",
+      "oldLine": 17355,
+      "oldEnd": 17364,
+      "new": "vP",
+      "newLine": 17416,
+      "newEnd": 17425,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "Is",
+      "oldLine": 17365,
+      "oldEnd": 17468,
+      "new": "Rs",
+      "newLine": 17426,
+      "newEnd": 17529,
+      "issues": [],
+      "unknowns": [
+        {
+          "old": "yt",
+          "new": "yt",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        },
+        {
+          "old": "yy",
+          "new": "Ny",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        },
+        {
+          "old": "qe",
+          "new": "qe",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        },
+        {
+          "old": "jt",
+          "new": "Ut",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        }
+      ]
+    },
+    {
+      "old": null,
+      "oldLine": 17469,
+      "oldEnd": 17469,
+      "new": null,
+      "newLine": 17530,
+      "newEnd": 17530,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "qL,WL,aI,TC",
+      "oldLine": 17471,
+      "oldEnd": 17471,
+      "new": "yP,EP,wA,JC",
+      "newLine": 17532,
+      "newEnd": 17532,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "NC",
+      "oldLine": 17472,
+      "oldEnd": 17474,
+      "new": "ZC",
+      "newLine": 17533,
+      "newEnd": 17535,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "Qh",
+      "oldLine": 17482,
+      "oldEnd": 17484,
+      "new": "cp",
+      "newLine": 17543,
+      "newEnd": 17545,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "KL",
+      "oldLine": 17485,
+      "oldEnd": 17501,
+      "new": "wP",
+      "newLine": 17546,
+      "newEnd": 17562,
+      "issues": [],
+      "unknowns": [
+        {
+          "old": "Zh",
+          "new": "op",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        }
+      ]
+    },
+    {
+      "old": "YL",
+      "oldLine": 17502,
+      "oldEnd": 17510,
+      "new": "_P",
+      "newLine": 17563,
+      "newEnd": 17571,
+      "issues": [],
+      "unknowns": [
+        {
+          "old": "Zh",
+          "new": "op",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        }
+      ]
+    },
+    {
+      "old": "XL",
+      "oldLine": 17511,
+      "oldEnd": 17517,
+      "new": "SP",
+      "newLine": 17572,
+      "newEnd": 17578,
+      "issues": [],
+      "unknowns": [
+        {
+          "old": "Zh",
+          "new": "op",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        }
+      ]
+    },
+    {
+      "old": "JL",
+      "oldLine": 17518,
+      "oldEnd": 17557,
+      "new": "AP",
+      "newLine": 17579,
+      "newEnd": 17618,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "ZL",
+      "oldLine": 17559,
+      "oldEnd": 17564,
+      "new": "IP",
+      "newLine": 17620,
+      "newEnd": 17625,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "QL",
+      "oldLine": 17565,
+      "oldEnd": 17567,
+      "new": "bP",
+      "newLine": 17626,
+      "newEnd": 17628,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "eP",
+      "oldLine": 17568,
+      "oldEnd": 17849,
+      "new": "CP",
+      "newLine": 17629,
+      "newEnd": 17910,
+      "issues": [],
+      "unknowns": [
+        {
+          "old": "Tc",
+          "new": "kc",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        },
+        {
+          "old": "yt",
+          "new": "yt",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        },
+        {
+          "old": "tP",
+          "new": "RP",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        }
+      ]
+    },
+    {
+      "old": "kn",
+      "oldLine": 17854,
+      "oldEnd": 17856,
+      "new": "Un",
+      "newLine": 17915,
+      "newEnd": 17917,
+      "issues": [],
+      "unknowns": [
+        {
+          "old": "lv",
+          "new": "gv",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        }
+      ]
+    },
+    {
+      "old": "ct",
+      "oldLine": 17857,
+      "oldEnd": 17908,
+      "new": "ct",
+      "newLine": 17918,
+      "newEnd": 17969,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "rP",
+      "oldLine": 17909,
+      "oldEnd": 17912,
+      "new": "TP",
+      "newLine": 17970,
+      "newEnd": 17973,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "sP,nP",
+      "oldLine": 17913,
+      "oldEnd": 17913,
+      "new": "NP,xP",
+      "newLine": 17974,
+      "newEnd": 17974,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "Pp",
+      "oldLine": 17914,
+      "oldEnd": 17926,
+      "new": "Gp",
+      "newLine": 17975,
+      "newEnd": 17987,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "iP",
+      "oldLine": 17927,
+      "oldEnd": 17935,
+      "new": "OP",
+      "newLine": 17988,
+      "newEnd": 17996,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "aP",
+      "oldLine": 17936,
+      "oldEnd": 17936,
+      "new": "kP",
+      "newLine": 17997,
+      "newEnd": 17997,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "oP",
+      "oldLine": 17937,
+      "oldEnd": 17964,
+      "new": "LP",
+      "newLine": 17998,
+      "newEnd": 18025,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "xC",
+      "oldLine": 17965,
+      "oldEnd": 17965,
+      "new": "QC",
+      "newLine": 18026,
+      "newEnd": 18026,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "cP",
+      "oldLine": 17966,
+      "oldEnd": 17968,
+      "new": "DP",
+      "newLine": 18027,
+      "newEnd": 18029,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "OC",
+      "oldLine": 17969,
+      "oldEnd": 17990,
+      "new": "eR",
+      "newLine": 18030,
+      "newEnd": 18051,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "Ht",
+      "oldLine": 17991,
+      "oldEnd": 17991,
+      "new": "Ht",
+      "newLine": 18052,
+      "newEnd": 18052,
+      "issues": [],
+      "unknowns": [
+        {
+          "old": "Ys",
+          "new": "Js",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        }
+      ]
+    },
+    {
+      "old": "lP",
+      "oldLine": 17992,
+      "oldEnd": 17998,
+      "new": "PP",
+      "newLine": 18053,
+      "newEnd": 18059,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "uP",
+      "oldLine": 17999,
+      "oldEnd": 18016,
+      "new": "jP",
+      "newLine": 18060,
+      "newEnd": 18077,
+      "issues": [],
+      "unknowns": [
+        {
+          "old": "bt",
+          "new": "bt",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        }
+      ]
+    },
+    {
+      "old": "dP",
+      "oldLine": 18017,
+      "oldEnd": 18028,
+      "new": "UP",
+      "newLine": 18078,
+      "newEnd": 18089,
+      "issues": [],
+      "unknowns": [
+        {
+          "old": "bt",
+          "new": "bt",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        }
+      ]
+    },
+    {
+      "old": "qf",
+      "oldLine": 18029,
+      "oldEnd": 18038,
+      "new": "rh",
+      "newLine": 18090,
+      "newEnd": 18099,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "uv",
+      "oldLine": 18039,
+      "oldEnd": 18047,
+      "new": "vv",
+      "newLine": 18100,
+      "newEnd": 18108,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "oI",
+      "oldLine": 18048,
+      "oldEnd": 18056,
+      "new": "_A",
+      "newLine": 18109,
+      "newEnd": 18117,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "cI",
+      "oldLine": 18057,
+      "oldEnd": 18065,
+      "new": "SA",
+      "newLine": 18118,
+      "newEnd": 18126,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "fP",
+      "oldLine": 18066,
+      "oldEnd": 18068,
+      "new": "MP",
+      "newLine": 18127,
+      "newEnd": 18129,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "hP",
+      "oldLine": 18069,
+      "oldEnd": 18071,
+      "new": "$P",
+      "newLine": 18130,
+      "newEnd": 18132,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "pP",
+      "oldLine": 18072,
+      "oldEnd": 18079,
+      "new": "VP",
+      "newLine": 18133,
+      "newEnd": 18140,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "mP",
+      "oldLine": 18080,
+      "oldEnd": 18082,
+      "new": "FP",
+      "newLine": 18141,
+      "newEnd": 18143,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "gP",
+      "oldLine": 18083,
+      "oldEnd": 18085,
+      "new": "BP",
+      "newLine": 18144,
+      "newEnd": 18146,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "vP",
+      "oldLine": 18086,
+      "oldEnd": 18088,
+      "new": "zP",
+      "newLine": 18147,
+      "newEnd": 18149,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "yP",
+      "oldLine": 18089,
+      "oldEnd": 18092,
+      "new": "HP",
+      "newLine": 18150,
+      "newEnd": 18153,
+      "issues": [],
+      "unknowns": [
+        {
+          "old": "bt",
+          "new": "bt",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        }
+      ]
+    },
+    {
+      "old": "EP",
+      "oldLine": 18093,
+      "oldEnd": 18101,
+      "new": "GP",
+      "newLine": 18154,
+      "newEnd": 18162,
+      "issues": [],
+      "unknowns": [
+        {
+          "old": "bt",
+          "new": "bt",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        }
+      ]
+    },
+    {
+      "old": "_P",
+      "oldLine": 18102,
+      "oldEnd": 18104,
+      "new": "qP",
+      "newLine": 18163,
+      "newEnd": 18165,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "wP",
+      "oldLine": 18105,
+      "oldEnd": 18107,
+      "new": "WP",
+      "newLine": 18166,
+      "newEnd": 18168,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "SP",
+      "oldLine": 18108,
+      "oldEnd": 18110,
+      "new": "KP",
+      "newLine": 18169,
+      "newEnd": 18171,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "Pc",
+      "oldLine": 18111,
+      "oldEnd": 18115,
+      "new": "Fc",
+      "newLine": 18172,
+      "newEnd": 18176,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "IP",
+      "oldLine": 18116,
+      "oldEnd": 18125,
+      "new": "YP",
+      "newLine": 18177,
+      "newEnd": 18186,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "kC",
+      "oldLine": 18126,
+      "oldEnd": 18209,
+      "new": "tR",
+      "newLine": 18187,
+      "newEnd": 18270,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "DC",
+      "oldLine": 18210,
+      "oldEnd": 18215,
+      "new": "rR",
+      "newLine": 18271,
+      "newEnd": 18276,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "AP",
+      "oldLine": 18216,
+      "oldEnd": 18222,
+      "new": "XP",
+      "newLine": 18277,
+      "newEnd": 18283,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "bP",
+      "oldLine": 18223,
+      "oldEnd": 18225,
+      "new": "JP",
+      "newLine": 18284,
+      "newEnd": 18286,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "CP",
+      "oldLine": 18226,
+      "oldEnd": 18230,
+      "new": "ZP",
+      "newLine": 18287,
+      "newEnd": 18291,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "RP",
+      "oldLine": 18231,
+      "oldEnd": 18241,
+      "new": "QP",
+      "newLine": 18292,
+      "newEnd": 18302,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "LC",
+      "oldLine": 18242,
+      "oldEnd": 18244,
+      "new": "sR",
+      "newLine": 18303,
+      "newEnd": 18305,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "TP",
+      "oldLine": 18245,
+      "oldEnd": 18247,
+      "new": "e2",
+      "newLine": 18306,
+      "newEnd": 18308,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "PC",
+      "oldLine": 18248,
+      "oldEnd": 18254,
+      "new": "nR",
+      "newLine": 18309,
+      "newEnd": 18315,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "NP",
+      "oldLine": 18255,
+      "oldEnd": 18264,
+      "new": "t2",
+      "newLine": 18316,
+      "newEnd": 18325,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "xP",
+      "oldLine": 18265,
+      "oldEnd": 18265,
+      "new": "r2",
+      "newLine": 18326,
+      "newEnd": 18326,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "OP",
+      "oldLine": 18266,
+      "oldEnd": 18268,
+      "new": "s2",
+      "newLine": 18327,
+      "newEnd": 18329,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "jp",
+      "oldLine": 18269,
+      "oldEnd": 18274,
+      "new": "qp",
+      "newLine": 18330,
+      "newEnd": 18335,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "kP",
+      "oldLine": 18275,
+      "oldEnd": 18301,
+      "new": "n2",
+      "newLine": 18336,
+      "newEnd": 18362,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "DP",
+      "oldLine": 18302,
+      "oldEnd": 18302,
+      "new": "i2",
+      "newLine": 18363,
+      "newEnd": 18363,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "cE",
+      "oldLine": 18303,
+      "oldEnd": 18310,
+      "new": "_E",
+      "newLine": 18364,
+      "newEnd": 18371,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "LP",
+      "oldLine": 18311,
+      "oldEnd": 18315,
+      "new": "a2",
+      "newLine": 18372,
+      "newEnd": 18376,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "lI",
+      "oldLine": 18316,
+      "oldEnd": 18320,
+      "new": "AA",
+      "newLine": 18377,
+      "newEnd": 18381,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "uI",
+      "oldLine": 18321,
+      "oldEnd": 18325,
+      "new": "IA",
+      "newLine": 18382,
+      "newEnd": 18386,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": null,
+      "oldLine": 18327,
+      "oldEnd": 18329,
+      "new": null,
+      "newLine": 18388,
+      "newEnd": 18390,
+      "issues": [],
+      "unknowns": [
+        {
+          "old": "Ey",
+          "new": "xy",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        }
+      ]
+    },
+    {
+      "old": "PP",
+      "oldLine": 18330,
+      "oldEnd": 18366,
+      "new": "o2",
+      "newLine": 18391,
+      "newEnd": 18427,
+      "issues": [],
+      "unknowns": [
+        {
+          "old": "Ey",
+          "new": "xy",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        }
+      ]
+    },
+    {
+      "old": "dc",
+      "oldLine": 18367,
+      "oldEnd": 18374,
+      "new": "vc",
+      "newLine": 18428,
+      "newEnd": 18435,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "jC,dI,jP,UC",
+      "oldLine": 18375,
+      "oldEnd": 18375,
+      "new": "iR,bA,c2,aR",
+      "newLine": 18436,
+      "newEnd": 18436,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "hI",
+      "oldLine": 18422,
+      "oldEnd": 18436,
+      "new": "RA",
+      "newLine": 18483,
+      "newEnd": 18497,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "VP",
+      "oldLine": 18437,
+      "oldEnd": 18439,
+      "new": "f2",
+      "newLine": 18498,
+      "newEnd": 18500,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "$C",
+      "oldLine": 18440,
+      "oldEnd": 18465,
+      "new": "oR",
+      "newLine": 18501,
+      "newEnd": 18526,
+      "issues": [],
+      "unknowns": [
+        {
+          "old": "to",
+          "new": "ao",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        }
+      ]
+    },
+    {
+      "old": "FP,BP",
+      "oldLine": 18466,
+      "oldEnd": 18608,
+      "new": "h2,p2",
+      "newLine": 18527,
+      "newEnd": 18669,
+      "issues": [],
+      "unknowns": [
+        {
+          "old": "to",
+          "new": "ao",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        }
+      ]
+    },
+    {
+      "old": "pI",
+      "oldLine": 18609,
+      "oldEnd": 18609,
+      "new": "TA",
+      "newLine": 18670,
+      "newEnd": 18670,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "tc,zP",
+      "oldLine": 18610,
+      "oldEnd": 18762,
+      "new": "oc,m2",
+      "newLine": 18671,
+      "newEnd": 18823,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "HP",
+      "oldLine": 18763,
+      "oldEnd": 18773,
+      "new": "g2",
+      "newLine": 18824,
+      "newEnd": 18834,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "mI",
+      "oldLine": 18774,
+      "oldEnd": 18778,
+      "new": "NA",
+      "newLine": 18835,
+      "newEnd": 18839,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "GP",
+      "oldLine": 18779,
+      "oldEnd": 18844,
+      "new": "v2",
+      "newLine": 18840,
+      "newEnd": 18905,
+      "issues": [],
+      "unknowns": [
+        {
+          "old": "to",
+          "new": "ao",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        }
+      ]
+    },
+    {
+      "old": "qP",
+      "oldLine": 18845,
+      "oldEnd": 18879,
+      "new": "y2",
+      "newLine": 18906,
+      "newEnd": 18940,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "WP,KP,YP,VC,XP,JP,ZP,QP,e2,Qi,FC,_y",
+      "oldLine": 18880,
+      "oldEnd": 18880,
+      "new": "E2,w2,_2,lR,S2,A2,I2,b2,C2,sa,uR,Oy",
+      "newLine": 18941,
+      "newEnd": 18941,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": "t2",
+      "oldLine": 18881,
+      "oldEnd": 18955,
+      "new": "R2",
+      "newLine": 18942,
+      "newEnd": 19016,
+      "issues": [],
+      "unknowns": []
+    },
+    {
+      "old": null,
+      "oldLine": 18957,
+      "oldEnd": 18959,
+      "new": null,
+      "newLine": 19018,
+      "newEnd": 19020,
+      "issues": [],
+      "unknowns": [
+        {
+          "old": "Bt",
+          "new": "zt",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        }
+      ]
+    },
+    {
+      "old": "gI,r2,BC,wy,s2,n2,i2,a2,o2,zC",
+      "oldLine": 18960,
+      "oldEnd": 19044,
+      "new": "xA,T2,dR,ky,N2,x2,O2,k2,L2,fR",
+      "newLine": 19021,
+      "newEnd": 19105,
+      "issues": [],
+      "unknowns": [
+        {
+          "old": "Bt",
+          "new": "zt",
+          "type": "UNPAIRED_GLOBAL_REFERENCE"
+        }
+      ]
+    },
+    {
+      "old": "fc,c2,rc,Dn,l2,u2,d2,f2,Pn,os,ci,Sy,h2,Iy,Wf,HC,p2,ep,m2,Go,g2,Kf,v2",
+      "oldLine": 19045,
+      "oldEnd": 19769,
+      "new": "yc,D2,cc,Mn,P2,j2,U2,M2,Vn,ds,fi,Ly,$2,Dy,sh,hR,V2,lp,F2,Xo,B2,nh,z2",
+      "newLine": 19106,
+      "newEnd": 19830,
+      "issues": [],
+      "unknowns": []
+    }
+  ]
+}

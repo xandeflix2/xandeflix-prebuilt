@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "gate": "CANON-01-DETAIL-BACKDROP-TYPES",
+  "parentGate": "CANON-01",
+  "amendment": "CANON-01-DETAIL-BACKDROP-TYPES",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "EXPLICIT_USER_PRIORITIZED_UPDATED_APK_INSTALLATION_AND_IN_SCOPE_COMPILATION_CORRECTION",
+  "authorizationRequestSha256": "dc9feae1e4dddb0cc8950d1df1cb93d840d99bc8446f68897e7b91b9681bf854",
+  "reason": "Explicit return types reference the React namespace required by the TSX test loader, satisfying noUnusedLocals without runtime changes.",
+  "physicalImpact": "REQUIRED",
+  "physicalImpactJustification": "Same-version/certificate separate APK, authorized in-place tests on Fire/tablet/phone; preserve private records and observe backgrounds, navigation and automatic retention. No uninstall/reset/PIN.",
+  "testChangesReviewed": true,
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c105-complete-root-search.mjs",
+    "scripts/test-c107-catalog-return-navigation.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c11-landscape-navigation.mjs",
+    "scripts/validate-direct-playback.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock",
+    "npm run typecheck",
+    "npm run update:check",
+    "npm run security:check",
+    "npm run playback:check",
+    "npm run build",
+    "npm run site:build",
+    "node scripts/test-vercel-prebuilt-contract.mjs",
+    "node scripts/test-c105-directory-import.mjs",
+    "node scripts/test-c105-directory-details.mjs",
+    "node scripts/test-c105-directory-orchestration.mjs",
+    "node scripts/test-c11-automatic-source-refresh.mjs",
+    "node scripts/test-catalog-read-diagnostic.mjs",
+    "node scripts/test-xui-m3u-kind-recovery.mjs",
+    "node scripts/test-c157-web-source-https.mjs",
+    "node scripts/test-catalog-physical-regressions.mjs",
+    "node scripts/test-c135-adult-reader.mjs",
+    "node scripts/test-series-poster-composition.mjs",
+    "node scripts/test-tmdb-context-identity.mjs",
+    "node scripts/test-tmdb-subtitle-preview-recovery.mjs",
+    "node scripts/test-c11-catalog-promotion-directories.mjs",
+    "node scripts/test-catalog-snapshot-retention.mjs",
+    "node scripts/test-detail-backdrop-recovery.mjs",
+    "node scripts/test-c11-source-first-tmdb-artwork.mjs",
+    "node scripts/test-c11-artwork-visible-recovery.mjs"
+  ],
+  "evidence": "docs/evidence/DETAIL_BACKDROP_UI_RECOVERY.md",
+  "compatibilityRisk": "Detail-only behavior; official same-identity alternatives, bounded cache/queue and decode geometry. Old positive metadata refreshed by a separate purpose without clearing poster caches. TV-only icon rules do not zoom native surfaces.",
+  "restrictions": [
+    "Preserve128 controls/22 suites and add suite23. Previous test assertions unchanged; loader ports only.",
+    "Preserve all68 previous paths outside exact closed scope and all16 historical receipts. Frozen retention source/receipt unchanged.",
+    "No Android/native source, version/signing, source formats/catalog/player/parental/license/backend/Git publication or next Gate.",
+    "Preserve DETAIL-BACKDROP-UI receipt. Type annotations only; no new suite or runtime change."
+  ],
+  "supersedes": {
+    "src/ui/components/DetailBackdrop.tsx": "CANON-01-DETAIL-BACKDROP-UI",
+    "scripts/test-canonical-regression.mjs": "CANON-01-DETAIL-BACKDROP-UI"
+  },
+  "changes": [
+    {
+      "path": "src/ui/components/DetailBackdrop.tsx",
+      "before": "4db0506a6818d6406ec7eda93a0ea659130679e0",
+      "after": "129b76646f91db41c60645d9636c0ab435914ed9"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "3cea6e7f74ee138233359db331f5a36a5fe6f93e",
+      "after": "c778eb274d3fd2aa2f93ae9d60dc4d4d7554a983"
+    }
+  ],
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": true,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false
+}

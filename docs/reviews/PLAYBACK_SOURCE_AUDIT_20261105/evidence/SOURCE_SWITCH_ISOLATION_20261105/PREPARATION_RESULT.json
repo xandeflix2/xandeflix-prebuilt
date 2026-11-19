@@ -1,0 +1,16 @@
+{
+  "observedUTC": "2026-11-05T10:55:49.129Z",
+  "result": "ISOLATED_REFERENCE_REPRODUCED_NOT_PRODUCT_APPROVAL",
+  "workspace": "C:\\Xandeflix\\Audits\\SOURCE_SWITCH_ISOLATION_20261105\\workspace",
+  "branch": "main",
+  "head": "d8a74102124fbb8a3f013f6fd8a502519c1db4b8",
+  "origin": "https://github.com/xandeflix2/xandeflix-prebuilt.git",
+  "sourceFiles": 1581,
+  "dependencyFiles": 6760,
+  "indexMatchesHead": true,
+  "sourceGitBytesUnchanged": true,
+  "sourceBytesUnchanged": true,
+  "independentGit": true,
+  "historicalGovernanceLimitation": "RETAINED",
+  "productLogicChanged": false
+}

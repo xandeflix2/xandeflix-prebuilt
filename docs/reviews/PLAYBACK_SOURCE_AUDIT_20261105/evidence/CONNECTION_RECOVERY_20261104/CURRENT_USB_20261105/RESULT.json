@@ -1,0 +1,16 @@
+{
+  "result": "USB_5G_COMPARATIVE_DIAGNOSTIC_COMPLETE_RECOVERY_OPEN",
+  "phoneTested": true,
+  "sameMovieUriHeadersPlaysOnPhoneAndTablet": true,
+  "sameEpisodeUriHeadersFails403OnPhoneAndTablet": true,
+  "firePlaybackHomologated": false,
+  "rootCauseExclusive": "UNRESOLVED",
+  "recovery": "OPEN",
+  "observersRemovedAllThree": true,
+  "productCodeModified": false,
+  "apkInstalledByExecutor": false,
+  "buildExecuted": false,
+  "gitWrite": false,
+  "supabaseWrite": false,
+  "nextGateStarted": false
+}

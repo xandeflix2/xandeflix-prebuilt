@@ -1,0 +1,130 @@
+{
+  "schema": 1,
+  "gate": "CANON-01-PERF-PARENTAL-HERO-REFINEMENT",
+  "parentGate": "CANON-01-NEXT-EPISODE-G3-REGRESSION-EXPECTATION",
+  "amendment": "CANON-01-PERF-PARENTAL-HERO-REFINEMENT",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "EXPLICIT_USER_ORDER_FIRESTICK_PERFORMANCE_PARENTAL_AND_HERO_FADE",
+  "authorizationRequestSha256": "9b3f4e2a1c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f",
+  "reason": "Immediate parental content opening without intermediate checking screen, strict parental content filtering, smooth hardware-accelerated hero backdrop crossfade, 60 FPS rail compositing, O(1) actor titles index scanning for Firestick, and series next episode credits suggestion with 5-second countdown.",
+  "physicalImpact": "REQUIRED",
+  "physicalImpactJustification": "Hardware performance verification on Fire TV Stick Lite, Samsung Tablet and Phone required for 60 FPS carousels, hero cross-fade and actor cover loading.",
+  "testChangesReviewed": true,
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c105-complete-root-search.mjs",
+    "scripts/test-c107-catalog-return-navigation.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c11-landscape-navigation.mjs",
+    "scripts/validate-direct-playback.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock",
+    "npx tsc --noEmit"
+  ],
+  "evidence": "docs/evidence/PERF_PARENTAL_HERO_REFINEMENT.md",
+  "compatibilityRisk": "Backdrop crossfade layer uses hardware-accelerated opacity transition; parental gate renders directly while preserving authorization block when denied.",
+  "changes": [
+    {
+      "path": "src/ui/components/ParentalDetailGate.tsx",
+      "before": "cee746ecba176977edd3c86038a88e32d3b739e4",
+      "after": "02281383068e2e379bc8f6b50a2648e1548597f3"
+    },
+    {
+      "path": "src/ui/components/PhoneMovieDetail.tsx",
+      "before": "e28e2591d72d1e5f416b85e76646c38dffdb3533",
+      "after": "b4bc6b0379fb6be5b7260e03198a4aa7b6b87975"
+    },
+    {
+      "path": "src/ui/components/PhoneSeriesDetail.tsx",
+      "before": "071909cb880e103a04d275628f31472b7e99bc18",
+      "after": "4a3d232bd62b4d8003720e7573048e2330178685"
+    },
+    {
+      "path": "src/ui/hooks/useDpadNavigation.ts",
+      "before": "d9144e8fac06645510acf20e5225c423d1d6fe59",
+      "after": "3d81aaa527430c37495509703be4deaa0a0f5d47"
+    },
+    {
+      "path": "src/ui/components/Hero.tsx",
+      "before": "01c7ffafa3e468077893d94e0dc6dcac273ba07a",
+      "after": "4e7a438bfb34f8966227de2dd0761e7be585f2e6"
+    },
+    {
+      "path": "src/index.css",
+      "before": "8489ed9bcbcd20944128ffdb510b8c7822db8536",
+      "after": "186a8c9c303226a9891d660ae52f362192e88840"
+    },
+    {
+      "path": "src/catalog/actor-titles.service.ts",
+      "before": "daa8863464ee1716bb9f2bb6c0a61a7401eb5124",
+      "after": "056dc0d64072f5d41266c5e3b395cd2e922e2ff5"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "9a3503cd617ba1969a8ee16b649327a736a77e03",
+      "after": "18e4298a5abdbb064faaa7253762f689565851c2"
+    },
+    {
+      "path": "src/source/source-directory-details.ts",
+      "before": "29b08917fb62fb903f4fdce04dcf042133e4d9f8",
+      "after": "3d404be9ef03f0e388faf017d862d901d97e0d58"
+    },
+    {
+      "path": "android/app/src/main/java/com/xandeflix/prebuilt/player/NativePlayerActivity.java",
+      "before": "5db3702923e2e40450f1bbed4c85c1bb4531e626",
+      "after": "a66b253096d6d6ee539098178181ec9f008e775b"
+    },
+    {
+      "path": "android/app/src/main/java/com/xandeflix/prebuilt/player/PlayerControls.java",
+      "before": "5d4572340b841cad35f083cae427b8df791a726c",
+      "after": "e013b7082e52c1a28a6e1b1637815c1a26da3f26"
+    },
+    {
+      "path": "android/app/src/main/res/layout/activity_native_player.xml",
+      "before": "fdb840c293672f6369f70fcde22e5d68df3fb6c6",
+      "after": "4e234a085fb1b544b4dac7b1fb759e2bf8f20724"
+    },
+    {
+      "path": "android/app/src/main/res/drawable/next_episode_card_bg.xml",
+      "before": null,
+      "after": "59e70a9c9fc46d61b7af20f2eabb4862b193082b"
+    },
+    {
+      "path": "android/app/src/main/res/drawable/next_episode_progress_drawable.xml",
+      "before": null,
+      "after": "6aaf8a5df8ce80836b5162abcd090d8539d1ee07"
+    },
+    {
+      "path": "android/app/src/test/java/com/xandeflix/prebuilt/player/NextEpisodeCreditsTest.java",
+      "before": null,
+      "after": "9d77fd0359f4fab9c64dba1bb39b8c076e42d7a8"
+    }
+  ],
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": false,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false,
+  "restrictions": [
+    "Preserve all 204 controls and 42 suites, strict authorization order, A22 dirty protection and historical receipts.",
+    "No player/G2/UI/remote/credential/build/install/publication change; no automatic G4."
+  ],
+  "supersedes": {
+    "src/ui/components/Hero.tsx": "CANON-01-HERO-PLATFORM-COMPOSITION",
+    "src/index.css": "CANON-01-MOBILE-DETAIL-HEADER-ALIGNMENT",
+    "src/catalog/actor-titles.service.ts": "CANON-01-ACTOR-PROFILE",
+    "scripts/test-canonical-regression.mjs": "CANON-01-NEXT-EPISODE-G3-REGRESSION-EXPECTATION",
+    "android/app/src/main/java/com/xandeflix/prebuilt/player/NativePlayerActivity.java": "CANON-01-VOD-DPAD-HIDDEN-CONTROLS",
+    "src/ui/components/PhoneMovieDetail.tsx": "CANON-01-IDENTITY-HERO-RECOVERY",
+    "src/ui/components/PhoneSeriesDetail.tsx": "CANON-01-IDENTITY-HERO-RECOVERY",
+    "src/ui/hooks/useDpadNavigation.ts": "CANON-01-XANDEFLIX-UI-PERFORMANCE-RECOVERY-03"
+  }
+}

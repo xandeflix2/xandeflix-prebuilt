@@ -1,0 +1,102 @@
+[
+  {
+    "path": "src/bootstrap/source-replacement.ts",
+    "addedLines": 184,
+    "removedLines": 0
+  },
+  {
+    "path": "src/bootstrap/boot-sync-coordinator.ts",
+    "addedLines": 90,
+    "removedLines": 4
+  },
+  {
+    "path": "src/App.tsx",
+    "addedLines": 27,
+    "removedLines": 4
+  },
+  {
+    "path": "src/playback/watch-history.ts",
+    "addedLines": 10,
+    "removedLines": 6
+  },
+  {
+    "path": "src/playback/live-favorites.ts",
+    "addedLines": 5,
+    "removedLines": 3
+  },
+  {
+    "path": "src/playback/last-live-channel.ts",
+    "addedLines": 4,
+    "removedLines": 2
+  },
+  {
+    "path": "src/ui/series-personal.store.ts",
+    "addedLines": 4,
+    "removedLines": 2
+  },
+  {
+    "path": "src/catalog/new-content-badge.ts",
+    "addedLines": 4,
+    "removedLines": 2
+  },
+  {
+    "path": "src/artwork/artwork-file-cache.ts",
+    "addedLines": 4,
+    "removedLines": 2
+  },
+  {
+    "path": "android/app/src/main/java/com/xandeflix/prebuilt/artwork/ArtworkDiskCache.java",
+    "addedLines": 9,
+    "removedLines": 1
+  },
+  {
+    "path": "android/app/src/main/java/com/xandeflix/prebuilt/artwork/ArtworkCachePlugin.java",
+    "addedLines": 4,
+    "removedLines": 2
+  },
+  {
+    "path": "android/app/build.gradle",
+    "addedLines": 2,
+    "removedLines": 2
+  },
+  {
+    "path": "scripts/test-source-replacement-isolation.mjs",
+    "addedLines": 108,
+    "removedLines": 0
+  },
+  {
+    "path": "scripts/test-source-replacement-bootstrap.mjs",
+    "addedLines": 259,
+    "removedLines": 0
+  },
+  {
+    "path": "scripts/test-source-replacement-ui.mjs",
+    "addedLines": 50,
+    "removedLines": 0
+  },
+  {
+    "path": "android/app/src/test/java/com/xandeflix/prebuilt/artwork/ArtworkScopeIsolationTest.java",
+    "addedLines": 40,
+    "removedLines": 0
+  },
+  {
+    "path": "scripts/test-c11-new-content-badge.mjs",
+    "addedLines": 6,
+    "removedLines": 1
+  },
+  {
+    "path": "scripts/test-c11-artwork-visible-recovery.mjs",
+    "addedLines": 2,
+    "removedLines": 0
+  },
+  {
+    "path": "scripts/test-c11-page-artwork-preparation.mjs",
+    "addedLines": 2,
+    "removedLines": 1
+  },
+  {
+    "path": "scripts/test-canonical-regression.mjs",
+    "addedLines": 2,
+    "removedLines": 2
+  }
+]

@@ -1,0 +1,294 @@
+{
+  "observedUTC": "2026-11-05T17:47:42.247Z",
+  "scope": "All evidence files, except this self-referential closure",
+  "files": [
+    {
+      "path": "cdp-local.mjs",
+      "bytes": 2291,
+      "nlink": 1,
+      "sha256": "a6e655fb66ef35f367affb64975cd538ddac9550342aacbfe8ab9afd15757279"
+    },
+    {
+      "path": "cleanup-media.mjs",
+      "bytes": 769,
+      "nlink": 1,
+      "sha256": "8a11fd7c30900c3922c91257cbdc0e3cd28514e7f4e98d15fcc2ef198f384679"
+    },
+    {
+      "path": "collect-media.mjs",
+      "bytes": 567,
+      "nlink": 1,
+      "sha256": "a6b48ae63dcc4544f6ba3a7ba9f955d9665efb577efcac000bf14a0cf4e9f327"
+    },
+    {
+      "path": "FIRE_5G_INITIAL.json",
+      "bytes": 152,
+      "nlink": 1,
+      "sha256": "6f20dffb19daaccd14a4eb4b434a00c773aece789883b328d8f70eb523d9c1e9"
+    },
+    {
+      "path": "FIRE_5G_MOVIE_RETRY_FOLLOWUP.json",
+      "bytes": 2613,
+      "nlink": 1,
+      "sha256": "81a0d3b91679963cfc54c0eabc7e21d27959521bf2ce14d87c3faf2bf032c5d6"
+    },
+    {
+      "path": "FIRE_5G_MOVIE_RETRY.json",
+      "bytes": 1846,
+      "nlink": 1,
+      "sha256": "f284cd809fe8438c0a4861df10bbf3362e7e2e4a839ee104cc6b15c54725a63e"
+    },
+    {
+      "path": "FIRE_5G_MOVIE.json",
+      "bytes": 1221,
+      "nlink": 1,
+      "sha256": "1d81a8fae4cc425f2337f87fea8ac9f6b9c7d9b2e985279e7fc7ccc86352ee35"
+    },
+    {
+      "path": "FIRE_5G_SCREEN.png",
+      "bytes": 4989044,
+      "nlink": 1,
+      "sha256": "d3ed9a544c2728a5a718e13a44e30003427aa899332f2129d0beccfaefe70b82"
+    },
+    {
+      "path": "FIRE_OBSERVER_CLEANUP.json",
+      "bytes": 150,
+      "nlink": 1,
+      "sha256": "449b9eb85d66644bbff5f0165c56a392738a1c18c96a279e2b5ed47701f8e66e"
+    },
+    {
+      "path": "HttpDeliveryProbe.class",
+      "bytes": 19143,
+      "nlink": 1,
+      "sha256": "8204c36c72f3ff67927323b30074a948c9a92b880686b6f511ca984b0e0337c5"
+    },
+    {
+      "path": "HttpDeliveryProbe.java",
+      "bytes": 13808,
+      "nlink": 1,
+      "sha256": "40d9912c5f09bdd227970d0bb06401207a7b427cae36333f841b2112b4c0f2f9"
+    },
+    {
+      "path": "https-api-probe.mjs",
+      "bytes": 3239,
+      "nlink": 1,
+      "sha256": "b47f58e80714649e48e16c40d78c960fd5eb1073440c388db5e0f78ee23281fa"
+    },
+    {
+      "path": "inspect-selected-episode.mjs",
+      "bytes": 5434,
+      "nlink": 1,
+      "sha256": "3b58f0ba1a862a160ad5158fc21a8d451cd51c153ac577c910e353db6590ef5b"
+    },
+    {
+      "path": "media-observer.mjs",
+      "bytes": 2697,
+      "nlink": 1,
+      "sha256": "2eeb348780a9940cada1110f5f9e232c0dcee520ef607cb655c9ef0f84c199de"
+    },
+    {
+      "path": "native-current-proof.mjs",
+      "bytes": 1952,
+      "nlink": 1,
+      "sha256": "8b06de1db9e391df0917104b60a663238745de37bf3230247c294f48b8a0a572"
+    },
+    {
+      "path": "playback-action.mjs",
+      "bytes": 2447,
+      "nlink": 1,
+      "sha256": "2319245c5af6672c91d2d7a931fd07681ddc28b2a63c494443303e74abcb3966"
+    },
+    {
+      "path": "post-clean-account.mjs",
+      "bytes": 4409,
+      "nlink": 1,
+      "sha256": "0ab26fd4e68a7bebfd5f390340130b7bfc86ab3aaa8f894fe44f0dd0a3da9aea"
+    },
+    {
+      "path": "redirect-https-probe.mjs",
+      "bytes": 2575,
+      "nlink": 1,
+      "sha256": "5536f6b16b6c563dcffe220d7c44249562f65ad2cdd282087d05629854263cc5"
+    },
+    {
+      "path": "repeat-5g.mjs",
+      "bytes": 977,
+      "nlink": 1,
+      "sha256": "26fb8190761fe7c85fc69653c859f39c0f8f79e6c5577c67857a6b3b3407979a"
+    },
+    {
+      "path": "REPORT.md",
+      "bytes": 5560,
+      "nlink": 1,
+      "sha256": "292cdf5f0f2e053a83c23688ae642da4be694d17cae253baf730e482a033a04d"
+    },
+    {
+      "path": "run-http-probe.mjs",
+      "bytes": 1298,
+      "nlink": 1,
+      "sha256": "13ab3b26b03f3b943e8ef1fd644219af677c8e3976895216dabd0e825be5abf0"
+    },
+    {
+      "path": "SPEC.md",
+      "bytes": 3890,
+      "nlink": 1,
+      "sha256": "04087978920fdfe39209409bc19b1816acf5f81721e910321f73e81e077b67c5"
+    },
+    {
+      "path": "TABLET_5G_ACTION.json",
+      "bytes": 116,
+      "nlink": 1,
+      "sha256": "155a6866f82f76967ebb8b8b6d67b21eccfe69915615fbe30e2b942d58cd34c7"
+    },
+    {
+      "path": "TABLET_5G_INITIAL_STATE.json",
+      "bytes": 149,
+      "nlink": 1,
+      "sha256": "d27ec7e15228678e53ea5c6bd9a6ed67974e70635b502217215111fc149ec699"
+    },
+    {
+      "path": "TABLET_5G_MOVIE_FOLLOWUP.json",
+      "bytes": 955,
+      "nlink": 1,
+      "sha256": "92dde01d17f9698b5656b7cdcd8278eb2a355e12d6e9103bb39bc3b9b46bcc77"
+    },
+    {
+      "path": "TABLET_5G_MOVIE_PROOF.json",
+      "bytes": 2576,
+      "nlink": 1,
+      "sha256": "f61073acecc25f48dfe2487f7c4c4a228c7440237597cece3d97c37f1c66f1e0"
+    },
+    {
+      "path": "TABLET_5G_MOVIE.json",
+      "bytes": 621,
+      "nlink": 1,
+      "sha256": "5364f90d50079b0498fe3a0a0edf5437a0f991946e38893fa07bacb88a778054"
+    },
+    {
+      "path": "TABLET_5G_REDIRECT_HTTPS.json",
+      "bytes": 104,
+      "nlink": 1,
+      "sha256": "a7820eb9dc9fb5f83c9947e47a81bc76506a15750c6e2316de437940bc00d5be"
+    },
+    {
+      "path": "TABLET_5G_SERIES_FOLLOWUP.json",
+      "bytes": 935,
+      "nlink": 1,
+      "sha256": "b0ccc2acda4ce39f9454308cdb141bd0a7ad8e4fc47e23ab7e5dae17c52fd2d4"
+    },
+    {
+      "path": "TABLET_5G_SERIES_HTTP.log",
+      "bytes": 2022,
+      "nlink": 1,
+      "sha256": "1aa50f6fa08a8ecc57395ec810853366a944aa1850a22a7c85e92262917e2a38"
+    },
+    {
+      "path": "TABLET_5G_SERIES_HTTPS_OBSERVATION.json",
+      "bytes": 1702,
+      "nlink": 1,
+      "sha256": "d45852ff64ce446999fcee3f96f7f03e435bf7bfab22a269918113c68ee6b89f"
+    },
+    {
+      "path": "TABLET_5G_SERIES_HTTPS_TARGET.log",
+      "bytes": 2328,
+      "nlink": 1,
+      "sha256": "62aa95d00100bb6fe12b271b8f9e9338b1f42bdeccd1b13d29d9404edd6c1763"
+    },
+    {
+      "path": "TABLET_5G_SERIES.json",
+      "bytes": 623,
+      "nlink": 1,
+      "sha256": "4735e0c679b41e82f1470a59c36085b96b274b32437f763fe15d0bf446a15d59"
+    },
+    {
+      "path": "TABLET_AFTER_CLEAN_ACCOUNT.json",
+      "bytes": 549,
+      "nlink": 1,
+      "sha256": "b95f741ee5f6ec8fb8878e3956971591ae400ab340bcbc93a1b9362123870ce3"
+    },
+    {
+      "path": "TABLET_AFTER_CLEAN_EPISODE_REFERENCE.json",
+      "bytes": 314,
+      "nlink": 1,
+      "sha256": "3446be395d1b87cca912bda53391fdfb125e07f70100af2c0ba5d590eded23e1"
+    },
+    {
+      "path": "TABLET_AFTER_CLEAN_MOVIE_PROOF.json",
+      "bytes": 1816,
+      "nlink": 1,
+      "sha256": "721cc1161bb67570e5ed7f8678d6bd842d07f30bbd44a5e7a117a72b06331a76"
+    },
+    {
+      "path": "TABLET_AFTER_CLEAN_REQUEST_BINDING.json",
+      "bytes": 324,
+      "nlink": 1,
+      "sha256": "f440f3934c0327fa66660d7bb3f3d98e77f88f5abaf61658c36ae954d78813ac"
+    },
+    {
+      "path": "TABLET_AFTER_CLEAN_SERIES_PROOF.json",
+      "bytes": 1950,
+      "nlink": 1,
+      "sha256": "17e28a7723d31dd40f8a35321457d34685328f1ddb3b7a771721f1d1cd0fcf15"
+    },
+    {
+      "path": "TABLET_HTTP_DELIVERY_DETAIL.log",
+      "bytes": 1788,
+      "nlink": 1,
+      "sha256": "436a872469eeaf349e38d874edf65e66a2f35631d8cfe03e0bbed35350552959"
+    },
+    {
+      "path": "TABLET_HTTPS_API.json",
+      "bytes": 162,
+      "nlink": 1,
+      "sha256": "ada4928440946ea95518e22282412924f4c401730026ef0fae172162ca1ecad6"
+    },
+    {
+      "path": "TABLET_OBSERVER_CLEANUP.json",
+      "bytes": 150,
+      "nlink": 1,
+      "sha256": "edb503f4e14ddcab674fce1d6ffff246d35ee34fa71dad6492ddd5e6498a316a"
+    },
+    {
+      "path": "TABLET_SCREEN.png",
+      "bytes": 1293187,
+      "nlink": 1,
+      "sha256": "42696a0c6b34cc3c8ee81569c74f123c2f2cf4110cc2557879715f4d3d4c95d6"
+    },
+    {
+      "path": "TABLET_TLS_DETAIL.json",
+      "bytes": 570,
+      "nlink": 1,
+      "sha256": "e18cdf4229ce4a2a620a60fbd9caf3aa80d507323c64d6915ba60b19e0816e6f"
+    },
+    {
+      "path": "TABLET_TRANSPORT_HINTS.json",
+      "bytes": 549,
+      "nlink": 1,
+      "sha256": "9e85a3d08bdb783b075441eff2fa7bc48106f1b7c5544a596ac69b2ac4009867"
+    },
+    {
+      "path": "tls-detail.mjs",
+      "bytes": 2028,
+      "nlink": 1,
+      "sha256": "4a3bc950d2cc98ff0a57926f13b5388db3ef7ac9983175934c05076ddc58f5c8"
+    },
+    {
+      "path": "transport-hints.mjs",
+      "bytes": 4405,
+      "nlink": 1,
+      "sha256": "d4e86aa8f0beab4b97e2cac34da7541eb4682a105653f443ac351733f45d2da4"
+    },
+    {
+      "path": "verify-5g-movie.mjs",
+      "bytes": 1838,
+      "nlink": 1,
+      "sha256": "270356722fbe90365a31cfaa1d9a403b2f70cef22f17bed4e262d893f1a44227"
+    },
+    {
+      "path": "verify-reference-binding.mjs",
+      "bytes": 1322,
+      "nlink": 1,
+      "sha256": "7da957d0f8572b44d1a0b146adec6f3d42ffb2cfe95123850f4c3db19a9a3371"
+    }
+  ]
+}

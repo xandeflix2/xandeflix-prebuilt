@@ -17,6 +17,8 @@
  */
 
 import { useEffect, useCallback, useRef } from 'react';
+import {acceptDpadRepeat} from '../dpad-repeat.ts';
+import {searchDpadTarget,rememberSearchResult} from '../search-dpad-navigation.ts';
 import { parentalControls, parentalDpadTarget, parentalEntry } from '../parental-dpad-navigation.ts';
 
 interface UseDpadNavigationOptions {
@@ -44,6 +46,16 @@ function focusableSibling(current: HTMLElement, forward: boolean): HTMLElement |
   }
   return null;
 }
+function rememberedRailCard(rail:Element):HTMLElement|null {
+  const track=rail.querySelector<HTMLElement>('.media-rail-track');
+  if(!track)return null;
+  if(track.hasAttribute('data-rail-window')){
+    const index=Number(track.dataset.railCurrentIndex||0);
+    const remembered=track.querySelector<HTMLElement>(`[data-rail-index="${index}"]`);
+    if(isFocusable(remembered))return remembered;
+  }
+  return track.querySelector<HTMLElement>('.focusable-item:not([disabled])');
+}
 
 function adjacentRailTarget(current: HTMLElement, forward: boolean, preferAction = false): HTMLElement | null {
   const rail = current.closest('.media-rail');
@@ -53,12 +65,14 @@ function adjacentRailTarget(current: HTMLElement, forward: boolean, preferAction
   const index = rails.indexOf(rail);
   if (index < 0) return null;
   const currentCards = Array.from(rail.querySelector('.media-rail-track')?.children || []).filter(isFocusable);
-  const column = Math.max(0, currentCards.indexOf(current));
+  const column = current.hasAttribute('data-rail-index')?Number(current.dataset.railIndex):Math.max(0, currentCards.indexOf(current));
   for (let next = index + (forward ? 1 : -1); next >= 0 && next < rails.length; next += forward ? 1 : -1) {
     const cards = Array.from(rails[next].querySelector('.media-rail-track')?.children || []).filter(isFocusable);
     if (!cards.length) continue;
     const action = preferAction ? rails[next].querySelector('.rail-view-all') : null;
-    return isFocusable(action) ? action : cards[Math.min(column, cards.length - 1)];
+    if(isFocusable(action))return action;
+    if(rails[next].querySelector('.media-rail-track[data-rail-window]'))return rememberedRailCard(rails[next]);
+    return cards.find(card=>Number(card.dataset.railIndex)===column)||cards[Math.min(column, cards.length - 1)];
   }
   return null;
 }
@@ -81,11 +95,45 @@ function activationControls(page: Element): HTMLElement[] {
 function findNextDpadTarget(current: HTMLElement, key: Direction, previousContent: HTMLElement | null, grids: WeakMap<Element, GridNavigation>): HTMLElement | null {
   const parentalDialog = current.closest('.parental-dialog[open]');
   if (parentalDialog) return parentalDpadTarget(parentalDialog, current, key, null, null);
+  const searchTarget=searchDpadTarget(current,key);
+  if(searchTarget!==undefined)return searchTarget;
   const sideShell = current.closest('.app-shell--side-nav');
   const sideMenu = sideShell && !current.closest('.modal-content, .player-overlay')
     ? sideShell.querySelector<HTMLElement>('.header-nav .nav-link.active') || sideShell.querySelector<HTMLElement>('.header-nav .focusable-item')
     : null;
   if (sideMenu && key === 'ArrowLeft' && current.closest('[data-dpad-region="live-categories"]')) return sideMenu;
+  const liveCategories = current.closest('[data-dpad-region="live-categories"]');
+  if (liveCategories) {
+    if (key === 'ArrowDown') return focusableSibling(current, true);
+    if (key === 'ArrowUp') return focusableSibling(current, false);
+    if (key === 'ArrowRight') {
+      const activeChannel = document.querySelector<HTMLElement>('.live-channel-list .active-channel.focusable-item:not([disabled])')
+        || document.querySelector<HTMLElement>('.live-channel-list .focusable-item:not([disabled])');
+      if (activeChannel && isFocusable(activeChannel)) return activeChannel;
+    }
+  }
+  const liveChannels = current.closest('.live-channel-list, .live-channel-column, [data-dpad-region="live-channels"]');
+  if (liveChannels) {
+    if (key === 'ArrowLeft') {
+      const activeGroup = document.querySelector<HTMLElement>('[data-dpad-region="live-categories"] .active-group.focusable-item:not([disabled])')
+        || document.querySelector<HTMLElement>('[data-dpad-region="live-categories"] .focusable-item:not([disabled])');
+      if (activeGroup && isFocusable(activeGroup)) return activeGroup;
+    }
+    if (key === 'ArrowRight') {
+      const previewAction = document.querySelector<HTMLElement>('.live-preview-panel .focusable-item:not([disabled])');
+      if (previewAction && isFocusable(previewAction)) return previewAction;
+    }
+  }
+  const livePreview = current.closest('.live-preview-panel, .live-preview-section, .live-epg-section');
+  if (livePreview) {
+    if (key === 'ArrowLeft') {
+      const activeChannel = document.querySelector<HTMLElement>('.live-channel-list .active-channel.focusable-item:not([disabled])')
+        || document.querySelector<HTMLElement>('.live-channel-list .focusable-item:not([disabled])');
+      if (activeChannel && isFocusable(activeChannel)) return activeChannel;
+    }
+    if (key === 'ArrowDown') return focusableSibling(current, true);
+    if (key === 'ArrowUp') return focusableSibling(current, false);
+  }
   const pageBack = sideMenu ? sideShell?.querySelector<HTMLElement>('.page-back-row .focusable-item') : null;
   const parentalPage = !current.closest('.modal-content, .player-overlay')
     ? current.closest('.parental-page') : null;
@@ -169,7 +217,7 @@ function findNextDpadTarget(current: HTMLElement, key: Direction, previousConten
   // Category overview: the row action must be reachable without geometry scans.
   if (current.classList.contains('rail-view-all')) {
     const rail = current.closest('.media-rail');
-    if (key === 'ArrowDown') return rail?.querySelector<HTMLElement>('.media-rail-track .focusable-item:not([disabled])') || null;
+    if (key === 'ArrowDown') return rail?rememberedRailCard(rail):null;
     if (key === 'ArrowLeft') return sideMenu || rail?.querySelector<HTMLElement>('.media-rail-track .focusable-item:not([disabled])') || null;
     if (key === 'ArrowUp') {
       return adjacentRailTarget(current, false, true) || pageHeroTarget(current) || sideMenu || null;
@@ -368,7 +416,6 @@ function findNextDpadTarget(current: HTMLElement, key: Direction, previousConten
 
 export function useDpadNavigation(options: UseDpadNavigationOptions = {}): void {
   const { onBack, enabled = true, autoFocusFirst = true } = options;
-  const lastKeyTimeRef = useRef<number>(0);
   const previousContentRef = useRef<HTMLElement | null>(null);
   const gridsRef = useRef(new WeakMap<Element, GridNavigation>());
   const scrollFrameRef = useRef(0);
@@ -412,6 +459,7 @@ export function useDpadNavigation(options: UseDpadNavigationOptions = {}): void 
       }
       const track = target.closest<HTMLElement>('.media-rail-track');
       if ((key === 'ArrowLeft' || key === 'ArrowRight') && track && current?.closest('.media-rail-track') === track) {
+        if(document.documentElement.dataset.cardInput==='dpad'&&track.hasAttribute('data-card-dpad-ready'))return;
         const bounds = track.getBoundingClientRect(), rect = target.getBoundingClientRect();
         if (rect.left < bounds.left + 6) track.scrollLeft -= bounds.left + 6 - rect.left;
         else if (rect.right > bounds.right - 6) track.scrollLeft += rect.right - bounds.right + 6;
@@ -497,11 +545,7 @@ export function useDpadNavigation(options: UseDpadNavigationOptions = {}): void 
       // Interrompe imediatamente o scroll nativo concorrente do WebView!
       event.preventDefault();
 
-      const now = performance.now();
-      if (event.repeat && now - lastKeyTimeRef.current < 55) {
-        return;
-      }
-      lastKeyTimeRef.current = now;
+      if(!acceptDpadRepeat(event))return;
 
       const active = document.activeElement as HTMLElement | null;
       let current = isFocusable(active) ? active : null;
@@ -526,6 +570,7 @@ export function useDpadNavigation(options: UseDpadNavigationOptions = {}): void 
       }
       const target = findNextDpadTarget(current, key as Direction, previousContentRef.current, gridsRef.current);
       if (target) {
+        rememberSearchResult(current);
         target.focus({ preventScroll: true });
         scheduleScroll(target, key as Direction, current);
       }

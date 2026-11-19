@@ -1,0 +1,121 @@
+
+> xandeflix-prebuilt@0.1.0 prebuild
+> npm run c11:new-device:lock
+
+
+> xandeflix-prebuilt@0.1.0 c11:new-device:lock
+> node scripts/test-c11-new-device-activation-lock.mjs
+
+PASS C11_NEW_DEVICE_ACTIVATION_AND_CATALOG_LOCK_V1_STATIC_INVARIANTS
+PASS LOCK_NEGATIVE_CONTROLS=9
+PASS SHA256_native
+PASS SHA256_absent
+PASS SHA256_rejected
+PASS SHA256_stalled
+PASS CONCURRENT_LOCAL_VALUES_AND_RELOAD_STABLE
+PASS TWO_CLEAN_DEVICES_ISOLATED_ACTIVATION_AND_RELOAD
+PASS OFFLINE_STILL_GENERATES_LOCAL_KEY
+PASS NATIVE_FAILURE_LOCALSTORAGE_VERIFIED
+PASS LOCALSTORAGE_FAILURE_NATIVE_VERIFIED
+PASS FAILED_PERSISTENCE_RETRY_DOES_NOT_ROTATE
+PASS HUNG_READ_NEVER_OVERWRITES_UNKNOWN_KEY
+PASS HUNG_READ_USES_EXISTING_LOCAL_COPY
+PASS DENIED_READ_IS_NOT_ABSENT_AND_NEVER_ROTATES
+PASS EXISTING_NATIVE_KEY_READ_ONLY_PRESERVED
+PASS BOOT_AND_UI_SHARE_ONE_A1_REQUEST_AND_PORTAL_HASH
+PASS INDETERMINATE_STATUS_PRESERVES_PENDING_SESSION
+PASS DELETED_PENDING_REQUEST_RECREATED_WITH_SAME_LOCAL_IDENTITY_AND_KEY
+PASS DELETION_RECOVERY_FAILURE_PRESERVES_OLD_CAPABILITY_UNTIL_SUCCESS
+PASS CAPABILITY_OR_UNKNOWN_FAILURE_NEVER_RECREATES_PENDING_REQUEST
+PASS DELETION_RECOVERY_REGISTER_FAILURE_RETRIES_NEW_REQUEST_WITHOUT_ROTATION
+PASS FAILED_REGISTER_IS_NOT_READY_AND_RETRY_REUSES_SESSION
+PASS HUNG_REPORT_IS_BOUNDED_LOCAL_KEY_REMAINS_READY
+PASS AUTHORIZED_STATE_PRESERVED_NO_NEW_REQUEST
+PASS CLEAN_BOOT_IDLES_WITHOUT_SOURCE_LOOKUP_OR_LICENSE_ERROR
+PASS BACKUP_EXCLUDES_IDENTITY_AND_WEBVIEW_COPIES
+[BOOT_TELEMETRY] T7_SOURCE_RESOLUTION_READY reached at +-1793879048227ms
+PASS AUTHORIZED_BOOT_STILL_RESOLVES_AND_PRESERVES_REAL_CATALOG
+RESULT=26_TESTS_PASSED (isolated mocks; no live backend writes)
+PASS fresh install: mkdir parent then rename, read model ready
+PASS actual stageArtifacts -> rename -> Bootstrap read model
+PASS actual stageArtifacts -> copy -> Bootstrap read model
+PASS existing directories native: stat-confirmed and old snapshot preserved
+PASS existing directories web: stat-confirmed and old snapshot preserved
+PASS existing directories posix: stat-confirmed and old snapshot preserved
+PASS rename unavailable: fallback creates target and canonical segments before pointer
+PASS fallback on fresh install: full Bootstrap -> storage -> active read model
+PASS fallback on update: keeps previous generation
+PASS existing non-active partial target: fallback recovers without changing old generation
+PASS mkdir OS-PLUG-FILE-0007: propagated, active and identities intact
+PASS mkdir ENOSPC: propagated, active and identities intact
+PASS mkdir BRIDGE_UNAVAILABLE: propagated, active and identities intact
+PASS target mkdir failure: old pointer and snapshot intact
+PASS segments mkdir failure: incomplete target cleaned, old active intact
+PASS already exists but is a file: reject, never delete file
+PASS already exists but stat fails: do not swallow I/O error
+PASS copy failure /manifest.json: cleanup candidate only, preserve old active
+PASS copy failure /catalog.json: cleanup candidate only, preserve old active
+PASS copy failure /segments/streams_000001.json: cleanup candidate only, preserve old active
+PASS same active snapshot repeat: reject before deleting data
+PASS same active snapshot hash conflict: reject before deleting data
+PASS staging and binary index mkdir idempotence: existing data unchanged
+PASS concurrent mkdir for index writes: existing-directory race tolerated
+PASS negative control no-op ensureDir rename: reproduces reported failure
+PASS negative control no-op ensureDir copy: reproduces reported failure
+PASS negative control no-op with existing parent: explains device-dependent success
+C11_CATALOG_PROMOTION_DIRECTORY_TESTS=27/27_PASS
+ANDROID_BRIDGE_MODEL_ONLY_PHYSICAL_REVALIDATION=PENDING
+PASS Vercel POSIX root survives chained imports
+PASS POSIX spaces, Unicode, hash and literal percent
+PASS POSIX relative dot segments
+PASS Windows C drive
+PASS Windows D drive with special characters
+PASS Windows UNC share
+C153_ACTIVATION_LOADER_PATHS=6/6_PASS
+C11_NEW_DEVICE_ACTIVATION_AND_CATALOG_LOCK_V1=PASS
+
+> xandeflix-prebuilt@0.1.0 build
+> npm run canon:check && tsc && vite build
+
+
+> xandeflix-prebuilt@0.1.0 canon:check
+> node scripts/verify-canonical-contract.mjs
+
+{"result":"PASS","referenceCommit":"b3fc8d1e3844bc5601813ab1b298289af5b3f1fd","protectedFiles":975,"canonicalContract":"PASS","protectedIntegrity":"PASS","packageId":"com.xandeflix.prebuilt","currentVersion":{"code":53,"name":"1.0.53"},"historicalVersion":{"code":37,"name":"1.0.37"},"authorizedEvolution":"CANON-01-G10FIX","authorizedAmendments":["CANON-01-G10FIX","CANON-01-LEGACYTESTS","CANON-01-AUTHORIZATION-HARDENING","CANON-01-VERCEL-BUILD-A1","CANON-01-VERCEL-A2-ARTIFACT","CANON-01-VERCEL-A22A","CANON-01-A22A-CI-DIAG","CANON-01-A22A-WINDOWS-EOL","CANON-01-SOURCE-OUTPUT","CANON-01-CATALOG-READ-DIAG","CANON-01-XUI-OPAQUE-RECOVERY","CANON-01-CATALOG-PHYSICAL-FIXES","CANON-01-SERIES-POSTER-COMPOSITION","CANON-01-TMDB-CONTEXT-IDENTITY","CANON-01-TMDB-SUBTITLE-PREVIEW","CANON-01-CATALOG-RETENTION","CANON-01-DETAIL-BACKDROP-UI","CANON-01-DETAIL-BACKDROP-TYPES","CANON-01-TV-SIDEBAR-COMPOSITION","CANON-01-A22A-WINDOWS-METADATA-EOL","CANON-01-VERCEL-PREBUILT-RECOVERY-01","CANON-01-OPAQUE-HLS-MIME-RECOVERY","CANON-01-STREAMED-VOD-INVENTORY-RECOVERY","CANON-01-TABLET-SIDEBAR-TRANSPARENCY","CANON-01-HERO-PLATFORM-COMPOSITION","CANON-01-HERO-PLATFORM-ALIGNMENT","CANON-01-LIVE-SINGLE-TRANSPORT","CANON-01-NETWORK-DIAGNOSTICS","CANON-01-NETWORK-UI-POLISH","CANON-01-LIVE-NETWORK-ACTIONS","CANON-01-TV-CAST-SENDER-HIDDEN","CANON-01-TMDB-RELEASE-TAGS","CANON-01-VOD-DPAD-HIDDEN-CONTROLS","CANON-01-DPAD-EXPANDED-CARDS-AUTOPREVIEW-01","CANON-01-HOME-DPAD-CAROUSEL-PREVIEW-PAGINATION-02","CANON-01-DPAD-CARD-SCOPE-SEEALL-GRID-01","CANON-01-XANDEFLIX-UI-PERFORMANCE-RECOVERY-03","CANON-01-XANDEFLIX-APP-INTRO-BRANDING-07","CANON-01-XANDEFLIX-INTRO-VIDEO-ONLY-07-R1","CANON-01-MOBILE-CATALOG-HEADER-SPACING","CANON-01-PHONE-HEADER-REFINEMENT","CANON-01-SERIES-EPISODE-RETURN","CANON-01-TRAILER-CONTAINMENT-R4","CANON-01-TMDB-EPISODE-METADATA-ENRICHMENT","CANON-01-P250-V139-CANONICAL-RECOVERY","CANON-01-TMDB-EPISODE-RUNTIME-RECOVERY","CANON-01-EPISODE-ROW-ALIGNMENT","CANON-01-EPISODE-GENERAL-IDENTITY","CANON-01-DETAIL-HERO-REFINEMENT","CANON-01-ACTOR-PROFILE","CANON-01-IDENTITY-HERO-RECOVERY","CANON-01-TABLET-HERO-SPACING","CANON-01-MOBILE-HEADER-ALIGNMENT","CANON-01-MOBILE-DETAIL-HEADER-ALIGNMENT","CANON-01-CARD-TRAILER-AUDIO","CANON-01-NEXT-EPISODE-G2-R2","CANON-01-NEXT-EPISODE-G2-R4-REGRESSION-RECOVERY","CANON-01-NEXT-EPISODE-G3-MARKERS","CANON-01-NEXT-EPISODE-G3-REGRESSION-EXPECTATION","CANON-01-PERF-PARENTAL-HERO-REFINEMENT","CANON-01-SOURCE-SWITCH-ISOLATION","CANON-01-SOURCE-SWITCH-ISOLATION-CACHE-REVIEW"],"physicalEvidenceOrigin":"OPERATOR_REPORT","physicalRetestPerformed":false}
+CANONICAL_CONTRACT=PASS
+CANON_INTEGRITY=PASS
+vite v6.4.3 building for production...
+transforming...
+✓ 634 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                              0.60 kB │ gzip:   0.38 kB
+dist/assets/xandeflix-wordmark-transparent-Cw9y148q.png    487.93 kB
+dist/assets/xandeflix-sidebar-logo-BY-DJlIm.png            993.79 kB
+dist/assets/main-B8Sgg5pC.css                               92.08 kB │ gzip:  16.52 kB
+dist/assets/index-DrzG8pmq.css                             114.57 kB │ gzip:  18.94 kB
+dist/assets/web-92URk_-o.js                                  0.36 kB │ gzip:   0.25 kB
+dist/assets/web-DiJhNsc1.js                                  0.38 kB │ gzip:   0.25 kB
+dist/assets/parental-storage-07R_J1vJ.js                     0.85 kB │ gzip:   0.50 kB
+dist/assets/poster-identity-BUH_yg1s.js                      2.80 kB │ gzip:   1.45 kB
+dist/assets/web-BPUmNbis.js                                  8.76 kB │ gzip:   2.99 kB
+dist/assets/index-CaKLtAjp.js                               10.27 kB │ gzip:   4.31 kB
+dist/assets/main-DWPqI29W.js                             1,668.00 kB │ gzip: 476.51 kB
+✓ built in 14.12s
+[plugin vite:resolve] Module "node:fs" has been externalized for browser compatibility, imported by "C:/Xandeflix/Audits/SOURCE_SWITCH_ISOLATION_20261105/workspace/src/provisioning/package-builder.ts". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "node:path" has been externalized for browser compatibility, imported by "C:/Xandeflix/Audits/SOURCE_SWITCH_ISOLATION_20261105/workspace/src/provisioning/package-builder.ts". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "node:fs" has been externalized for browser compatibility, imported by "C:/Xandeflix/Audits/SOURCE_SWITCH_ISOLATION_20261105/workspace/src/provisioning/package-validator.ts". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:reporter] 
+(!) C:/Xandeflix/Audits/SOURCE_SWITCH_ISOLATION_20261105/workspace/node_modules/@capacitor/filesystem/dist/esm/index.js is dynamically imported by C:/Xandeflix/Audits/SOURCE_SWITCH_ISOLATION_20261105/workspace/src/control-plane/engine/control-plane-engine.ts, C:/Xandeflix/Audits/SOURCE_SWITCH_ISOLATION_20261105/workspace/src/control-plane/engine/control-plane-engine.ts but also statically imported by C:/Xandeflix/Audits/SOURCE_SWITCH_ISOLATION_20261105/workspace/src/bootstrap/storage/capacitor-filesystem.storage.ts, C:/Xandeflix/Audits/SOURCE_SWITCH_ISOLATION_20261105/workspace/src/catalog/live/live-catalog.service.ts, C:/Xandeflix/Audits/SOURCE_SWITCH_ISOLATION_20261105/workspace/src/debug/source/debug-source-config.service.ts, C:/Xandeflix/Audits/SOURCE_SWITCH_ISOLATION_20261105/workspace/src/device/device-identity.service.ts, C:/Xandeflix/Audits/SOURCE_SWITCH_ISOLATION_20261105/workspace/src/search/deferred-search-index-coordinator.ts, C:/Xandeflix/Audits/SOURCE_SWITCH_ISOLATION_20261105/workspace/src/search/search.service.ts, C:/Xandeflix/Audits/SOURCE_SWITCH_ISOLATION_20261105/workspace/src/source/m3u-bounded-staging-writer.ts, C:/Xandeflix/Audits/SOURCE_SWITCH_ISOLATION_20261105/workspace/src/ui/settings/catalog-read-diagnostic.ts, C:/Xandeflix/Audits/SOURCE_SWITCH_ISOLATION_20261105/workspace/src/web/web-catalog-files.ts, dynamic import will not move module into another chunk.
+
+[plugin vite:reporter] 
+(!) C:/Xandeflix/Audits/SOURCE_SWITCH_ISOLATION_20261105/workspace/src/catalog/live/live-catalog.service.ts is dynamically imported by C:/Xandeflix/Audits/SOURCE_SWITCH_ISOLATION_20261105/workspace/src/source/real-source-device-import.service.ts but also statically imported by C:/Xandeflix/Audits/SOURCE_SWITCH_ISOLATION_20261105/workspace/src/source/m3u-bounded-staging-writer.ts, C:/Xandeflix/Audits/SOURCE_SWITCH_ISOLATION_20261105/workspace/src/ui/components/SearchResults.tsx, C:/Xandeflix/Audits/SOURCE_SWITCH_ISOLATION_20261105/workspace/src/ui/pages/LiveTvPage.tsx, C:/Xandeflix/Audits/SOURCE_SWITCH_ISOLATION_20261105/workspace/src/ui/pages/ParentalControlPage.tsx, dynamic import will not move module into another chunk.
+
+[plugin vite:reporter] 
+(!) C:/Xandeflix/Audits/SOURCE_SWITCH_ISOLATION_20261105/workspace/src/web-production/web-pin-recovery.storage.ts is dynamically imported by C:/Xandeflix/Audits/SOURCE_SWITCH_ISOLATION_20261105/workspace/src/parental/parental-control.store.ts but also statically imported by C:/Xandeflix/Audits/SOURCE_SWITCH_ISOLATION_20261105/workspace/src/web-production/web-pin-device.service.ts, dynamic import will not move module into another chunk.
+
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.

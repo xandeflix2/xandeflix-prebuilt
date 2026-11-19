@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "gate": "CANON-01-MOBILE-DETAIL-HEADER-ALIGNMENT",
+  "parentGate": "CANON-01-MOBILE-HEADER-ALIGNMENT",
+  "amendment": "CANON-01-MOBILE-DETAIL-HEADER-ALIGNMENT",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "CURRENT_EXPLICIT_USER_MOBILE_INTERNAL_MOVIE_SERIES_HEADER_MATCH_BROWSE_AND_LIVE_2026_10_29; NOT_NEW_MASTER_ATTACHMENT",
+  "authorizationRequestSha256": "48c858e2edffdb04add998971818bc316a967fa6c0733dbe4080a18a2f253e02",
+  "reason": "Extend the approved phone12px header top padding to internal movie and series pages without duplicating the native top inset.",
+  "physicalImpact": "NOT_REQUIRED_JUSTIFIED",
+  "physicalImpactJustification": "CSS-only phone header correction. Browser safe-area scenarios and manual-user-test APK; no physical phone connected or installed. Tablet/TV excluded.",
+  "testChangesReviewed": true,
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c105-complete-root-search.mjs",
+    "scripts/test-c107-catalog-return-navigation.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c11-landscape-navigation.mjs",
+    "scripts/validate-direct-playback.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock",
+    "node node_modules/typescript/bin/tsc --noEmit",
+    "node scripts/test-identity-hero-recovery.mjs",
+    "official build and APK asset/signature audits",
+    "offline native257/39"
+  ],
+  "evidence": "docs/evidence/MOBILE_DETAIL_HEADER_ALIGNMENT.md",
+  "compatibilityRisk": "One phone hero-header padding declaration. Browse/Live remain12px, lower6px, controls44px and hero gap12px retained. No component/native/source/player change.",
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": true,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false,
+  "supersedes": {
+    "src/index.css": "CANON-01-MOBILE-HEADER-ALIGNMENT",
+    "android/app/build.gradle": "CANON-01-MOBILE-HEADER-ALIGNMENT",
+    "scripts/test-identity-hero-recovery.mjs": "CANON-01-MOBILE-HEADER-ALIGNMENT",
+    "scripts/test-canonical-regression.mjs": "CANON-01-MOBILE-HEADER-ALIGNMENT"
+  },
+  "changes": [
+    {
+      "path": "src/index.css",
+      "before": "7000571ebb65e69610958edfbd30d63c0d924742",
+      "after": "8489ed9bcbcd20944128ffdb510b8c7822db8536"
+    },
+    {
+      "path": "android/app/build.gradle",
+      "before": "f3ddea015d7d6f5f059958aa2df15b83af421c9f",
+      "after": "f3f39ec1c6db038b34986c4707b90a9042dace5c"
+    },
+    {
+      "path": "scripts/test-identity-hero-recovery.mjs",
+      "before": "c58d80498d372e9117567db109b8e483e102f97d",
+      "after": "67d74dc216ac1883d3cf7036259b31e5340b88b1"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "f5b793803652757589038eef18dfcd57e8d59753",
+      "after": "da4f3393b3c69bea09731510ac73a8203a96dc26"
+    }
+  ],
+  "restrictions": [
+    "Preserve53 prior receipts,204 controls and42 suites. Retain24 browse geometry combinations and add16 internal combinations. Existing internal top6 expectation explicitly superseded by current12px parity request; no assertion removed.",
+    "No device install/reset, root promotion, Git publication, backend writes or next gate."
+  ]
+}

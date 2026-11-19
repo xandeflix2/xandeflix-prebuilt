@@ -1,0 +1,148 @@
+{
+  "schema": 1,
+  "gate": "CANON-01-TMDB-CONTEXT-IDENTITY",
+  "parentGate": "CANON-01",
+  "amendment": "CANON-01-TMDB-CONTEXT-IDENTITY",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "EXPLICIT_USER_AUTONOMOUS_LOCAL_RECOVERY_AND_IDENTIFIED_TMDB_TITLES_WITH_EXISTING_DEVICE_UPDATE_TEST_AUTHORIZATION",
+  "authorizationRequestSha256": "dc9feae1e4dddb0cc8950d1df1cb93d840d99bc8446f68897e7b91b9681bf854",
+  "reason": "Use explicit source country/network and declared episodic context to safely resolve known official TV homonyms; normalize only full title whitespace boundaries. Preserve source/country/year/type and no-context ambiguity protections.",
+  "physicalImpact": "REQUIRED",
+  "physicalImpactJustification": "Same-signature1.0.37 separate APK and authorized in-place three-device UI tests; private data and prior APKs preserved.",
+  "testChangesReviewed": true,
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c105-complete-root-search.mjs",
+    "scripts/test-c107-catalog-return-navigation.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c11-landscape-navigation.mjs",
+    "scripts/validate-direct-playback.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock",
+    "npm run typecheck",
+    "npm run update:check",
+    "npm run security:check",
+    "npm run playback:check",
+    "npm run build",
+    "npm run site:build",
+    "node scripts/test-vercel-prebuilt-contract.mjs",
+    "node scripts/test-c105-directory-import.mjs",
+    "node scripts/test-c105-directory-details.mjs",
+    "node scripts/test-c105-directory-orchestration.mjs",
+    "node scripts/test-c11-automatic-source-refresh.mjs",
+    "node scripts/test-catalog-read-diagnostic.mjs",
+    "node scripts/test-xui-m3u-kind-recovery.mjs",
+    "node scripts/test-c157-web-source-https.mjs",
+    "node scripts/test-catalog-physical-regressions.mjs",
+    "node scripts/test-c135-adult-reader.mjs",
+    "node scripts/test-series-poster-composition.mjs",
+    "node scripts/test-tmdb-context-identity.mjs"
+  ],
+  "evidence": "docs/evidence/TMDB_CONTEXT_IDENTITY_RECOVERY.md",
+  "compatibilityRisk": "Source categories can be incomplete or describe distribution rather than production; country hints are explicit and conflicting hints ignored, network filters only ambiguous strong matches, missing context stays ambiguous. Cache context isolated from old unqualified identity.",
+  "restrictions": [
+    "Preserve previous receipts and128 controls/19 suites; add suite20.",
+    "No source/importer, catalog records, native/player, credentials/API configuration, parental/authority/backend/version changes.",
+    "No commit/push/merge/deploy/reset or SOURCE-FORMAT-01."
+  ],
+  "supersedes": {
+    "scripts/test-c11-source-first-tmdb-artwork.mjs": "CANON-01-SERIES-POSTER-COMPOSITION",
+    "scripts/test-c11-artwork-visible-recovery.mjs": "CANON-01-SERIES-POSTER-COMPOSITION",
+    "scripts/test-canonical-regression.mjs": "CANON-01-SERIES-POSTER-COMPOSITION"
+  },
+  "changes": [
+    {
+      "path": "src/artwork/tmdb-metadata.service.ts",
+      "before": "9805f255c465426c3c0814002456fe58d362a898",
+      "after": "f272cd0f9b2f48d2383690a4df89fdc8a8079c3f"
+    },
+    {
+      "path": "src/artwork/hero-artwork.service.ts",
+      "before": "1fbb3504f0b01dc46490d6df7cdb39f8641a7fb0",
+      "after": "7186917a860e87da4f2c04a2f2060f59075fc808"
+    },
+    {
+      "path": "src/catalog/catalog-view-model.ts",
+      "before": "1a117b0fb43b187d3101b6943b3d0916c55747c1",
+      "after": "97a899f75a32a8c345f0abeafcfbb079268ab3da"
+    },
+    {
+      "path": "src/catalog/catalog-selectors.ts",
+      "before": "25fe09daa48fbf0e7c7d7a9bbdfed25db48607ca",
+      "after": "4e5c53e845f30b0e35ff91cca8b5f3a48476ada1"
+    },
+    {
+      "path": "src/ui/components/MediaCard.tsx",
+      "before": "1c16374650a0aa83de5d9bc4b4a66b3cf1f1092e",
+      "after": "083a910c535d4dbee3230d113a3b44a4d1195e99"
+    },
+    {
+      "path": "src/ui/components/Hero.tsx",
+      "before": "57b1fa0c46af5ae0aee22545faf5640151813d03",
+      "after": "511fee75591f0d81b3d62f54c5b830eb240c0de3"
+    },
+    {
+      "path": "src/ui/components/PhoneSeriesDetail.tsx",
+      "before": "b3f7af1f8b40a8960ed37d508b363ce6246aa82c",
+      "after": "9dafdae04e8aec5fbb0aeabe99d9914e39dfdd4c"
+    },
+    {
+      "path": "src/ui/pages/SeriesDetailPage.tsx",
+      "before": "bfd2eb9a7990dbb6e10755bb02999bd6a8733bf6",
+      "after": "1da239f5a42f43700956197798bb16f65c7cfaea"
+    },
+    {
+      "path": "src/ui/hooks/useArtworkMetadata.ts",
+      "before": "39c44e57cad4b788c5cdef49baf8dcc47f622575",
+      "after": "3ce6743d1b79d54c41cf24545f3530e88589ceac"
+    },
+    {
+      "path": "src/ui/hooks/useCardGenres.ts",
+      "before": "0a065c9f1add5147eebf8a76c8f677df32496d83",
+      "after": "8a3c658ea77e6e0e8ec1fa12efdb623d352ec035"
+    },
+    {
+      "path": "src/ui/hooks/useWatchProviders.ts",
+      "before": "a8cec672c106dc07946e8e6c9f3d51fd36abb34d",
+      "after": "215225ca02ac7bcac93c2cd74915d6d156b3dfdd"
+    },
+    {
+      "path": "scripts/test-tmdb-context-identity.mjs",
+      "before": null,
+      "after": "2f362e7fc941830c626b744618ef1f468f3ecf1b"
+    },
+    {
+      "path": "scripts/test-c11-tmdb-alias-recovery.mjs",
+      "before": "b7910e18f07db4785ab3c1d864eafb816e378656",
+      "after": "953990018783d1a629131d815297bbf4af0248e1"
+    },
+    {
+      "path": "scripts/test-c11-source-first-tmdb-artwork.mjs",
+      "before": "c9a26e9cc8cc1365185ed31e76a94aa126ada24e",
+      "after": "4ab9aa989e13ef33d8cd226af81acd6a25b334f4"
+    },
+    {
+      "path": "scripts/test-c11-artwork-visible-recovery.mjs",
+      "before": "967c2a62cb0751bcb252d6e32ddb55208d671149",
+      "after": "9dc1a1757f3c8741f3f0af396cfc7eb39079677f"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "1e635bc2bc511ac07fae56ceaf05ea0cd21929d2",
+      "after": "a8bf93bd45d16b69708eed62e188a234f4a4e6fc"
+    }
+  ],
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": true,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false
+}

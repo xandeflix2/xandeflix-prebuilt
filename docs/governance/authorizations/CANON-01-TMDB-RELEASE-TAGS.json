@@ -1,0 +1,115 @@
+{
+  "schema": 1,
+  "gate": "CANON-01-TMDB-RELEASE-TAGS",
+  "parentGate": "CANON-01",
+  "amendment": "CANON-01-TMDB-RELEASE-TAGS",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "EXPLICIT_USER_GENERIC_TMDB_MOVIE_TITLE_NORMALIZATION_4K_DV_HDR_2026_10_24",
+  "authorizationRequestSha256": "847adabb8663f59d0bf23c8ad47c4b1a6c24ded108471cad13a92d77d34a790b",
+  "reason": "Normalize recognized release labels in public TMDB identities independent of source URL and display the confirmed localized movie title without changing source/catalog/stream identity. Include the real normalizer in one existing TSX-test module port without changing assertions.",
+  "physicalImpact": "REQUIRED",
+  "physicalImpactJustification": "Recoverable same-certificate tablet update and Mayday detail check, private state preserved. Other devices receive manual APK availability only in this cycle.",
+  "testChangesReviewed": true,
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c105-complete-root-search.mjs",
+    "scripts/test-c107-catalog-return-navigation.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c11-landscape-navigation.mjs",
+    "scripts/validate-direct-playback.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock",
+    "npm run typecheck",
+    "npm run build",
+    "node scripts/test-tmdb-release-tags.mjs"
+  ],
+  "evidence": "docs/evidence/TMDB_RELEASE_TAGS.md",
+  "compatibilityRisk": "Bare numbers remain significant unless explicit release-year evidence exists. Homonym/poster/year/kind constraints and source-first data remain strict. Missing/ambiguous TMDB metadata remains unavailable; no broad query or global cache purge.",
+  "restrictions": [
+    "Only12 nominal paths. No source/importer/catalog/ID/stream/credentials/parental/license/C9/buffer/native/bridge/package/version/dependency/workflow/verifier or backend/admin changes.",
+    "Preserve31 historical receipts,176 controls/28 suites,21 network scenarios/127 Prebuilt. Add suite29 and only3 receipt/content negatives. Known release tags are removed, meaningful words and numbers remain.",
+    "Localized public title is an optional allowlisted metadata cache field, not a mutation of catalog titles. Match7/512 entries/TTL/concurrency2/privacy guards remain; old dirty misses naturally have different normalized keys.",
+    "Five scoped npm commands, focused artwork regressions, browser detail flow, bounded authenticated public TMDB checks, Android unit tests/build and APK audit. Prior baseline regression provenance is explicit; no fabricated 13-command rerun.",
+    "Only SM-X610 same-package/certificate in-place update for actual Mayday UI check; private digests compared in RAM only. No uninstall/reset/PIN/PUK bypass or automatic Fire/phone update.",
+    "No Git add/commit/push/PR/merge/main, administrative writes/deployments or next implementation."
+  ],
+  "previousGovernanceHashes": {
+    "docs/governance/CANON_CHANGE_AUTHORIZATION.json": "e73152f228cbb625c508062d70ef810e8342059a",
+    "docs/governance/CANON_01_LEGACY_TESTS_AUTHORIZATION.json": "e59e2d328db3d0dfd8c1d873b154e2e3f7900a0c",
+    "docs/governance/CANON_01_AUTHORIZATION_HARDENING.json": "766db763ee98aeeb33230c2828f050a8527555b7",
+    "docs/governance/authorizations/CANON-01-VERCEL-BUILD-A1.json": "7edaa32c4b13c8295fc0daa64abed1ef7a4b0c2d",
+    "docs/governance/authorizations/CANON-01-VERCEL-A2-ARTIFACT.json": "fb613a143676e3e32267ebacb3bec81123791823",
+    "docs/governance/authorizations/CANON-01-VERCEL-A22A.json": "c698fec429f4058118d4701a7f5208ece9a0b0d1",
+    "docs/governance/authorizations/CANON-01-A22A-CI-DIAG.json": "7d89451bf23a05fa1ba819b72b99b28025aa7a66",
+    "docs/governance/authorizations/CANON-01-A22A-WINDOWS-EOL.json": "73ffd5ed494cb87a7c0d22e4a8a3f94252cf321e",
+    "docs/governance/authorizations/CANON-01-SOURCE-OUTPUT.json": "a93d98a1022f99c0e0957dd8f4a2c7d078b8f588",
+    "docs/governance/authorizations/CANON-01-CATALOG-READ-DIAG.json": "169b19ee02a4c1cacbe575cded00ec02928fa3c7",
+    "docs/governance/authorizations/CANON-01-XUI-OPAQUE-RECOVERY.json": "cf4176d0007b4a04997bf2631558bd9d954fd6f7",
+    "docs/governance/authorizations/CANON-01-CATALOG-PHYSICAL-FIXES.json": "ea179b852518e2a14c7ee79b6c3c72e76c0df6a9",
+    "docs/governance/authorizations/CANON-01-SERIES-POSTER-COMPOSITION.json": "645dc8b2b5d4b822bc83d72e9f5ab9f4f4cb4347",
+    "docs/governance/authorizations/CANON-01-TMDB-CONTEXT-IDENTITY.json": "3ab236bab99175dcb5374047c2fc6565650d8945",
+    "docs/governance/authorizations/CANON-01-TMDB-SUBTITLE-PREVIEW.json": "5e50d1c29c33b5fe3455112818e978213d065e96",
+    "docs/governance/authorizations/CANON-01-CATALOG-RETENTION.json": "b3c18f01ba1e753597af3a162c2605669dcd4e6b",
+    "docs/governance/authorizations/CANON-01-DETAIL-BACKDROP-UI.json": "579097e952a7ddf142ba885aaf23e164c0241e54",
+    "docs/governance/authorizations/CANON-01-DETAIL-BACKDROP-TYPES.json": "da8c532e25e220040bba3c942bad41507d4b9245",
+    "docs/governance/authorizations/CANON-01-TV-SIDEBAR-COMPOSITION.json": "f5d43f845cd4e3fdb7947dc33e4f9b3df8669ab7",
+    "docs/governance/authorizations/CANON-01-A22A-WINDOWS-METADATA-EOL.json": "90d7db4a18e84221afa6fa9dda40c82d6dad6121",
+    "docs/governance/authorizations/CANON-01-VERCEL-PREBUILT-RECOVERY-01.json": "9cb685590481ba094ffbca2e2abe2f585aa3ae46",
+    "docs/governance/authorizations/CANON-01-OPAQUE-HLS-MIME-RECOVERY.json": "5a8c735b59f921a5d24be15f6c14f32541687719",
+    "docs/governance/authorizations/CANON-01-STREAMED-VOD-INVENTORY-RECOVERY.json": "a16dd131aa09b3027724ea94f49a6d841551a9cb",
+    "docs/governance/authorizations/CANON-01-TABLET-SIDEBAR-TRANSPARENCY.json": "ffcc5c6c6005e4fcd24ce40ba776950bf55a5dbe",
+    "docs/governance/authorizations/CANON-01-HERO-PLATFORM-COMPOSITION.json": "75f9ca539c1723ca1db6c2e8948a63a3a19d5264",
+    "docs/governance/authorizations/CANON-01-HERO-PLATFORM-ALIGNMENT.json": "66a112450541d8a038292d8b07d08cc5547ad51e",
+    "docs/governance/authorizations/CANON-01-LIVE-SINGLE-TRANSPORT.json": "039d22359310380cd79432efe17f9533c93fb6cb",
+    "docs/governance/authorizations/CANON-01-NETWORK-DIAGNOSTICS.json": "80a4d01348eb82b4a7cafd4836c3f221d97e02e5",
+    "docs/governance/authorizations/CANON-01-NETWORK-UI-POLISH.json": "2fc3ce79b3a78454e7ad15f1d06002a6bc69d594",
+    "docs/governance/authorizations/CANON-01-LIVE-NETWORK-ACTIONS.json": "e345e800a7a52d79241701cb5fd13f34bc699e01",
+    "docs/governance/authorizations/CANON-01-TV-CAST-SENDER-HIDDEN.json": "f1e466b249afac7a6dab2a62952dc83a4dd31540"
+  },
+  "supersedes": {
+    "src/artwork/tmdb-metadata.service.ts": "CANON-01-DETAIL-BACKDROP-UI",
+    "src/ui/pages/MovieDetailPage.tsx": "CANON-01-DETAIL-BACKDROP-UI",
+    "scripts/test-c11-source-first-tmdb-artwork.mjs": "CANON-01-DETAIL-BACKDROP-UI",
+    "scripts/test-canonical-regression.mjs": "CANON-01-TV-CAST-SENDER-HIDDEN"
+  },
+  "changes": [
+    {
+      "path": "src/artwork/tmdb-metadata.service.ts",
+      "before": "d7674cc922ef449e7c62bcd844704d62de0f7c41",
+      "after": "469696fac9d5a20fea363e8ae8db8ffb96ed7071"
+    },
+    {
+      "path": "src/ui/pages/MovieDetailPage.tsx",
+      "before": "9e7c8ee2c0e285d94d864590430a084a1e32e79d",
+      "after": "7d690b931d3238436635c00bcabde2cd23a89202"
+    },
+    {
+      "path": "scripts/test-tmdb-release-tags.mjs",
+      "before": null,
+      "after": "2289641be4b2c43d7431a5aa6681b42082775278"
+    },
+    {
+      "path": "scripts/test-c11-source-first-tmdb-artwork.mjs",
+      "before": "b48686581e9ff4362573f06fa585f85120847db2",
+      "after": "c19fa5068a43cc478934491b27cc0c163a6256c6"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "0adf2cbc69fbc10142a16d24a784b2b9db4ccfc9",
+      "after": "5a79eb63d820a03a153c196c96470e3fb56a56b8"
+    }
+  ],
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": true,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false
+}

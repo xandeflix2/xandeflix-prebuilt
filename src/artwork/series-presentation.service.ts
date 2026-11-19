@@ -1,14 +1,21 @@
 /// <reference types="vite/client" />
 import { tmdbMetadataService, type ArtworkIdentity } from './tmdb-metadata.service.ts';
 
+export interface CastMember { id:number; name:string; character?:string; profileUri?:string }
 export interface MoviePresentation {
+  cast?:CastMember[];
   tmdbId: number;
   runtimeMinutes?: number;
   ageRating?: string;
   trailer?: { key: string; name: string };
+  previewTrailer?: { key: string; name: string };
 }
 export interface SeriesPresentation extends MoviePresentation {
   episodeCount?: number;
+}
+/** Same validated public media as details; missing TMDB official flag is not absence. */
+export function selectPreviewTrailer(presentation:MoviePresentation|null|undefined):MoviePresentation['trailer'] {
+  return presentation?.previewTrailer||presentation?.trailer;
 }
 
 const object = (v: unknown): Record<string, unknown> => v && typeof v === 'object' && !Array.isArray(v) ? v as Record<string, unknown> : {};
@@ -22,15 +29,36 @@ export function selectSeriesTrailer(value: unknown): SeriesPresentation['trailer
   const video = videos[0];
   return video ? { key: video.key as string, name: typeof video.name === 'string' ? video.name.trim().slice(0,160) : 'Trailer' } : undefined;
 }
+/** Public credits only; validate and deduplicate the title response without truncating its cast. */
+export function parseTitleCast(value:unknown):CastMember[] {
+  const seen=new Set<number>(),cast:CastMember[]=[];
+  for(const raw of array(value)) {
+    const row=object(raw),id=integer(row.id,Number.MAX_SAFE_INTEGER);
+    const name=typeof row.name==='string'?row.name.trim().slice(0,120):'';
+    if(!id||!name||seen.has(id))continue;
+    seen.add(id);
+    const role=typeof row.character==='string'?row.character:object(array(row.roles)[0]).character;
+    const character=typeof role==='string'?role.trim().slice(0,160):undefined;
+    const profileUri=typeof row.profile_path==='string'&&/^\/[A-Za-z0-9_-]+\.(?:jpg|png|webp)$/.test(row.profile_path)?'https://image.tmdb.org/t/p/w185'+row.profile_path:undefined;
+    cast.push({id,name,...(character?{character}:{}),...(profileUri?{profileUri}:{})});
+  }
+  return cast;
+}
+const credits=(v:unknown)=>{const cast=parseTitleCast(object(v).cast);return cast.length?{cast}:{};};
 export function parseSeriesPresentation(raw: unknown, tmdbId: number): SeriesPresentation | null {
   const v=object(raw); if (v.id !== tmdbId) return null;
   const ratings=array(object(v.content_ratings).results).map(object).filter(r=>r.iso_3166_1==='BR');
   const rating=ratings.map(r=>r.rating).find(r=>typeof r==='string' && /^(?:L|Livre|AL|10|12|14|16|18)$/.test(r));
   const runtimes=array(v.episode_run_time).map(n=>integer(n,600)).filter((n):n is number=>!!n);
   const runtime=runtimes[0] || integer(object(v.last_episode_to_air).runtime,600);
-  return { tmdbId, episodeCount:integer(v.number_of_episodes,100000), runtimeMinutes:runtime,
+  return { ...credits(v.aggregate_credits), tmdbId, episodeCount:integer(v.number_of_episodes,100000), runtimeMinutes:runtime,
     ageRating: typeof rating==='string' ? /^(?:L|Livre|AL)$/.test(rating)?'L':rating : undefined,
-    trailer:selectSeriesTrailer(object(v.videos).results) };
+    trailer:selectSeriesTrailer(object(v.videos).results), ...officialPreview(object(v.videos).results) };
+}
+
+function officialPreview(videos:unknown):Pick<MoviePresentation,'previewTrailer'> {
+  const trailer=selectSeriesTrailer(array(videos).filter(value=>object(value).official===true));
+  return trailer?{previewTrailer:trailer}:{};
 }
 
 export function parseMoviePresentation(raw: unknown, tmdbId: number): MoviePresentation | null {
@@ -42,10 +70,12 @@ export function parseMoviePresentation(raw: unknown, tmdbId: number): MoviePrese
   const rating = ratings.map(row => row.certification)
     .find(value => typeof value === 'string' && /^(?:L|Livre|AL|10|12|14|16|18)$/.test(value));
   return {
+    ...credits(v.credits),
     tmdbId,
     runtimeMinutes: integer(v.runtime, 1440),
     ageRating: typeof rating === 'string' ? /^(?:L|Livre|AL)$/.test(rating) ? 'L' : rating : undefined,
     trailer: selectSeriesTrailer(object(v.videos).results),
+    ...officialPreview(object(v.videos).results),
   };
 }
 
@@ -93,7 +123,7 @@ export class SeriesPresentationService {
   private async request(id:number):Promise<SeriesPresentation|null> {
     const movie = this.options.kind === 'movie';
     const url=new URL(`https://api.themoviedb.org/3/${movie ? 'movie' : 'tv'}/${id}`);
-    url.searchParams.set('language','pt-BR');url.searchParams.set('append_to_response',movie ? 'videos,release_dates' : 'videos,content_ratings');url.searchParams.set('include_video_language','pt,en,null');
+    url.searchParams.set('language','pt-BR');url.searchParams.set('append_to_response',movie ? 'videos,release_dates,credits' : 'videos,content_ratings,aggregate_credits');url.searchParams.set('include_video_language','pt,en,null');
     const credential=this.options.credential().trim(),headers:Record<string,string>={accept:'application/json'};
     if(/^[a-fA-F0-9]{32}$/.test(credential))url.searchParams.set('api_key',credential);else headers.Authorization=`Bearer ${credential}`;
     const controller=new AbortController();let timer:ReturnType<typeof setTimeout>|undefined;

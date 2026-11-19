@@ -47,6 +47,7 @@ export interface NativePlaybackRequest {
 }
 
 export interface NativePreviewRequest {
+  requestId?: string;
   uri: string;
   kind: 'live' | 'vod';
   headers?: Record<string, string>;
@@ -57,11 +58,12 @@ export interface NativePreviewRequest {
   liveContext?: NativeLiveContext;
 }
 
-export type NativeLiveAction = 'previous' | 'next' | 'channels' | 'categories' | 'guide' | 'favorite' | 'favorites' | 'selectChannel' | 'selectGroup' | 'pageNext' | 'pagePrevious' | 'groupNext' | 'groupPrevious' | 'closePanel';
+export type NativeLiveAction = 'previous' | 'next' | 'channels' | 'categories' | 'guide' | 'favorite' | 'favorites' | 'selectChannel' | 'selectGroup' | 'pageNext' | 'pagePrevious' | 'groupNext' | 'groupPrevious' | 'loadChannelWindow' | 'closePanel';
 export interface NativeLiveActionEvent { previewId: string; channelId: string; action: NativeLiveAction; id?: string }
 export interface NativeLiveContext {
   channelId: string; name: string; groupName: string; favorite: boolean;
   browseName: string; channels: Array<{ id: string; name: string; favorite: boolean }>;
+  channelPage?: { windowKey: string; offset: number; total: number; loaded: boolean; failedOffset?: number };
   groups: Array<{ id: string; name: string }>;
   nextPage: boolean; previousPage: boolean; nextGroups: boolean; previousGroups: boolean;
   busy: boolean; message: string;
@@ -69,6 +71,7 @@ export interface NativeLiveContext {
 }
 
 export interface NativePreviewUpdateRequest {
+  requestId?: string;
   previewId?: string;
   /** Temporarily hide the live native surface behind a WebView parental dialog. */
   obscured?: boolean;
@@ -83,6 +86,7 @@ export interface NativePreviewUpdateRequest {
 }
 
 export interface NativePreviewErrorEvent {
+  requestId?: string;
   previewId?: string;
   errorCode?: string;
 }
@@ -96,7 +100,8 @@ export interface NativePreviewTapEvent {
   previewId: string;
 }
 
-export interface NativePreviewPlayingEvent { previewId: string }
+export interface NativePreviewPlayingEvent { previewId: string; requestId?: string }
+export type NativePreviewStateEvent = import('./live-auto-recovery.ts').LiveRecoveryState;
 
 export interface NativeAndroidBackButtonEvent {}
 
@@ -133,6 +138,7 @@ export interface NativeAndroidPlayerPlugin {
   addListener(eventName: 'nativePreviewFullscreenChanged', listenerFunc: (event: NativePreviewFullscreenChangedEvent) => void): Promise<PluginListenerHandle>;
   addListener(eventName: 'nativePreviewTap', listenerFunc: (event: NativePreviewTapEvent) => void): Promise<PluginListenerHandle>;
   addListener(eventName: 'nativePreviewPlaying', listenerFunc: (event: NativePreviewPlayingEvent) => void): Promise<PluginListenerHandle>;
+  addListener(eventName: 'nativePreviewState', listenerFunc: (event: NativePreviewStateEvent) => void): Promise<PluginListenerHandle>;
   addListener(eventName: 'nativeLiveAction', listenerFunc: (event: NativeLiveActionEvent) => void): Promise<PluginListenerHandle>;
   addListener(eventName: 'androidBackButton', listenerFunc: (event: NativeAndroidBackButtonEvent) => void): Promise<PluginListenerHandle>;
 }
@@ -482,6 +488,10 @@ export async function readNativeWatchProgress(): Promise<NativePlayerProgressEve
 
 export async function addNativePreviewPlayingListener(listener: (event: NativePreviewPlayingEvent) => void): Promise<PluginListenerHandle> {
   return NativeAndroidPlayer.addListener('nativePreviewPlaying', listener);
+}
+
+export async function addNativePreviewStateListener(listener: (event: NativePreviewStateEvent) => void): Promise<PluginListenerHandle> {
+  return NativeAndroidPlayer.addListener('nativePreviewState', listener);
 }
 
 export function addNativeLiveActionListener(listener: (event: NativeLiveActionEvent) => void): Promise<PluginListenerHandle> {

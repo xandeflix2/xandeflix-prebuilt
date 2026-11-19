@@ -42,7 +42,7 @@ export class CatalogReturnNavigation {
     const point:ReturnPoint={card:target?.dataset.catalogItem,rail:rail?.getAttribute('aria-labelledby')||undefined,
       hero:Boolean(target?.closest('.hero-banner')),viewAll:Boolean(target?.classList.contains('rail-view-all')),
       horizontal:rail?.querySelector<HTMLElement>('.media-rail-track')?.scrollLeft||0,
-      gridCount:root.querySelectorAll('.catalog-grid [data-catalog-item]').length,offsets};
+      gridCount:Math.max(root.querySelectorAll('.catalog-grid [data-catalog-item]').length,Number(target?.closest<HTMLElement>('[data-grid-index]')?.dataset.gridIndex || -1)+1),offsets};
     const entry=key(route,snapshot);this.points.delete(entry);this.points.set(entry,point);
     while(this.points.size>16)this.points.delete(this.points.keys().next().value!);
     this.origin=null;
@@ -83,6 +83,10 @@ export class CatalogReturnNavigation {
       }
       const point=request.point!;
       if(!expanded&&point.gridCount>48){root.dispatchEvent(new CustomEvent(CATALOG_RETURN_EXPAND,{detail:{count:point.gridCount}}));expanded=true;}
+      const windowed=root.querySelector('.catalog-grid--windowed');
+      // Applying a deep offset before its row exists clamps scroll to each
+      // partial page and repeatedly replaces the visible window while loading.
+      if(windowed&&point.card&&point.gridCount>48&&!Array.from(windowed.querySelectorAll<HTMLElement>('[data-catalog-item]')).some(node=>node.dataset.catalogItem===point.card))return;
       for(const[name,node]of Object.entries(scrollers(root))){const offset=point.offsets[name];if(node&&offset){node.scrollTop=offset.top;node.scrollLeft=offset.left;}}
       const line=point.rail?document.getElementById(point.rail)?.closest<HTMLElement>('.media-rail'):null;
       const rail=line&&root.contains(line)?line:null;

@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "gate": "CANON-01-SOURCE-SWITCH-ISOLATION-CACHE-REVIEW",
+  "parentGate": "CANON-01-SOURCE-SWITCH-ISOLATION",
+  "amendment": "CANON-01-SOURCE-SWITCH-ISOLATION-CACHE-REVIEW",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "EXPLICIT_CURRENT_SESSION_USER_SOURCE_SWITCH_CORRECTION_CAPTURE_NOT_INDEPENDENT_ADJUDICATION",
+  "authorizationRequestSha256": "399e803fbaa00f07b861c8bc503f861c41fb73356e32b5448ebd68b14eec3a44",
+  "reason": "Complete source replacement metadata coverage by clearing the three identified local presentation databases after runtime restart and before import. Add failure/order tests and keep strict authorization expectations, all existing controls and suites.",
+  "physicalImpact": "REQUIRED",
+  "physicalImpactJustification": "Same physical upgrade/source migration validation as parent scope; no additional player behavior.",
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "node scripts/test-source-replacement-isolation.mjs",
+    "node scripts/test-source-replacement-bootstrap.mjs",
+    "node scripts/test-source-replacement-ui.mjs",
+    "node scripts/test-c11-new-content-badge.mjs",
+    "node scripts/test-c11-artwork-visible-recovery.mjs",
+    "node scripts/test-c11-page-artwork-preparation.mjs",
+    "node node_modules/typescript/bin/tsc --noEmit",
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock"
+  ],
+  "evidence": "docs/evidence/SOURCE_SWITCH_ISOLATION_CACHE_REVIEW.md",
+  "compatibilityRisk": "One initial clean migration requires a remotely confirmed source. Unverified legacy catalog is blocked offline; established exact-snapshot local fallback remains. Source changes must increment logical generation through provisioning. External HTML403 remains a separate issue.",
+  "changes": [
+    {
+      "path": "src/bootstrap/source-replacement.ts",
+      "before": "71828a35f43c309eb15542187db9319e65c53557",
+      "after": "84eec2b43e199cfe1cbf57593c0e7765a6be8567"
+    },
+    {
+      "path": "src/bootstrap/boot-sync-coordinator.ts",
+      "before": "94c1c7a25c31f3a67d0c4c525e5cd3a16a23f394",
+      "after": "0153aec0631f7cbcdc26919fa59415e66856ced9"
+    },
+    {
+      "path": "scripts/test-source-replacement-isolation.mjs",
+      "before": "b2047e7eadd67b76a37f7b7ce0a4f11d193cb660",
+      "after": "1d1758e1b2ee94a597b24bfac5a860ed3db4d9d0"
+    },
+    {
+      "path": "scripts/test-source-replacement-bootstrap.mjs",
+      "before": "dc090286fbf6d52f979c515f1fdb81dd42e66f52",
+      "after": "2944a7426583fadd803af24752126ccda70ccfaa"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "ff64fd90dde8297622f8ee99fa07eda845ad94e9",
+      "after": "23d6ad5fe63d6a993d427e232d410d3296ac40bd"
+    }
+  ],
+  "supersedes": {
+    "src/bootstrap/source-replacement.ts": "CANON-01-SOURCE-SWITCH-ISOLATION",
+    "src/bootstrap/boot-sync-coordinator.ts": "CANON-01-SOURCE-SWITCH-ISOLATION",
+    "scripts/test-source-replacement-isolation.mjs": "CANON-01-SOURCE-SWITCH-ISOLATION",
+    "scripts/test-source-replacement-bootstrap.mjs": "CANON-01-SOURCE-SWITCH-ISOLATION",
+    "scripts/test-canonical-regression.mjs": "CANON-01-SOURCE-SWITCH-ISOLATION"
+  },
+  "testChangesReviewed": true,
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": true,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false,
+  "restrictions": [
+    "Current user authorization for isolated source correction and test APK, not independent adjudication or historical approval.",
+    "No identity/key/license/PIN/C9 bypass, no data clear/uninstall or source secrets in artifacts.",
+    "No NativePlayerActivity/PlayerControls/credits/G4 change; no backend administrative write or Git publication.",
+    "All old controls, strict authorization order and negative tests remain."
+  ]
+}

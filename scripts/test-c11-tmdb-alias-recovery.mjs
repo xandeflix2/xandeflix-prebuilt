@@ -68,7 +68,7 @@ assert.equal(selectTmdbMatch({ kind: 'movie', title: 'Suando Frio', year: 2018 }
 
 const now = () => 1_700_000_000_000;
 const storageFor = (key, value) => ({ getItem: () => JSON.stringify({ version: 2, entries: [[key, { expires: now() + 60000, value }]] }), setItem() {} });
-const oldKey = artworkIdentityKey(identity).replace(':match6', ':match3');
+const oldKey = artworkIdentityKey(identity).replace(/:match\d+/, ':match3');
 const positive = fixture({ now, storage: storageFor(oldKey, result) });
 assert.equal(positive.service.peek(identity).tmdbId, candidate.id);
 assert.equal((await positive.service.resolve(identity)).tmdbId, candidate.id);
@@ -76,7 +76,7 @@ assert.equal(positive.paths.length, 0, 'old successful mapping remains available
 const negative = fixture({ now, storage: storageFor(oldKey, null) });
 assert.equal((await negative.service.resolve(identity)).tmdbId, candidate.id, 'old negative mapping does not pin alias failure');
 const pinnedIdentity = { ...identity, posterPath: '/synthetic.jpg' };
-const pinnedKey = artworkIdentityKey(pinnedIdentity).replace(':match6', ':match3');
+const pinnedKey = artworkIdentityKey(pinnedIdentity).replace(/:match\d+/, ':match3');
 const pinnedPositive = fixture({ now, storage: storageFor(pinnedKey, result) });
 assert.equal(pinnedPositive.service.peek(pinnedIdentity).tmdbId, candidate.id);
 assert.equal((await pinnedPositive.service.resolve(pinnedIdentity)).tmdbId, candidate.id);

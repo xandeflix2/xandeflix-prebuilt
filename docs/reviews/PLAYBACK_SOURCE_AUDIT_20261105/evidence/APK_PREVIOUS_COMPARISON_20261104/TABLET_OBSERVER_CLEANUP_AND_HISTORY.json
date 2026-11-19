@@ -1,0 +1,19 @@
+{
+  "observedUTC": "2026-11-05T01:14:52.909Z",
+  "status": "COMPLETE",
+  "previousObserverPresent": true,
+  "observerRemoved": true,
+  "syncObserverPresent": false,
+  "history": {
+    "recent": {
+      "present": false
+    },
+    "positions": {
+      "present": false
+    },
+    "sessions": {
+      "present": true,
+      "records": 3
+    }
+  }
+}

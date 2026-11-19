@@ -1,3 +1,5 @@
+import {acceptDpadRepeat} from '../src/ui/dpad-repeat.ts';
+import {searchDpadTarget,rememberSearchResult} from '../src/ui/search-dpad-navigation.ts';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
@@ -44,6 +46,8 @@ class Element {
   querySelector(selector) { return this.querySelectorAll(selector)[0] || null; }
   contains(node) { return node === this || this.children.some(child => child.contains(node)); }
   getAttribute(name) { return this.attributes[name] ?? null; }
+  hasAttribute(name) { return Object.hasOwn(this.attributes,name); }
+  get dataset() { return Object.fromEntries(Object.entries(this.attributes).filter(([key])=>key.startsWith('data-')).map(([key,value])=>[key.slice(5).replace(/-([a-z])/g,(_,letter)=>letter.toUpperCase()),value])); }
   get nextElementSibling() { return this.parentElement?.children[this.parentElement.children.indexOf(this) + 1] || null; }
   get previousElementSibling() { return this.parentElement?.children[this.parentElement.children.indexOf(this) - 1] || null; }
   focus() { document.activeElement = this; }
@@ -62,6 +66,7 @@ function rail(count, viewAll = true) {
 function harness(fire = true) {
   const listeners = new Map(), frames = new Map(), cleanup = []; let id = 0, now = 0;
   document = new Element('body'); document.body = document; document.activeElement = null;
+  document.documentElement={dataset:{}};
   const shell = new Element('div', 'app-shell--side-nav' + (fire ? ' app-shell--fire-stick' : ''));
   const menu = button('nav-link active'), header = new Element('header', 'app-header').append(new Element('nav', 'header-nav').append(menu));
   const main = new Element('main'), back = button('btn-back'), content = new Element('div', 'app-content').append(new Element('div', 'page-back-row').append(back), main);
@@ -73,7 +78,7 @@ function harness(fire = true) {
     requestAnimationFrame: fn => { frames.set(++id, fn); return id; }, cancelAnimationFrame: frame => frames.delete(frame),
     getComputedStyle:()=>({scrollMarginTop:'16.2px'}),
     window: { scrollY:100,scrollX:0,scrollTo:options=>document.activeElement.closest('.hero-banner, .detail-hero-wide').scrolls.push(options), addEventListener: (name, fn) => listeners.set(name, fn), removeEventListener: name => listeners.delete(name), getComputedStyle: () => ({ gridTemplateColumns: '1fr 1fr' }), innerWidth: 960 },
-    require: name => { if (name === '../parental-dpad-navigation.ts') return { parentalControls, parentalDpadTarget, parentalEntry }; assert.equal(name, 'react'); return { useRef: value => ({ current: value }), useCallback: fn => fn, useEffect: fn => { const dispose = fn(); if (dispose) cleanup.push(dispose); } }; },
+    require: name => { if(name==='../dpad-repeat.ts')return{acceptDpadRepeat};if(name==='../search-dpad-navigation.ts')return{rememberSearchResult,searchDpadTarget:(...args)=>{const old=globalThis.document;globalThis.document=document;try{return searchDpadTarget(...args);}finally{if(old===undefined)delete globalThis.document;else globalThis.document=old;}}};if (name === '../parental-dpad-navigation.ts') return { parentalControls, parentalDpadTarget, parentalEntry }; assert.equal(name, 'react'); return { useRef: value => ({ current: value }), useCallback: fn => fn, useEffect: fn => { const dispose = fn(); if (dispose) cleanup.push(dispose); } }; },
   });
   exports.useDpadNavigation({ autoFocusFirst: false });
   const commit = () => { const pending = [...frames.values()]; frames.clear(); pending.forEach(fn => fn()); };

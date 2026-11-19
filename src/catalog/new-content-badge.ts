@@ -1,3 +1,4 @@
+import { getSourceCacheScope } from '../bootstrap/source-replacement.ts';
 import type { CatalogReadModel } from './catalog-read-model.ts';
 import type { LocalCatalogStorage, SegmentedCatalogManifest } from '../bootstrap/storage/storage.interface.ts';
 import { resolveSegmentRelativePath } from '../bootstrap/storage/segment-path-resolver.ts';
@@ -35,7 +36,7 @@ export function newContentKey(kind: 'movie' | 'series', title: string): string {
   // Do not key by ordinal ID or metadata which can change after enrichment.
   return hash(`${kind}:${title.normalize('NFKC').trim().toLowerCase().replace(/\s+/g, ' ')}`);
 }
-export function newContentScope(sourceId: string): string { return hash(sourceId); }
+export function newContentScope(sourceId: string): string { const scope = getSourceCacheScope(); return hash(scope === 'legacy' ? sourceId : `${sourceId}\0${scope}`); }
 export function isNewContent(firstSeen: number | undefined, now: number): boolean {
   return typeof firstSeen === 'number' && firstSeen > 0 && now >= firstSeen && now < firstSeen + NEW_CONTENT_WINDOW_MS;
 }
@@ -147,7 +148,8 @@ export async function scanNewContent(
   now = Date.now(), cooperate = () => new Promise<void>((resolve) => setTimeout(resolve, 0)),
 ): Promise<NewContentInventory> {
   const snapshotId = model.catalog.metadata.snapshotId;
-  const check = () => { if (signal.aborted) throw Error('NOVELTY_SCAN_CANCELLED'); };
+  const activationScope = getSourceCacheScope();
+  const check = () => { if (getSourceCacheScope() !== activationScope) throw Error('NOVELTY_GENERATION_CHANGED'); if (signal.aborted) throw Error('NOVELTY_SCAN_CANCELLED'); };
   check();
   const manifest = await storage.readActiveManifest() as SegmentedCatalogManifest | null;
   check();

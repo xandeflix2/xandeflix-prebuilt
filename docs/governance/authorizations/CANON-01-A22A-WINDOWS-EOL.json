@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "gate": "CANON-01-A22A-WINDOWS-EOL",
+  "parentGate": "CANON-01",
+  "amendment": "CANON-01-A22A-WINDOWS-EOL",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "EXPLICIT_USER_AUTONOMOUS_CORRECTION_REQUEST_2026_10_20",
+  "authorizationRequestSha256": "dc9feae1e4dddb0cc8950d1df1cb93d840d99bc8446f68897e7b91b9681bf854",
+  "reason": "Correct only the Windows CRLF test fixture: normalize before conversion to prevent CRCRLF while preserving exact workflow validation and all security negatives.",
+  "physicalImpact": "NOT_REQUIRED_JUSTIFIED",
+  "physicalImpactJustification": "Test fixture and synthetic amendment registry expectation only; no runtime or Android source changed.",
+  "testChangesReviewed": true,
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c105-complete-root-search.mjs",
+    "scripts/test-c107-catalog-return-navigation.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c11-landscape-navigation.mjs",
+    "scripts/validate-direct-playback.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock",
+    "npm run typecheck",
+    "npm run update:check",
+    "npm run security:check",
+    "npm run playback:check",
+    "npm run build",
+    "npm run site:build",
+    "node scripts/test-vercel-prebuilt-contract.mjs"
+  ],
+  "evidence": "docs/evidence/CANON_01_A22A_WINDOWS_EOL.md",
+  "compatibilityRisk": "Local tests cannot certify the remote Windows job; no workflow, canonical verifier or historical receipt is weakened.",
+  "restrictions": [
+    "CI-only correction. All 128 canonical controls, 14 suites and 111 prior dedicated controls remain mandatory. Five EOL cases are added.",
+    "Only isolated review-branch commit/push permitted after validation and subject to the explicit prohibition on deployments. No main, merge, force, release or integration changes.",
+    "No Android/runtime/backend or historical receipt changes in this amendment. Later explicit APK-only request is recorded separately."
+  ],
+  "supersedes": {
+    "scripts/test-vercel-prebuilt-contract.mjs": "CANON-01-VERCEL-A22A",
+    "scripts/test-canonical-regression.mjs": "CANON-01-A22A-CI-DIAG"
+  },
+  "changes": [
+    {
+      "path": "scripts/test-vercel-prebuilt-contract.mjs",
+      "before": "35d5cba2f2f11544384f69d551147359c5fd7bd6",
+      "after": "82f78c239466fd40c089dcb2c339bd247c245bcb"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "d52fc1d8ce31b47cc4fbbaef91a2024e938b6e58",
+      "after": "764a3bb68b46fada561c41c5ebb64f516d458b10"
+    }
+  ],
+  "gitCommitAuthorized": true,
+  "gitPushAuthorized": true,
+  "androidBuildAuthorized": false,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false
+}

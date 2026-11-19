@@ -1,0 +1,110 @@
+{
+  "schema": 1,
+  "gate": "CANON-01-LIVE-SINGLE-TRANSPORT",
+  "parentGate": "CANON-01",
+  "amendment": "CANON-01-LIVE-SINGLE-TRANSPORT",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "EXPLICIT_USER_SINGLE_TRANSPORT_CORRECTION_APK_AND_TWO_DEVICE_TEST_2026_10_23",
+  "authorizationRequestSha256": "af1f00bdf115b0e1320d4a7945632a5785d51d49bbb8caf0dc243837ba291b39",
+  "reason": "Remove the two automatic parallel diagnostic GETs from native candidate startup; retain passive transfer/state/error observation on the existing authorized Media3 transport. Verify C9 preserves two permitted devices without changing limits.",
+  "physicalImpact": "REQUIRED",
+  "physicalImpactJustification": "User explicitly requests APK for in-place installation on two distinct devices and live buffer/concurrency testing. Preserve private state, package/signature/version; no reset or source/license reconfiguration.",
+  "testChangesReviewed": true,
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c105-complete-root-search.mjs",
+    "scripts/test-c107-catalog-return-navigation.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c11-landscape-navigation.mjs",
+    "scripts/validate-direct-playback.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock",
+    "npm run typecheck",
+    "npm run update:check",
+    "npm run security:check",
+    "npm run playback:check",
+    "npm run build",
+    "npm run site:build",
+    "node scripts/test-site-build-contract.mjs",
+    "node scripts/test-vercel-artifact-contract.mjs",
+    "node scripts/verify-vercel-artifact.mjs inspect",
+    "node scripts/test-vercel-prebuilt-contract.mjs"
+  ],
+  "evidence": "docs/evidence/LIVE_SINGLE_TRANSPORT.md",
+  "compatibilityRisk": "Additional diagnostic media request is confirmed; provider counting and the real user failure remain unverified until physical correlation. Synthetic C9 and structural tests cannot certify source quota or slow-network playback.",
+  "restrictions": [
+    "Only the two automatic probe callers change production; keep the legacy helper and R6 checks unchanged, retaining passive transport diagnostics.",
+    "Preserve26 previous receipts and all147 controls/26 suites; add closed-scope protection and one dedicated suite.",
+    "Buffer policy, HLS MIME/candidates, source headers/credentials, retries/timeouts, C9/heartbeat/limits, source/catalog/UI/version/dependencies/backend/workflows/verifier remain unchanged.",
+    "In-place install same package/signature on two available authorized devices only; preserve identity/activation/source/parental/catalog; no uninstall/clear-data/reset/restore. No forced PIN, licence bypass, global network disruption or more than two real streams.",
+    "No Git staging/commit/push/PR/merge/main, Vercel/Supabase admin write or next implementation."
+  ],
+  "previousGovernanceHashes": {
+    "docs/governance/CANON_01_AUTHORIZATION_HARDENING.json": "766db763ee98aeeb33230c2828f050a8527555b7",
+    "docs/governance/CANON_01_LEGACY_TESTS_AUTHORIZATION.json": "e59e2d328db3d0dfd8c1d873b154e2e3f7900a0c",
+    "docs/governance/CANON_CHANGE_AUTHORIZATION.json": "e73152f228cbb625c508062d70ef810e8342059a",
+    "docs/governance/authorizations/CANON-01-A22A-CI-DIAG.json": "7d89451bf23a05fa1ba819b72b99b28025aa7a66",
+    "docs/governance/authorizations/CANON-01-A22A-WINDOWS-EOL.json": "73ffd5ed494cb87a7c0d22e4a8a3f94252cf321e",
+    "docs/governance/authorizations/CANON-01-A22A-WINDOWS-METADATA-EOL.json": "90d7db4a18e84221afa6fa9dda40c82d6dad6121",
+    "docs/governance/authorizations/CANON-01-CATALOG-PHYSICAL-FIXES.json": "ea179b852518e2a14c7ee79b6c3c72e76c0df6a9",
+    "docs/governance/authorizations/CANON-01-CATALOG-READ-DIAG.json": "169b19ee02a4c1cacbe575cded00ec02928fa3c7",
+    "docs/governance/authorizations/CANON-01-CATALOG-RETENTION.json": "b3c18f01ba1e753597af3a162c2605669dcd4e6b",
+    "docs/governance/authorizations/CANON-01-DETAIL-BACKDROP-TYPES.json": "da8c532e25e220040bba3c942bad41507d4b9245",
+    "docs/governance/authorizations/CANON-01-DETAIL-BACKDROP-UI.json": "579097e952a7ddf142ba885aaf23e164c0241e54",
+    "docs/governance/authorizations/CANON-01-HERO-PLATFORM-ALIGNMENT.json": "66a112450541d8a038292d8b07d08cc5547ad51e",
+    "docs/governance/authorizations/CANON-01-HERO-PLATFORM-COMPOSITION.json": "75f9ca539c1723ca1db6c2e8948a63a3a19d5264",
+    "docs/governance/authorizations/CANON-01-OPAQUE-HLS-MIME-RECOVERY.json": "5a8c735b59f921a5d24be15f6c14f32541687719",
+    "docs/governance/authorizations/CANON-01-SERIES-POSTER-COMPOSITION.json": "645dc8b2b5d4b822bc83d72e9f5ab9f4f4cb4347",
+    "docs/governance/authorizations/CANON-01-SOURCE-OUTPUT.json": "a93d98a1022f99c0e0957dd8f4a2c7d078b8f588",
+    "docs/governance/authorizations/CANON-01-STREAMED-VOD-INVENTORY-RECOVERY.json": "a16dd131aa09b3027724ea94f49a6d841551a9cb",
+    "docs/governance/authorizations/CANON-01-TABLET-SIDEBAR-TRANSPARENCY.json": "ffcc5c6c6005e4fcd24ce40ba776950bf55a5dbe",
+    "docs/governance/authorizations/CANON-01-TMDB-CONTEXT-IDENTITY.json": "3ab236bab99175dcb5374047c2fc6565650d8945",
+    "docs/governance/authorizations/CANON-01-TMDB-SUBTITLE-PREVIEW.json": "5e50d1c29c33b5fe3455112818e978213d065e96",
+    "docs/governance/authorizations/CANON-01-TV-SIDEBAR-COMPOSITION.json": "f5d43f845cd4e3fdb7947dc33e4f9b3df8669ab7",
+    "docs/governance/authorizations/CANON-01-VERCEL-A2-ARTIFACT.json": "fb613a143676e3e32267ebacb3bec81123791823",
+    "docs/governance/authorizations/CANON-01-VERCEL-A22A.json": "c698fec429f4058118d4701a7f5208ece9a0b0d1",
+    "docs/governance/authorizations/CANON-01-VERCEL-BUILD-A1.json": "7edaa32c4b13c8295fc0daa64abed1ef7a4b0c2d",
+    "docs/governance/authorizations/CANON-01-VERCEL-PREBUILT-RECOVERY-01.json": "9cb685590481ba094ffbca2e2abe2f585aa3ae46",
+    "docs/governance/authorizations/CANON-01-XUI-OPAQUE-RECOVERY.json": "cf4176d0007b4a04997bf2631558bd9d954fd6f7"
+  },
+  "supersedes": {
+    "android/app/src/main/java/com/xandeflix/prebuilt/player/NativePlayerActivity.java": "CANON-01-OPAQUE-HLS-MIME-RECOVERY",
+    "android/app/src/main/java/com/xandeflix/prebuilt/player/NativeAndroidPlayerPlugin.java": "CANON-01-OPAQUE-HLS-MIME-RECOVERY",
+    "scripts/test-canonical-regression.mjs": "CANON-01-HERO-PLATFORM-ALIGNMENT"
+  },
+  "changes": [
+    {
+      "path": "android/app/src/main/java/com/xandeflix/prebuilt/player/NativePlayerActivity.java",
+      "before": "3c4ade24ad659b00185d2de1434dfa5741da3920",
+      "after": "0e6758a07b87cc97054f8e6d509a4a355193cb15"
+    },
+    {
+      "path": "android/app/src/main/java/com/xandeflix/prebuilt/player/NativeAndroidPlayerPlugin.java",
+      "before": "dcf2c27419f9d80fbe43da2c5e4e78dd44884c91",
+      "after": "77d3e1eea97a5e7a1faeb498e9fe8651c41383ea"
+    },
+    {
+      "path": "scripts/test-live-single-transport.mjs",
+      "before": null,
+      "after": "b0f12e8d183730e3fce9912bdd460a0b66e42262"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "3a499038737311c6e5aa4a52fd58e949be427db1",
+      "after": "7dca2f72bcdfe30d0c67427ed686674ce5693fee"
+    }
+  ],
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": true,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false
+}

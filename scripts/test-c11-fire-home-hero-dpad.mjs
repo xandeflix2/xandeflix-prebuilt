@@ -1,3 +1,5 @@
+import {acceptDpadRepeat} from '../src/ui/dpad-repeat.ts';
+import {searchDpadTarget,rememberSearchResult} from '../src/ui/search-dpad-navigation.ts';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
@@ -17,7 +19,7 @@ vm.runInNewContext(code, { exports, document, HTMLElement: Element,
   getComputedStyle:()=>({scrollMarginTop:'16.2px'}),
   MutationObserver: class { observe() {} disconnect() {} },
   requestAnimationFrame: fn => { frames.set(++serial, fn); return serial; }, cancelAnimationFrame: id => { if (frames.delete(id)) cancelled++; },
-  require: name => { if (name === '../parental-dpad-navigation.ts') return { parentalControls, parentalDpadTarget, parentalEntry }; assert.equal(name, 'react'); return {
+  require: name => { if(name==='../dpad-repeat.ts')return{acceptDpadRepeat};if(name==='../search-dpad-navigation.ts')return{rememberSearchResult,searchDpadTarget:(...args)=>{const old=globalThis.document;globalThis.document=document;try{return searchDpadTarget(...args);}finally{if(old===undefined)delete globalThis.document;else globalThis.document=old;}}};if (name === '../parental-dpad-navigation.ts') return { parentalControls, parentalDpadTarget, parentalEntry }; assert.equal(name, 'react'); return {
     useRef: value => ({ current: value }), useCallback: fn => { callbacks.push(fn); return fn; },
     useEffect: fn => { const dispose = fn(); if (dispose) cleanup.push(dispose); },
   }; },

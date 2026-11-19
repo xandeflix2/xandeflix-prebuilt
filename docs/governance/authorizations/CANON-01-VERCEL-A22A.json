@@ -1,0 +1,86 @@
+{
+  "schema": 1,
+  "gate": "CANON-01-VERCEL-A22A",
+  "parentGate": "CANON-01",
+  "amendment": "CANON-01-VERCEL-A22A",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "USER_A22A_LOCAL_REQUEST_2026_10_20_RECORDED_IN_PHASED_SPEC",
+  "authorizationRequestSha256": "69fd12fdcf79eb32c5421f73f35361073d61dd25453051c5a3497c709caa6668",
+  "reason": "Implement separate manual real Vercel Prebuilt build and GitHub-signed provenance pipeline, with fail-closed output and identity checks, preserving all earlier canonical receipts and tests.",
+  "physicalImpact": "NOT_REQUIRED_JUSTIFIED",
+  "physicalImpactJustification": "Build-only governance scripts, independent manual CI and append-only records. No runtime, backend or Android changes and no physical homologation is claimed.",
+  "testChangesReviewed": true,
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c105-complete-root-search.mjs",
+    "scripts/test-c107-catalog-return-navigation.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c11-landscape-navigation.mjs",
+    "scripts/validate-direct-playback.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock",
+    "npm run typecheck",
+    "npm run update:check",
+    "npm run security:check",
+    "npm run playback:check",
+    "npm run build",
+    "npm run site:build",
+    "node scripts/test-site-build-contract.mjs",
+    "node scripts/test-vercel-artifact-contract.mjs",
+    "node scripts/verify-vercel-artifact.mjs inspect",
+    "node scripts/test-vercel-prebuilt-contract.mjs"
+  ],
+  "evidence": "docs/evidence/CANON_01_VERCEL_A22A.md",
+  "compatibilityRisk": "Real CLI output, project read permissions and native GitHub attestation are pending authorized remote execution; local fixtures are never trusted attestations. Manual workflow requires default-branch registration. No publication authority.",
+  "restrictions": [
+    "Local implementation only; no commit, push, merge, main change or PR readiness.",
+    "No Vercel deployment, redeploy, production build or integration mutation. No remote workflow dispatch in this stage.",
+    "No package.json, lockfile, vercel.json, runtime, Android, Supabase, user data or historical receipt changes.",
+    "Missing credentials, configuration, full Git history or verified signature must fail closed.",
+    "Authorization digest records the canonical instruction transcription in the pre-code phased specification, not a cryptographic signature of the human."
+  ],
+  "supersedes": {
+    "scripts/verify-canonical-contract.mjs": "CANON-01-VERCEL-A2-ARTIFACT",
+    "scripts/test-canonical-regression.mjs": "CANON-01-VERCEL-A2-ARTIFACT"
+  },
+  "changes": [
+    {
+      "path": "scripts/verify-canonical-contract.mjs",
+      "before": "005c771e9b844892b6a20b63a024bc4a43d3d9de",
+      "after": "f8e4027078c77dbbcdc51aff72dbe758ee0ea78f"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "15fed01d8860419b8ddb8e552e2e5762d6f58099",
+      "after": "671c556bb582f37320bb2c7682b70ed5d23321b8"
+    },
+    {
+      "path": ".github/workflows/vercel-prebuilt-attested.yml",
+      "before": null,
+      "after": "f022d5103a20bfd11caa84d742f60eab87a6f32f"
+    },
+    {
+      "path": "scripts/vercel-prebuilt-contract.mjs",
+      "before": null,
+      "after": "2a51da39ccb96da6253d0ecdc17de802764d39df"
+    },
+    {
+      "path": "scripts/test-vercel-prebuilt-contract.mjs",
+      "before": null,
+      "after": "35d5cba2f2f11544384f69d551147359c5fd7bd6"
+    }
+  ],
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": false,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false
+}

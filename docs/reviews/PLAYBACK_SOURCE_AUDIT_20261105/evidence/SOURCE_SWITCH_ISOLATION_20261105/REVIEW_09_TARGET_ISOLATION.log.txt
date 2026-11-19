@@ -1,0 +1,10 @@
+PASS installed migration cleans only source metadata and requires one new runtime
+PASS A to B to A creates different epochs even when B never promotes
+PASS version and protocol changes both invalidate same logical ID
+PASS interrupted PREPARED cleanup resumes and never reports old snapshot verified
+PASS lost writes and incomplete removals block rather than falsely completing
+PASS invalid state, target, snapshot and stale commit cannot authorize reuse
+PASS last synchronous cleanup removes closing runtime writes before reload
+PASS personal data and novelty inventory never rebind through colliding IDs
+PASS only allowlisted presentation databases are removed; blocked and failed cleanup reject
+SOURCE_REPLACEMENT_ISOLATION=PASS 9

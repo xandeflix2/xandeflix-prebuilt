@@ -88,7 +88,7 @@ export async function updateSourceCatalog(deps = { canRun: canUpdateSourceCatalo
     const result = await deps.sync(canPromote);
     if (publicWeb) observeWebCatalogRefresh(result.outcome, 'error' in result ? result.error : undefined);
     return result.outcome === 'PROMOTED' ? 'updated' : result.outcome === 'NO_OP' ? 'unchanged'
-      : result.outcome === 'LOCAL_FIRST_ACTIVE_PRESERVED' ? publicWeb && 'error' in result && result.error ? 'failed' : 'deferred' : 'failed';
+      : result.outcome === 'LOCAL_FIRST_ACTIVE_PRESERVED' ? 'error' in result && result.error ? 'failed' : 'deferred' : 'failed';
   } catch { return 'failed'; }
   finally { await listener?.remove().catch(() => {}); }
 }

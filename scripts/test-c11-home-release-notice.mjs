@@ -10,6 +10,7 @@ function load(file, imports) {
   const output=ts.transpileModule(readFileSync(new URL('../'+file,import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.React,esModuleInterop:true}}).outputText;
   new Function('require','module','exports','window','document','HTMLElement',output)(name=>{
     if(name.includes('useHeroPlayback'))return {useHeroPlayback:()=>({})};
+    if(name.endsWith('CardExpansion.tsx'))return{CardExpansionHost:()=>null};
     if(name.includes('FavoriteTitles'))return {FavoriteTitles:()=>null};
     if(name.includes('startup-catalog-preview'))return {selectStartupPosters:()=>[]};
     if(name.includes('useFeaturedRotation'))return {useFeaturedRotation:model=>({movies:model.catalog.movies.slice(0,20),series:model.catalog.series.slice(0,20)})};

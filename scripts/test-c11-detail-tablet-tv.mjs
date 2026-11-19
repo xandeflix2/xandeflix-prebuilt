@@ -34,7 +34,7 @@ const buttons=tree=>nodes(tree).filter(node=>node.type==='button');
 
 let retry=0;
 const sections=harness('src/ui/components/SeriesDetailSections.tsx',{
-  './RelatedTitles.tsx':{RelatedTitles:stub('related')},
+  './RelatedTitles.tsx':{RelatedTitles:stub('related')},'./TitleCast.tsx':{TitleCast:stub('actors')},
 });
 const props={seriesId:'series-one',readModel:{},episodes:React.createElement('p',null,'REAL EPISODE PANEL'),episodesFailed:false,onRetryEpisodes:()=>retry++,onSelectItem:()=>{}};
 let tree=sections.render('SeriesDetailSections',props),html=renderToStaticMarkup(tree);
@@ -54,10 +54,13 @@ console.log('PASS_REAL_SERIES_TABS_DEFAULT_EPISODES_RELATED_ONLY_KEYBOARD_RETRY'
 const canonicalSeries={id:'series-one',title:'Public series'};
 const detailPage=harness('src/ui/pages/SeriesDetailPage.tsx',{
   '../detail-genres.ts':{meaningfulDetailGenres},
+  '../components/EpisodeListPresentation.tsx':{EpisodeListPresentation:()=>null},
+  '../components/EpisodeStill.tsx':{EpisodeStill:()=>null},
+  '../../web/web-playback-diagnostic.ts':{observeWebSeriesDetails:fn=>fn()},
   '../../catalog/catalog-selectors.ts':{getSeriesDetail:()=>({id:'series-one',title:'Public series',externalIds:{tmdbId:'1399'},genreLabels:[],seasons:[],overview:'Synopsis'})},
-  '../components/Artwork.tsx':{Artwork:stub('artwork')},
+  '../components/Artwork.tsx':{Artwork:stub('artwork')},'../components/DetailBackdrop.tsx':{DetailBackdrop:stub('backdrop')},
   '../hooks/useArtworkMetadata.ts':{useArtworkMetadata:()=>undefined},
-  '../../artwork/tmdb-metadata.service.ts':{tmdbPosterPath:()=>undefined},
+  '../../artwork/tmdb-metadata.service.ts':{tmdbPosterPath:()=>undefined,normalizeArtworkIdentity:i=>i,artworkCategoryContext:()=>({})},
   '../hooks/useImmersiveArtwork.ts':{useImmersiveArtwork:()=>({current:null})},
   '../components/DetailTrailer.tsx':{DetailTrailer:stub('trailer')},
   '../components/SeriesDetailSections.tsx':{SeriesDetailSections:stub('sections')},
@@ -65,6 +68,7 @@ const detailPage=harness('src/ui/pages/SeriesDetailPage.tsx',{
   '../../playback/watch-history.ts':{watchFingerprint:(kind,row)=>{assert.equal(kind,'series');assert.equal(row,canonicalSeries);return '0123456789abcdef';},watchHistory:{list:()=>[],savedPosition:()=>0,subscribe:()=>()=>{},syncNativeProgress:async()=>{}}},
   '../components/PhoneSeriesDetail.tsx':{PhoneSeriesDetail:stub('phone')},
   '../components/WatchProviders.tsx':{WatchProviders:stub('providers')},
+  '../components/TitleCast.tsx':{TitleCast:stub('title-cast')},
   '../hooks/usePhoneLayout.ts':{usePhoneLayout:()=>false},
   '../hooks/useDetailInitialFocus.ts':{useDetailInitialFocus:()=>{}},
   '../../playback/playback.service.ts':{defaultPlaybackService:{}},
@@ -82,11 +86,12 @@ const canonicalMovie={id:'movie-one',title:'Public movie'};
 const moviePage=harness('src/ui/pages/MovieDetailPage.tsx',{
   '../detail-genres.ts':{meaningfulDetailGenres},
   '../../catalog/catalog-selectors.ts':{getMovieDetail:()=>({id:'movie-one',title:'Public movie',externalIds:{tmdbId:'75802'},genreLabels:[],categoryLabels:[],overview:'Synopsis'})},
-  '../components/Artwork.tsx':{Artwork:stub('artwork')},'../hooks/useArtworkMetadata.ts':{useArtworkMetadata:()=>undefined},
-  '../../artwork/tmdb-metadata.service.ts':{tmdbPosterPath:()=>undefined},'../hooks/useImmersiveArtwork.ts':{useImmersiveArtwork:()=>({current:null})},
+  '../components/Artwork.tsx':{Artwork:stub('artwork')},'../components/DetailBackdrop.tsx':{DetailBackdrop:stub('backdrop')},'../hooks/useArtworkMetadata.ts':{useArtworkMetadata:()=>undefined},
+  '../../artwork/tmdb-metadata.service.ts':{tmdbPosterPath:()=>undefined,normalizeArtworkIdentity:i=>i,artworkCategoryContext:()=>({})},'../hooks/useImmersiveArtwork.ts':{useImmersiveArtwork:()=>({current:null})},
   '../components/DetailTrailer.tsx':{DetailTrailer:stub('trailer')},'../components/SeriesPersonalActions.tsx':{SeriesPersonalActions:stub('personal')},
-  '../components/RelatedTitles.tsx':{RelatedTitles:stub('related')},'../components/PhoneMovieDetail.tsx':{PhoneMovieDetail:stub('phone')},
+  '../components/SeriesDetailSections.tsx':{SeriesDetailSections:stub('related')},'../components/RelatedTitles.tsx':{RelatedTitles:stub('related')},'../components/PhoneMovieDetail.tsx':{PhoneMovieDetail:stub('phone')},
   '../components/WatchProviders.tsx':{WatchProviders:stub('providers')},
+  '../components/TitleCast.tsx':{TitleCast:stub('title-cast')},
   '../hooks/usePhoneLayout.ts':{usePhoneLayout:()=>false},'../hooks/useDetailInitialFocus.ts':{useDetailInitialFocus:()=>{}},
   '../../playback/playback.service.ts':{defaultPlaybackService:{}},
   '../../playback/watch-history.ts':{watchFingerprint:(kind,row)=>{assert.equal(kind,'movie');assert.equal(row,canonicalMovie);return 'abcdef0123456789';}},
@@ -102,6 +107,7 @@ console.log('PASS_REAL_MOVIE_CANONICAL_PERSONAL_ACTIONS_ROUNDED_CONTENT_HEIGHT_H
 const previousNavigator=Object.getOwnPropertyDescriptor(globalThis,'navigator');
 let landscape=true,portrait=false;
 const shell=harness('src/ui/components/AppShell.tsx',{
+ './StartupLoadingScreen.tsx':{StartupLoadingScreen:()=>null},
   './Header.tsx':{Header:stub('header')},'../hooks/useLandscapeNavigation.ts':{useLandscapeNavigation:()=>landscape},
   '../hooks/useLivePresentation.ts':{useLivePresentation:()=>({tabletPortrait:portrait,stackedLive:false})},'./CastButton.tsx':{CastButton:stub('cast')},
   '../hooks/useDevicePresentation.ts':{useDevicePresentation:()=>null},
@@ -153,6 +159,7 @@ globalThis.document={hidden:false,activeElement:originalFocus,querySelector:()=>
 globalThis.ResizeObserver=class {observe(){}disconnect(){}};
 globalThis.requestAnimationFrame=callback=>{callback();return 1;};globalThis.cancelAnimationFrame=()=>{};
 const trailer=harness('src/ui/components/SeriesTrailer.tsx',{
+ './DetailBackdrop.tsx':{DetailBackdrop:stub('backdrop')},
   '@capacitor/browser':{Browser:{open:()=>Promise.resolve()}},'./Artwork.tsx':{Artwork:stub('artwork')},
   '../../playback/public-trailer.bridge.ts':{hasPublicTrailer:()=>true,PublicTrailer:{
     addListener:async(_name,fn)=>{listener=fn;return {remove:async()=>{calls.removed++;}};},
@@ -187,5 +194,5 @@ assert.ok(!plugin.includes('addJavascriptInterface'));assert.ok(plugin.includes(
 const wiring=(series,movie,plugin)=>{for(const page of [series,movie])assert.ok(!page.includes('<CastButton'));assert.ok(plugin.includes('PublicTrailerPolicy.presentation('));};
 wiring(series,movie,plugin);
 assert.throws(()=>wiring(series+'<CastButton />',movie,plugin));
-assert.throws(()=>wiring(series,movie,plugin.replace('PublicTrailerPolicy.presentation(','PublicTrailerPolicy.phone(')));
+assert.throws(()=>wiring(series,movie,plugin.replaceAll('PublicTrailerPolicy.presentation(','PublicTrailerPolicy.phone(')));
 console.log('PASS_DETAIL_BACK_CLOSE_BEFORE_ROUTE_HERO_ACTIONS_AND_NATIVE_BOUNDARIES');

@@ -1,0 +1,13 @@
+{
+  "observedUTC": "2026-11-05T01:25:55.467Z",
+  "startedUTC": "2026-11-05T01:25:20.686Z",
+  "finished": true,
+  "restored": true,
+  "result": {
+    "outcome": "PROMOTED",
+    "syncState": "READY",
+    "error": null
+  },
+  "codes": [],
+  "events": []
+}

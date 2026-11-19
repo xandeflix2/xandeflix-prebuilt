@@ -157,3 +157,16 @@ navegador, consumida/retirada do fragmento antes do SDK. Nao transmite chave
 permanente na URL nem cria identidade do navegador. Dados pessoais minimos
 e apresentacao do proprio aparelho nao concedem acesso de gestor. Preservar
 cofres, fonte direta, C9, licencas gerenciadas/pagas, identidade e lock.
+
+## CANON-01 - Consolidacao e ordem de expansao
+
+Referencia normativa obrigatoria:
+[XANDEFLIX_PREBUILT_PHASED_EXPANSION](XANDEFLIX_PREBUILT_PHASED_EXPANSION.md).
+Executar `npm run canon:check` e `npm run canon:test`, preservando lock C11.
+Decisoes, evidencia, hipotese, pendencia e expansao futura sao categorias
+distintas. EXTERNAL_PREPROCESSING continua TARGET; os canais atuais do Source
+Data Boundary nao sao movidos nem declarados universalmente prebuilt por este
+Gate. Fonte direta/catalogo e busca locais/vault/identidade permanecem protegidos.
+Baseline fisica1.0.37 e historica, permitindo evolucao por Gate autorizado.
+Prioridade Android/Fire OS; Google Play/piloto60 planejados; Tizen/webOS somente
+apos analise do piloto e novo Gate. Nenhuma funcionalidade/runtime novo aqui.

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { CatalogItemViewModel } from '../../catalog/catalog-view-model.ts';
 import { observeArtwork } from '../../artwork/artwork-visibility.ts';
-import { tmdbPosterPath } from '../../artwork/tmdb-metadata.service.ts';
+import { tmdbPosterPath, artworkCategoryContext } from '../../artwork/tmdb-metadata.service.ts';
 import { meaningfulDetailGenres } from '../detail-genres.ts';
 import { useArtworkMetadata } from './useArtworkMetadata.ts';
 
@@ -22,6 +22,7 @@ export function useCardGenres(item: CatalogItemViewModel) {
   const source = meaningfulDetailGenres(item.genreLabels);
   const metadata = useArtworkMetadata({ kind: item.kind, title: item.title,
     year: item.yearFormatted, tmdbId: item.externalIds?.tmdbId,
+    ...(item.kind === 'series' ? artworkCategoryContext(item.categoryLabels, item.hasEpisodes) : {}),
     posterPath: tmdbPosterPath(item.posterUri), sourcePosterUri: item.posterUri }, visible && !source.length);
   return { ref: setElement, visible, genres: source.length ? source : meaningfulDetailGenres(metadata?.genres || []) };
 }

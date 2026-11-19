@@ -1,0 +1,38 @@
+[
+  {
+    "name": "17_PUBLIC_WEB_BUILD",
+    "startedUTC": "2026-11-05T11:44:12.301Z",
+    "finishedUTC": "2026-11-05T11:45:24.381Z",
+    "exitCode": 0
+  },
+  {
+    "name": "18_CAPACITOR_SYNC",
+    "startedUTC": "2026-11-05T11:45:24.382Z",
+    "finishedUTC": "2026-11-05T11:45:26.821Z",
+    "exitCode": 0
+  },
+  {
+    "name": "19_C11_PRE_GRADLE",
+    "startedUTC": "2026-11-05T11:45:26.827Z",
+    "finishedUTC": "2026-11-05T11:45:44.188Z",
+    "exitCode": 0
+  },
+  {
+    "name": "20_ANDROID_TEST_BUILD",
+    "startedUTC": "2026-11-05T11:45:44.189Z",
+    "finishedUTC": "2026-11-05T11:49:51.392Z",
+    "exitCode": 0
+  },
+  {
+    "name": "21_CANONICAL_POST_BUILD",
+    "startedUTC": "2026-11-05T11:49:51.403Z",
+    "finishedUTC": "2026-11-05T11:50:00.620Z",
+    "exitCode": 0
+  },
+  {
+    "name": "22_C11_POST_BUILD",
+    "startedUTC": "2026-11-05T11:50:00.621Z",
+    "finishedUTC": "2026-11-05T11:50:16.893Z",
+    "exitCode": 0
+  }
+]

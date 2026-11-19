@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "gate": "CANON-01-TABLET-HERO-SPACING",
+  "parentGate": "CANON-01-IDENTITY-HERO-RECOVERY",
+  "amendment": "CANON-01-TABLET-HERO-SPACING",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "CURRENT_EXPLICIT_USER_TABLET_ONLY_HERO_ACTIONS_AND_COMPACT_TOP_MARGINS_2026_10_29; NOT_NEW_MASTER_ATTACHMENT; CURRENT_USER_INCREASE_GAP8_TO12",
+  "authorizationRequestSha256": "1fb2159f388f07838cf763bb322186af70262a5c15c00e619d5fdd781113ee3c",
+  "reason": "Tablet-only hero controls and12px top separation (current user revision), consistent compact mobile headers.",
+  "physicalImpact": "REQUIRED",
+  "physicalImpactJustification": "Same Fire standing in-place testing authorization; phone/tablet browser only and APK for user tests.",
+  "testChangesReviewed": true,
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c105-complete-root-search.mjs",
+    "scripts/test-c107-catalog-return-navigation.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c11-landscape-navigation.mjs",
+    "scripts/validate-direct-playback.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock",
+    "node node_modules/typescript/bin/tsc --noEmit",
+    "node scripts/test-identity-hero-recovery.mjs",
+    "official configured build and APK/asset audits",
+    "offline native257/39",
+    "same Fire controls and top spacing validation"
+  ],
+  "evidence": "docs/evidence/TABLET_HERO_SPACING.md",
+  "compatibilityRisk": "Presentation eligibility/spacing only; preserve normal native Back, tablet casting handlers and nonhero navigation; no metadata/source/player/backend change.",
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": true,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false,
+  "supersedes": {
+    "src/ui/components/AppShell.tsx": "CANON-01-IDENTITY-HERO-RECOVERY",
+    "src/index.css": "CANON-01-IDENTITY-HERO-RECOVERY",
+    "android/app/build.gradle": "CANON-01-IDENTITY-HERO-RECOVERY",
+    "scripts/test-identity-hero-recovery.mjs": "CANON-01-IDENTITY-HERO-RECOVERY",
+    "scripts/test-canonical-regression.mjs": "CANON-01-IDENTITY-HERO-RECOVERY",
+    "scripts/test-c107-fire-hero-metadata.mjs": "CANON-01-IDENTITY-HERO-RECOVERY"
+  },
+  "changes": [
+    {
+      "path": "src/ui/components/AppShell.tsx",
+      "before": "68feddcefa276dd9847168c5bff3ee3afef0798c",
+      "after": "8a63640270a115f551b59e65359ac8c539d9ca95"
+    },
+    {
+      "path": "src/index.css",
+      "before": "1866c979b30c4e13fa80d7d5e351f815944c1588",
+      "after": "509efd9dc10d71c881159b195f7891bc8cb277b4"
+    },
+    {
+      "path": "android/app/build.gradle",
+      "before": "c846e2718389cfbdc94338defa831a52c303476f",
+      "after": "b92243f4cb468acb63f4349f70f88d2461f1f71f"
+    },
+    {
+      "path": "scripts/test-identity-hero-recovery.mjs",
+      "before": "16ed500194bff91ea202d4965e0abdafe57bac7a",
+      "after": "cf84f9573e39f7388c1d76391e74e3e0d8e703e1"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "16df16631760e0f374d233c824e70e34c26b5d93",
+      "after": "9708a25584c44c561d2c5a7915bb395fdc56199a"
+    },
+    {
+      "path": "scripts/test-c107-fire-hero-metadata.mjs",
+      "before": "78220c6e4f83b37d133ef3798ea810110908cd63",
+      "after": "113162a1aa2b26580f802e44deb05b282bfea448"
+    }
+  ],
+  "restrictions": [
+    "Preserve51 prior receipts and204controls42suites. Prior hero phone/top-zero assertions explicitly superseded by current user request; all metadata assertions remain. Runner changes only strict future gate list. Legacy C107 PHONE Back predicate superseded by explicit current phone-hidden policy; all profile/route/callback assertions retained.",
+    "No root/source/backend/Git/reset/other-device install/next gate."
+  ]
+}

@@ -2,7 +2,8 @@ import React, { useLayoutEffect, useMemo, useRef } from 'react';
 import type { CatalogReadModel } from '../../catalog/catalog-read-model.ts';
 import type { CatalogItemViewModel } from '../../catalog/catalog-view-model.ts';
 import { movieToViewModel, seriesToViewModel } from '../../catalog/catalog-selectors.ts';
-import { CatalogGrid } from '../components/CatalogGrid.tsx';
+import { VirtualCatalogGrid } from '../components/VirtualCatalogGrid.tsx';
+import { CategoryHero } from '../components/CategoryHero.tsx';
 import { RecentTitles } from '../components/RecentTitles.tsx';
 import { FavoriteTitles } from '../components/FavoriteTitles.tsx';
 import { useSeriesHighlights } from '../hooks/useSeriesHighlights.ts';
@@ -41,6 +42,6 @@ export function HomeCollectionPage({ collection, readModel, onSelectItem, onBack
     </div>
     {collection === 'favorites' ? <FavoriteTitles readModel={readModel} presentation="collection" onSelectItem={onSelectItem}/>
       : collection === 'recent-watched' ? <RecentTitles readModel={readModel} presentation="collection"/>
-      : <CatalogGrid items={items} onItemClick={onSelectItem} autoLoadMore/>}
+      : <><CategoryHero items={items} onSelect={onSelectItem}/><VirtualCatalogGrid items={items} onItemClick={onSelectItem} autoLoadMore/></>}
   </main>;
 }

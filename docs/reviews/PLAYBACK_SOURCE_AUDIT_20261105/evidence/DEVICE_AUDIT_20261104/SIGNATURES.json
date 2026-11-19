@@ -1,0 +1,12 @@
+[
+  {
+    "file": "fire-installed-before.apk",
+    "exitCode": 0,
+    "certificateSha256": "b235c7117c9660e17cf0732cd6493600a812692af289e627454988ea096e848d"
+  },
+  {
+    "file": "candidate-20261103.apk",
+    "exitCode": 0,
+    "certificateSha256": "b235c7117c9660e17cf0732cd6493600a812692af289e627454988ea096e848d"
+  }
+]

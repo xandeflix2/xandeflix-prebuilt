@@ -87,6 +87,7 @@ export class CatalogDeltaApplier {
       episodes,
       streams,
       artworks,
+      ...(delta.targetExtensions !== undefined ? { extensions: delta.targetExtensions } : {}),
     };
 
     return targetCatalog;

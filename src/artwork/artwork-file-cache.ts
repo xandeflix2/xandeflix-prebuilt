@@ -1,5 +1,7 @@
+import { getSourceCacheScope } from '../bootstrap/source-replacement.ts';
+const scope = getSourceCacheScope();
 import { Capacitor, registerPlugin } from '@capacitor/core';
-const plugin=registerPlugin<{get(options:{uri:string}):Promise<{path:string}>}>('ArtworkCache');
+const plugin=registerPlugin<{get(options:{uri:string;scope:string}):Promise<{path:string}>}>('ArtworkCache');
 const pending=new Map<string,Promise<string|undefined>>();
 const ready=new Map<string,{src:string;expires:number}>();
 const unavailable=new Map<string,number>();
@@ -20,7 +22,7 @@ export function acquireCachedArtworkUri(uri:string):Promise<string|undefined> {
   unavailable.delete(uri);
   const existing=pending.get(uri);if(existing)return existing;
   if(pending.size>=64)return Promise.resolve(uri);
-  const job=plugin.get({uri}).then(({path})=>{
+  const job=plugin.get({uri,scope}).then(({path})=>{
     const src=Capacitor.convertFileSrc(path);ready.delete(uri);ready.set(uri,{src,expires:Date.now()+5*60*1000});
     while(ready.size>128)ready.delete(ready.keys().next().value!);return src;
   },(error:unknown)=>{

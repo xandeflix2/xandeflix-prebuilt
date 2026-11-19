@@ -1,0 +1,157 @@
+{
+  "schema": 1,
+  "gate": "CANON-01-SOURCE-SWITCH-ISOLATION",
+  "parentGate": "CANON-01",
+  "amendment": "CANON-01-SOURCE-SWITCH-ISOLATION",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "EXPLICIT_CURRENT_SESSION_USER_SOURCE_SWITCH_CORRECTION_CAPTURE_NOT_INDEPENDENT_ADJUDICATION",
+  "authorizationRequestSha256": "399e803fbaa00f07b861c8bc503f861c41fb73356e32b5448ebd68b14eec3a44",
+  "reason": "User requested correction so installed devices verify the authorized source at startup and rebuild all source metadata after replacement. Exact reviewed scope and additional test harness ports are documented before edits; historical ambiguity is retained.",
+  "physicalImpact": "REQUIRED",
+  "physicalImpactJustification": "Verify upgrade, source comparison, one runtime restart, preserved device activation and actual playback separately on connected tablet, phone and Fire.",
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "node scripts/test-source-replacement-isolation.mjs",
+    "node scripts/test-source-replacement-bootstrap.mjs",
+    "node scripts/test-source-replacement-ui.mjs",
+    "node scripts/test-c11-new-content-badge.mjs",
+    "node scripts/test-c11-artwork-visible-recovery.mjs",
+    "node scripts/test-c11-page-artwork-preparation.mjs",
+    "node node_modules/typescript/bin/tsc --noEmit",
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock"
+  ],
+  "evidence": "docs/evidence/SOURCE_SWITCH_ISOLATION.md",
+  "compatibilityRisk": "One initial clean migration requires a remotely confirmed source. Unverified legacy catalog is blocked offline; established exact-snapshot local fallback remains. Source changes must increment logical generation through provisioning. External HTML403 remains a separate issue.",
+  "changes": [
+    {
+      "path": "src/bootstrap/source-replacement.ts",
+      "before": null,
+      "after": "71828a35f43c309eb15542187db9319e65c53557"
+    },
+    {
+      "path": "src/bootstrap/boot-sync-coordinator.ts",
+      "before": "3f25ad0e991cbe790826685a0605b7c5e190c7cc",
+      "after": "94c1c7a25c31f3a67d0c4c525e5cd3a16a23f394"
+    },
+    {
+      "path": "src/App.tsx",
+      "before": "7634b994338bffc566e359e205fae0ca0a262473",
+      "after": "1936f79d2dd0631a77a26a61048e0b1fd6cda631"
+    },
+    {
+      "path": "src/playback/watch-history.ts",
+      "before": "9ff486a5c294089259d274bb18c9c831825ebb43",
+      "after": "aafabb6b063898083ef06fc0b6838e1f49f8d669"
+    },
+    {
+      "path": "src/playback/live-favorites.ts",
+      "before": "301c629a5a583118d1ac885c4045830078af7441",
+      "after": "150e52c22f28982d86463ae8372f370f0896711a"
+    },
+    {
+      "path": "src/playback/last-live-channel.ts",
+      "before": "119082ed5e0306d6ff569cc54f43f14913d7fb5c",
+      "after": "d4db1548e860f61649fb1c6ccdc6bc43cc5c7081"
+    },
+    {
+      "path": "src/ui/series-personal.store.ts",
+      "before": "88a1a205cba25cfcecee64112c79505cfd89ea3e",
+      "after": "9acab5def6f378cf89ac7d95e2fa44e29e1858bc"
+    },
+    {
+      "path": "src/catalog/new-content-badge.ts",
+      "before": "0c3da040f5cfef6808ff08675233cf624ab0ee61",
+      "after": "7ce55cfd29d1eb5ed997436ee96e3876c22cf7fd"
+    },
+    {
+      "path": "src/artwork/artwork-file-cache.ts",
+      "before": "1185c73802592ed4ee9040ad26ffb99d5c5617dc",
+      "after": "aa7be632815a5f600b60b9106327fa01610aa237"
+    },
+    {
+      "path": "android/app/src/main/java/com/xandeflix/prebuilt/artwork/ArtworkDiskCache.java",
+      "before": "a5a08f1e972e4557edbc259a0230aa85e377e081",
+      "after": "b911e13a2f320ab486e1d4db8b039cc915f6f231"
+    },
+    {
+      "path": "android/app/src/main/java/com/xandeflix/prebuilt/artwork/ArtworkCachePlugin.java",
+      "before": "4825f9bc5d5c269936306c63718176624a0c1d1e",
+      "after": "1cba701eb1ea350ca8a49da0d05591d8c330fadf"
+    },
+    {
+      "path": "android/app/build.gradle",
+      "before": "c1eeab1da062d3fe473ec81512fd1838d7aa52c5",
+      "after": "0781b74d8da7d0bd4b1d0a51fcc443234ab850b2"
+    },
+    {
+      "path": "scripts/test-source-replacement-isolation.mjs",
+      "before": null,
+      "after": "b2047e7eadd67b76a37f7b7ce0a4f11d193cb660"
+    },
+    {
+      "path": "scripts/test-source-replacement-bootstrap.mjs",
+      "before": null,
+      "after": "dc090286fbf6d52f979c515f1fdb81dd42e66f52"
+    },
+    {
+      "path": "scripts/test-source-replacement-ui.mjs",
+      "before": null,
+      "after": "752854011e65a71e29400a59272e9c57c1e876f1"
+    },
+    {
+      "path": "android/app/src/test/java/com/xandeflix/prebuilt/artwork/ArtworkScopeIsolationTest.java",
+      "before": null,
+      "after": "a723aee4d354434debbfde868720b09d524e5e44"
+    },
+    {
+      "path": "scripts/test-c11-new-content-badge.mjs",
+      "before": "3df0c1917b0720a175a0d2743ed334107d30f10f",
+      "after": "dbb74d07c928633247d665bb7f74c43a09a93112"
+    },
+    {
+      "path": "scripts/test-c11-artwork-visible-recovery.mjs",
+      "before": "4cc4964d27a61687b4d7749cc233bc4df0702910",
+      "after": "4584d57e2911a1eec101e7f19892c982c89e6f89"
+    },
+    {
+      "path": "scripts/test-c11-page-artwork-preparation.mjs",
+      "before": "d3f61fb4010b434f19551178d099704f0551e968",
+      "after": "902c2ff554ca842316e14a121324f194c745a433"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "18e4298a5abdbb064faaa7253762f689565851c2",
+      "after": "ff64fd90dde8297622f8ee99fa07eda845ad94e9"
+    }
+  ],
+  "supersedes": {
+    "src/bootstrap/boot-sync-coordinator.ts": "CANON-01-XUI-OPAQUE-RECOVERY",
+    "src/App.tsx": "CANON-01-SERIES-EPISODE-RETURN",
+    "src/playback/watch-history.ts": "CANON-01-TMDB-EPISODE-METADATA-ENRICHMENT",
+    "android/app/build.gradle": "CANON-01-CARD-TRAILER-AUDIO",
+    "scripts/test-c11-artwork-visible-recovery.mjs": "CANON-01-XANDEFLIX-UI-PERFORMANCE-RECOVERY-03",
+    "scripts/test-canonical-regression.mjs": "CANON-01-PERF-PARENTAL-HERO-REFINEMENT"
+  },
+  "testChangesReviewed": true,
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": true,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false,
+  "restrictions": [
+    "Current user authorization for isolated source correction and test APK, not independent adjudication or historical approval.",
+    "No identity/key/license/PIN/C9 bypass, no data clear/uninstall or source secrets in artifacts.",
+    "No NativePlayerActivity/PlayerControls/credits/G4 change; no backend administrative write or Git publication.",
+    "All old controls, strict authorization order and negative tests remain."
+  ]
+}

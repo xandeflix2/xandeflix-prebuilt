@@ -1,0 +1,11 @@
+# CANON-01-MOBILE-DETAIL-HEADER-ALIGNMENT
+
+Pedido atual de 29/10/2026: no celular, o cabeçalho das páginas internas de filme e série deve ter o mesmo espaçamento de Home, Filmes, Séries e Canais ao Vivo.
+
+Base: entrega isolada 1.0.50. A regra hero-top ainda usa max(6px, env(safe-area-inset-top)); o catálogo já tem override fixo de12px, mas as páginas internas não. Alterar somente essa declaração da regra mobile hero-top para12px. A aplicação Android já preserva os insets nativos. Manter6px abaixo dos controles, alvos44px, logo, navegação e separação12px do hero. Tablet, Fire/Android TV, Live, fonte, player e lógica permanecem fora do patch.
+
+Criar candidato isolado1.0.51/code51 com dependências físicas próprias, sem ambiente copiado. Preservar1.0.50,53 recibos históricos, root/Git, APKs e referências congeladas. Gate e documentação antes do código. Registro de autorização local do pedido atual, sem alegar nova adjudicação independente do Chat Mestre. Sem commit/push/PR, backend, instalação/reset de aparelho ou próximo gate.
+
+Allowlist fechada: src/index.css (uma declaração), android/app/build.gradle (50→51), scripts/test-identity-hero-recovery.mjs (ampliar matriz para páginas internas, padding12 para todas as cinco páginas), scripts/test-canonical-regression.mjs (somente identidade do gate), docs/architecture/MOBILE_DETAIL_HEADER_ALIGNMENT.md, docs/evidence/MOBILE_DETAIL_HEADER_ALIGNMENT.md, docs/governance/authorizations/CANON-01-MOBILE-DETAIL-HEADER-ALIGNMENT.json e os quatro normativos append-only de fase/status/evolução/erros.
+
+Validação: canon/C11/regressão completa da base antes do patch; RED específico na fonte50; GREEN com Header/AppShell reais,40 combinações (cinco rotas, quatro larguras e insets0/32), callbacks/foco e controles antigos preservados. Capturas dos cabeçalhos internos antes/depois e comparação das demais páginas e tablet/TV. TypeScript,204 controles/42 suítes finais, comandos de proteção recebidos, build oficial com configuração pública previamente aprovada somente em memória, ativos web/Android/APK, testes nativos257/39 e auditoria de assinatura/integridade/preservação. Validação física de celular permanece pendente do teste manual do usuário com o APK; nenhum aparelho será instalado neste ciclo.

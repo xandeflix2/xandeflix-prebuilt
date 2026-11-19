@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "gate": "TABLET-PIP-LIVE-01-VALIDATION",
+  "parentGate": "TABLET-PIP-LIVE-01",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "User message on 2026-11-19: PROSSIGA COM A INSTALAÇAO NO TABLET. The response followed the named TABLET-PIP-LIVE-01 proposal for two repairs and a test APK installed on the tablet, in the specified isolated main workspace. The schema status records operator authorization without independent adjudication.",
+  "authorizationRequestSha256": "3fef9d3ca8c5aa4c276f4e20dcae089b1242afd2bd3395a8d8ec9e44d5248bac",
+  "reason": "Validate the existing correlation identifiers before reading Media3 state for an event that would be discarded. Keep the original Java suite and all controls.",
+  "physicalImpact": "REQUIRED",
+  "physicalImpactJustification": "Check update, activation preservation, rotation after PiP and the real channel panel on SM-X610.",
+  "requiredTests": [
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock",
+    "node node_modules/typescript/bin/tsc --noEmit",
+    "node scripts/test-c11-live-player-controls.mjs",
+    "node scripts/test-live-auto-recovery.mjs",
+    "gradlew.bat --offline :app:testDebugUnitTest"
+  ],
+  "evidence": "docs/evidence/TABLET_PIP_LIVE_01.md",
+  "compatibilityRisk": "Only uncorrelated events return before Media3 reads. The same payload and lifecycle remain in use for valid IDs.",
+  "changes": [
+    {
+      "path": "android/app/src/main/java/com/xandeflix/prebuilt/player/NativeAndroidPlayerPlugin.java",
+      "before": "d5331ce363f818058017cac3f092f955923a66a4",
+      "after": "1cd1bd533481f0fed61034743e2f5735318e279d"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "22952154233d671e553500b0c3527481fe13bfc5",
+      "after": "64180cf8904ccfe37000faabf93145340bec27a7"
+    }
+  ],
+  "supersedes": {
+    "android/app/src/main/java/com/xandeflix/prebuilt/player/NativeAndroidPlayerPlugin.java": "LIVE-AUTO-RECOVERY-01",
+    "scripts/test-canonical-regression.mjs": "TABLET-PIP-LIVE-01"
+  },
+  "testChangesReviewed": true,
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": true,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false,
+  "restrictions": [
+    "In-place update solely on the designated Samsung tablet.",
+    "Preserve identity, activation, license and the local source.",
+    "No publication."
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "cwd": "C:/Xandeflix/xandeflix-prebuilt-c11-main",
+  "gitOptionalLocks": "0",
+  "results": [
+    {
+      "name": "canonical",
+      "command": [
+        "node",
+        "scripts/verify-canonical-contract.mjs"
+      ],
+      "startedAt": "2026-11-04T19:23:52.037Z",
+      "finishedAt": "2026-11-04T19:24:30.923Z",
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "c11",
+      "command": [
+        "node",
+        "scripts/test-c11-new-device-activation-lock.mjs"
+      ],
+      "startedAt": "2026-11-04T19:24:30.925Z",
+      "finishedAt": "2026-11-04T19:25:35.858Z",
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "typecheck",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit"
+      ],
+      "startedAt": "2026-11-04T19:25:35.861Z",
+      "finishedAt": "2026-11-04T19:27:04.519Z",
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "regression",
+      "command": [
+        "node",
+        "scripts/test-canonical-regression.mjs"
+      ],
+      "startedAt": "2026-11-04T19:27:04.520Z",
+      "finishedAt": "2026-11-04T19:39:37.321Z",
+      "exitCode": 0,
+      "signal": null
+    }
+  ]
+}

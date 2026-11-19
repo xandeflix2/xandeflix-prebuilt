@@ -17,6 +17,7 @@ import { movieToViewModel, seriesToViewModel } from '../../catalog/catalog-selec
 import type { SegmentedBrowseService, BrowseKind } from '../../catalog/segmented-browse.service.ts';
 import type { Movie, Series } from '../../contracts/catalog.ts';
 import { MediaRail } from './MediaRail.tsx';
+import {ProgressiveCategoryRail} from './ProgressiveCategoryRail.tsx';
 import { observeArtwork } from '../../artwork/artwork-visibility.ts';
 import { isReleaseCategory } from '../../catalog/category-presentation.ts';
 import { useParentalControl } from '../hooks/useParentalControl.ts';
@@ -77,6 +78,8 @@ interface AsyncCategoryRailProps {
   loadWhenVisible?: boolean;
   previewIndex?: CategoryPreviewIndex;
   startupArtworkCount?: number;
+  progressive?:boolean;
+  expansionContext?:'home'|'movies'|'series';
 }
 
 export const AsyncCategoryRail = React.memo<AsyncCategoryRailProps>(function AsyncCategoryRail({
@@ -95,6 +98,7 @@ export const AsyncCategoryRail = React.memo<AsyncCategoryRailProps>(function Asy
   loadWhenVisible = false,
   previewIndex,
   startupArtworkCount = 0,
+  progressive=false,expansionContext,
 }) {
   const latestSourceFirst = kind === 'movies' && isReleaseCategory(title);
   const pendingRoot = useRef<HTMLElement | null>(null);
@@ -224,8 +228,10 @@ export const AsyncCategoryRail = React.memo<AsyncCategoryRailProps>(function Asy
     );
   }
 
+  if(progressive)return <ProgressiveCategoryRail expansionContext={expansionContext} id={id} title={title} kind={kind} categoryId={categoryId} initialItems={items} readModel={readModel} browseService={browseService} queue={queue} onItemClick={onItemClick} onViewAll={onViewAll} onViewAllFocus={onViewAllFocus} startupArtworkCount={startupArtworkCount}/>;
   return (
     <MediaRail
+      expansionContext={expansionContext}
       id={id}
       title={title}
       items={items}

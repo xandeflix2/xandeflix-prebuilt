@@ -1,0 +1,42 @@
+{
+  "observedUTC": "2026-11-05T10:26:54.556Z",
+  "status": "SEQUENTIAL_MOVIE_PAIR_OBSERVED",
+  "uniqueDisplayedTitleMatch": true,
+  "comparable": false,
+  "phone": {
+    "version": "1.0.37"
+  },
+  "tablet": {
+    "version": "1.0.52",
+    "events": [
+      {
+        "event": "OPEN",
+        "kind": "movie",
+        "scheme": "http:",
+        "typedPath": "movie",
+        "extension": "mp4",
+        "pathDepth": 4,
+        "hasQuery": false,
+        "headerNames": [
+          "User-Agent"
+        ],
+        "uaClass": "IPTV_SMARTERS_DEFAULT",
+        "observedUTC": "2026-11-05T10:26:49.190Z"
+      },
+      {
+        "event": "OPEN_RETURN",
+        "accepted": true,
+        "candidateCount": 1,
+        "observedUTC": "2026-11-05T10:26:49.224Z"
+      },
+      {
+        "event": "progress",
+        "positionMs": 2758,
+        "durationMs": 5448683,
+        "ended": false,
+        "observedUTC": "2026-11-05T10:26:54.675Z"
+      }
+    ]
+  },
+  "scope": "Unique displayed title used only to select cards; actual URI identity established separately; normal application authorization and play actions, source configuration unchanged, tests sequential"
+}

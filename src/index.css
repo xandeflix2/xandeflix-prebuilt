@@ -32,6 +32,27 @@
   color-scheme: dark;
 }
 
+/* Category See all: stable vertical posters and bounded row mounting. */
+#root .catalog-grid--windowed .catalog-grid-slot { min-width: 0; }
+#root .catalog-grid--windowed .catalog-grid-row-spacer { grid-column: 1 / -1; min-width: 0; pointer-events: none; }
+#root .catalog-grid--windowed .media-card {
+  width: 100% !important; max-width: none !important; height: auto !important;
+}
+#root .catalog-grid--windowed .media-card-poster-wrapper {
+  width: 100% !important; height: auto !important; min-height: 0 !important;
+  flex: none !important; aspect-ratio: 2 / 3 !important;
+}
+#root .catalog-grid--windowed .media-card-poster { width: 100% !important; height: 100% !important; object-fit: contain; }
+#root .catalog-grid--windowed .media-card:focus { transform: none !important; }
+#root .app-shell--television :is(.category-collection-page,.home-collection-page) {
+  max-width: none !important; margin-inline: 0 !important;
+  padding-left: max(12px, env(safe-area-inset-left, 0px)) !important;
+  padding-right: max(12px, env(safe-area-inset-right, 0px)) !important;
+}
+#root .app-shell--television :is(.category-collection-page,.home-collection-page) .catalog-grid--windowed {
+  width: 100%; grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--tv-card-width, 140px)), 1fr)) !important;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -261,7 +282,7 @@ html, body {
   margin-bottom: 3rem;
   display: flex;
   align-items: flex-end;
-  border: 1px solid var(--border-subtle);
+  border: 0;
   background: #0d1320;
 }
 
@@ -282,7 +303,7 @@ html, body {
   content: '';
   position: absolute;
   inset: 0;
-  border: 1px solid rgba(255, 255, 255, 0.28);
+  border: 0;
   border-radius: inherit;
   pointer-events: none;
   z-index: 5;
@@ -477,6 +498,10 @@ html, body {
   scroll-behavior: auto;
   padding: 0.5rem 0.25rem 1rem;
   scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  will-change: scroll-position;
+  transform: translateZ(0);
+  contain: layout style;
 }
 
 .media-rail-track::-webkit-scrollbar {
@@ -493,6 +518,9 @@ html, body {
   width: 180px;
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
+  contain: layout paint style;
+  transform: translateZ(0);
+  backface-visibility: hidden;
   border-radius: 10px;
   overflow: hidden;
   text-align: left;
@@ -3132,6 +3160,13 @@ html, body {
 
 /* Configuracoes mobile: engrenagem no topo, quatro atalhos no rodape. */
 .header-settings-button { display: none; }
+@media (max-width: 599px) {
+  #root .app-shell--adult-page .app-header .header-nav { flex-shrink: 0; }
+  #root .app-shell--adult-page .app-header .header-nav .nav-link { min-width: 44px; flex-shrink: 0; }
+  #root .app-shell--adult-page .app-header .header-adult-button { width: 44px; min-width: 44px; flex-shrink: 0; }
+  #root .app-shell--adult-page .app-header .brand-container { min-width: 0; overflow: hidden; }
+  #root .app-shell--adult-page .app-header .brand-logo { font-size: clamp(0.75rem, 3vw, 1rem) !important; overflow: hidden; text-overflow: ellipsis; }
+}
 @media (max-width: 600px) {
   #root .app-shell--phone-header-back:not(.app-shell--tablet-portrait):not(.app-shell--side-nav) .brand-sub {
     display: none;
@@ -3536,6 +3571,45 @@ html, body {
 #root .detail-page--fire .detail-poster-col { flex: 0 0 clamp(130px, 15vw, 240px) !important; width: clamp(130px, 15vw, 240px) !important; max-width: clamp(130px, 15vw, 240px) !important; }
 #root .detail-page--fire .detail-poster-img { width: 100% !important; height: auto !important; aspect-ratio: 2 / 3 !important; }
 
+/* Detail-only artwork: a decoded horizontal image replaces the same-work
+   poster composition. Empty loading surfaces must keep geometry for visibility. */
+.detail-artwork-surface { position: relative; width: 100%; height: 100%; overflow: hidden; pointer-events: none; }
+.detail-artwork-surface > :is(.detail-artwork-poster, .detail-artwork-horizontal) {
+  position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover;
+}
+.detail-artwork-surface > .detail-artwork-poster { filter: blur(12px); transform: scale(1.08); object-position: center 35%; }
+.detail-artwork-surface > .artwork-empty { background: transparent; }
+.detail-artwork-surface :is(.artwork-fallback-icon, .artwork-fallback-title) { display: none; }
+#root .detail-page--wide .detail-backdrop-img { opacity: .75; object-position: center top; }
+#root .detail-page--wide .detail-backdrop-gradient {
+  background: linear-gradient(90deg, rgba(8,12,20,.88), rgba(8,12,20,.30) 75%), linear-gradient(0deg, var(--bg-dark), transparent 45%);
+}
+
+/* Transparent side navigation; keep contrast only on focused/active controls.
+   TV remote targets are44px wide/36px high; touch layouts keep their sizes. */
+#root :is(.app-shell--tablet, .app-shell--television).app-shell--side-nav .app-header {
+  background: transparent; box-shadow: none; border-right: 0; backdrop-filter: none;
+}
+#root :is(.app-shell--television, .app-shell--fire-stick, .app-shell--android-tv).app-shell--side-nav:not(.app-shell--tablet):not(.app-shell--phone) {
+  --side-nav-width: 56px;
+  background-color: var(--bg-dark);
+}
+#root :is(.app-shell--television, .app-shell--fire-stick, .app-shell--android-tv).app-shell--side-nav:not(.app-shell--tablet):not(.app-shell--phone) .page-container.immersive-background {
+  position: relative;
+}
+#root :is(.app-shell--television, .app-shell--fire-stick, .app-shell--android-tv).app-shell--side-nav:not(.app-shell--tablet):not(.app-shell--phone) .page-container.immersive-background::before {
+  content: ''; position: absolute; inset: 0 100% 0 auto;
+  width: var(--side-nav-width, 56px); background: inherit; pointer-events: none;
+}
+#root :is(.app-shell--television, .app-shell--fire-stick, .app-shell--android-tv).app-shell--side-nav:not(.app-shell--tablet):not(.app-shell--phone) .app-header {
+  padding-left: max(5px, env(safe-area-inset-left, 0px)) !important; padding-right: 5px !important;
+}
+#root :is(.app-shell--television, .app-shell--fire-stick, .app-shell--android-tv).app-shell--side-nav:not(.app-shell--tablet):not(.app-shell--phone) .nav-link {
+  min-width: 44px; min-height: 36px !important; height: 36px; padding: 6px !important;
+}
+#root :is(.app-shell--television, .app-shell--fire-stick, .app-shell--android-tv).app-shell--side-nav:not(.app-shell--tablet):not(.app-shell--phone) .header-nav { gap: 0 !important; }
+#root :is(.app-shell--television, .app-shell--fire-stick, .app-shell--android-tv).app-shell--side-nav:not(.app-shell--tablet):not(.app-shell--phone) .app-header .nav-icon svg { width: 16px; height: 16px; }
+
 /* Tablet em retrato: menu global no topo e Live empilhado, sem barra inferior. */
 #root .app-shell--tablet-portrait { --live-bottom-space: env(safe-area-inset-bottom, 0px); padding-left: 0; }
 #root .app-shell--tablet-portrait .app-header {
@@ -3661,4 +3735,204 @@ html, body {
   html[data-device-presentation="phone"] #root .app-shell :is(.home-page, .movies-page, .series-page) .hero-content {
     padding-bottom: 4px !important;
   }
+}
+
+
+/* Tablet side rail shares the immersive page background; touch geometry stays unchanged. */
+#root .app-shell--tablet.app-shell--side-nav:not(.app-shell--tablet-portrait) {
+  background-color: var(--bg-dark);
+}
+#root .app-shell--tablet.app-shell--side-nav:not(.app-shell--tablet-portrait) .page-container.immersive-background {
+  position: relative;
+}
+#root .app-shell--tablet.app-shell--side-nav:not(.app-shell--tablet-portrait) .page-container.immersive-background::before {
+  content: ''; position: absolute; inset: 0 100% 0 auto;
+  width: calc(var(--side-nav-width, 80px) + env(safe-area-inset-left, 0px));
+  background: inherit; pointer-events: none;
+}
+
+/* Reuse the existing genre line: platform below the title, never a tall badge. */
+.hero-platform-genres { display: flex; align-items: flex-start; gap: 8px; }
+.hero-platform-genres > .hero-genres { min-width: 0; }
+#root .hero-banner .hero-platform-slot { display: inline-flex; flex: 0 0 auto; padding: 0; margin-top: 1px; line-height: 1; }
+#root .hero-banner .hero-platform-slot:empty { display: none; }
+#root .hero-banner .hero-platform-slot .hero-platform-logo { width: 32px; height: 32px; object-fit: contain; }
+
+/* Carry the tablet back-row ambient surface behind the transparent brand corner. */
+#root .app-shell--tablet.app-shell--side-nav:not(.app-shell--tablet-portrait) > .app-content > :is(.page-back-row--browse, .page-back-row--detail) {
+  isolation: isolate;
+}
+#root .app-shell--tablet.app-shell--side-nav:not(.app-shell--tablet-portrait) > .app-content > :is(.page-back-row--browse, .page-back-row--detail)::before {
+  content: ''; position: absolute;
+  inset: 0 0 0 calc(-1 * (var(--side-nav-width, 80px) + env(safe-area-inset-left, 0px)));
+  z-index: -1; background: var(--navigation-ambient, var(--bg-dark)); pointer-events: none;
+}
+
+/* Center the actual genre text on the32px logo and leave room before the synopsis. */
+.hero-platform-genres { align-items: center; }
+#root .hero-banner .hero-platform-slot { margin-top: 0; margin-bottom: 12px; }
+#root .hero-banner .hero-platform-slot:not(:empty) + .hero-genres { margin-bottom: 12px !important; }
+
+/* Recovery03: structural programmatic focus never paints the UA white ring.
+   Interactive cards/buttons/inputs keep their own accessible focus rules. */
+#root :is(main,section,div)[tabindex="-1"]:not(.focusable-item):not([role="button"]):focus {outline:none;}
+/* StartupArtworkPreparation mounts this programmatic dialog on document.body. */
+.startup-loading-screen[tabindex="-1"]:focus {outline:none;}
+#root .hero-unavailable {padding:12px 0;color:var(--text-muted);min-height:0;}
+#root .hero-official-composition .hero-backdrop-img {object-fit:contain;background:#111726;}
+#root .hero-official-composition .hero-backdrop-container {background:linear-gradient(100deg,#101624,#202b3b);}
+#root .sidebar-brand-image {display:block;width:40px;height:30px;object-fit:contain;}
+#root .app-shell--side-nav .brand-mark {align-items:center;justify-content:center;}
+#root .home-collection-page .hero-banner--vertical {width:100%;max-width:520px;aspect-ratio:2/3;height:auto!important;min-height:0!important;max-height:none!important;margin:0 auto 1.25rem;}
+#root .home-collection-page .hero-banner--vertical .hero-poster-img {width:100%;height:100%;object-fit:contain;}
+#root .home-collection-page .hero-banner--vertical .hero-content {width:100%;padding:1rem!important;}
+#root .home-collection-page .hero-banner--vertical .hero-title {font-size:clamp(1.2rem,5vw,1.75rem)!important;}
+
+
+/* Mobile catalog: compact header, comfortable touch targets and hero separation. */
+@media (max-width: 600px) {
+  #root .app-shell--catalog-page:not(.app-shell--side-nav):not(.app-shell--tablet):not(.app-shell--television):not(.app-shell--square-display) > .app-header {
+    height: calc(56px + env(safe-area-inset-top, 0px)) !important;
+    min-height: calc(56px + env(safe-area-inset-top, 0px)) !important;
+    padding-top: max(6px, env(safe-area-inset-top, 0px)) !important;
+    padding-bottom: 6px !important;
+  }
+  #root .app-shell--catalog-page:not(.app-shell--side-nav):not(.app-shell--tablet):not(.app-shell--television):not(.app-shell--square-display) > .app-content > .page-container {
+    padding-top: 8px !important;
+  }
+}
+
+
+/* Phone: approved live spacing, transparent wordmark and centered footer. */
+@media(max-width:599px){#root .app-shell--catalog-page:not(.app-shell--side-nav):not(.app-shell--tablet):not(.app-shell--television):not(.app-shell--square-display)>.app-header{height:auto!important;min-height:0!important;max-height:none!important;padding-top:12px!important;padding-bottom:6px!important;}}
+
+@media(max-width:599px){#root .app-shell.app-shell--live-page.app-shell--live-stacked:not(.app-shell--side-nav):not(.app-shell--tablet):not(.app-shell--tablet-portrait):not(.app-shell--television):not(.app-shell--square-display)>.app-header{height:auto!important;min-height:0!important;max-height:none!important;padding-top:12px!important;padding-bottom:6px!important;}}
+@media(max-width:599px){#root .app-shell:not(.app-shell--side-nav):not(.app-shell--tablet):not(.app-shell--television):not(.app-shell--square-display) > .app-header .brand-mark,#root .app-shell:not(.app-shell--side-nav):not(.app-shell--tablet):not(.app-shell--television):not(.app-shell--square-display) > .app-header .brand-sub{display:none!important}#root .app-shell:not(.app-shell--side-nav):not(.app-shell--tablet):not(.app-shell--television):not(.app-shell--square-display) > .app-header .brand-container{min-width:0}#root .app-shell:not(.app-shell--side-nav):not(.app-shell--tablet):not(.app-shell--television):not(.app-shell--square-display) > .app-header .brand-logo{display:block!important;width:min(240px,60vw);max-width:100%;height:auto!important;aspect-ratio:2065/220;font-size:0!important;line-height:0!important;text-shadow:none!important;background-color:transparent!important;background-image:url("./assets/xandeflix-wordmark-transparent.png");background-size:105.18159806295% auto;background-position:42.05607476636% 51.58730158730%;background-repeat:no-repeat;mix-blend-mode:normal!important}#root .app-shell:not(.app-shell--side-nav):not(.app-shell--tablet):not(.app-shell--television):not(.app-shell--square-display) > .app-header .brand-logo>*{display:none!important}}
+
+@media(max-width:599px){#root .app-shell:not(.app-shell--side-nav):not(.app-shell--tablet):not(.app-shell--tablet-portrait):not(.app-shell--television):not(.app-shell--square-display)>.app-header{padding-left:8px!important;}#root .app-shell:not(.app-shell--side-nav):not(.app-shell--tablet):not(.app-shell--tablet-portrait):not(.app-shell--television):not(.app-shell--square-display)>.app-header .brand-container{margin-left:0!important;justify-content:flex-start!important;}#root .app-shell:not(.app-shell--side-nav):not(.app-shell--tablet):not(.app-shell--tablet-portrait):not(.app-shell--television):not(.app-shell--square-display)>.app-header .brand-logo{margin-left:0!important;text-align:left!important;}}
+@media(max-width:599px){#root .app-shell:not(.app-shell--side-nav):not(.app-shell--tablet):not(.app-shell--tablet-portrait):not(.app-shell--television):not(.app-shell--square-display)>.mobile-bottom-nav{left:50%;right:auto;width:calc(100% - max(16px, env(safe-area-inset-left,0px)) - max(16px, env(safe-area-inset-right,0px)));margin-inline:0;transform:translateX(-50%);}}
+
+/* CANON-01-DETAIL-HERO-REFINEMENT: wide hero only; phone controls unchanged. */
+#root .detail-page--wide .detail-poster-col > .watch-providers { justify-content: center; flex-wrap: nowrap; gap: 6px; width: 100%; }
+#root .detail-page--fire .series-detail-hero-actions .series-personal-actions { flex: 0 1 228px; min-width: 210px; }
+#root .detail-page--fire .series-detail-hero-actions .series-personal-button { min-height: 44px; padding: 3px 4px; gap: 3px; font-size: 11px; }
+#root .detail-page--fire .series-detail-hero-actions .series-personal-button svg { width: 20px; height: 20px; }
+#root .detail-cast { margin-top: 0; min-width: 0; }
+#root .detail-cast-list { display: flex; flex-wrap: nowrap; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; scrollbar-width: thin; gap: 12px; margin: 10px 0 0; padding: 4px 4px 10px; list-style: none; }
+#root .detail-cast-person { display: flex; flex: 0 0 108px; flex-direction: column; align-items: flex-start; gap: 7px; min-width: 0; padding: 4px; border-radius: 7px; scroll-snap-align: start; }
+#root .detail-cast-person img { width: 100px; height: 132px; flex: 0 0 auto; object-fit: cover; border-radius: 5px; }
+#root .detail-cast-person span { min-width: 0; }
+#root .detail-cast-person strong { display: block; font-size: 12px; overflow-wrap: anywhere; }
+#root .detail-cast-person small { display: block; font-size: 11px; color: #b3b3b3; overflow-wrap: anywhere; }
+
+#root .detail-cast-list:focus-within { scroll-behavior: auto; }
+#root .detail-cast-person:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 1px; }
+
+
+#root .series-phone-tabs { display: flex; flex-wrap: nowrap; overflow-x: auto; }
+#root .series-phone-tabs button { flex: 0 0 auto; min-height: 44px; }
+
+/* CANON-01-ACTOR-PROFILE: full-screen actor page; underlying detail stays inert. */
+#root dialog.actor-detail-page {position:fixed;inset:0;width:100vw;max-width:none;height:100dvh;max-height:none;margin:0;padding:24px 4vw 48px;box-sizing:border-box;border:0;border-radius:0;background:#101010;color:#f5f5f5;overflow:auto;overscroll-behavior:contain;}
+#root .actor-detail-page::backdrop{background:#101010;}
+#root .actor-back{min-height:44px;padding:8px 14px;margin-bottom:24px;background:#242424;border:1px solid #555;border-radius:6px;color:inherit;font:inherit;cursor:pointer;}
+#root .actor-profile-top{display:flex;align-items:flex-start;gap:30px;max-width:1280px;margin:auto;}
+#root .actor-portrait{width:200px;max-width:28vw;aspect-ratio:2/3;object-fit:cover;border-radius:8px;background:#252525;flex-shrink:0;}
+#root .actor-biography{min-width:0;flex:1;}#root .actor-biography h1{font-size:30px;line-height:1.2;margin:0 0 18px;}#root .actor-biography h2,#root .actor-filmography h2{font-size:20px;line-height:1.3;margin:20px 0 14px;}
+#root .actor-biography dl{display:grid;grid-template-columns:auto 1fr;gap:6px 18px;font-size:14px;}#root .actor-biography dt{color:#aaa;}#root .actor-biography dd{margin:0;overflow-wrap:anywhere;}
+#root .actor-biography-text{white-space:pre-line;overflow-wrap:anywhere;line-height:1.65;font-size:16px;border-radius:4px;}
+#root .actor-filmography{max-width:1280px;margin:30px auto 0;}#root .actor-detail-page .focusable-item:focus-visible{outline:3px solid #fff;outline-offset:3px;}
+@media(max-width:600px){#root dialog.actor-detail-page{padding:16px 18px 32px;}#root .actor-profile-top{display:block;}#root .actor-portrait{display:block;width:140px;max-width:48vw;margin:0 auto 22px;}#root .actor-biography h1{font-size:26px;}#root .actor-biography-text{font-size:15px;}#root .actor-biography dl{font-size:13px;gap:6px 12px;}}
+
+/* Current user: refined, crisp focus on every input profile without layout changes. */
+#root .focusable-item:is(:focus,:focus-visible),
+#root .media-card:is(:focus,:focus-visible,.is-focused),
+#root .is-focused,
+#root .actor-detail-page .focusable-item:is(:focus,:focus-visible) {
+ outline:2px solid #f3dfe2 !important;outline-offset:-2px;
+ box-shadow:0 0 0 1px rgba(229,9,20,.22),0 2px 8px rgba(0,0,0,.2) !important;
+}
+#root .media-card:is(:focus,:focus-visible,.is-focused){border-color:rgba(243,223,226,.65);}
+#root .media-card:is(:focus,:focus-visible,.is-focused)::after {
+ border:2px solid #f3dfe2;border-radius:inherit;box-shadow:none;
+}
+
+/* Actor revision2: normal shell page, full width, Fire typography0.8. */
+#root .actor-detail-page {--actor-scale:1;display:block;position:relative;inset:auto;width:100%;max-width:none;min-width:0;min-height:100vh;margin:0;padding:calc(24px * var(--actor-scale)) calc(24px * var(--actor-scale)) calc(40px * var(--actor-scale));box-sizing:border-box;background:#101010;color:#f5f5f5;}
+#root .app-shell--fire-stick .actor-detail-page {--actor-scale:.8;}
+#root .app-shell--actor-page > .app-header .btn-back {display:none!important;}
+#root .actor-detail-page .actor-profile-top {width:100%;max-width:none;gap:calc(30px * var(--actor-scale));}
+#root .actor-detail-page .actor-portrait {width:calc(200px * var(--actor-scale));max-width:28vw;}
+#root .actor-detail-page .actor-biography h1 {font-size:calc(30px * var(--actor-scale));margin-bottom:calc(18px * var(--actor-scale));}
+#root .actor-detail-page .actor-biography h2,#root .actor-detail-page .actor-filmography h2 {font-size:calc(20px * var(--actor-scale));}
+#root .actor-detail-page .actor-biography dl {font-size:calc(14px * var(--actor-scale));gap:calc(6px * var(--actor-scale)) calc(18px * var(--actor-scale));}
+#root .actor-detail-page .actor-biography-text {font-size:calc(16px * var(--actor-scale));}
+#root .actor-detail-page .actor-filmography {width:100%;max-width:none;min-width:0;margin-top:calc(30px * var(--actor-scale));}
+#root .actor-detail-page .catalog-grid-container {width:100%;max-width:none;min-width:0;}
+#root .actor-detail-page .catalog-grid {display:grid;width:100%;max-width:none;grid-template-columns:repeat(auto-fill,minmax(min(100%,calc(140px * var(--actor-scale))),1fr))!important;}
+#root .actor-detail-page .catalog-grid .media-card {width:100%!important;max-width:none!important;min-width:0;}
+#root .actor-detail-page .catalog-grid .media-card-poster-wrapper {width:100%!important;max-width:none!important;height:auto!important;aspect-ratio:2/3;}
+#root .actor-detail-page .media-card-poster {width:100%!important;height:100%!important;object-fit:cover;}
+#root .actor-detail-page .media-card-kind-badge {position:absolute;right:5px;bottom:5px;z-index:4;border:1px solid rgba(255,255,255,.4);border-radius:4px;padding:2px 6px;background:rgba(8,12,20,.92);color:#fff;font-size:11px;font-weight:700;line-height:1.3;pointer-events:none;}
+#root .actor-detail-page .media-card-year {top:5px;bottom:auto;}
+#root .app-shell--fire-stick .actor-detail-page .media-card-title,#root .app-shell--fire-stick .actor-detail-page .media-card-genres {font-size:8px!important;}
+#root .app-shell--fire-stick .actor-detail-page .media-card-kind-badge {font-size:9px;}
+@media(max-width:600px){#root .actor-detail-page{padding:16px 12px 32px;}#root .actor-detail-page .actor-portrait{width:140px;max-width:48vw;}#root .actor-detail-page .actor-biography h1{font-size:26px;}#root .actor-detail-page .actor-biography-text{font-size:15px;}#root .actor-detail-page .actor-biography dl{font-size:13px;}#root .actor-detail-page .catalog-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;}}
+
+/* Actor revision3: legacy WebView poster geometry and continuous transparent rail. */
+#root .app-shell--actor-page.app-shell--side-nav {background-color:#101010!important;}
+#root .actor-detail-page .catalog-grid .media-card {height:auto!important;min-height:0!important;align-self:start;}
+#root .actor-detail-page .catalog-grid .media-card-poster-wrapper {position:relative;box-sizing:content-box;width:100%!important;height:0!important;min-height:0!important;max-height:none!important;padding:150% 0 0!important;flex:0 0 auto!important;aspect-ratio:auto!important;}
+#root .actor-detail-page .media-card-poster {position:absolute!important;inset:0;display:block;width:100%!important;height:100%!important;object-fit:cover;}
+
+/* CANON-01-IDENTITY-HERO-RECOVERY: actions belong to the hero, never a row above it. */
+#root .app-shell--hero-top > .app-content > .page-container {padding-top:12px!important;}
+#root .app-shell--hero-top .detail-content {padding-top:0!important;}
+#root .app-shell--hero-top :is(.home-page,.movies-page,.series-page) > .page-header {display:none!important;}
+#root .app-shell--hero-top :is(.hero-banner,.home-hero-carousel,.detail-hero-wide,.series-phone-hero) {margin-top:0!important;}
+#root .hero-with-navigation {position:relative;}
+#root .hero-top-actions {position:absolute;top:8px;right:8px;z-index:12;display:flex;align-items:center;gap:8px;max-width:calc(100% - 16px);}
+#root .hero-top-actions .btn-back,#root .hero-top-actions .cast-button {min-height:44px;min-width:44px;margin:0;padding:6px 10px;display:inline-flex;align-items:center;justify-content:center;background:rgba(8,12,20,.8);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:7px;}
+#root .detail-hero-wide.hero-with-navigation {padding-top:64px!important;}
+#root .hero-top-actions .cast-control-group {display:inline-flex;align-items:center;}
+
+/* CANON-01-TABLET-HERO-SPACING: same compact mobile header on browse and internal pages. */
+@media(max-width:600px){#root .app-shell--hero-top:not(.app-shell--side-nav):not(.app-shell--tablet):not(.app-shell--television):not(.app-shell--square-display) > .app-header {height:auto!important;min-height:0!important;max-height:none!important;padding-top:12px!important;padding-bottom:6px!important;}}
+
+/* Phone catalog header: use the approved Live spacing; Android already insets its content. */
+@media (max-width: 600px) {
+  #root .app-shell--hero-top.app-shell--catalog-page:not(.app-shell--side-nav):not(.app-shell--tablet):not(.app-shell--television):not(.app-shell--square-display) > .app-header {
+    padding-top: 12px !important;
+  }
+}
+
+/* Hero Backdrop Crossfade (smooth dissolve) */
+.hero-backdrop-crossfade {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.hero-backdrop-crossfade--prev {
+  z-index: 1;
+}
+.hero-backdrop-crossfade--enter {
+  z-index: 2;
+  animation: hero-crossfade-fade-in 350ms ease-in-out forwards;
+  will-change: opacity;
+}
+@keyframes hero-crossfade-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-backdrop-crossfade--enter {
+    animation: none;
+  }
+}
+
+/* TABLET-CATALOG-HERO-BACK-01: hide the tablet movie/series catalog hero Back action; keep detail Back. */
+#root .app-shell--tablet :is(.movies-page,.series-page) .hero-banner > .hero-top-actions > .btn-back {
+  display: none !important;
 }

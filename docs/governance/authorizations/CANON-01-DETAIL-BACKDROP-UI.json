@@ -1,0 +1,144 @@
+{
+  "schema": 1,
+  "gate": "CANON-01-DETAIL-BACKDROP-UI",
+  "parentGate": "CANON-01",
+  "amendment": "CANON-01-DETAIL-BACKDROP-UI",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "EXPLICIT_USER_DETAIL_BACKGROUND_PRIORITY_TRANSPARENT_SIDEBAR_TV_ONLY_COMPACT_ICONS_AND_IN_PLACE_APK_TESTS",
+  "authorizationRequestSha256": "dc9feae1e4dddb0cc8950d1df1cb93d840d99bc8446f68897e7b91b9681bf854",
+  "reason": "Recover same-work horizontal detail artwork with bounded variants and safe poster composition; transparent landscape sidebar and smaller TV-only glyphs, preserving phone/tablet geometry and remote focus.",
+  "physicalImpact": "REQUIRED",
+  "physicalImpactJustification": "Same-version/certificate separate APK, authorized in-place tests on Fire/tablet/phone; preserve private records and observe backgrounds, navigation and automatic retention. No uninstall/reset/PIN.",
+  "testChangesReviewed": true,
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c105-complete-root-search.mjs",
+    "scripts/test-c107-catalog-return-navigation.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c11-landscape-navigation.mjs",
+    "scripts/validate-direct-playback.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock",
+    "npm run typecheck",
+    "npm run update:check",
+    "npm run security:check",
+    "npm run playback:check",
+    "npm run build",
+    "npm run site:build",
+    "node scripts/test-vercel-prebuilt-contract.mjs",
+    "node scripts/test-c105-directory-import.mjs",
+    "node scripts/test-c105-directory-details.mjs",
+    "node scripts/test-c105-directory-orchestration.mjs",
+    "node scripts/test-c11-automatic-source-refresh.mjs",
+    "node scripts/test-catalog-read-diagnostic.mjs",
+    "node scripts/test-xui-m3u-kind-recovery.mjs",
+    "node scripts/test-c157-web-source-https.mjs",
+    "node scripts/test-catalog-physical-regressions.mjs",
+    "node scripts/test-c135-adult-reader.mjs",
+    "node scripts/test-series-poster-composition.mjs",
+    "node scripts/test-tmdb-context-identity.mjs",
+    "node scripts/test-tmdb-subtitle-preview-recovery.mjs",
+    "node scripts/test-c11-catalog-promotion-directories.mjs",
+    "node scripts/test-catalog-snapshot-retention.mjs",
+    "node scripts/test-detail-backdrop-recovery.mjs",
+    "node scripts/test-c11-source-first-tmdb-artwork.mjs",
+    "node scripts/test-c11-artwork-visible-recovery.mjs"
+  ],
+  "evidence": "docs/evidence/DETAIL_BACKDROP_UI_RECOVERY.md",
+  "compatibilityRisk": "Detail-only behavior; official same-identity alternatives, bounded cache/queue and decode geometry. Old positive metadata refreshed by a separate purpose without clearing poster caches. TV-only icon rules do not zoom native surfaces.",
+  "restrictions": [
+    "Preserve128 controls/22 suites and add suite23. Previous test assertions unchanged; loader ports only.",
+    "Preserve all68 previous paths outside exact closed scope and all16 historical receipts. Frozen retention source/receipt unchanged.",
+    "No Android/native source, version/signing, source formats/catalog/player/parental/license/backend/Git publication or next Gate."
+  ],
+  "supersedes": {
+    "src/artwork/tmdb-metadata.service.ts": "CANON-01-TMDB-SUBTITLE-PREVIEW",
+    "src/ui/hooks/useArtworkMetadata.ts": "CANON-01-TMDB-CONTEXT-IDENTITY",
+    "src/ui/components/Artwork.tsx": "CANON-01-SERIES-POSTER-COMPOSITION",
+    "src/ui/pages/SeriesDetailPage.tsx": "CANON-01-TMDB-CONTEXT-IDENTITY",
+    "src/index.css": "CANON-01-CATALOG-PHYSICAL-FIXES",
+    "scripts/test-c11-source-first-tmdb-artwork.mjs": "CANON-01-TMDB-CONTEXT-IDENTITY",
+    "scripts/test-c11-artwork-visible-recovery.mjs": "CANON-01-TMDB-CONTEXT-IDENTITY",
+    "scripts/test-canonical-regression.mjs": "CANON-01-CATALOG-RETENTION"
+  },
+  "changes": [
+    {
+      "path": "src/artwork/tmdb-metadata.service.ts",
+      "before": "cda0991d3ff80f68346470d068c8c5396fb4f7dc",
+      "after": "d7674cc922ef449e7c62bcd844704d62de0f7c41"
+    },
+    {
+      "path": "src/artwork/detail-backdrop.ts",
+      "before": null,
+      "after": "6bae2f7914511389ab6796b041ee6db45437c28a"
+    },
+    {
+      "path": "src/ui/hooks/useArtworkMetadata.ts",
+      "before": "3ce6743d1b79d54c41cf24545f3530e88589ceac",
+      "after": "4d2b1b58e16f200dd2232f79fc94c583aeee86f9"
+    },
+    {
+      "path": "src/ui/components/Artwork.tsx",
+      "before": "86b912ae78ddd0451f1db9f115676fdf12b18963",
+      "after": "e607776bd4bd193ad40fa12aae8e629f73e7e9b1"
+    },
+    {
+      "path": "src/ui/components/DetailBackdrop.tsx",
+      "before": null,
+      "after": "4db0506a6818d6406ec7eda93a0ea659130679e0"
+    },
+    {
+      "path": "src/ui/components/SeriesTrailer.tsx",
+      "before": "fe715254e965e840af2e40d7e66a60f8b01475fd",
+      "after": "48fc6b8082f3b175b97a698203db0fab6804937a"
+    },
+    {
+      "path": "src/ui/pages/MovieDetailPage.tsx",
+      "before": "7e5a9ee6719436c548a9f9511c6901306c92556f",
+      "after": "9e7c8ee2c0e285d94d864590430a084a1e32e79d"
+    },
+    {
+      "path": "src/ui/pages/SeriesDetailPage.tsx",
+      "before": "1da239f5a42f43700956197798bb16f65c7cfaea",
+      "after": "6bb67448b97f86702ecd9f070300ab0b0500d463"
+    },
+    {
+      "path": "src/index.css",
+      "before": "f1753915d4843995a600544dcda36bbcd54e7ea8",
+      "after": "b69221154aac2db071f23b316f576410482e9945"
+    },
+    {
+      "path": "scripts/test-detail-backdrop-recovery.mjs",
+      "before": null,
+      "after": "fb0561ecca5317273827b85040e080b4a62a3b2c"
+    },
+    {
+      "path": "scripts/test-c11-source-first-tmdb-artwork.mjs",
+      "before": "4ab9aa989e13ef33d8cd226af81acd6a25b334f4",
+      "after": "b48686581e9ff4362573f06fa585f85120847db2"
+    },
+    {
+      "path": "scripts/test-c11-artwork-visible-recovery.mjs",
+      "before": "9dc1a1757f3c8741f3f0af396cfc7eb39079677f",
+      "after": "6cf789021d220e96f295c098fbb99ca6bd53c842"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "2ae8ab1201dd4624d4eb77454b7d2a79c749883c",
+      "after": "3cea6e7f74ee138233359db331f5a36a5fe6f93e"
+    }
+  ],
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": true,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false
+}

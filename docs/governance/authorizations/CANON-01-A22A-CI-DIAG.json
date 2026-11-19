@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "gate": "CANON-01-A22A-CI-DIAG",
+  "parentGate": "CANON-01",
+  "amendment": "CANON-01-A22A-CI-DIAG",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "USER_REQUEST_NEXT_CONTROLLED_DIAGNOSTIC_2026_10_20",
+  "authorizationRequestSha256": "7895a20433392077bc06ff5e459509d18e5d0c5d9c37ce790f4dda7ffba8b724",
+  "reason": "Add bounded, redact-by-allowlist CI failure diagnostics for existing Windows-only A22 contract failure without bypassing any suite, runner status, or canonical control.",
+  "physicalImpact": "NOT_REQUIRED_JUSTIFIED",
+  "physicalImpactJustification": "Diagnostic-only output on failing governance test runner; no runtime, production backend or Android code modified.",
+  "testChangesReviewed": true,
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c105-complete-root-search.mjs",
+    "scripts/test-c107-catalog-return-navigation.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c11-landscape-navigation.mjs",
+    "scripts/validate-direct-playback.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "npm run canon:check",
+    "npm run canon:test"
+  ],
+  "evidence": "docs/evidence/CANON_01_A22A_CI_DIAG.md",
+  "compatibilityRisk": "CI Windows root cause remains unknown until GitHub-run diagnostics. This does not certify remote Prebuilt or native attestation. Failure remains exit 1.",
+  "restrictions": [
+    "Local-only diagnostic gate; no implicit Git commit, push, merge, main change or deploy.",
+    "Safe bounded control names and error classes only; no raw stdout/stderr logging.",
+    "Preserve all 125 previous regression controls and 14 suites; keep fail-closed behavior.",
+    "No Android, package version, backend, Vercel, historical receipt, workflow or A2.1 script mutation."
+  ],
+  "supersedes": {
+    "scripts/test-canonical-regression.mjs": "CANON-01-VERCEL-A22A"
+  },
+  "changes": [
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "671c556bb582f37320bb2c7682b70ed5d23321b8",
+      "after": "d52fc1d8ce31b47cc4fbbaef91a2024e938b6e58"
+    }
+  ],
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": false,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false
+}

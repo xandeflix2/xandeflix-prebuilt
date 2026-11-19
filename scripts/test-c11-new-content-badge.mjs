@@ -129,7 +129,12 @@ await test('REAL_CARD_MARKUP_ACCESSIBLE_AND_NO_ADDITIONAL_DPAD_TARGET', () => {
       './Artwork.tsx': { Artwork: () => React.createElement('img', { alt: '' }) },
       '../../artwork/artwork-uri.ts': { displayArtworkUri: () => undefined },
       '../../artwork/image-load-queue.ts': { loadImage: () => Promise.resolve() },
-      './NewContentProvider.tsx': { useContentBadge: () => fresh ? 'Novidade' : undefined } };
+      './NewContentProvider.tsx': { useContentBadge: () => fresh ? 'Novidade' : undefined },
+      '../hooks/useCardGenres.ts': { useCardGenres: () => ({ ref() {}, genres: [], visible: false }) },
+      '../hooks/useParentalControl.ts': { useParentalControl: () => ({ admin: false }) },
+      '../hooks/useParentalClassification.ts': { useParentalClassification() {} },
+      '../../parental/parental-content.ts': { canShowParentalItem: () => true },
+      '../../artwork/tmdb-metadata.service.ts': { artworkCategoryContext: () => ({}) } };
     new Function('require', 'module', 'exports', ts.transpileModule(text, { compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.React, esModuleInterop: true } }).outputText)
       (name => { assert.ok(ports[name], name); return ports[name]; }, module, module.exports);
     const html = renderToStaticMarkup(React.createElement(module.exports.MediaCard, { item: { id: 'a', title: 'Title', kind: 'series', yearFormatted: '1995', genreLabels: [] }, onClick() {} }));

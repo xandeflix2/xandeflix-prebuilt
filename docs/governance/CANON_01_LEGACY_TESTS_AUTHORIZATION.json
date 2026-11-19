@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "gate": "CANON-01-LEGACYTESTS",
+  "parentGate": "CANON-01",
+  "amendment": "CANON-01-LEGACYTESTS",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "USER_SUPPLIED_CHAT_MASTER_AMENDMENT_2026_10_20",
+  "authorizationRequestSha256": "6db32f1cc2bb81913434dc13bd558843b405543e8660f7b91525f55ec1ef34f1",
+  "reason": "Correct the order-dependent XML assertion and initialize the Node G8 parental storage fixture without changing runtime protections; preserve all previous controls and independently verify both receipts.",
+  "physicalImpact": "NOT_REQUIRED_JUSTIFIED",
+  "physicalImpactJustification": "Only local test fixtures and executable governance change. No Android/runtime/source/backend changes, new binary, device installation or claim of new physical homologation.",
+  "testChangesReviewed": true,
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c105-complete-root-search.mjs",
+    "scripts/test-c107-catalog-return-navigation.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c11-landscape-navigation.mjs",
+    "scripts/validate-direct-playback.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "node scripts/test-c11-phone-ui-orientation.mjs",
+    "npm run playback:check",
+    "node scripts/test-c126-parental-control.mjs",
+    "node scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "npm run update:check",
+    "npm run security:check",
+    "node scripts/test-g10-delta-extensions-regression.mjs",
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock",
+    "npm run typecheck",
+    "npm run contract:check",
+    "npm run search:check",
+    "npm run build",
+    "npm run site:build"
+  ],
+  "evidence": "docs/evidence/CANON_01_LEGACY_TESTS_EVIDENCE.md",
+  "restrictions": [
+    "Only the two named legacy tests receive protected-content grants.",
+    "No G10 receipt replacement or cross-receipt permission inheritance.",
+    "No future change authorized by this amendment.",
+    "No runtime, Android, Supabase, package, helper or workflow edits.",
+    "Documentation append only; no Git writes, device operations or APK/AAB builds."
+  ],
+  "changes": [
+    {
+      "path": "scripts/test-c11-phone-ui-orientation.mjs",
+      "before": "c28f9a0b910ac5d767be3c67e06700a6c3142e08",
+      "after": "54e6da9d3f4bca6220009fd93aeebc1e103a4002"
+    },
+    {
+      "path": "scripts/validate-direct-playback.mjs",
+      "before": "daeb80efd3c986dbb6a68fe97072c9511c1c74d2",
+      "after": "b77f6f395bb062994c0fc7a971bf6d923b5b6ead"
+    }
+  ],
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": false,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false
+}

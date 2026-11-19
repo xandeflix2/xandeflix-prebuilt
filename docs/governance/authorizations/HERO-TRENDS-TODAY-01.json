@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "gate": "HERO-TRENDS-TODAY-01",
+  "parentGate": "LIVE-AUTO-RECOVERY-01-VALIDATION",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "CURRENT_USER_REQUEST_FOR_HOME_MOVIES_SERIES_HERO_DAILY_TMDB_TRENDS_AND_EXPLICIT_CLARIFICATION_THAT_AVAILABILITY_MEANS_LISTED_IN_ACTIVE_SOURCE_NOT_NETWORK_PLAYBACK; NOT_INDEPENDENT_ADJUDICATION",
+  "reason": "Restrict the Home, Movies and Series heroes to the ranked TMDB Today entries that unambiguously match items listed in the currently active local source catalog. Remove old random, release-year and series-update fallback from these heroes while preserving other rails and playback.",
+  "physicalImpact": "REQUIRED",
+  "physicalImpactJustification": "The changed hero selection and empty/loading state should be observed on tablet and Fire after automated validation, without resetting source or activation.",
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c105-complete-root-search.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "node scripts/test-daily-trending-hero.mjs",
+    "node scripts/test-c11-browse-dynamic-hero.mjs",
+    "node node_modules/typescript/bin/tsc --noEmit",
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock"
+  ],
+  "evidence": "docs/evidence/HERO_TRENDS_TODAY_01.md",
+  "compatibilityRisk": "A source with no unambiguous matches in the first five pages of TMDB daily ranking, no public TMDB credential or no network will show an empty hero. Catalog presence is not proof of media HTTP availability. Existing rails, details, playback and authorization remain unchanged.",
+  "changes": [
+    { "path": "src/catalog/daily-trending-hero.service.ts", "before": null, "after": "693f1bc88173ce795e52462a5db184e8ffc64766" },
+    { "path": "src/ui/hooks/useHomeHero.ts", "before": "be086fc62296e750162be79a468cb96c82c03485", "after": "6de211e5094d5f464179b4fdfa23031a2c192e94" },
+    { "path": "src/ui/components/HomeHero.tsx", "before": "70be446ef40c8543e0c688bc70736b8dadd40394", "after": "15b1b53d2c750b5182bd59d01d0c0fdfca4b8322" },
+    { "path": "scripts/test-daily-trending-hero.mjs", "before": null, "after": "62f8881f1a24e35265ce3915c8cf0cdd605c3d0b" },
+    { "path": "scripts/test-c11-browse-dynamic-hero.mjs", "before": "c212cf8a9fd89c54f623d501679477de54dd902a", "after": "0049dbcd4f8439b1a1ae9f839d608cabdde7c807" },
+    { "path": "scripts/test-canonical-regression.mjs", "before": "fcd20e309eff51da25d0fc9a7768ff0cc5d6feb2", "after": "609df4539c52e157e2c6f7f6dc5ab09a47a73067" }
+  ],
+  "supersedes": {
+    "scripts/test-canonical-regression.mjs": "LIVE-AUTO-RECOVERY-01-VALIDATION"
+  },
+  "testChangesReviewed": true,
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": true,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false,
+  "restrictions": [
+    "No remote source, Supabase, player, C9, parental or credential changes.",
+    "No HTTP probing or claim that catalog listing proves playback.",
+    "No Git publication or production homologation by this receipt."
+  ]
+}

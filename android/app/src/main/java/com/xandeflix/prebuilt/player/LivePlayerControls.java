@@ -7,9 +7,12 @@ import android.graphics.drawable.ColorDrawable;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -23,11 +26,15 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 
 /** Live metadata stays in RAM. Channel resolution and C9 remain in the JS owner. */
 final class LivePlayerControls {
     interface Action { void accept(String action, String id, String channelId); }
+    private static final int CHANNEL_WINDOW_SIZE = 48;
+    private static final int MAX_CHANNEL_WINDOWS = 3;
     private final Activity activity;
     private final PlayerView view;
     private final Action action;
@@ -41,6 +48,7 @@ final class LivePlayerControls {
     private Button previousPage, nextPage;
     private View returnFocus;
     private JSONArray rows = new JSONArray();
+    private ChannelWindowAdapter channelWindows;
     private boolean disposing;
     private boolean fullscreen;
     private int shortcutKey = KeyEvent.KEYCODE_UNKNOWN;
@@ -132,27 +140,165 @@ final class LivePlayerControls {
         pages.addView(previousPage,new LinearLayout.LayoutParams(0,dp(48),1));pages.addView(nextPage,new LinearLayout.LayoutParams(0,dp(48),1));body.addView(pages);
         previousPage.setOnClickListener(v -> emit("categories".equals(panel)?"groupPrevious":"pagePrevious",null));
         nextPage.setOnClickListener(v -> emit("categories".equals(panel)?"groupNext":"pageNext",null));
+        list.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override public void onScrollStateChanged(AbsListView view, int state) {}
+            @Override public void onScroll(AbsListView view, int first, int visible, int total) {
+                if (channelWindows != null) requestVisibleChannelWindow();
+            }
+        });
         list.setOnItemClickListener((parent,v,position,id) -> {
-            JSONObject row=rows.optJSONObject(position);if(row==null||context.optBoolean("busy"))return;
-            if("categories".equals(panel)){emit("selectGroup",row.optString("id"));panel="channels";rows=new JSONArray();list.setAdapter(null);list.setEnabled(false);message.setText("Carregando…");}
+            JSONObject row=channelWindows!=null?channelWindows.getItem(position):rows.optJSONObject(position);
+            if(row==null||context.optBoolean("busy"))return;
+            if("categories".equals(panel)){
+                emit("selectGroup",row.optString("id"));panel="channels";rows=new JSONArray();
+                list.setAdapter(null);list.setEnabled(false);message.setText("Carregando…");
+                if(fullscreenPanel){previousPage.setVisibility(View.GONE);nextPage.setVisibility(View.GONE);}
+            }
             else if(!"guide".equals(panel)){emit("selectChannel",row.optString("id"));close(false);}
         });
         Dialog value;
         if(fullscreenPanel){value=new Dialog(activity,androidx.appcompat.R.style.Theme_AppCompat_Dialog);value.requestWindowFeature(Window.FEATURE_NO_TITLE);value.setContentView(body);value.setCanceledOnTouchOutside(true);}
         else value=new AlertDialog.Builder(activity,androidx.appcompat.R.style.Theme_AppCompat_Dialog_Alert).setView(body).setNegativeButton("Voltar",(d,which)->{}).create();
         dialog=value;view.setControllerShowTimeoutMs(0);
-        value.setOnDismissListener(d->{if(dialog!=value)return;dialog=null;list=null;panel=null;panelTitle=null;view.setControllerShowTimeoutMs(3000);if(fullscreen){view.showController();if(returnFocus!=null)returnFocus.requestFocus();}else view.hideController();emit("closePanel",null);});
+        value.setOnDismissListener(d->{if(dialog!=value)return;dialog=null;list=null;panel=null;panelTitle=null;channelWindows=null;view.setControllerShowTimeoutMs(3000);if(fullscreen){view.showController();if(returnFocus!=null)returnFocus.requestFocus();}else view.hideController();emit("closePanel",null);});
         if(closePanel!=null)closePanel.setOnClickListener(v->value.dismiss());
         value.show();
         if(fullscreenPanel)placePanel(value,name);
         else {Button back=((AlertDialog)value).getButton(AlertDialog.BUTTON_NEGATIVE);back.setBackgroundResource(R.drawable.player_control_focus);back.setTextColor(Color.WHITE);}
         updatePanel();list.requestFocus();
     }
+    static int channelWindowOffset(int position) {
+        return position < 0 ? -1 : position - position % CHANNEL_WINDOW_SIZE;
+    }
+
+    static boolean validChannelWindow(int offset, int count, int total) {
+        if (total == 0) return offset == 0 && count == 0;
+        return offset >= 0 && offset == channelWindowOffset(offset) && offset < total
+                && count == Math.min(CHANNEL_WINDOW_SIZE, total - offset);
+    }
+
+    private void updateChannelPanel() {
+        previousPage.setVisibility(View.GONE);
+        nextPage.setVisibility(View.GONE);
+        JSONObject page = context.optJSONObject("channelPage");
+        String key = page == null ? "" : page.optString("windowKey");
+        if (!key.matches("live-window-[1-9][0-9]{0,15}")) {
+            if (list.getAdapter() != null) list.setAdapter(null);
+            channelWindows = null;
+            message.setText("Carregando canais…");
+            return;
+        }
+
+        int offset = page.optInt("offset", -1);
+        int total = page.optInt("total", -1);
+        int failure = page.optInt("failedOffset", -1);
+        JSONArray items = context.optJSONArray("channels");
+        boolean loaded = page.optBoolean("loaded") && items != null
+                && validChannelWindow(offset, items.length(), total);
+        if (channelWindows == null || !key.equals(channelWindows.key)
+                || (loaded && channelWindows.loaded && total != channelWindows.total)) {
+            channelWindows = new ChannelWindowAdapter(key);
+            list.setAdapter(channelWindows);
+        }
+
+        if (failure >= 0) {
+            if (channelWindows.failedOffsets.add(failure)) channelWindows.notifyDataSetChanged();
+            if (channelWindows.pendingOffset == failure) channelWindows.pendingOffset = -1;
+        }
+        if (loaded) channelWindows.put(offset, total, items);
+
+        String name = text(context.optString("browseName"), 180);
+        String detail = channelWindows.total > 0
+                ? channelWindows.total + (channelWindows.total == 1 ? " canal" : " canais")
+                : failure == 0 ? "Não foi possível carregar os canais. Feche e abra a lista para tentar novamente."
+                : channelWindows.loaded ? "Nenhum canal disponível nesta lista." : "Carregando canais…";
+        message.setText(name.isEmpty() ? detail : name + "\n" + detail);
+        list.post(this::requestVisibleChannelWindow);
+    }
+
+    private void requestVisibleChannelWindow() {
+        ChannelWindowAdapter adapter = channelWindows;
+        if (adapter == null || !adapter.loaded || adapter.total == 0
+                || adapter.pendingOffset >= 0 || context.optBoolean("busy")) return;
+        int first = list.getFirstVisiblePosition();
+        int last = list.getLastVisiblePosition();
+        if (first < 0 || last < first || last >= adapter.total) return;
+        int ahead = last + Math.min(4, adapter.total - 1 - last);
+        for (int position : new int[]{first, last, ahead, Math.max(0, first - 4)}) {
+            int offset = channelWindowOffset(position);
+            if (adapter.windows.containsKey(offset) || adapter.failedOffsets.contains(offset)) continue;
+            adapter.pendingOffset = offset;
+            emit("loadChannelWindow", adapter.key + ":" + offset);
+            return;
+        }
+    }
+
+    private final class ChannelWindowAdapter extends BaseAdapter {
+        final String key;
+        final LinkedHashMap<Integer, JSONArray> windows = new LinkedHashMap<>(MAX_CHANNEL_WINDOWS + 1, 0.75f, true);
+        final HashSet<Integer> failedOffsets = new HashSet<>();
+        int total;
+        int pendingOffset = -1;
+        boolean loaded;
+
+        ChannelWindowAdapter(String key) {
+            this.key = key;
+        }
+
+        void put(int offset, int total, JSONArray items) {
+            this.total = total;
+            loaded = true;
+            if (pendingOffset == offset) pendingOffset = -1;
+            JSONArray prior = windows.get(offset);
+            if (prior != null && prior.toString().equals(items.toString())) return;
+            windows.put(offset, items);
+            failedOffsets.remove(offset);
+            if (windows.size() > MAX_CHANNEL_WINDOWS) windows.remove(windows.keySet().iterator().next());
+            notifyDataSetChanged();
+        }
+
+        @Override public int getCount() { return total; }
+
+        @Override public JSONObject getItem(int position) {
+            if (position < 0 || position >= total) return null;
+            int offset = channelWindowOffset(position);
+            JSONArray window = windows.get(offset);
+            return window == null ? null : window.optJSONObject(position - offset);
+        }
+
+        @Override public long getItemId(int position) { return position; }
+        @Override public boolean areAllItemsEnabled() { return false; }
+        @Override public boolean isEnabled(int position) { return getItem(position) != null; }
+
+        @Override public View getView(int position, View recycled, ViewGroup parent) {
+            TextView row = recycled instanceof TextView ? (TextView) recycled : new TextView(activity);
+            JSONObject channel = getItem(position);
+            row.setText(channel != null
+                    ? (channel.optBoolean("favorite") ? "★ " : "") + text(channel.optString("name"), 180)
+                    : failedOffsets.contains(channelWindowOffset(position)) ? "Canal indisponível na lista" : "Carregando…");
+            row.setTextColor(Color.WHITE);
+            row.setTextSize(15);
+            row.setMinHeight(dp(48));
+            row.setGravity(Gravity.CENTER_VERTICAL);
+            row.setBackgroundResource(R.drawable.live_panel_row);
+            row.setPadding(dp(12), dp(10), dp(12), dp(10));
+            row.setMaxLines(2);
+            row.setEllipsize(android.text.TextUtils.TruncateAt.END);
+            row.setActivated(channel != null && channel.optString("id").equals(context.optString("channelId")));
+            return row;
+        }
+    }
+
     private void updatePanel() {
         list.setEnabled(!context.optBoolean("busy"));
         boolean guide="guide".equals(panel), categories="categories".equals(panel);
         dialog.setTitle(guide?"Guia de programação":categories?"Categorias":"favorites".equals(panel)?"Canais favoritos":"Canais");
         if(panelTitle!=null)panelTitle.setText(guide?"Guia de programação":categories?"Categorias":"favorites".equals(panel)?"Canais favoritos":"Canais");
+        if (fullscreenPanel && "channels".equals(panel)) {
+            updateChannelPanel();
+            return;
+        }
+        channelWindows = null;
         JSONObject epg=context.optJSONObject("epg");
         JSONArray input=guide?(epg!=null?epg.optJSONArray("programs"):null):context.optJSONArray(categories?"groups":"channels");
         String previousFirst=rows.optJSONObject(0)!=null?rows.optJSONObject(0).optString("id"):"";
@@ -166,7 +312,8 @@ final class LivePlayerControls {
             if(guide){long start=row.optLong("start"),end=row.optLong("end");labels[i]=(start<=now&&now<end?"AGORA · ":"A SEGUIR · ")+time.format(new Date(start))+" – "+time.format(new Date(end))+"\n"+text(row.optString("title"),180)+"\n"+text(row.optString("description"),700);}
             else {labels[i]=(row.optBoolean("favorite")?"★ ":"")+text(row.optString("name"),180);if(row.optString("id").equals(context.optString("channelId")))selected=i;}
         }
-        message.setText(context.optBoolean("busy")?"Carregando…":guide?(epg!=null?text(epg.optString("message"),240):"Carregando programação…"):!context.optString("message").isEmpty()?text(context.optString("message"),240):count==0?"Nenhum canal disponível nesta lista.":text(context.optString("browseName"),180));
+        String browseName = text(context.optString("browseName"), 180);
+        message.setText(context.optBoolean("busy")?"Carregando…":guide?(epg!=null?text(epg.optString("message"),240):"Carregando programação…"):!context.optString("message").isEmpty()?text(context.optString("message"),240):count==0?"Nenhum canal disponível nesta lista.":browseName);
         list.setAdapter(new ArrayAdapter<String>(activity,fullscreenPanel?android.R.layout.simple_list_item_1:android.R.layout.simple_list_item_single_choice,labels){
             @Override public View getView(int p,View converted,android.view.ViewGroup parent){TextView v=(TextView)super.getView(p,converted,parent);v.setTextColor(Color.WHITE);v.setTextSize(15);v.setMinHeight(dp(48));if(fullscreenPanel){v.setBackgroundResource(R.drawable.live_panel_row);v.setPadding(dp(12),dp(10),dp(12),dp(10));v.setMaxLines(guide?6:2);v.setEllipsize(android.text.TextUtils.TruncateAt.END);}return v;}
         });
@@ -175,6 +322,8 @@ final class LivePlayerControls {
         previousPage.setVisibility(guide?View.GONE:View.VISIBLE);nextPage.setVisibility(guide?View.GONE:View.VISIBLE);
         previousPage.setEnabled(!context.optBoolean("busy")&&context.optBoolean(categories?"previousGroups":"previousPage"));
         nextPage.setEnabled(!context.optBoolean("busy")&&context.optBoolean(categories?"nextGroups":"nextPage"));
+        previousPage.setAlpha(previousPage.isEnabled() ? 1f : 0.45f);
+        nextPage.setAlpha(nextPage.isEnabled() ? 1f : 0.45f);
         if(pageChanged&&count>0){list.requestFocus();list.setSelection(0);}
     }
     boolean dismissPanel(){if(dialog==null)return false;dialog.dismiss();return true;}
@@ -219,6 +368,6 @@ final class LivePlayerControls {
         }
         return false;
     }
-    private void close(boolean dispose){disposing=dispose;shortcutKey=KeyEvent.KEYCODE_UNKNOWN;if(volumeToast!=null){volumeToast.cancel();volumeToast=null;}if(dialog!=null){dialog.setOnDismissListener(null);dialog.dismiss();dialog=null;}list=null;panel=null;panelTitle=null;}
+    private void close(boolean dispose){disposing=dispose;shortcutKey=KeyEvent.KEYCODE_UNKNOWN;if(volumeToast!=null){volumeToast.cancel();volumeToast=null;}if(dialog!=null){dialog.setOnDismissListener(null);dialog.dismiss();dialog=null;}list=null;panel=null;panelTitle=null;channelWindows=null;}
     void close(){close(true);context=new JSONObject();}
 }

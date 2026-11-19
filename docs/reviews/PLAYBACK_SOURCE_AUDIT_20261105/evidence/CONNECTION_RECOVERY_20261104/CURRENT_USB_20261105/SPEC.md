@@ -1,0 +1,13 @@
+# Continuação USB — 05/11/2026
+
+Objetivo: identificar o Fire substituído e diagnosticar a abertura de mídia no tablet com o APK fornecido, pelos fluxos normais do aplicativo. Preservar evidências das sessões anteriores em arquivos próprios.
+
+Allowlist: exclusivamente ferramentas e evidências nesta subpasta externa. Nenhuma edição de produto, instalação, build, mudança de fonte/identidade/licença, Git write ou backend administrativo. Consultar a configuração ativa na memória do dispositivo e exportar apenas flags, classes, contagens e erros sanitizados. Não exportar URLs, credenciais, respostas privadas ou títulos de conteúdo.
+
+Experimento controlado permitido: depois de reproduzir um episódio pelo fluxo normal, repetir o mesmo episódio pela interface e alterar apenas o User-Agent do próximo pedido nativo correspondente, de forma transitória. Exigir identidade exata da URI e episódio em RAM; restaurar a função após o único pedido e ao encerrar. Não mudar extensão, rota, identidade ou autorização; não considerar uma resposta HEAD ou um teste de rede no desktop equivalente à reprodução real. Esta observação não modifica o APK nem constitui proposta definitiva de correção.
+
+Capturar os resultados separados por tentativa e manter a causa aberta se não demonstrada. Os testes normais passam pela autorização atual do aplicativo. Limpar observadores e referências privadas da RAM ao terminar. Nenhuma publicação nem integração Next Episode autorizada por este diagnóstico.
+
+Complemento solicitado pelo usuário: testar também o celular conectado. Foi informado que tablet e Fire usam hotspot 5G do celular. Comparações entre fontes de aparelhos devem distinguir identidade/configuração de mera versão do app. Para comparar sem exportar configuração privada, pode-se calcular no aparelho HMAC-SHA256 de campos com chave aleatória exclusiva da execução; digests e chave ficam transitórios na memória do auditor e somente flags de igualdade são persistidas. Não persistir digests, chave ou valores originais. Identificadores de catálogo/episódio podem ser transmitidos transitoriamente entre as interfaces para repetir o mesmo conteúdo, sem gravar seus valores nos logs. Nenhuma configuração será copiada entre os aparelhos.
+
+Para catálogos que usam IDs locais diferentes, um título público exibido no card poderá ser transmitido apenas em RAM entre as interfaces, exigindo correspondência única para a seleção. Comparar depois as URIs reais por HMAC; título igual sozinho não prova edição, mídia ou URI iguais. Não persistir título ou IDs nos relatórios. Executar as reproduções sequencialmente, encerrando a primeira antes da segunda.

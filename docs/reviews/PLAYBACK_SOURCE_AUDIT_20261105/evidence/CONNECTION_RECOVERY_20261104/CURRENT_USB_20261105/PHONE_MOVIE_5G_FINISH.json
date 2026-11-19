@@ -1,0 +1,98 @@
+{
+  "observedUTC": "2026-11-05T10:22:14.330Z",
+  "observerPresent": true,
+  "events": [
+    {
+      "event": "OPEN",
+      "kind": "movie",
+      "scheme": "http:",
+      "typedPath": "movie",
+      "extension": "mp4",
+      "pathDepth": 4,
+      "hasQuery": false,
+      "headerNames": [
+        "User-Agent"
+      ],
+      "uaClass": "IPTV_SMARTERS_DEFAULT",
+      "observedUTC": "2026-11-05T10:20:39.906Z"
+    },
+    {
+      "event": "OPEN_RETURN",
+      "accepted": true,
+      "candidateCount": 1,
+      "observedUTC": "2026-11-05T10:20:39.957Z"
+    },
+    {
+      "event": "progress",
+      "positionMs": 2854,
+      "durationMs": 6395094,
+      "ended": false,
+      "observedUTC": "2026-11-05T10:20:45.140Z"
+    },
+    {
+      "event": "progress",
+      "positionMs": 7871,
+      "durationMs": 6395094,
+      "ended": false,
+      "observedUTC": "2026-11-05T10:20:50.154Z"
+    },
+    {
+      "event": "progress",
+      "positionMs": 12891,
+      "durationMs": 6395094,
+      "ended": false,
+      "observedUTC": "2026-11-05T10:20:55.167Z"
+    },
+    {
+      "event": "progress",
+      "positionMs": 17901,
+      "durationMs": 6395094,
+      "ended": false,
+      "observedUTC": "2026-11-05T10:21:00.179Z"
+    },
+    {
+      "event": "progress",
+      "positionMs": 22911,
+      "durationMs": 6395094,
+      "ended": false,
+      "observedUTC": "2026-11-05T10:21:05.194Z"
+    },
+    {
+      "event": "progress",
+      "positionMs": 27932,
+      "durationMs": 6395094,
+      "ended": false,
+      "observedUTC": "2026-11-05T10:21:10.207Z"
+    },
+    {
+      "event": "progress",
+      "positionMs": 32948,
+      "durationMs": 6395094,
+      "ended": false,
+      "observedUTC": "2026-11-05T10:21:15.212Z"
+    },
+    {
+      "event": "progress",
+      "positionMs": 37955,
+      "durationMs": 6395094,
+      "ended": false,
+      "observedUTC": "2026-11-05T10:21:20.225Z"
+    },
+    {
+      "event": "progress",
+      "positionMs": 42958,
+      "durationMs": 6395094,
+      "ended": false,
+      "observedUTC": "2026-11-05T10:21:25.231Z"
+    },
+    {
+      "event": "progress",
+      "positionMs": 47973,
+      "durationMs": 6395094,
+      "ended": false,
+      "observedUTC": "2026-11-05T10:21:30.246Z"
+    }
+  ],
+  "privateRequestPresent": true,
+  "visibility": "hidden"
+}

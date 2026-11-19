@@ -1,0 +1,95 @@
+{
+  "schema": 1,
+  "gate": "CANON-01-SERIES-POSTER-COMPOSITION",
+  "parentGate": "CANON-01",
+  "amendment": "CANON-01-SERIES-POSTER-COMPOSITION",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "EXPLICIT_USER_AUTONOMOUS_SOURCE_RECOVERY_AND_AUTOMATIC_SOURCE_TO_TMDB_SERIES_COVER_RULE_WITH_DEVICE_INSTALL_AUTHORIZATION",
+  "authorizationRequestSha256": "dc9feae1e4dddb0cc8950d1df1cb93d840d99bc8446f68897e7b91b9681bf854",
+  "reason": "Confirmed horizontal and reused generic source images prevent correct TV posters. Reject invalid/shared art and perform existing conservative independent TV lookup without changing catalog or source.",
+  "physicalImpact": "REQUIRED",
+  "physicalImpactJustification": "Separately named same-signature1.0.37 APK and authorized in-place three-device UI tests; previous APKs/private data preserved.",
+  "testChangesReviewed": true,
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c105-complete-root-search.mjs",
+    "scripts/test-c107-catalog-return-navigation.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c11-landscape-navigation.mjs",
+    "scripts/validate-direct-playback.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock",
+    "npm run typecheck",
+    "npm run update:check",
+    "npm run security:check",
+    "npm run playback:check",
+    "npm run build",
+    "npm run site:build",
+    "node scripts/test-vercel-prebuilt-contract.mjs",
+    "node scripts/test-c105-directory-import.mjs",
+    "node scripts/test-c105-directory-details.mjs",
+    "node scripts/test-c105-directory-orchestration.mjs",
+    "node scripts/test-c11-automatic-source-refresh.mjs",
+    "node scripts/test-catalog-read-diagnostic.mjs",
+    "node scripts/test-xui-m3u-kind-recovery.mjs",
+    "node scripts/test-c157-web-source-https.mjs",
+    "node scripts/test-catalog-physical-regressions.mjs",
+    "node scripts/test-c135-adult-reader.mjs",
+    "node scripts/test-series-poster-composition.mjs"
+  ],
+  "evidence": "docs/evidence/SERIES_POSTER_COMPOSITION_RECOVERY.md",
+  "compatibilityRisk": "Shared art detection may include legitimate aliases; official TMDB variants restore valid source priority. No confirmed TV match retains honest unavailable art. Bounded optional RAM metadata never changes playback authorization.",
+  "restrictions": [
+    "Preserve all previous receipts and128 controls/18 suites; add suite19.",
+    "No importer, native/player, source/credential/API configuration, matching threshold, parental/authority/backend/version changes.",
+    "No commit/push/merge/deploy/reset or SOURCE-FORMAT-01."
+  ],
+  "supersedes": {
+    "scripts/test-canonical-regression.mjs": "CANON-01-CATALOG-PHYSICAL-FIXES"
+  },
+  "changes": [
+    {
+      "path": "src/ui/components/Artwork.tsx",
+      "before": "b5a17f6b6d20b902ec3e4b11761f0c46185d203d",
+      "after": "86b912ae78ddd0451f1db9f115676fdf12b18963"
+    },
+    {
+      "path": "src/artwork/series-poster-claims.ts",
+      "before": null,
+      "after": "de76d2fe4f67cf27de18b44a5e288621ce31f6aa"
+    },
+    {
+      "path": "scripts/test-series-poster-composition.mjs",
+      "before": null,
+      "after": "c9d43af60334798c218de441f96ae4fed65dba22"
+    },
+    {
+      "path": "scripts/test-c11-source-first-tmdb-artwork.mjs",
+      "before": "e8609574af552e49ffb66f6bb00938521320c789",
+      "after": "c9a26e9cc8cc1365185ed31e76a94aa126ada24e"
+    },
+    {
+      "path": "scripts/test-c11-artwork-visible-recovery.mjs",
+      "before": "64b478755eab2f702bb76b6c10da51fb14927102",
+      "after": "967c2a62cb0751bcb252d6e32ddb55208d671149"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "4543f705542c000df181a220bdd7fa6ab0e3d80c",
+      "after": "1e635bc2bc511ac07fae56ceaf05ea0cd21929d2"
+    }
+  ],
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": true,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false
+}

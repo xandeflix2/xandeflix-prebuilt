@@ -12,13 +12,13 @@ export function normalizeArtworkUri(value: unknown): string | undefined {
 }
 
 /** Public TMDB resizes only; source filenames and non-TMDB URLs stay intact. */
-export function displayArtworkUri(value: string | undefined, kind: 'poster' | 'backdrop' | 'thumbnail', high = false): string | undefined {
+export function displayArtworkUri(value: string | undefined, kind: 'poster' | 'backdrop' | 'thumbnail', high = false, preview = false): string | undefined {
   const normalized = normalizeArtworkUri(value);
   if (!normalized) return;
   const url = new URL(normalized);
   const path = url.pathname.match(/^\/t\/p\/[^/]+(\/[A-Za-z0-9_.-]+\.(?:jpg|jpeg|png|webp))$/i);
   if (url.hostname === 'image.tmdb.org' && path) {
-    url.pathname = `/t/p/${kind === 'backdrop' ? 'w1280' : high && kind === 'poster' ? 'w780' : 'w342'}${path[1]}`;
+    url.pathname = `/t/p/${kind === 'backdrop' ? (preview ? 'w780' : 'w1280') : high && kind === 'poster' ? 'w780' : 'w342'}${path[1]}`;
   }
   return url.href;
 }

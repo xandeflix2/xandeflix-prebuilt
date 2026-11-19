@@ -1,0 +1,17 @@
+{
+  "observedUTC": "2026-11-04T19:41:10.315Z",
+  "results": [
+    {
+      "label": "fire",
+      "temporaryAuditGlobals": []
+    },
+    {
+      "label": "tablet",
+      "temporaryAuditGlobals": []
+    },
+    {
+      "label": "phone",
+      "temporaryAuditGlobals": []
+    }
+  ]
+}

@@ -66,6 +66,7 @@ export function seriesToViewModel(readModel: CatalogReadModel, series: Series): 
     id: series.id,
     externalIds: series.externalIds?.tmdbId ? { tmdbId: series.externalIds.tmdbId } : undefined,
     kind: 'series',
+    hasEpisodes: series.seasonIds.length > 0,
     title: series.title,
     originalTitle: series.originalTitle,
     yearFormatted: readModel.formatYear(series.year),

@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "gate": "CANON-01-VERCEL-A2-ARTIFACT",
+  "parentGate": "CANON-01",
+  "amendment": "CANON-01-VERCEL-A2-ARTIFACT",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "USER_REQUEST_MANUAL_POWERSHELL_A2_1_LOCAL_ONLY",
+  "authorizationRequestSha256": "e0dfa959fee6cb037cb06411d6d59a69de2b9a57feecf0253e81ee01c3bc98b7",
+  "reason": "Implement local-only artifact integrity inspection and negative tests; preserve historical canonical governance, with no remote attestation, Git write, deployment, or publication authority.",
+  "physicalImpact": "NOT_REQUIRED_JUSTIFIED",
+  "physicalImpactJustification": "Only local scripts, canonical tests, governance records, and append-only documentation; no Android application or backend mutation.",
+  "testChangesReviewed": true,
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c105-complete-root-search.mjs",
+    "scripts/test-c107-catalog-return-navigation.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c11-landscape-navigation.mjs",
+    "scripts/validate-direct-playback.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock",
+    "npm run typecheck",
+    "npm run update:check",
+    "npm run security:check",
+    "npm run playback:check",
+    "npm run build",
+    "npm run site:build",
+    "node scripts/test-site-build-contract.mjs",
+    "node scripts/test-vercel-artifact-contract.mjs",
+    "node scripts/verify-vercel-artifact.mjs inspect"
+  ],
+  "evidence": "docs/evidence/CANON_01_VERCEL_A2_ARTIFACT.md",
+  "compatibilityRisk": "A2.1 local file integrity alone is insufficient to authorize publishing; authenticated GitHub and Vercel provenance plus explicit human approval remain pending.",
+  "restrictions": [
+    "No Git commit, push, merge or branch change.",
+    "No Vercel deployment, redeploy, API publish, secrets or project changes.",
+    "Do not alter canonical or site-build workflows, package.json, vercel.json, Android, Supabase, runtime or historical receipts."
+  ],
+  "supersedes": {
+    "scripts/verify-canonical-contract.mjs": "CANON-01-VERCEL-BUILD-A1",
+    "scripts/test-canonical-regression.mjs": "CANON-01-VERCEL-BUILD-A1"
+  },
+  "changes": [
+    {
+      "path": "scripts/verify-canonical-contract.mjs",
+      "before": "bf99d655897772c04635a7624fb5dbdbb4c57c54",
+      "after": "005c771e9b844892b6a20b63a024bc4a43d3d9de"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "ab9c771133c84282bbf9c7a7d2091e5d0dd0f1a6",
+      "after": "15fed01d8860419b8ddb8e552e2e5762d6f58099"
+    },
+    {
+      "path": "scripts/verify-vercel-artifact.mjs",
+      "before": null,
+      "after": "e9e4e939d4e345c584af4f1e3c9b410b197db6a3"
+    },
+    {
+      "path": "scripts/test-vercel-artifact-contract.mjs",
+      "before": null,
+      "after": "0d5a65a2e5017aef6329e475cffb351f07d2e19e"
+    }
+  ],
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": false,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false
+}

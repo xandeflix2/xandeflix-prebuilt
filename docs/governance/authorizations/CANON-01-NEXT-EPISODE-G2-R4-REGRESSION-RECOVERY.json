@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "gate": "CANON-01-NEXT-EPISODE-G2-R4-REGRESSION-RECOVERY",
+  "parentGate": "CANON-01-NEXT-EPISODE-G2-R2",
+  "amendment": "CANON-01-NEXT-EPISODE-G2-R4-REGRESSION-RECOVERY",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "EXPLICIT_CURRENT_USER_NEXT_EPISODE_G2_R4_ORDER; NOMINAL_PROTECTED_TEST_REVISION; INDEPENDENT_GATE_REVIEW_PENDING",
+  "authorizationRequestSha256": "9e602c7d2176993f0af872318176038aa53cfc396ce6f3124b9de34163bc6259",
+  "reason": "Update only the explicit strict authorization expectation with the legitimately registered G2-R2 and this G2-R4 receipt, preserving all historical controls and the synthetic future approval.",
+  "physicalImpact": "NOT_REQUIRED_JUSTIFIED",
+  "physicalImpactJustification": "Only test expectation and additive governance; no runtime, player, device or distribution changes.",
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c105-complete-root-search.mjs",
+    "scripts/test-c107-catalog-return-navigation.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c11-landscape-navigation.mjs",
+    "scripts/validate-direct-playback.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "node scripts/verify-canonical-contract.mjs",
+    "node scripts/test-canonical-regression.mjs",
+    "node scripts/test-next-episode-resolver.mjs",
+    "node node_modules/typescript/bin/tsc --noEmit",
+    "node scripts/test-series-episode-return.mjs",
+    "node scripts/test-c11-new-device-activation-lock.mjs"
+  ],
+  "evidence": "docs/evidence/NEXT_EPISODE_G2_R4.md",
+  "compatibilityRisk": "None to runtime; strict historical authorization order and synthetic ANDROID-38 remain validated. No verifier, controls, suite list or interruption policy changes.",
+  "testChangesReviewed": true,
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": false,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false,
+  "supersedes": {
+    "scripts/test-canonical-regression.mjs": "CANON-01-CARD-TRAILER-AUDIO"
+  },
+  "changes": [
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "2f55a4a2c4f4e12dc2700450532fc4d2606f39cc",
+      "after": "17717e3ab4b86aa5009668d3372795b4b458eae7"
+    }
+  ],
+  "restrictions": [
+    "Preserve 204 named controls and 42 suites, all existing negative checks, A22 provenance and dirty-source protection.",
+    "No runtime/resolver/player edits, builds, installs, deploys, Git publication, historical receipt edits or next gate."
+  ]
+}

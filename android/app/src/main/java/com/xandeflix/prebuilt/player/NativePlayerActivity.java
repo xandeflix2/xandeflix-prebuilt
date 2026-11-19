@@ -76,6 +76,26 @@ public class NativePlayerActivity extends AppCompatActivity {
     private final EpisodeNavigationState episodeNavigation = new EpisodeNavigationState();
     private Runnable episodeTimeout;
     private org.json.JSONObject episodeContext;
+    private View nextEpisodeOverlay;
+    private android.widget.TextView nextEpisodeLabel;
+    private android.widget.TextView nextEpisodeTitle;
+    private android.widget.ProgressBar nextEpisodeProgress;
+    private android.widget.Button nextEpisodeBtnPlay;
+    private android.widget.Button nextEpisodeBtnCancel;
+    private View episodeTransitionOverlay;
+    private android.widget.TextView episodeTransitionTitle;
+    private android.animation.ValueAnimator countdownAnimator;
+    private boolean creditsPromptShown = false;
+    private boolean creditsPromptDismissed = false;
+    private final Runnable creditsProbe = new Runnable() {
+        @Override
+        public void run() {
+            checkCreditsMarker();
+            if (playerForeground && !isFinishing() && !isDestroyed() && !creditsPromptShown && !creditsPromptDismissed) {
+                observabilityHandler.postDelayed(this, 1000);
+            }
+        }
+    };
     private final Runnable watchProgressProbe=new Runnable(){@Override public void run(){emitWatchProgress(false);observabilityHandler.postDelayed(this,5000);}};
     private void emitWatchProgress(boolean ended) {
         if(player!=null && !wasCasting)NativeAndroidPlayerPlugin.notifyPlaybackProgress(watchPlaybackId,player.getCurrentPosition(),player.getDuration(),ended);
@@ -103,6 +123,7 @@ public class NativePlayerActivity extends AppCompatActivity {
             if(activity.candidateRequests!=null&&activity.currentCandidateIndex<activity.candidateRequests.size())
                 com.xandeflix.prebuilt.cast.CastController.get().detach(activity.candidateRequests.get(activity.currentCandidateIndex));
             activity.setupFromIntent(intent);
+            activity.resetNextEpisodeState();
             activity.setIntent(intent);
             activity.watchPlaybackId=intent.getStringExtra("watchPlaybackId");
             activity.episodeNavigation.started(activity.watchPlaybackId);
@@ -116,7 +137,31 @@ public class NativePlayerActivity extends AppCompatActivity {
     }
     public static void cancelEpisodeNavigation(String id,String requestId) {
         NativePlayerActivity activity=activeActivity.get();if(activity==null)return;
-        activity.runOnUiThread(()->{if(activity.episodeNavigation.accepts(id,requestId))activity.failEpisodeTransition();});
+        activity.runOnUiThread(()->{
+            if(activity.episodeNavigation.accepts(id,requestId)) {
+                if (activity.episodeTimeout != null) activity.observabilityHandler.removeCallbacks(activity.episodeTimeout);
+                activity.failEpisodeTransition();
+            }
+        });
+    }
+    private void showEpisodeTransitionOverlay(@Nullable String title) {
+        if (episodeTransitionOverlay != null) {
+            if (episodeTransitionTitle != null && title != null && !title.isEmpty()) {
+                episodeTransitionTitle.setText("Carregando " + title + "...");
+            } else if (episodeTransitionTitle != null) {
+                episodeTransitionTitle.setText("Carregando próximo episódio...");
+            }
+            episodeTransitionOverlay.setAlpha(0f);
+            episodeTransitionOverlay.setVisibility(View.VISIBLE);
+            episodeTransitionOverlay.animate().alpha(1f).setDuration(250).start();
+        }
+    }
+    private void hideEpisodeTransitionOverlay() {
+        if (episodeTransitionOverlay != null && episodeTransitionOverlay.getVisibility() == View.VISIBLE) {
+            episodeTransitionOverlay.animate().alpha(0f).setDuration(250).withEndAction(() -> {
+                if (episodeTransitionOverlay != null) episodeTransitionOverlay.setVisibility(View.GONE);
+            }).start();
+        }
     }
     private void bindEpisodeControls(Intent intent) {
         episodeContext=null;
@@ -132,6 +177,18 @@ public class NativePlayerActivity extends AppCompatActivity {
         if(!episodeNavigation.request(watchPlaybackId,requestId))return false;
         Log.i(TAG,"EPISODE_NAVIGATION_REQUEST reason="+reason+" uptime="+android.os.SystemClock.uptimeMillis());
         emitWatchProgress("ended".equals(reason));
+        dismissNextEpisodeCountdown(false);
+        String nextTitle = null;
+        if (controls != null) {
+            org.json.JSONObject nextEp = "select".equals(reason) ? null : controls.getNextEpisode();
+            if (nextEp != null) {
+                int s = nextEp.optInt("seasonNumber", 1);
+                int e = nextEp.optInt("episodeNumber", 1);
+                String t = nextEp.optString("title", "");
+                nextTitle = "T" + s + ":E" + e + (t.isEmpty() ? "" : " · " + t);
+            }
+        }
+        showEpisodeTransitionOverlay(nextTitle);
         if(player!=null)player.pause();
         controls.close();
         controls.setTransitioning(true);
@@ -142,8 +199,96 @@ public class NativePlayerActivity extends AppCompatActivity {
     }
     private void failEpisodeTransition() {
         Log.i(TAG,"EPISODE_NAVIGATION_FAILED uptime="+android.os.SystemClock.uptimeMillis());
+        hideEpisodeTransitionOverlay();
         episodeNavigation.close();
         emitTerminalEvent(false,"NEXT_EPISODE_FAILED");releasePlayer();finish();
+    }
+    private void checkCreditsMarker() {
+        if (player == null || !"series".equals(currentKind) || controls == null || !controls.hasNext()
+                || creditsPromptShown || creditsPromptDismissed || episodeNavigation.pending() || wasCasting) return;
+        long duration = player.getDuration();
+        long position = player.getCurrentPosition();
+        if (duration <= 0 || duration == androidx.media3.common.C.TIME_UNSET || position <= 0) return;
+        long tailMs = duration > 1500_000L ? 45_000L : 35_000L;
+        long creditsStartMs = Math.max(0, duration - tailMs);
+        if (position >= creditsStartMs) {
+            showNextEpisodeCountdown();
+        }
+    }
+    private void showNextEpisodeCountdown() {
+        if (isFinishing() || isDestroyed() || nextEpisodeOverlay == null || controls == null || !controls.hasNext()) return;
+        creditsPromptShown = true;
+        org.json.JSONObject nextEp = controls.getNextEpisode();
+        String titleText = "Próximo episódio";
+        if (nextEp != null) {
+            int s = nextEp.optInt("seasonNumber", 1);
+            int e = nextEp.optInt("episodeNumber", 1);
+            String t = nextEp.optString("title", "");
+            titleText = "T" + s + ":E" + e + (t.isEmpty() ? "" : " · " + t);
+        }
+        if (nextEpisodeTitle != null) {
+            nextEpisodeTitle.setText(titleText);
+        }
+        nextEpisodeOverlay.setVisibility(View.VISIBLE);
+        nextEpisodeOverlay.setAlpha(0f);
+        nextEpisodeOverlay.animate().alpha(1f).setDuration(250).start();
+        if (nextEpisodeBtnPlay != null) {
+            nextEpisodeBtnPlay.requestFocus();
+        }
+        startCountdownTimer();
+    }
+    private void startCountdownTimer() {
+        cancelCountdownTimer();
+        countdownAnimator = android.animation.ValueAnimator.ofInt(5000, 0);
+        countdownAnimator.setDuration(5000);
+        countdownAnimator.setInterpolator(new android.view.animation.LinearInterpolator());
+        countdownAnimator.addUpdateListener(animation -> {
+            int remainingMs = (int) animation.getAnimatedValue();
+            if (nextEpisodeProgress != null) {
+                nextEpisodeProgress.setProgress(remainingMs);
+            }
+            int seconds = (int) Math.ceil(remainingMs / 1000.0);
+            if (seconds < 1) seconds = 1;
+            if (nextEpisodeBtnPlay != null) {
+                nextEpisodeBtnPlay.setText("Assistir agora (" + seconds + "s) ▶");
+            }
+        });
+        countdownAnimator.addListener(new android.animation.AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(android.animation.Animator animation) {
+                if (!creditsPromptDismissed && creditsPromptShown && !isFinishing() && !isDestroyed()) {
+                    dismissNextEpisodeCountdown(false);
+                    requestEpisode("next", null);
+                }
+            }
+        });
+        countdownAnimator.start();
+    }
+    private void cancelCountdownTimer() {
+        if (countdownAnimator != null) {
+            countdownAnimator.removeAllUpdateListeners();
+            countdownAnimator.removeAllListeners();
+            countdownAnimator.cancel();
+            countdownAnimator = null;
+        }
+    }
+    private void dismissNextEpisodeCountdown(boolean byUser) {
+        cancelCountdownTimer();
+        if (byUser) {
+            creditsPromptDismissed = true;
+        }
+        if (nextEpisodeOverlay != null && nextEpisodeOverlay.getVisibility() == View.VISIBLE) {
+            nextEpisodeOverlay.animate().alpha(0f).setDuration(200).withEndAction(() -> {
+                if (nextEpisodeOverlay != null) nextEpisodeOverlay.setVisibility(View.GONE);
+            }).start();
+        }
+    }
+    private void resetNextEpisodeState() {
+        cancelCountdownTimer();
+        creditsPromptShown = false;
+        creditsPromptDismissed = false;
+        if (nextEpisodeOverlay != null) nextEpisodeOverlay.setVisibility(View.GONE);
+        if (episodeTransitionOverlay != null) episodeTransitionOverlay.setVisibility(View.GONE);
     }
     public static void terminateCastPlayback(boolean ended,String errorCode) {
         NativePlayerActivity activity=activeActivity.get();
@@ -157,6 +302,7 @@ public class NativePlayerActivity extends AppCompatActivity {
 
     private PlayerView playerView;
     private ExoPlayer player;
+    private final VodDpadController vodDpad = new VodDpadController();
 
     private List<NativeStreamRequest> candidateRequests;
     private int currentCandidateIndex = 0;
@@ -208,6 +354,23 @@ public class NativePlayerActivity extends AppCompatActivity {
                 ()->{emitTerminalEvent(false,null);releasePlayer();finish();},
                 ()->requestEpisode("next",null), id->requestEpisode("select",id));
         seekFeedback = findViewById(R.id.native_seek_feedback);
+        nextEpisodeOverlay = findViewById(R.id.next_episode_overlay);
+        nextEpisodeLabel = findViewById(R.id.next_episode_label);
+        nextEpisodeTitle = findViewById(R.id.next_episode_title);
+        nextEpisodeProgress = findViewById(R.id.next_episode_progress);
+        nextEpisodeBtnPlay = findViewById(R.id.next_episode_btn_play);
+        nextEpisodeBtnCancel = findViewById(R.id.next_episode_btn_cancel);
+        episodeTransitionOverlay = findViewById(R.id.episode_transition_overlay);
+        episodeTransitionTitle = findViewById(R.id.episode_transition_title);
+        if (nextEpisodeBtnPlay != null) {
+            nextEpisodeBtnPlay.setOnClickListener(v -> {
+                dismissNextEpisodeCountdown(false);
+                requestEpisode("next", null);
+            });
+        }
+        if (nextEpisodeBtnCancel != null) {
+            nextEpisodeBtnCancel.setOnClickListener(v -> dismissNextEpisodeCountdown(true));
+        }
         seekGestures = new VodTouchSeekController(playerView, this::canSeekFromTouch, direction -> {
             long delta = seekFromDoubleTap(currentKind, direction, player);
             if (delta != 0) showSeekFeedback(delta);
@@ -351,6 +514,7 @@ public class NativePlayerActivity extends AppCompatActivity {
         this.initialStartPositionMs = parsed.startPositionMs;
         this.candidateRequests = parsed.candidateRequests;
         this.currentCandidateIndex = 0;
+        resetNextEpisodeState();
         return true;
     }
 
@@ -366,7 +530,7 @@ public class NativePlayerActivity extends AppCompatActivity {
         NativeStreamRequest request = candidateRequests.get(index);
         playAttemptId = SecurePlaybackDiagnosticProbe.newAttemptId();
         checkpoint("NATIVE_ACTIVITY_STARTED");
-        if (SecurePlaybackDiagnosticProbe.enabled(this)) diagnosticExecutor.execute(() -> SecurePlaybackDiagnosticProbe.run(request, playAttemptId));
+        // Diagnostics observe the Media3 transport below; do not open an extra source connection.
         if ("movie".equalsIgnoreCase(currentKind) && index == 0) {
             moviePositionAdvancedLogged = false;
         }
@@ -400,6 +564,23 @@ public class NativePlayerActivity extends AppCompatActivity {
                 @Override public void onTracksChanged(@NonNull androidx.media3.common.Tracks tracks){if(controls!=null)controls.updateTracks();}
                 @Override public void onIsPlayingChanged(boolean playing) {
                     if(!playing)emitWatchProgress(player!=null && player.getPlaybackState()==Player.STATE_ENDED);
+                    observabilityHandler.removeCallbacks(creditsProbe);
+                    if(playing && "series".equals(currentKind) && !creditsPromptShown && !creditsPromptDismissed) {
+                        observabilityHandler.post(creditsProbe);
+                    }
+                }
+                @Override
+                public void onPositionDiscontinuity(@NonNull Player.PositionInfo oldPosition, @NonNull Player.PositionInfo newPosition, int reason) {
+                    if (player != null && "series".equals(currentKind)) {
+                        long duration = player.getDuration();
+                        long tailMs = duration > 1500_000L ? 45_000L : 35_000L;
+                        if (duration > 0 && newPosition.positionMs < duration - tailMs) {
+                            if (creditsPromptShown && !creditsPromptDismissed) {
+                                dismissNextEpisodeCountdown(false);
+                            }
+                            creditsPromptShown = false;
+                        }
+                    }
                 }
                 @Override
                 public void onPlayerError(@NonNull PlaybackException error) {
@@ -410,6 +591,7 @@ public class NativePlayerActivity extends AppCompatActivity {
                 public void onRenderedFirstFrame() {
                     checkpoint("FIRST_FRAME");
                     Log.i(TAG, "RENDERED_FIRST_FRAME playAttemptId=" + playAttemptId);
+                    hideEpisodeTransitionOverlay();
                     if ("movie".equalsIgnoreCase(currentKind)) {
                         Log.i(TAG, "MOVIE_FIRST_FRAME_RENDERED=SIM");
                     }
@@ -444,6 +626,7 @@ public class NativePlayerActivity extends AppCompatActivity {
 
         MediaItem mediaItem = new MediaItem.Builder()
                 .setUri(Uri.parse(request.getMediaUrl()))
+                .setMimeType(request.getMediaMimeTypeHint())
                 .build();
 
         androidx.media3.exoplayer.source.MediaSource mediaSource =
@@ -662,6 +845,12 @@ public class NativePlayerActivity extends AppCompatActivity {
      * Tratamento centralizado e testÃ¡vel dos eventos de controle remoto / D-pad e tecla BACK.
      */
     public boolean handleDpadKey(int keyCode, int action, String kind) {
+        if (nextEpisodeOverlay != null && nextEpisodeOverlay.getVisibility() == View.VISIBLE) {
+            if (keyCode == KeyEvent.KEYCODE_BACK) {
+                if (action == KeyEvent.ACTION_DOWN) dismissNextEpisodeCountdown(true);
+                return true;
+            }
+        }
         return handleDpadKey(keyCode, action, kind, this.player, this.playerView, () -> {
             emitTerminalEvent(false, null);
             releasePlayer();
@@ -834,6 +1023,7 @@ public class NativePlayerActivity extends AppCompatActivity {
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
+        if (event != null && dispatchHiddenVodDpad(event)) return true;
         if(event!=null&&controls!=null) {
             int key=event.getKeyCode();
             if(episodeNavigation.pending()&&(key==KeyEvent.KEYCODE_MEDIA_PLAY||key==KeyEvent.KEYCODE_MEDIA_PAUSE||key==KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE
@@ -854,6 +1044,55 @@ public class NativePlayerActivity extends AppCompatActivity {
             return true;
         }
         return super.dispatchKeyEvent(event);
+    }
+
+    private boolean dispatchHiddenVodDpad(KeyEvent event) {
+        if (nextEpisodeOverlay != null && nextEpisodeOverlay.getVisibility() == View.VISIBLE) {
+            int code = event.getKeyCode();
+            if (code == KeyEvent.KEYCODE_BACK) {
+                if (event.getAction() == KeyEvent.ACTION_DOWN) dismissNextEpisodeCountdown(true);
+                return true;
+            }
+            if (code == KeyEvent.KEYCODE_DPAD_CENTER || code == KeyEvent.KEYCODE_ENTER || code == KeyEvent.KEYCODE_NUMPAD_ENTER) {
+                if (event.getAction() == KeyEvent.ACTION_UP) {
+                    View focused = getCurrentFocus();
+                    if (focused == nextEpisodeBtnCancel) {
+                        dismissNextEpisodeCountdown(true);
+                    } else {
+                        dismissNextEpisodeCountdown(false);
+                        requestEpisode("next", null);
+                    }
+                }
+                return true;
+            }
+            if (code == KeyEvent.KEYCODE_DPAD_RIGHT || code == KeyEvent.KEYCODE_DPAD_LEFT) {
+                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                    View focused = getCurrentFocus();
+                    if (focused == nextEpisodeBtnPlay && code == KeyEvent.KEYCODE_DPAD_RIGHT) {
+                        if (nextEpisodeBtnCancel != null) nextEpisodeBtnCancel.requestFocus();
+                    } else if (focused == nextEpisodeBtnCancel && code == KeyEvent.KEYCODE_DPAD_LEFT) {
+                        if (nextEpisodeBtnPlay != null) nextEpisodeBtnPlay.requestFocus();
+                    }
+                }
+                return true;
+            }
+            if (code == KeyEvent.KEYCODE_DPAD_UP || code == KeyEvent.KEYCODE_DPAD_DOWN) {
+                return false;
+            }
+            return true;
+        }
+        if (!VodSeekGesturePolicy.isVod(currentKind) || controls == null || playerView == null) return false;
+        boolean enabled = event.hasNoModifiers() && playerForeground && !isFinishing() && !isDestroyed()
+                && !inPipMode && !wasCasting && !controls.locked() && !controls.dialogOpen()
+                && !episodeNavigation.pending();
+        return vodDpad.dispatch(event.getKeyCode(), event.getAction(), event.getRepeatCount(),
+                currentKind, enabled, player, new VodDpadController.Controls() {
+                    @Override public boolean visible() { return playerView.isControllerFullyVisible(); }
+                    @Override public void showAndFocusPlayPause() {
+                        playerView.showController();
+                        playerView.findViewById(androidx.media3.ui.R.id.exo_play_pause).requestFocus();
+                    }
+                });
     }
 
     @Override
@@ -901,6 +1140,8 @@ public class NativePlayerActivity extends AppCompatActivity {
         super.onDestroy();
         observabilityHandler.removeCallbacks(moviePositionProbe);
         observabilityHandler.removeCallbacks(watchProgressProbe);
+        observabilityHandler.removeCallbacks(creditsProbe);
+        resetNextEpisodeState();
         releasePlayer();
     }
 
@@ -909,6 +1150,7 @@ public class NativePlayerActivity extends AppCompatActivity {
      */
     public void releasePlayer() {
         cancelSeekGestures();
+        resetNextEpisodeState();
         episodeNavigation.close();
         if(episodeTimeout!=null)observabilityHandler.removeCallbacks(episodeTimeout);
         if(controls!=null)controls.close();

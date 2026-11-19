@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import ts from 'typescript';
 import { HeroArtworkService } from '../src/artwork/hero-artwork.service.ts';
+import { parentalFixtureBindings } from './lib/parental-fixture-bindings.mjs';
 
 const priorities = [];
 const uri = 'https://image.tmdb.org/t/p/w1280/synthetic.jpg';
@@ -30,9 +31,10 @@ function hookHarness(rows, limit, maxPerKind, failedId) {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
   }).outputText;
   new Function('require', 'module', 'exports', 'window', 'setTimeout', 'clearTimeout', code)(name =>
-    name === 'react' ? react : name.includes('tmdb-metadata') ? { artworkIdentityKey: row => row.id }
+    parentalFixtureBindings(name) ?? (name === 'react' ? react : name.includes('tmdb-metadata') ? { artworkIdentityKey: row => row.id }
       : name.includes('hero-artwork') ? { heroArtworkService: fakeService, heroArtworkIdentity: row => row }
-      : { reserveHeroImageSlot: () => () => {} }, module, module.exports,
+      : name.includes('useWatchProviders') ? { warmPlatformLogos: () => Promise.resolve() }
+      : { reserveHeroImageSlot: () => () => {} }), module, module.exports,
     { addEventListener: (name, callback) => listeners.set(name, callback), removeEventListener: name => listeners.delete(name) },
     (fn, ms) => { const id = ++serial; timers.set(id, { fn, ms }); return id; }, id => timers.delete(id));
   const hook = () => module.exports.useHeroArtwork(rows, 'horizontal', limit, maxPerKind);

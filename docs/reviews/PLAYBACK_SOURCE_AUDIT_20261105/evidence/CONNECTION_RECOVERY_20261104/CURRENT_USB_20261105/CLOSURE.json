@@ -1,0 +1,286 @@
+{
+    "closedUTC":  "2026-11-05T10:35:24.5399671Z",
+    "scope":  "All direct files in CURRENT_USB_20261105 except this closure; no product or source snapshot claim",
+    "files":  [
+                  {
+                      "path":  "account-state.mjs",
+                      "sha256":  "5e3266cfe395dd16e03602fdfb714314d1d37e05e712632f60f82af0008546e0",
+                      "bytes":  3705
+                  },
+                  {
+                      "path":  "cleanup-media.mjs",
+                      "sha256":  "450050a173509ddda64226563fdcb60bb009bcdbd1e7cd9c2c6fff18118e0a7d",
+                      "bytes":  797
+                  },
+                  {
+                      "path":  "collect-media.mjs",
+                      "sha256":  "6809e39825f53416326fe80bcba94d90b4d68078b414f589741cd2dfdc74d01e",
+                      "bytes":  593
+                  },
+                  {
+                      "path":  "compare-current-requests.mjs",
+                      "sha256":  "32754d723475ab461f001302d1d9e3655c2ad90dc6af9428cad1c23c82585aa9",
+                      "bytes":  1685
+                  },
+                  {
+                      "path":  "compare-source-bindings.mjs",
+                      "sha256":  "a788d67e08ca6608a3f772446f7ee671370aa8d3d241dfcfff20984911f67cc0",
+                      "bytes":  2688
+                  },
+                  {
+                      "path":  "episode-action.mjs",
+                      "sha256":  "670768cce42bee0cbfeae6e421c4f9b0e20c0f435cb5bdaf7e40c0d585ec303a",
+                      "bytes":  2042
+                  },
+                  {
+                      "path":  "FIRE_OBSERVER_CLEANUP.json",
+                      "sha256":  "b175e7af541d8acc056197510067f9e54d3dfe0dd30693b1bfddc231718cc5d2",
+                      "bytes":  150
+                  },
+                  {
+                      "path":  "FIRE_USB_5G_NATIVE.json",
+                      "sha256":  "f3a19654f51ce3bd84b1dd2c611c02ecaf1eef1dca16bdc4967babebd8c65ad8",
+                      "bytes":  728
+                  },
+                  {
+                      "path":  "FIRE_USB_ACCOUNT_STATE.json",
+                      "sha256":  "47f29e07b89551895ef1bfc531e37be063c7394c9b7c1e8516381c2979712074",
+                      "bytes":  419
+                  },
+                  {
+                      "path":  "FIRE_USB_KNOWN_MOVIE_5G.json",
+                      "sha256":  "d2f9670e3079fee8525a2891925bb8326de06e5a490f261f965af3b9ab24cfaf",
+                      "bytes":  1094
+                  },
+                  {
+                      "path":  "FIRE_USB_KNOWN_MOVIE_ATTEMPT.json",
+                      "sha256":  "83aee89121e91ff3e1d7c6e0ac3cf9d1c049ad0814fa9da3632f0f184d85fbde",
+                      "bytes":  85
+                  },
+                  {
+                      "path":  "FIRE_USB_MOVIE_5G.json",
+                      "sha256":  "47e109011bcbeafe4dffaf117b818f3a6d7e79802b41007ba30decc55d3de3e3",
+                      "bytes":  2221
+                  },
+                  {
+                      "path":  "FIRE_USB_MOVIE_5G_FINISH.json",
+                      "sha256":  "280e78fc2aa6009a8ac5d2ee76191daaa6c8f982218cd7a75ba749f6effe318c",
+                      "bytes":  2357
+                  },
+                  {
+                      "path":  "fire-account-state.mjs",
+                      "sha256":  "1d6625422d8a2b64148497695bafd0237ef0e93c66819ce19b05eb4f396bbcab",
+                      "bytes":  3707
+                  },
+                  {
+                      "path":  "fire-play-current.mjs",
+                      "sha256":  "c8c64f2fca3041fc7bb6cbc5ff3d4c85e656f28bbb109207f965934d443d8dad",
+                      "bytes":  1431
+                  },
+                  {
+                      "path":  "inspect-selected-episode.mjs",
+                      "sha256":  "58773cea80e2874b24d4119ca25c438ebe0b2047156fb52ba6955f865d311fe6",
+                      "bytes":  5442
+                  },
+                  {
+                      "path":  "INSTALLED_APKS_AFTER_TESTS.json",
+                      "sha256":  "efe365d627e4d7599b09fa7dd34c4f8a709e64cee97791618f6a7c31a36ea3cc",
+                      "bytes":  1761
+                  },
+                  {
+                      "path":  "known-movie-on-fire.mjs",
+                      "sha256":  "6c3e5fe0fdd716310811fa07e2662b598920d30994ea7352844442d3808b28c6",
+                      "bytes":  2634
+                  },
+                  {
+                      "path":  "media-observer.mjs",
+                      "sha256":  "3e753fe302f3a31e08a94ee2344ad23f8808027c0b7124dbdbf10556fdc3fafc",
+                      "bytes":  2717
+                  },
+                  {
+                      "path":  "native-playback-proof.mjs",
+                      "sha256":  "e065fe961f81db5da99c2ee2ced9aeba627c82dca10b255d1b44c725ba5d02ac",
+                      "bytes":  2681
+                  },
+                  {
+                      "path":  "network-repeat.mjs",
+                      "sha256":  "e7dc8d4a92c4c605b2656c0d10014fdbd9c853f644aa6cb2a51c61a4d19152d1",
+                      "bytes":  2284
+                  },
+                  {
+                      "path":  "next-sample.mjs",
+                      "sha256":  "c64c1d5aeaad01f0259dbb7c0fc8f5fc03bcdcb78e2e41d2c5d4c7826f128689",
+                      "bytes":  1435
+                  },
+                  {
+                      "path":  "PAIRED_MOVIE_BY_CARD.json",
+                      "sha256":  "036236a9c273b7496c73fb327c209ddb9b1a6842e0b46fd9b3df14983fa4d649",
+                      "bytes":  1157
+                  },
+                  {
+                      "path":  "PAIRED_MOVIE_EXACT_PLAY.json",
+                      "sha256":  "b4cae3115f76a5ee1b81f6d810f03dd3d615877d30c02491fbdb367f049d351c",
+                      "bytes":  2310
+                  },
+                  {
+                      "path":  "paired-movie-by-card.mjs",
+                      "sha256":  "9c851fcf5618f89243928106e86cca8fc29031bcddc65a1e6c4ba9698dc2b9d2",
+                      "bytes":  4633
+                  },
+                  {
+                      "path":  "PHONE_5G_NATIVE.json",
+                      "sha256":  "8e340c37ad8fc3eab00e7c67a28d139c37db116a70bf67afbeb28b45174d57a4",
+                      "bytes":  1901
+                  },
+                  {
+                      "path":  "PHONE_FINAL_NATIVE.json",
+                      "sha256":  "1114d437c7ba61d37a9edab2c9f8ba2f280f44f8bba65cffb67e1169bdd538ee",
+                      "bytes":  2428
+                  },
+                  {
+                      "path":  "PHONE_MOVIE_5G.json",
+                      "sha256":  "58d9faf0e775215a2dbbb1243c00f1a0a9fec731676fd0865b7c35728462f0bb",
+                      "bytes":  951
+                  },
+                  {
+                      "path":  "PHONE_MOVIE_5G_FINISH.json",
+                      "sha256":  "5d6cf6ade9bff67a14d7b1f45daef95d267cf42269e895ed14bda6d3102a4a64",
+                      "bytes":  2279
+                  },
+                  {
+                      "path":  "PHONE_OBSERVER_CLEANUP.json",
+                      "sha256":  "22391f764a66e46f695cadd160f93dffd04cca7091d01848be1525387baf2f49",
+                      "bytes":  150
+                  },
+                  {
+                      "path":  "PHONE_POST_PAIR.json",
+                      "sha256":  "c0ff7466a2bbd702c2c1e43ef1090f54d323a21e027118a81dcc4bbc979eb411",
+                      "bytes":  150
+                  },
+                  {
+                      "path":  "PHONE_SERIES_5G.json",
+                      "sha256":  "064e16e5cfed76e666517efb912b2e21962c786b5802969a361a109d3f652e7a",
+                      "bytes":  1546
+                  },
+                  {
+                      "path":  "phone-movie-on-tablet.mjs",
+                      "sha256":  "4f9689dfd2b62ed7e10235e149c83709b0484abf6e3be07c3591aa8ba35ad36b",
+                      "bytes":  3256
+                  },
+                  {
+                      "path":  "REPORT.md",
+                      "sha256":  "1ebb95acc28c91d6091e4751847af7b5d8872a6782be07af77ac3cdab9afb747",
+                      "bytes":  12116
+                  },
+                  {
+                      "path":  "request-binding.mjs",
+                      "sha256":  "e8e6ad177aa0b0572f17d77333f94ae915bc9d01063afa4c81123333501c4f28",
+                      "bytes":  1788
+                  },
+                  {
+                      "path":  "RESULT.json",
+                      "sha256":  "b2e3437f4dc1d9665b83299b94c1463f0d7c4946bab0af75533680a881ad1a57",
+                      "bytes":  503
+                  },
+                  {
+                      "path":  "select-series.mjs",
+                      "sha256":  "84ae82953c32a9fd375966153693844ba8b04625d2ea858260a43e67016a47cb",
+                      "bytes":  508
+                  },
+                  {
+                      "path":  "series-ui.mjs",
+                      "sha256":  "690b6b9dbaf5502689a39abece541a2b781c12381a5f3dfe1e53e51a184a976d",
+                      "bytes":  1359
+                  },
+                  {
+                      "path":  "SOURCE_BINDING_COMPARISON.json",
+                      "sha256":  "d0dacc7aed3d2f759d2ca9c007f30a005bab7b10f90dffcc480b74ddf7581c40",
+                      "bytes":  854
+                  },
+                  {
+                      "path":  "SPEC.md",
+                      "sha256":  "b0aae8c28d6e826e66b495fb428fd5b516a9d7a91d455401da24b3bb88560653",
+                      "bytes":  2739
+                  },
+                  {
+                      "path":  "TABLET_ACCOUNT_STATE.json",
+                      "sha256":  "ae58334712faabf1e166c8a78ba0ce6a761345dc2469b5a6a34fa13525b6813b",
+                      "bytes":  419
+                  },
+                  {
+                      "path":  "TABLET_EPISODE_BROWSER_UA.json",
+                      "sha256":  "015103de36371270c13b31de7112db4bc124230a1bb3a305a70c6ccd067af733",
+                      "bytes":  1541
+                  },
+                  {
+                      "path":  "TABLET_EPISODE_DEFAULT.json",
+                      "sha256":  "04dd09265ac1a7664111ff67f0a72610e34cb719236856b95af1a6af529291fb",
+                      "bytes":  1546
+                  },
+                  {
+                      "path":  "TABLET_EPISODE_REFERENCE.json",
+                      "sha256":  "812d20c89e05d1aeefa8ead485195a4221178f283a6bcad7ad54a5b405c0d404",
+                      "bytes":  312
+                  },
+                  {
+                      "path":  "TABLET_FINAL_NATIVE.json",
+                      "sha256":  "320ba0e168e590a55bb10e32387326bb122330990253788ef2ce859815f5b22d",
+                      "bytes":  5035
+                  },
+                  {
+                      "path":  "TABLET_MOVIE_CURRENT.json",
+                      "sha256":  "80af7386dbab7569a643beb718768d8b4ff4e461c164235e07dc87f261f88d31",
+                      "bytes":  1388
+                  },
+                  {
+                      "path":  "TABLET_NETWORK_REPEAT.json",
+                      "sha256":  "e34102223424417e8efaaf33e66b33c33a49aa261a6ac2df73b1b99a0f866c9d",
+                      "bytes":  1690
+                  },
+                  {
+                      "path":  "TABLET_OBSERVER_CLEANUP.json",
+                      "sha256":  "cc6b8433a4536849f1062584953fea3c4c1ebeaab8ecc483308b08aeeb3a97a7",
+                      "bytes":  150
+                  },
+                  {
+                      "path":  "TABLET_PHONE_CURRENT_REQUEST_COMPARISON.json",
+                      "sha256":  "0d2540b8841676c2611f45a6b0e502fdc594777701f2a9c098f5435cda9e312d",
+                      "bytes":  5513
+                  },
+                  {
+                      "path":  "TABLET_POST_PAIR.json",
+                      "sha256":  "72fd57410f5babeffee7dfd6c79433ee7b26789cf142688adf1b42ad7bc68b0f",
+                      "bytes":  1251
+                  },
+                  {
+                      "path":  "TABLET_REQUEST_BINDING.json",
+                      "sha256":  "6b732b3c00c9536a5863bc58cc5deebb194b437c5db2c51e3057eb86d926d898",
+                      "bytes":  500
+                  },
+                  {
+                      "path":  "TABLET_SECOND_EPISODE_DEFAULT.json",
+                      "sha256":  "82ace38898d6c14096da9acd28300dd6ae85f078d7934d6dcd212ac150ebd8b8",
+                      "bytes":  1546
+                  },
+                  {
+                      "path":  "TABLET_UA_EXPERIMENT.json",
+                      "sha256":  "2fc67abce677d41a6bdfdb0c2be6234b9f6e2df943bed81928a5e01f833d235a",
+                      "bytes":  224
+                  },
+                  {
+                      "path":  "ua-once.mjs",
+                      "sha256":  "17deea971bdc9bbe876538b099a46577ab33a23b72fba810ca15dfd8a1c280c7",
+                      "bytes":  2094
+                  },
+                  {
+                      "path":  "ui-probe.mjs",
+                      "sha256":  "68a0eabeca3d11d17b46428fe9e9509b064480475bbd72f28f00ac9d8dc7cba0",
+                      "bytes":  1109
+                  },
+                  {
+                      "path":  "verify-apks-after-tests.mjs",
+                      "sha256":  "64581364604a14f4be5b1bd8375322a402583ef743897f5542de0ab5b79049d8",
+                      "bytes":  2315
+                  }
+              ]
+}

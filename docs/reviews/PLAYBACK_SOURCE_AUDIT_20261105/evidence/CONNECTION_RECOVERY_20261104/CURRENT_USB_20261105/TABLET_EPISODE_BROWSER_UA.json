@@ -1,0 +1,67 @@
+{
+  "observedUTC": "2026-11-05T10:14:24.959Z",
+  "observerPresent": true,
+  "events": [
+    {
+      "event": "OPEN",
+      "kind": "series",
+      "scheme": "http:",
+      "typedPath": "series",
+      "extension": "mp4",
+      "pathDepth": 4,
+      "hasQuery": false,
+      "headerNames": [
+        "User-Agent"
+      ],
+      "uaClass": "OTHER_OR_MISSING",
+      "observedUTC": "2026-11-05T10:13:56.170Z"
+    },
+    {
+      "event": "OPEN_RETURN",
+      "accepted": true,
+      "candidateCount": 1,
+      "observedUTC": "2026-11-05T10:13:56.218Z"
+    },
+    {
+      "event": "progress",
+      "positionMs": 0,
+      "durationMs": 0,
+      "ended": false,
+      "observedUTC": "2026-11-05T10:14:01.205Z"
+    },
+    {
+      "event": "resume",
+      "positionMs": 0,
+      "ended": false,
+      "errorCode": "NATIVE_ERROR",
+      "errorCategory": "HTTP_ERROR",
+      "httpStatus": 403,
+      "media3ErrorCode": 2004,
+      "checkpoint": "DATASOURCE_OPEN",
+      "observedUTC": "2026-11-05T10:14:01.208Z"
+    },
+    {
+      "event": "progress",
+      "positionMs": 0,
+      "durationMs": 0,
+      "ended": false,
+      "observedUTC": "2026-11-05T10:14:01.243Z"
+    },
+    {
+      "event": "progress",
+      "positionMs": 0,
+      "durationMs": 0,
+      "ended": false,
+      "observedUTC": "2026-11-05T10:14:01.329Z"
+    },
+    {
+      "event": "progress",
+      "positionMs": 0,
+      "durationMs": 0,
+      "ended": false,
+      "observedUTC": "2026-11-05T10:14:01.339Z"
+    }
+  ],
+  "privateRequestPresent": true,
+  "visibility": "visible"
+}

@@ -1,0 +1,38 @@
+[
+  {
+    "script": "test-source-replacement-isolation.mjs",
+    "startedUTC": "2026-11-05T11:27:54.713Z",
+    "finishedUTC": "2026-11-05T11:27:55.037Z",
+    "exitCode": 0
+  },
+  {
+    "script": "test-source-replacement-bootstrap.mjs",
+    "startedUTC": "2026-11-05T11:27:55.039Z",
+    "finishedUTC": "2026-11-05T11:27:56.617Z",
+    "exitCode": 0
+  },
+  {
+    "script": "test-source-replacement-ui.mjs",
+    "startedUTC": "2026-11-05T11:27:56.618Z",
+    "finishedUTC": "2026-11-05T11:27:58.794Z",
+    "exitCode": 0
+  },
+  {
+    "script": "test-c11-p5b-boot-sync-coordinator.mjs",
+    "startedUTC": "2026-11-05T11:27:58.795Z",
+    "finishedUTC": "2026-11-05T11:28:00.325Z",
+    "exitCode": 0
+  },
+  {
+    "script": "test-c11-automatic-source-refresh.mjs",
+    "startedUTC": "2026-11-05T11:28:00.326Z",
+    "finishedUTC": "2026-11-05T11:28:02.061Z",
+    "exitCode": 0
+  },
+  {
+    "script": "test-c11-new-content-badge.mjs",
+    "startedUTC": "2026-11-05T11:28:02.062Z",
+    "finishedUTC": "2026-11-05T11:28:03.374Z",
+    "exitCode": 1
+  }
+]

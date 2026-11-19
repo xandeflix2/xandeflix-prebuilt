@@ -1,0 +1,65 @@
+{
+  "observedUTC": "2026-11-04T19:31:10.209Z",
+  "viewport": {
+    "width": 411,
+    "height": 807
+  },
+  "headings": [
+    "Nova versão pronta para instalar",
+    "Ted Lasso (2020)",
+    "O que achou desta série?"
+  ],
+  "headers": [
+    {
+      "tag": "HEADER",
+      "className": "app-header",
+      "top": 0,
+      "height": 62.857147216796875,
+      "width": 411.4285888671875,
+      "display": "flex",
+      "visibility": "visible"
+    }
+  ],
+  "hero": [
+    {
+      "tag": "DIV",
+      "className": "app-shell app-shell--hero-top app-shell--phone-header-back app-shell--phone-detail-page",
+      "top": 0,
+      "height": 1116.0670166015625,
+      "width": 411.4285888671875,
+      "display": "flex",
+      "visibility": "visible"
+    },
+    {
+      "tag": "DIV",
+      "className": "focusable-item series-phone-hero",
+      "top": 74.85714721679688,
+      "height": 231.4285888671875,
+      "width": 411.4285888671875,
+      "display": "block",
+      "visibility": "visible"
+    }
+  ],
+  "controls": [
+    {
+      "label": "← Voltar",
+      "tag": "BUTTON",
+      "className": "focusable-item btn-secondary",
+      "top": 688.607177734375,
+      "height": 44.000003814697266,
+      "width": 185.21429443359375,
+      "display": "flex",
+      "visibility": "visible"
+    },
+    {
+      "label": "Transmitir pelo Google Cast",
+      "tag": "BUTTON",
+      "className": "focusable-item btn-secondary cast-button",
+      "top": 688.607177734375,
+      "height": 44.000003814697266,
+      "width": 185.21429443359375,
+      "display": "flex",
+      "visibility": "visible"
+    }
+  ]
+}

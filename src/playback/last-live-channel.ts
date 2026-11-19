@@ -1,3 +1,4 @@
+import { sourceScopedStorageKey } from '../bootstrap/source-replacement.ts';
 import type { LiveCatalog, LiveChannel } from '../catalog/live/live-tv.types.ts';
 import type { LiveChannelPage } from '../catalog/live/live-catalog.service.ts';
 import { isAdultClassification, isAdultLiveChannel } from './content-adult-policy.ts';
@@ -12,6 +13,7 @@ export function liveChannelFingerprint(channel:LiveChannel,catalog:LiveCatalog):
 }
 
 export class LastLiveChannel {
+  private readonly storageKey = sourceScopedStorageKey(KEY);
   private value?:Preference;
   private loaded=false;
   private readonly port?:StoragePort;
@@ -19,7 +21,7 @@ export class LastLiveChannel {
   private storage(){try{return this.port||(typeof window!=='undefined'?window.localStorage:undefined);}catch{return undefined;}}
   read():Preference|undefined {
     if(!this.loaded){this.loaded=true;try{
-      const raw=this.storage()?.getItem(KEY);if(raw && new TextEncoder().encode(raw).byteLength<=2048){const data=JSON.parse(raw),p=data.value;
+      const raw=this.storage()?.getItem(this.storageKey);if(raw && new TextEncoder().encode(raw).byteLength<=2048){const data=JSON.parse(raw),p=data.value;
         if(data.version===1 && opaqueId(p?.channelId) && opaqueId(p?.groupId) && /^[0-9a-f]{16}$/.test(p?.fingerprint||'') && Number.isFinite(p?.updatedAt) && p.updatedAt>0)
           this.value={channelId:p.channelId,groupId:p.groupId,fingerprint:p.fingerprint,updatedAt:p.updatedAt};}
     }catch{/* Optional preference falls back to a safe current channel. */}}
@@ -30,7 +32,7 @@ export class LastLiveChannel {
     this.loaded=true;this.value={channelId:channel.id,groupId:channel.groupId,fingerprint:liveChannelFingerprint(channel,catalog),updatedAt:Date.now()};
     const serialized=JSON.stringify({version:1,value:this.value});
     if(new TextEncoder().encode(serialized).byteLength>2048)return false;
-    try{this.storage()?.setItem(KEY,serialized);}catch{/* RAM fallback */}
+    try{this.storage()?.setItem(this.storageKey,serialized);}catch{/* RAM fallback */}
     return true;
   }
 }

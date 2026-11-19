@@ -43,6 +43,27 @@ public class LivePlayerControlsTest {
         assertEquals("ABC",LivePlayerControls.text("ABCDE",3));
         assertEquals("",LivePlayerControls.text(null,180));
     }
+    @Test public void continuousChannelPositionsIncludeTheLastPartialWindow() {
+        assertEquals(-1, LivePlayerControls.channelWindowOffset(-1));
+        assertEquals(0, LivePlayerControls.channelWindowOffset(0));
+        assertEquals(0, LivePlayerControls.channelWindowOffset(47));
+        assertEquals(48, LivePlayerControls.channelWindowOffset(48));
+        assertEquals(48, LivePlayerControls.channelWindowOffset(95));
+        assertEquals(96, LivePlayerControls.channelWindowOffset(96));
+        assertEquals(96, LivePlayerControls.channelWindowOffset(99));
+        assertTrue(LivePlayerControls.validChannelWindow(0, 0, 0));
+        assertTrue(LivePlayerControls.validChannelWindow(0, 1, 1));
+        assertTrue(LivePlayerControls.validChannelWindow(0, 48, 100));
+        assertTrue(LivePlayerControls.validChannelWindow(48, 48, 100));
+        assertTrue(LivePlayerControls.validChannelWindow(96, 4, 100));
+        assertTrue(LivePlayerControls.validChannelWindow(48, 15, 63));
+        assertTrue(LivePlayerControls.validChannelWindow(96, 9, 105));
+        assertFalse(LivePlayerControls.validChannelWindow(96, 5, 100));
+        assertFalse(LivePlayerControls.validChannelWindow(47, 48, 100));
+        assertFalse(LivePlayerControls.validChannelWindow(-1, 1, 63));
+        assertFalse(LivePlayerControls.validChannelWindow(0, 0, 63));
+        assertFalse(LivePlayerControls.validChannelWindow(Integer.MAX_VALUE, 2, Integer.MAX_VALUE));
+    }
     @Test public void nativeActionsUseOnlyOpaqueBoundedIds() {
         assertTrue(LivePlayerControls.validId("live:channel:123"));
         assertFalse(LivePlayerControls.validId(null));

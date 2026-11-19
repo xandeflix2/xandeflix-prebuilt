@@ -1,0 +1,30 @@
+{
+  "observedUTC": "2026-11-05T01:32:04.252Z",
+  "visibility": "visible",
+  "shell": "app-shell app-shell--hero-top app-shell--catalog-page app-shell--tablet app-shell--side-nav app-shell--phone-header-back",
+  "episodeCards": 0,
+  "episodeSelectors": [],
+  "actions": [
+    {
+      "tag": "BUTTON",
+      "action": "DETAIL",
+      "className": "hero-artwork-link"
+    },
+    {
+      "tag": "BUTTON",
+      "action": "PLAY",
+      "className": "focusable-item btn-primary hero-btn-play"
+    },
+    {
+      "tag": "BUTTON",
+      "action": "DETAIL",
+      "className": "focusable-item btn-secondary hero-btn-primary"
+    },
+    {
+      "tag": "BUTTON",
+      "action": "BACK",
+      "className": "focusable-item btn-back"
+    }
+  ],
+  "seriesEmptyState": false
+}

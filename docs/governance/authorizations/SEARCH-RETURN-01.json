@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "gate": "SEARCH-RETURN-01",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "EXPLICIT_CURRENT_SESSION_USER_SEARCH_RETURN_REQUEST_WITH_EXISTING_TABLET_PREVIEW_AUTHORIZATION_NOT_INDEPENDENT_ADJUDICATION",
+  "authorizationRequestSha256": "9ce4e4a577870704df00d611b85a503581b3cf9a87da372edffa232e0eda1f84",
+  "reason": "Keep exactly one local SearchPage mounted while visiting content originating from search; preserve query/filter/results and restore selected result and scroll on return. Drop visit on section/catalog/authorization change. Add behavior tests and update only strict receipt expectation; no search-engine/player/authority change.",
+  "physicalImpact": "REQUIRED",
+  "physicalImpactJustification": "Reproduce and verify Search→content→Back on tablet while preserving identity/data; existing in-place preview workflow authorized.",
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "node scripts/test-search-return.mjs",
+    "node node_modules/typescript/bin/tsc --noEmit",
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock"
+  ],
+  "evidence": "docs/evidence/SEARCH_RETURN_01.md",
+  "compatibilityRisk": "Retains at most current local search results DOM during its content trail. Hidden subtree is not focusable/rendered; parental filtering stays live. Source/snapshot invalidation discards subtree. No persistence/backend or playback changes.",
+  "changes": [
+    {
+      "path": "src/App.tsx",
+      "before": "1936f79d2dd0631a77a26a61048e0b1fd6cda631",
+      "after": "a35345968d3e8bf441c94db48d175627ef8c407f"
+    },
+    {
+      "path": "src/ui/pages/SearchPage.tsx",
+      "before": "74dd9aea3dc9c93b3d439b8156b74935504f144b",
+      "after": "617a85f96ef4cdae412f987f186b8429b4aa3a87"
+    },
+    {
+      "path": "src/ui/navigation/search-return.ts",
+      "before": null,
+      "after": "876c6e8dbca197913de080f8d4fb265597b7b42c"
+    },
+    {
+      "path": "scripts/test-search-return.mjs",
+      "before": null,
+      "after": "3cc39604986d5cdd96a47464dfbb046ed20762f6"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "6266e188449d6001d63c0e7e11870373762bcc4a",
+      "after": "8ed68945912f9a267c2c6643373f77a16b6a13f6"
+    }
+  ],
+  "supersedes": {
+    "src/App.tsx": "CANON-01-SOURCE-SWITCH-ISOLATION",
+    "scripts/test-canonical-regression.mjs": "TABLET-CATALOG-HERO-BACK-01"
+  },
+  "testChangesReviewed": true,
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": true,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false,
+  "restrictions": [
+    "Current user authorization is not independent adjudication.",
+    "Only tablet update in-place; no reset/source/identity/backend changes.",
+    "No Git publication, release or live auto-recovery in this gate."
+  ],
+  "parentGate": "TABLET-CATALOG-HERO-BACK-01"
+}

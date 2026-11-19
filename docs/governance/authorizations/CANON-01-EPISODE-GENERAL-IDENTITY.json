@@ -1,0 +1,100 @@
+{
+  "schema": 1,
+  "gate": "CANON-01-EPISODE-GENERAL-IDENTITY",
+  "parentGate": "CANON-01-EPISODE-ROW-ALIGNMENT",
+  "amendment": "CANON-01-EPISODE-GENERAL-IDENTITY",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "CURRENT_USER_GENERAL_EPISODE_METADATA_CORRECTION_AND_YARGI_LIVE_ACTION_NOT_ANIMATION_2026_10_28; USER_NOT_NEW_MASTER_ATTACHMENT",
+  "authorizationRequestSha256": "6b3fb553d3e71f921bfa9750e20cad1a2fd846ab712dd3d3430ac99b79e2102f",
+  "reason": "Repair exact normalized title/poster proof and verified series horizontal-art fallback; no guessing of incompatible episode editions. Revision2: bounded English localized series name fallback under exact title/poster/year/context; scoped cache policy key. Revision3: complete second historical UI metadata I/O adapter with the actual new pure export; reverse comparison preserves every prior assertion. Revision4: temporal hidden-panel test now first proves one correct visible backdrop, then asserts zero added image calls after hiding; all other scenarios/assertions/timeouts unchanged. Revision5: read/validate Chrome debugging port inside existing bounded polling, ENOENT/EBUSY only, no assertion or timeout change.",
+  "physicalImpact": "REQUIRED",
+  "physicalImpactJustification": "Exact APK42 update on same authorized Fire; real artwork and compatible episode metadata validation. Other devices pending.",
+  "testChangesReviewed": true,
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c105-complete-root-search.mjs",
+    "scripts/test-c107-catalog-return-navigation.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c11-landscape-navigation.mjs",
+    "scripts/validate-direct-playback.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock",
+    "npm run typecheck",
+    "new focused real projector/hook tests",
+    "inherited episode/source status/source refresh tests",
+    "official production build/public config audit",
+    "offline native257/39 assembleDebug",
+    "APK/signature/CRC/config audit; Fire correct Yargi art and metadata cases"
+  ],
+  "evidence": "docs/evidence/EPISODE_GENERAL_IDENTITY.md",
+  "compatibilityRisk": "Only exact full normalized identity+public poster. Incompatible season distributions remain ambiguous and show confirmed series horizontal image; no fabricated episode synopsis. Unconfirmed parent artwork slot now remains unavailable instead of trusting unrelated source still. Full Moon/Dolunay case adds optional at-most-two public detail GETs only when localized/alias title has no match and strong source proof prerequisites exist; no movie/normal-match path change.",
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": true,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false,
+  "supersedes": {
+    "src/catalog/episode-presentation.ts": "CANON-01-TMDB-EPISODE-RUNTIME-RECOVERY",
+    "src/ui/hooks/useEpisodeMetadata.ts": "CANON-01-TMDB-EPISODE-RUNTIME-RECOVERY",
+    "android/app/build.gradle": "CANON-01-EPISODE-ROW-ALIGNMENT",
+    "scripts/test-tmdb-episode-enrichment-ui.mjs": "CANON-01-TMDB-EPISODE-METADATA-ENRICHMENT",
+    "scripts/test-canonical-regression.mjs": "CANON-01-EPISODE-ROW-ALIGNMENT",
+    "src/artwork/tmdb-metadata.service.ts": "CANON-01-TMDB-RELEASE-TAGS",
+    "scripts/test-series-episode-return.mjs": "CANON-01-TMDB-EPISODE-METADATA-ENRICHMENT"
+  },
+  "changes": [
+    {
+      "path": "src/catalog/episode-presentation.ts",
+      "before": "7a2777f1856506e889d79cf4a6d5c1737ea15ad2",
+      "after": "94e8276eca042a6edc6bcf78667eeec352e83ee6"
+    },
+    {
+      "path": "src/ui/hooks/useEpisodeMetadata.ts",
+      "before": "d7dfe05be943a3168f55cd6c036f58110d6c5fad",
+      "after": "5d7f732776cf708aa5800f9ea74ac3c8a181edd1"
+    },
+    {
+      "path": "android/app/build.gradle",
+      "before": "669aa5f87413b3f4da6779861431b2c1c3c31d68",
+      "after": "918e9764fe8851e4f7eaddbc344a3eeaedb4903e"
+    },
+    {
+      "path": "scripts/test-episode-general-identity.mjs",
+      "before": null,
+      "after": "58b877dbe229b968964aff2b39fa6708c027e925"
+    },
+    {
+      "path": "scripts/test-tmdb-episode-enrichment-ui.mjs",
+      "before": "a53fba5f3dd2c0b209e64eb70b3fdb5aa62c0d82",
+      "after": "55171f2d2bbb6a7f0d313806cc9422d8f2489975"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "56bf95e0e3077cf96145b8b57d9cf92ff7cd2d91",
+      "after": "6f1c6264741888b0ef945255c452692c970de9fc"
+    },
+    {
+      "path": "src/artwork/tmdb-metadata.service.ts",
+      "before": "469696fac9d5a20fea363e8ae8db8ffb96ed7071",
+      "after": "c66e40bc4459e93efc968e91d286c6862aea9ed0"
+    },
+    {
+      "path": "scripts/test-series-episode-return.mjs",
+      "before": "7fb584a7bc7a6d7f123cc1845b72507fefc50368",
+      "after": "1a40af5c3315078cecd73880a9a92b69b2bd7d92"
+    }
+  ],
+  "restrictions": [
+    "47 historical receipts and all204controls38suites unchanged; add one focused suite.",
+    "Do not change edition/ID/duration/season/source authority or R4 containment.",
+    "No Git/backend/reset/source change/other-device install/SET01/next gate."
+  ]
+}

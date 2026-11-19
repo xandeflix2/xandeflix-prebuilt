@@ -22,7 +22,7 @@ assert.equal(parseMoviePresentation({ id: 603, release_dates: { results: [{ iso_
 let calls = 0, now = 1000;
 const service = new SeriesPresentationService({ kind: 'movie', credential: () => 'synthetic-only', now: () => now, fetchImpl: async url => {
   calls++; const request = new URL(url); assert.equal(request.pathname, '/3/movie/603');
-  assert.equal(request.searchParams.get('append_to_response'), 'videos,release_dates');
+  assert.equal(request.searchParams.get('append_to_response'), 'videos,release_dates,credits');
   assert.equal(request.searchParams.get('language'), 'pt-BR');
   return new Response(JSON.stringify(raw));
 } });
@@ -63,7 +63,7 @@ const require = name => name === 'react' ? { default: react, ...react }
   : name.includes('SeriesPersonalActions') ? { SeriesPersonalActions: stub('personal') }
   : name.includes('CastButton') ? { CastButton: stub('cast') }
   : name.includes('WatchProviders') ? { WatchProviders: stub('providers') }
-  : { RelatedTitles: stub('related') };
+  : name.includes('SeriesDetailSections') ? { SeriesDetailSections: stub('related') } : { RelatedTitles: stub('related') };
 const module = { exports: {} };
 new Function('require', 'module', 'exports', ts.transpileModule(readFileSync(new URL('../src/ui/components/PhoneMovieDetail.tsx', import.meta.url), 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.React } }).outputText)(require, module, module.exports);
 let played = 0, backed = 0;

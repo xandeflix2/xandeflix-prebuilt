@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import React from 'react';
+import {renderToStaticMarkup} from 'react-dom/server';
+import {ParentalControlStore} from '../src/parental/parental-control.store.ts';
 import ts from 'typescript';
 import {parentalControl} from '../src/parental/parental-control.store.ts';
 import {parentalStorage} from '../src/parental/parental-storage.ts';
@@ -11,12 +13,59 @@ let tests=0,raw=null;const test=async(name,fn)=>{await fn();tests++;console.log(
 parentalStorage.read=async()=>raw;parentalStorage.write=async value=>{raw=value};
 const pin='135790',puk='Synthetic-PUK-C128-Only',ages=[0,10,12,14,16,18];
 const item=(age,kind='movie',id=String(age))=>({id,kind,title:'Synthetic '+id,categoryLabels:[],genreLabels:[],parental:{key:parentalContentKey(kind,'Synthetic '+id),age,adult:false}});
+
+// Actual shared components and local store; synthetic records only, no device I/O.
+function renderSetupUi(snapshot, choice='PHONE', view='home') {
+ const compile=(file,resolve)=>{const module={exports:{}};const source=ts.transpileModule(readFileSync(new URL('../'+file,import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.React,target:ts.ScriptTarget.ES2022,esModuleInterop:true}}).outputText;new Function('require','module','exports','React',source)(resolve,module,module.exports,React);return module.exports;};
+ const base=name=>{if(name==='react')return React;if(name.includes('useParentalControl'))return{useParentalControl:()=>snapshot};if(name.endsWith('.png'))return'fixture-logo.png';throw Error('UNEXPECTED_SETUP_UI_IMPORT '+name)};
+ const header=compile('src/ui/components/Header.tsx',base),presentation=compile('src/ui/device-presentation.ts',base);
+ const shell=compile('src/ui/components/AppShell.tsx',name=>{
+  if(name.includes('Header.tsx'))return header;if(name.includes('useLandscapeNavigation'))return{useLandscapeNavigation:()=>choice==='TV'};
+  if(name.includes('useDevicePresentation'))return{useDevicePresentation:()=>choice};if(name.includes('useLivePresentation'))return{useLivePresentation:()=>({tabletPortrait:choice==='TABLET',stackedLive:false,squareLive:false})};
+  if(name.endsWith('device-presentation.ts'))return presentation;if(name.includes('parental-control.store'))return{parentalControl};
+  if(name.includes('ParentalPinDialog'))return{ParentalPinDialog:()=>null};if(name.includes('CastButton'))return{CastButton:()=>null};if(name.includes('StartupLoadingScreen'))return{StartupLoadingScreen:()=>React.createElement('p',null,'Loading')};return base(name);
+ });
+ const settings=compile('src/ui/components/ActiveSourceSettings.tsx',name=>{
+  if(name.includes('active-source-status'))return{readActiveSourceStatus:async()=>undefined,updateSourceCatalog:async()=>undefined};
+  if(name.includes('boot-sync-coordinator'))return{getBootSyncCoordinator:()=>({subscribe:()=>()=>{}})};
+  if(name.includes('catalog-read-diagnostic'))return{readCatalogReadDiagnostic:async()=>undefined};return base(name);
+ });
+ return {shell:renderToStaticMarkup(React.createElement(shell.AppShell,{currentView:view,onNavigate(){},onBack(){},canGoBack:true,children:null})),settings:renderToStaticMarkup(React.createElement(settings.ActiveSourceSettings,{onOpenAdult(){}})),defaultHeader:renderToStaticMarkup(React.createElement(header.Header,{currentView:'home',onNavigate(){}}))};
+}
+const setupChannels=[{id:'common',name:'Canal comum',groupId:'g',groupName:'Abertos',metadata:{age_rating:18},streamRef:{}},{id:'flag',name:'Canal classificado',groupId:'g',groupName:'Abertos',metadata:{adult:true},streamRef:{}},{id:'adult',name:'Canal adulto',groupId:'a',groupName:'Adultos',streamRef:{}}];
+const setupCatalog={snapshotId:'synthetic-setup-only',groups:[{id:'g',name:'Abertos'},{id:'a',name:'Adultos'}],channels:setupChannels,channelsByGroup:{g:setupChannels.slice(0,2),a:setupChannels.slice(2)}};
+await test('UNCONFIGURED_LIVE_OMITS_ADULT_GROUPS_EVEN_WHEN_LOCKED_GROUPS_REQUESTED',async()=>{
+ await parentalControl.load();assert.equal(parentalControl.getSnapshot().status,'unconfigured');const original=JSON.stringify(setupCatalog);
+ const projected=parentalLiveCatalog(setupCatalog,true);assert.deepEqual(projected.groups.map(g=>g.id),['g']);assert.deepEqual(projected.channels.map(c=>c.id),['common']);assert.deepEqual(projected.channelsByGroup.g.map(c=>c.id),['common']);assert.equal(projected.channelsByGroup.a,undefined);assert.equal(JSON.stringify(setupCatalog),original);
+});
+await test('PIN_PUK_SETUP_GATES_SHARED_ENTRY_POINTS_AND_MISSING_VERIFIERS_FAIL_CLOSED',async()=>{
+ const record={version:1,iterations:600000,pin:{salt:'1'.repeat(32),hash:'2'.repeat(64)},puk:{salt:'3'.repeat(32),hash:'4'.repeat(64)},policy:{maxAge:18,allowAdult:false},failures:0,blockedUntil:0,rules:[]};
+ const states=[{status:'loading'},parentalControl.getSnapshot()];
+ for(const key of['pin','puk']){const invalid={...record};delete invalid[key];const local=new ParentalControlStore({storage:{read:async()=>JSON.stringify(invalid),write:async()=>{throw Error('NO_WRITE')}},now:()=>0});await local.load();assert.equal(local.getSnapshot().status,'error');states.push(local.getSnapshot());}
+ const broken=new ParentalControlStore({storage:{read:async()=>{throw Error('READ_DENIED')},write:async()=>{throw Error('NO_WRITE')}},now:()=>0});await broken.load();assert.equal(broken.getSnapshot().status,'error');states.push(broken.getSnapshot());
+ const local=new ParentalControlStore({storage:{read:async()=>JSON.stringify(record),write:async()=>{throw Error('NO_WRITE')}},now:()=>0});await local.load();assert.equal(local.getSnapshot().status,'ready');states.push(local.getSnapshot());
+ for(const state of states)for(const choice of['PHONE','TABLET','TV']){
+  const ui=renderSetupUi(state,choice);assert.equal(ui.shell.includes('aria-label="Área 18+ protegida por PIN"'),state.status==='ready');assert.equal(ui.settings.includes('Abrir área 18+'),state.status==='ready');assert.equal(ui.defaultHeader.includes('aria-label="Área 18+ protegida por PIN"'),false);
+ }
+ const parentalUi=renderSetupUi(local.getSnapshot(),'PHONE','parental-control');assert.ok(parentalUi.shell.includes('app-shell--phone-header-back'));assert.ok(parentalUi.shell.includes('aria-label="Voltar para a tela anterior"'));assert.ok(parentalUi.shell.includes('back-arrow-icon'));
+});
+
 await test('DEFAULT_COMMON_VISIBLE_ADULT_HIDDEN_THEN_INCLUSIVE_AGE_MATRIX_ALL_KINDS',async()=>{
  await parentalControl.load();assert.equal(canShowParentalItem(item(18)),true);assert.equal(canShowParentalItem({...item(18),parental:{...item(18).parental,adult:true}}),false);
  await parentalControl.configure(pin,puk,{maxAge:12,allowAdult:true});
  for(const maxAge of ages){await parentalControl.updatePolicy({maxAge,allowAdult:true});for(const kind of['movie','series'])for(const age of[...ages,undefined])assert.equal(canShowParentalItem(item(age,kind)),age===undefined||age<=maxAge);}
  await parentalControl.updatePolicy({maxAge:12,allowAdult:true});
 });
+
+await test('CONFIGURED_LIVE_GROUP_ENTRY_STILL_REQUIRES_ADULT_POLICY_AND_PIN_SESSION',async()=>{
+ assert.equal(parentalControl.getSnapshot().status,'ready');const original=JSON.stringify(setupCatalog);
+ assert.deepEqual(parentalLiveCatalog(setupCatalog,true).groups.map(g=>g.id),['g','a']);assert.deepEqual(parentalLiveCatalog(setupCatalog,true).channels.map(c=>c.id),['common']);
+ await assert.rejects(parentalControl.unlockAdult(pin),/ADULT_AGE_LIMIT/);assert.equal(canShowParentalLive(setupChannels[1],setupCatalog),false);
+ await parentalControl.updatePolicy({maxAge:18,allowAdult:true});await parentalControl.unlockAdult(pin);assert.deepEqual(parentalLiveCatalog(setupCatalog,true).channels.map(c=>c.id),['common','flag','adult']);
+ parentalControl.lock();assert.deepEqual(parentalLiveCatalog(setupCatalog,true).channels.map(c=>c.id),['common']);assert.equal(JSON.stringify(setupCatalog),original);
+ assert.equal(await parentalControl.authenticate(pin),true);await parentalControl.updatePolicy({maxAge:12,allowAdult:true});
+});
+
 await test('UNRATED_PIN_GRANT_NEVER_BYPASSES_LATER_KNOWN_ABOVE_LIMIT',async()=>{
  const unsub=parentalControl.subscribe(()=>{}),key='snapshot:unrated';const pending=parentalControl.authorize(key,undefined,false);await new Promise(r=>setTimeout(r,0));const id=parentalControl.getSnapshot().prompt.id;
  await parentalControl.submitPrompt(id,pin);assert.equal(await pending,true);assert.equal(parentalControl.isGranted(key),true);

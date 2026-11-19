@@ -1,0 +1,12 @@
+{
+  "origin": "USER_MESSAGES_IN_CURRENT_SESSION",
+  "clientDate": "2026-11-05",
+  "originalAttachment": false,
+  "independentChatMasterAdjudication": false,
+  "messages": [
+    "prossiga com a correção",
+    "ao trocar uma fonte, o sistema deve entender que é uma nova fonte e recarregar do absoluto zero todos os metadados sem aproveitar os dados da fonte anterior.",
+    "em casos onde o cliente ja tenha o aplicativo instalado e necessite trocar a fonte, no carregamento inicial deve ser verificado se a fonte ainda é a mesma e se for diferente iniciar a limpeza da fonte anterior e o carregamento dos dados da nova fonte"
+  ],
+  "scope": "Source replacement safety and continuation of playback recovery; no Git publication or administrative backend write. This is a faithful capture for provenance, not a reconstructed original attachment or retroactive approval of historical actions."
+}

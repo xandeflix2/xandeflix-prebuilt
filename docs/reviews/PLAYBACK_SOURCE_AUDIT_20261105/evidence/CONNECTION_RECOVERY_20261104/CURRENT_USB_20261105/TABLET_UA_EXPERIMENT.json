@@ -1,0 +1,11 @@
+{
+  "observedUTC": "2026-11-05T10:14:25.811Z",
+  "experiment": {
+    "status": "APPLIED_ONCE",
+    "attempts": 1,
+    "sameUri": true,
+    "sameEpisode": true,
+    "uaSource": "DEVICE_WEBVIEW_DEFAULT"
+  },
+  "armed": false
+}

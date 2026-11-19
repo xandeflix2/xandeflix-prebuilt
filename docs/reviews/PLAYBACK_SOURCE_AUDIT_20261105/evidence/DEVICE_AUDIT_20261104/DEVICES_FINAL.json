@@ -1,0 +1,45 @@
+{
+  "observedUTC": "2026-11-04T19:38:13.968Z",
+  "reference": "latest local existing candidate, not a certified production release",
+  "devices": [
+    {
+      "label": "fire",
+      "serial": "G071CQ070344374G",
+      "versionCode": 52,
+      "versionName": "1.0.52",
+      "apkSha256": "f1eb668de79aebd0384424c67a289eea9c5206fa8db901020789f52a8a079358",
+      "sameAsCandidate": false,
+      "updatePrompt": {
+        "open": false,
+        "visible": false,
+        "releaseText": "Versão  · atualização"
+      }
+    },
+    {
+      "label": "tablet",
+      "serial": "RX2X301Q3KY",
+      "versionCode": 52,
+      "versionName": "1.0.52",
+      "apkSha256": "0146a2fc05d3e45f5670f4c5aba0fa0d0ba1cd25bd0086f7ac00de4cb6ab8c29",
+      "sameAsCandidate": true,
+      "updatePrompt": {
+        "open": false,
+        "visible": false,
+        "releaseText": "Versão  · atualização"
+      }
+    },
+    {
+      "label": "phone",
+      "serial": "RXGYB03FL4W",
+      "versionCode": 52,
+      "versionName": "1.0.52",
+      "apkSha256": "0146a2fc05d3e45f5670f4c5aba0fa0d0ba1cd25bd0086f7ac00de4cb6ab8c29",
+      "sameAsCandidate": true,
+      "updatePrompt": {
+        "open": false,
+        "visible": false,
+        "releaseText": "Versão  · atualização"
+      }
+    }
+  ]
+}

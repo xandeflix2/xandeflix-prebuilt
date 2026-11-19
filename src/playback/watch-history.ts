@@ -1,3 +1,4 @@
+import { sourceScopedStorageKey } from '../bootstrap/source-replacement.ts';
 import { addNativePlayerProgressListener, readNativeWatchProgress, type NativePlayerProgressEvent } from './native-android-player.bridge.ts';
 import type {CatalogReadModel} from '../catalog/catalog-read-model.ts';
 import type {PlaybackService} from './playback.service.ts';
@@ -21,6 +22,9 @@ function record(value:unknown):RecentWatch|undefined{
   return {kind:r.kind,itemId:r.itemId,...(r.kind==='series'?{episodeId:r.episodeId}:{}),...(typeof r.fingerprint==='string' && /^[0-9a-f]{16}$/.test(r.fingerprint)?{fingerprint:r.fingerprint}:{}),positionMs:Math.min(r.positionMs,604800000),durationMs:Math.min(r.durationMs,604800000),updatedAt:r.updatedAt,completed:r.completed===true};
 }
 export class WatchHistory {
+  private readonly historyKey = sourceScopedStorageKey(KEY);
+  private readonly positionsKey = sourceScopedStorageKey(POSITIONS_KEY);
+  private readonly sessionsKey = sourceScopedStorageKey(SESSIONS_KEY);
   private records:RecentWatch[]=[];private loaded=false;
   private positions:RecentWatch[]=[];private positionsLoaded=false;
   private listeners=new Set<()=>void>();
@@ -34,14 +38,14 @@ export class WatchHistory {
   private privateStorage?:StoragePort;
   private storage(){if(this.privateStorage)return this.privateStorage;try{return typeof window!=='undefined'?window.localStorage:undefined;}catch{return undefined;}}
   list():RecentWatch[]{
-    if(!this.loaded){this.loaded=true;try{const raw=this.storage()?.getItem(KEY);if(raw && raw.length<=65536 && bytes(raw)<=65536){const data=JSON.parse(raw);if(data.version===1 && Array.isArray(data.records))this.records=data.records.slice(0,60).map(record).filter((r:RecentWatch|undefined):r is RecentWatch=>!!r).sort((a:RecentWatch,b:RecentWatch)=>b.updatedAt-a.updatedAt);}}catch{/* RAM fallback */}}
+    if(!this.loaded){this.loaded=true;try{const raw=this.storage()?.getItem(this.historyKey);if(raw && raw.length<=65536 && bytes(raw)<=65536){const data=JSON.parse(raw);if(data.version===1 && Array.isArray(data.records))this.records=data.records.slice(0,60).map(record).filter((r:RecentWatch|undefined):r is RecentWatch=>!!r).sort((a:RecentWatch,b:RecentWatch)=>b.updatedAt-a.updatedAt);}}catch{/* RAM fallback */}}
     return this.records.map(row=>({...row}));
   }
   subscribe(listener:()=>void):()=>void{this.listeners.add(listener);return()=>{this.listeners.delete(listener);};}
   private loadPositions():void{
     if(this.positionsLoaded)return;this.positionsLoaded=true;
     try{
-      const raw=this.storage()?.getItem(POSITIONS_KEY);
+      const raw=this.storage()?.getItem(this.positionsKey);
       if(raw && raw.length<=262144 && bytes(raw)<=262144){const data=JSON.parse(raw);if(data.version===1 && Array.isArray(data.records))this.positions=data.records.slice(0,1000).map(record).filter((r:RecentWatch|undefined):r is RecentWatch=>!!r);}
     }catch{/* RAM fallback */}
     for(const recent of this.list())if(!this.positions.some(row=>this.samePosition(row,recent)))this.positions.push(recent);
@@ -52,10 +56,17 @@ export class WatchHistory {
     this.loadPositions();const saved=this.positions.find(row=>row.kind===kind && row.itemId===itemId && row.fingerprint===fingerprint && row.episodeId===episodeId);
     return saved && !saved.completed?saved.positionMs:0;
   }
+  /** Snapshot somente de leitura para apresentar progresso sem alterar retomada. */
+  savedProgress(kind:'movie'|'series',itemId:string,fingerprint:string,episodeId?:string):Pick<RecentWatch,'positionMs'|'durationMs'|'completed'>|undefined{
+    this.loadPositions();
+    const saved=this.positions.find(row=>row.kind===kind && row.itemId===itemId && row.fingerprint===fingerprint && row.episodeId===episodeId);
+    if(!saved)return undefined;
+    return {positionMs:saved.positionMs,durationMs:saved.durationMs,completed:saved.completed};
+  }
   private loadSessions():void{
     if(this.sessionsLoaded)return;this.sessionsLoaded=true;
     try{
-      const raw=this.storage()?.getItem(SESSIONS_KEY);if(!raw || raw.length>8192 || bytes(raw)>8192)return;
+      const raw=this.storage()?.getItem(this.sessionsKey);if(!raw || raw.length>8192 || bytes(raw)>8192)return;
       const data=JSON.parse(raw);if(data.version!==1 || !Array.isArray(data.sessions))return;
       for(const value of data.sessions.slice(-4)){
         if(!value || !/^[A-Za-z0-9_-]{1,64}$/.test(value.nonce||''))continue;
@@ -69,7 +80,7 @@ export class WatchHistory {
     let serialized=serialize();
     while(bytes(serialized)>8192 && this.sessions.size>1){this.sessions.delete(this.sessions.keys().next().value!);serialized=serialize();}
     if(bytes(serialized)>8192)return;
-    try{this.storage()?.setItem(SESSIONS_KEY,serialized);}catch{/* RAM fallback */}
+    try{this.storage()?.setItem(this.sessionsKey,serialized);}catch{/* RAM fallback */}
   }
   async syncNativeProgress():Promise<void>{
     if(this.nativeSync)return this.nativeSync;
@@ -101,13 +112,13 @@ export class WatchHistory {
     this.positions=[next,...this.positions.filter(row=>!this.samePosition(row,next))].sort((a,b)=>b.updatedAt-a.updatedAt).slice(0,1000);
     let saved=JSON.stringify({version:1,records:this.positions});
     while(bytes(saved)>262144){this.positions.pop();saved=JSON.stringify({version:1,records:this.positions});}
-    try{this.storage()?.setItem(POSITIONS_KEY,saved);}catch{/* Optional positions conserve RAM. */}
+    try{this.storage()?.setItem(this.positionsKey,saved);}catch{/* Optional positions conserve RAM. */}
     const existing=this.records.find(row=>row.kind===next.kind && row.itemId===next.itemId);
     if(existing && existing.updatedAt>next.updatedAt)return;
     this.records=[...(current.recentEligible===false?[]:[next]),...this.records.filter(row=>row.kind!==next.kind || row.itemId!==next.itemId)].sort((a,b)=>b.updatedAt-a.updatedAt).slice(0,60);
     let serialized=JSON.stringify({version:1,records:this.records});
     while(bytes(serialized)>65536){this.records.pop();serialized=JSON.stringify({version:1,records:this.records});}
-    try{this.storage()?.setItem(KEY,serialized);}catch{/* Optional history never blocks playback. */}
+    try{this.storage()?.setItem(this.historyKey,serialized);}catch{/* Optional history never blocks playback. */}
     for(const notify of this.listeners)notify();
   }
 }

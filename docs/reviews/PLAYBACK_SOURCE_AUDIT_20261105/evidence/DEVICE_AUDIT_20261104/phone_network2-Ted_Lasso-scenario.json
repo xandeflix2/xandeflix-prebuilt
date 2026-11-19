@@ -1,0 +1,27 @@
+{
+  "observedUTC": "2026-11-04T19:18:41.839Z",
+  "label": "phone_network2",
+  "query": "Ted Lasso",
+  "elapsedMs": 2129,
+  "state": {
+    "text": "▶\nAssistir trailer\nTed Lasso (2020)\n2020\n14+\n56min por episódio\nQuantidade indisponível\nDrama • Comédia\n\nTed Lasso, um técnico de futebol americano que se muda para a Inglaterra para treinar um time de futebol, apesar da falta de experiência. Com jogadores e cidade desconfiados, será que ele vai conseguir conquistá-los?\n\n▶ Assistir\n← Voltar\nTransmitir\nAvaliar\nFavoritos\nCompartilhar\nEpisódios\nTítulos semelhantes\nElenco\n\nNão foi possível carregar os episódios.\n\nTentar novamente",
+    "loading": false,
+    "events": [
+      {
+        "method": "startDownload",
+        "success": false,
+        "errorCode": "HTTP_STATUS_ERROR",
+        "stage": "HTTP_RESPONSE",
+        "httpStatusClass": "4XX",
+        "httpResponseReceived": "SIM",
+        "retryable": true,
+        "bytesWritten": 0
+      }
+    ],
+    "headings": [
+      "Nova versão pronta para instalar",
+      "Ted Lasso (2020)",
+      "O que achou desta série?"
+    ]
+  }
+}

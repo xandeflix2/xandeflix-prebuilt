@@ -1,3 +1,4 @@
+import { NetworkConnectionButton } from '../components/NetworkConnectionButton.tsx';
 /**
  * Xandeflix Prebuilt — Live TV Three-Pane Layout (Gate R7C / Cycle R6B)
  *
@@ -18,12 +19,13 @@
 import React, { useState, useEffect, useLayoutEffect, useCallback, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import type { LiveCatalog, LiveChannel } from '../../catalog/live/live-tv.types.ts';
-import { LiveCatalogService, resolveCanonicalLiveTotal, type LiveChannelPage } from '../../catalog/live/live-catalog.service.ts';
+import { LiveCatalogService, type LiveChannelPage } from '../../catalog/live/live-catalog.service.ts';
 import {
   addNativePreviewErrorListener,
   addNativePreviewFullscreenListener,
   addNativePreviewTapListener,
   addNativePreviewPlayingListener,
+  addNativePreviewStateListener,
   enterNativeAndroidPreviewFullscreen,
   exitNativeAndroidPreviewFullscreen,
   startNativeAndroidPreview,
@@ -41,6 +43,7 @@ import { chooseInitialLiveChannel, lastLiveChannel } from '../../playback/last-l
 import { liveChannelFingerprint } from '../../playback/last-live-channel.ts';
 import { liveFavorites, liveFavoriteScope } from '../../playback/live-favorites.ts';
 import { adjacentLiveChannel, favoriteLivePage, type FavoriteCursor } from '../../playback/live-player-navigation.ts';
+import { LiveAutoRecovery, recoverNextLiveChannel } from '../../playback/live-auto-recovery.ts';
 import { LIVE_FAVORITES_GROUP_ID, resolveLiveFavoriteCategory, favoriteChannelPage } from '../../playback/live-favorite-category.ts';
 import { addNativeLiveActionListener, setNativeLiveControls, type NativeLiveActionEvent, type NativeLiveContext } from '../../playback/native-android-player.bridge.ts';
 import { liveEpgService, type LiveEpgResult } from '../../catalog/live/live-epg.service.ts';
@@ -87,6 +90,8 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
   const [fullscreenReturnNonce, setFullscreenReturnNonce] = useState(0);
   const appliedFullscreenReturn = useRef(0);
   const { tabletPortrait, stackedLive: isMobile, squareLive } = useLivePresentation();
+  const phoneLive = isMobile && !tabletPortrait && !squareLive;
+  const [networkWindowOpen, setNetworkWindowOpen] = useState(false);
   const [mobileTab, setMobileTab] = useState<'groups' | 'channels'>('channels');
   const [isEpgOpen, setIsEpgOpen] = useState(false);
   const [mobileHeaderTarget, setMobileHeaderTarget] = useState<HTMLElement | null>(null);
@@ -97,6 +102,9 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
   const favoriteChannelsRef=useRef(favoriteChannels);favoriteChannelsRef.current=favoriteChannels;
   const [favoriteCategoryError,setFavoriteCategoryError]=useState(false);
   const [livePanel, setLivePanel] = useState<string | null>(null);
+  const nativeWindowRequest = useRef<AbortController | null>(null);
+  const nativeWindowEpoch = useRef(0);
+  const [nativeWindow, setNativeWindow] = useState<{ key: string; page: LiveChannelPage; failedOffset?: number } | null>(null);
   const [liveMessage, setLiveMessage] = useState('');
   const [liveBusy, setLiveBusy] = useState(false);
   const [controlsReady, setControlsReady] = useState(0);
@@ -114,6 +122,9 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
   const previewMounted = useRef(false);
   const previewLeaving = useRef(false);
   const parentalSelectionIntent = useRef(0);
+  const previewAttemptId = useRef('');
+  const recoverySnapshot = useRef(liveCatalog?.snapshotId); recoverySnapshot.current = liveCatalog?.snapshotId;
+  const cancelAutoRecovery = useRef<(() => void) | null>(null);
   const adultGroupRequest = useRef<AbortController>();
   useEffect(() => () => adultGroupRequest.current?.abort(), []);
   const cancelPreviewOperation = useRef<(() => Promise<void>) | null>(null);
@@ -259,6 +270,15 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
   const favoritesSelected=effectiveGroupId===LIVE_FAVORITES_GROUP_ID;
   const favoriteRevision=useMemo(()=>[...favoriteKeys].join(':'),[favoriteKeys]);
   const expectedFavoriteVersion=[liveCatalog?.snapshotId,favoriteScope,favoriteRevision].join('|');
+  const continuousNativeChannels = livePanel === 'channels' && isPreviewFullscreen;
+  const nativeWindowKey = useMemo(() => 'live-window-' + (++nativeWindowEpoch.current), [
+    continuousNativeChannels, effectiveGroupId, liveCatalog?.snapshotId, selectedChannel?.id,
+    parental.status, parental.contentRevision, parental.adultSession, favoritesSelected ? expectedFavoriteVersion : '',
+  ]);
+  const currentNativeWindowKey = useRef(nativeWindowKey);
+  currentNativeWindowKey.current = nativeWindowKey;
+  const activeNativeWindow = nativeWindow?.key === nativeWindowKey ? nativeWindow : null;
+  const nativePage = activeNativeWindow?.page ?? EMPTY_LIVE_PAGE;
 
   const groupRequest = useRef<AbortController | null>(null);
   const browseGroupRef = useRef(effectiveGroupId); browseGroupRef.current = effectiveGroupId;
@@ -277,24 +297,35 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
     setInspectedChannel(previous => previous?.scope === guideScope && previous.channel.id === channel.id
       ? previous : { scope: guideScope, channel });
   }, [guideScope, liveCatalog, parental.prompt]);
-  const requestGroupPage = useCallback(async (groupId: string, offset: number, focusFirst = false, navigate = false) => {
-    if (!liveCatalog) return;
+  const requestGroupPage = useCallback(async (
+    groupId: string, offset: number, focusFirst = false, navigate = false, ownerSignal?: AbortSignal,
+  ) => {
+    if (!liveCatalog || !groupId || ownerSignal?.aborted) return;
     groupRequest.current?.abort();
     const controller = new AbortController(); groupRequest.current = controller;
+    const cancelPage = () => controller.abort();
+    ownerSignal?.addEventListener('abort', cancelPage, { once: true });
     setIsGroupPageLoading(true);
     try {
-      const page = groupId===LIVE_FAVORITES_GROUP_ID ? favoriteChannelPage(favoriteChannelsRef.current,offset)
-        : await LiveCatalogService.loadChannelPageForGroup(groupId, offset, LIVE_GROUP_PAGE_SIZE);
+      const page = groupId === LIVE_FAVORITES_GROUP_ID
+        ? favoriteChannelPage(favoriteChannelsRef.current, offset)
+        : await LiveCatalogService.loadContinuousChannelPage(groupId, offset, {
+            expectedSnapshotId: liveCatalog.snapshotId,
+            signal: controller.signal,
+          });
       const active = await LiveCatalogService.loadLiveCatalog();
       if (controller.signal.aborted || browseGroupRef.current !== groupId || active?.snapshotId !== liveCatalog.snapshotId) return;
       setGroupPage(page);
       if (navigate || focusFirst) setChannelScrollRequest(previous => ({ groupId, offset: page.offset, nonce: previous.nonce + 1, focus: focusFirst }));
     } catch {
-      if (!controller.signal.aborted) setLiveMessage('Não foi possível carregar os canais. Tente novamente.');
+      if (!controller.signal.aborted && browseGroupRef.current === groupId) {
+        setLiveMessage('Não foi possível carregar os canais. Tente novamente.');
+      }
     } finally {
+      ownerSignal?.removeEventListener('abort', cancelPage);
       if (groupRequest.current === controller) { groupRequest.current = null; setIsGroupPageLoading(false); }
     }
-  }, [liveCatalog?.snapshotId]);
+  }, [liveCatalog?.snapshotId, parental.contentRevision, parental.adultSession]);
   // Hidrata uma página do grupo selecionado; nunca o catálogo Live completo.
   useEffect(() => {
     if (!liveCatalog || !effectiveGroupId || favoritesSelected) return;
@@ -318,6 +349,42 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
       .finally(()=>{if(!controller.signal.aborted)setIsGroupPageLoading(false);});
     return()=>controller.abort();
   },[favoritesSelected,liveCatalog?.snapshotId,favoriteScope,favoriteKeys,expectedFavoriteVersion,parental.contentRevision,parental.adultSession]);
+
+  const requestNativeWindow = useCallback(async (offset: number) => {
+    if (!continuousNativeChannels || !liveCatalog || !effectiveGroupId) return;
+    if (favoritesSelected && favoriteCategoryVersion !== expectedFavoriteVersion && !favoriteCategoryError) return;
+    nativeWindowRequest.current?.abort();
+    const controller = new AbortController();
+    nativeWindowRequest.current = controller;
+    const current = () => !controller.signal.aborted && currentNativeWindowKey.current === nativeWindowKey;
+    try {
+      if (favoritesSelected && favoriteCategoryError) throw new Error('LIVE_FAVORITES_UNAVAILABLE');
+      const page = favoritesSelected
+        ? favoriteChannelPage(favoriteChannelsRef.current, offset)
+        : await LiveCatalogService.loadContinuousChannelPage(effectiveGroupId, offset, {
+            expectedSnapshotId: liveCatalog.snapshotId, signal: controller.signal,
+          });
+      const active = await LiveCatalogService.loadLiveCatalog();
+      if (!current() || active?.snapshotId !== liveCatalog.snapshotId) return;
+      setNativeWindow({ key: nativeWindowKey, page });
+    } catch {
+      if (!current()) return;
+      setNativeWindow(prior => ({
+        key: nativeWindowKey, page: prior?.key === nativeWindowKey ? prior.page : EMPTY_LIVE_PAGE,
+        failedOffset: offset,
+      }));
+    } finally {
+      if (nativeWindowRequest.current === controller) nativeWindowRequest.current = null;
+    }
+  }, [
+    continuousNativeChannels, effectiveGroupId, liveCatalog?.snapshotId, nativeWindowKey,
+    favoritesSelected, favoriteCategoryVersion, expectedFavoriteVersion, favoriteCategoryError,
+  ]);
+  useEffect(() => {
+    if (!continuousNativeChannels) return;
+    void requestNativeWindow(0);
+    return () => nativeWindowRequest.current?.abort();
+  }, [continuousNativeChannels, requestNativeWindow]);
 
   const currentGroupChannels = useMemo(() => {
     return liveCatalog ? groupPage.channels.filter(c => canShowParentalLive(c, liveCatalog)) : [];
@@ -364,22 +431,32 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
 
   const liveContext = useMemo<NativeLiveContext>(() => {
     const text = (value: string | undefined, max: number) => value && !/https?:\/\//i.test(value) ? value.replace(/[\u0000-\u001f\u007f]/g, ' ').slice(0, max) : '';
-    const channels = livePanel === 'favorites' ? favoritePage.channels : currentGroupChannels;
+    const groupChannels = continuousNativeChannels ? nativePage.channels : currentGroupChannels;
+    const channels = (livePanel === 'favorites' ? favoritePage.channels : groupChannels)
+      .filter(channel => !!liveCatalog && canShowParentalLive(channel, liveCatalog))
+      .slice(0, LIVE_GROUP_PAGE_SIZE);
+    const channelPage = continuousNativeChannels ? {
+      windowKey: nativeWindowKey, offset: nativePage.offset, total: nativePage.totalAvailable,
+      loaded: activeNativeWindow !== null, failedOffset: activeNativeWindow?.failedOffset,
+    } : undefined;
     const epgMessage = !playerEpg ? 'Carregando programação…' : playerEpg.status === 'error' ? 'Não foi possível carregar a programação. Feche e abra o guia para tentar novamente.' : playerEpg.status === 'unavailable' || !playerEpg.programs.length ? 'Programação indisponível. A fonte não forneceu uma grade compatível.' : '';
     return {
       channelId: selectedChannel?.id || '', name: text(selectedChannel?.name, 180),
       groupName: text(selectedChannel?.groupName || liveCatalog?.groups.find(g => g.id === selectedChannel?.groupId)?.name, 120),
       favorite: !!selectedChannel && !!liveCatalog && favoriteKeys.has(liveChannelFingerprint(selectedChannel, liveCatalog)),
       browseName: livePanel === 'favorites' || favoritesSelected ? 'Favoritos' : text(liveCatalog?.groups.find(g => g.id === effectiveGroupId)?.name, 180),
-      channels: channels.filter(c=>!!liveCatalog&&canShowParentalLive(c,liveCatalog)).slice(0, 48).map(c => ({ id: c.id, name: text(c.name, 180), favorite: !!liveCatalog && favoriteKeys.has(liveChannelFingerprint(c, liveCatalog)) })),
+      channels: channels.map(c => ({ id: c.id, name: text(c.name, 180), favorite: !!liveCatalog && favoriteKeys.has(liveChannelFingerprint(c, liveCatalog)) })),
+      channelPage,
       groups: [{id:LIVE_FAVORITES_GROUP_ID,name:`Favoritos (${favoriteScope?favoriteKeys.size:'…'})`},...(liveCatalog?.groups || [])].slice(groupsOffset, groupsOffset + 48).map(g => ({ id: g.id, name: text(g.name, 180) })),
-      nextPage: livePanel === 'favorites' ? favoritePage.next !== null : groupPage.nextOffset !== null,
-      previousPage: livePanel === 'favorites' ? favoriteIndex > 0 : groupPage.offset > 0,
+      nextPage: !continuousNativeChannels && (livePanel === 'favorites' ? favoritePage.next !== null : groupPage.nextOffset !== null),
+      previousPage: !continuousNativeChannels && (livePanel === 'favorites' ? favoriteIndex > 0 : groupPage.offset > 0),
       nextGroups: groupsOffset + 48 < (liveCatalog?.groups.length || 0)+1, previousGroups: groupsOffset > 0,
-      busy: liveBusy || (livePanel === 'channels' && isGroupPageLoading), message: text(liveMessage, 240),
+      busy: liveBusy || (livePanel === 'channels' && !continuousNativeChannels && isGroupPageLoading),
+      message: text(liveMessage, 240),
       epg: { message: epgMessage, programs: playerEpg?.status === 'ready' ? playerEpg.programs.filter(p => p.end > Date.now()).slice(0, 12).map(p => ({ title: text(p.title, 180), description: text(p.description, 700), start: p.start, end: p.end })) : [] },
     };
-  }, [selectedChannel, liveCatalog, livePanel, currentGroupChannels, favoritePage, favoriteKeys, effectiveGroupId, groupsOffset, groupPage, favoriteIndex, liveBusy, isGroupPageLoading, liveMessage, playerEpg, favoritesSelected, favoriteScope]);
+  }, [selectedChannel, liveCatalog, livePanel, currentGroupChannels, favoritePage, favoriteKeys, effectiveGroupId, groupsOffset, groupPage, favoriteIndex, liveBusy, isGroupPageLoading, liveMessage, playerEpg, favoritesSelected, favoriteScope,
+    continuousNativeChannels, nativePage, nativeWindowKey, activeNativeWindow]);
   const liveContextRef = useRef(liveContext); liveContextRef.current = liveContext;
   useEffect(() => {
     const previewId = previewIdRef.current;
@@ -389,13 +466,13 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
   useEffect(() => {
     const previewId = previewIdRef.current;
     if (!previewId) return;
-    const obscured = Boolean(parental.prompt);
+    const obscured = Boolean(parental.prompt) || networkWindowOpen;
     // Separate from media handoff, which may itself be waiting for this PIN.
     previewVisibility.current = previewVisibility.current.then(async () => {
       if (!previewMounted.current || previewLeaving.current || previewIdRef.current !== previewId) return;
       await updateNativeAndroidPreview({ previewId, obscured });
     }).catch(() => {});
-  }, [parental.prompt?.id, controlsReady]);
+  }, [parental.prompt?.id, controlsReady, networkWindowOpen]);
 
   // O canal em reprodução independe da categoria, página ou filtro em navegação.
   const hasPreviewSurface = selectedChannel !== null;
@@ -485,7 +562,10 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
 
     void addNativePreviewErrorListener((event) => {
       if (disposed) return;
+      // Correlated attempts are handled by their own lifecycle below.
+      if (event.requestId) return;
       if (event.previewId && previewIdRef.current && event.previewId !== previewIdRef.current) return;
+      cancelAutoRecovery.current?.();
       setStreamError(mapPreviewErrorCode(event.errorCode));
       const failedPreviewId = previewIdRef.current;
       previewIdRef.current = null;
@@ -602,7 +682,47 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
     let sessionAcquired = false;
     let unsubscribeTermination: (() => void) | undefined;
     let playingListener: Awaited<ReturnType<typeof addNativePreviewPlayingListener>> | undefined;
+    let stateListener: Awaited<ReturnType<typeof addNativePreviewStateListener>> | undefined;
+    let errorListener: Awaited<ReturnType<typeof addNativePreviewErrorListener>> | undefined;
     let firstPlayingId: string | undefined;
+    let recovering = false;
+    const requestId = crypto.randomUUID();
+    const recoveryAbort = new AbortController();
+    const selectionIntent = parentalSelectionIntent.current;
+    const current = () => !recoveryAbort.signal.aborted && previewMounted.current && !previewLeaving.current
+      && previewAttemptId.current === requestId && desiredPreviewChannel.current?.id === selectedChannel.id
+      && recoverySnapshot.current === liveCatalog?.snapshotId && parentalSelectionIntent.current === selectionIntent;
+    const recovery = new LiveAutoRecovery(requestId, () => {
+      if (!current() || !liveCatalog) return;
+      recovering = true;
+      const fullscreen = fullscreenStateRef.current;
+      setStreamError('LIVE_PREVIEW_PLAYBACK_FAILED');
+      setLiveMessage('Sinal interrompido. Abrindo o próximo canal da categoria…');
+      const port = {
+        loadPage: (id: string, offset: number, size: number) => LiveCatalogService.loadChannelPageForGroup(id, offset, size),
+        activeSnapshot: async () => (await LiveCatalogService.loadLiveCatalog())?.snapshotId,
+      };
+      void recoverNextLiveChannel({
+        current,
+        cleanup: () => cleanup(false),
+        next: () => adjacentLiveChannel(liveCatalog, selectedChannel, 1, port, recoveryAbort.signal),
+        permitted: async channel => canShowParentalLive(channel, liveCatalog) && !parentalLiveNeedsPin(channel, liveCatalog)
+          && await authorizeParentalLive(channel, liveCatalog),
+        select: channel => {
+          resumeFullscreen.current = fullscreen;
+          switchingChannel.current = true;
+          setSelectedChannel(channel); setStreamError(null);
+          setLiveMessage('Sinal interrompido. Canal seguinte selecionado automaticamente.');
+        },
+      }).then(result => {
+        if (!current()) return;
+        if (result === 'END') setLiveMessage('Sinal interrompido. Não há outro canal nesta categoria.');
+        if (result === 'BLOCKED') setLiveMessage('O próximo canal exige autorização. Selecione um canal para continuar.');
+      }).catch(() => {
+        if (current()) setLiveMessage('Não foi possível trocar o canal com segurança. Selecione um canal para tentar novamente.');
+      });
+    });
+    cancelAutoRecovery.current = () => { recovery.cancel(); recoveryAbort.abort(); };
     const rememberPlayingChannel = () => { if (!cancelled && liveCatalog) lastLiveChannel.remember(selectedChannel, liveCatalog); };
     const closePreview = async () => {
       const id = previewIdRef.current;
@@ -651,10 +771,22 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
       try {
         playingListener = await addNativePreviewPlayingListener(event => {
           if (cancelled) return;
+          if (event.requestId && event.requestId !== requestId) return;
           if (event.previewId === previewIdRef.current) rememberPlayingChannel();
           else firstPlayingId = event.previewId;
         });
         if (cancelled) { void playingListener.remove(); return; }
+        stateListener = await addNativePreviewStateListener(event => { if (!cancelled) recovery.state(event); });
+        if (cancelled) { void stateListener.remove(); return; }
+        errorListener = await addNativePreviewErrorListener(event => {
+          if (cancelled || event.requestId !== requestId) return;
+          if (!event.previewId || (previewIdRef.current && event.previewId !== previewIdRef.current)) return;
+          if (!recovery.error(event) && !recovering) {
+            setStreamError(mapPreviewErrorCode(event.errorCode));
+            void cleanup().catch(() => {});
+          }
+        });
+        if (cancelled) { void errorListener.remove(); return; }
         bootTelemetry.mark('LIVE_STREAMREF_RESOLVED');
         sessionGuard = getAuthorizedPlaybackSessionGuard();
         bootTelemetry.mark('C9_ACQUIRE_REQUESTED');
@@ -678,11 +810,13 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
         if (cancelled) { sessionAcquired = false; await sessionGuard.releaseSession('USER_EXIT'); return; }
 
         bootTelemetry.mark('NATIVE_PREVIEW_START_REQUESTED');
+        previewAttemptId.current = requestId;
         const retainedId = previewIdRef.current;
         const result = retainedId
-          ? await updateNativeAndroidPreview({ previewId: retainedId, uri: directStreamUrl, ...bounds })
-          : await startNativeAndroidPreview({ uri: directStreamUrl, kind: 'live', liveContext: liveContextRef.current, ...bounds });
+          ? await updateNativeAndroidPreview({ previewId: retainedId, requestId, uri: directStreamUrl, ...bounds })
+          : await startNativeAndroidPreview({ requestId, uri: directStreamUrl, kind: 'live', liveContext: liveContextRef.current, ...bounds });
         if (result.success && result.previewId) previewIdRef.current = result.previewId;
+        if (result.success && result.previewId) recovery.bind(result.previewId);
 
         if (cancelled) {
           // Cleanup serializado suspende antes de liberar C9, inclusive em troca rapida.
@@ -709,6 +843,7 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
         bootTelemetry.mark('NATIVE_PREVIEW_STARTED');
         setStreamError(null);
         unsubscribeTermination = sessionGuard.onTermination?.(() => {
+          recovery.cancel(); recoveryAbort.abort();
           void stopGoogleCast();
           sessionAcquired = false;
           const activePreviewId = previewIdRef.current;
@@ -736,9 +871,13 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
     previewLifecycle.current = task.catch(() => {});
 
     let cleanupTask: Promise<void> | null = null;
-    const cleanup = () => {
+    const cleanup = (cancelRecovery = true) => {
       cancelled = true;
+      recovery.cancel();
+      if (cancelRecovery) recoveryAbort.abort();
       void playingListener?.remove();
+      void stateListener?.remove();
+      void errorListener?.remove();
       unsubscribeTermination?.();
       unsubscribeTermination = undefined;
       if (cleanupTask) return cleanupTask;
@@ -797,7 +936,9 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
   // Handler de seleção de canal
   const handleChannelSelect = useCallback(async (channel: LiveChannel) => {
     initialFocusDone.current = true;
-    const intent = ++parentalSelectionIntent.current;
+    const sameChannel = selectedChannel?.id === channel.id;
+    const intent = sameChannel ? parentalSelectionIntent.current : ++parentalSelectionIntent.current;
+    if (!sameChannel) cancelAutoRecovery.current?.();
     if (switchingChannel.current) return;
     if (!liveCatalog) return;
     try {
@@ -832,18 +973,34 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
   const handleLiveAction = useCallback(async (event: NativeLiveActionEvent) => {
     if (!liveCatalog || !selectedChannel || event.previewId !== previewIdRef.current || event.channelId !== selectedChannel.id) return;
     const action = event.action;
-    if (action === 'closePanel') { liveOperation.current?.abort(); liveOperation.current = null; setLiveBusy(false); setLivePanel(null); return; }
+    if (action === 'closePanel') {
+      liveOperation.current?.abort();
+      nativeWindowRequest.current?.abort();
+      liveOperation.current = null;
+      setLiveBusy(false);
+      setLivePanel(null);
+      return;
+    }
+    if (action === 'loadChannelWindow') {
+      const request = event.id?.match(/^(live-window-\d+):(\d+)$/);
+      const offset = request ? Number(request[2]) : NaN;
+      if (continuousNativeChannels && request?.[1] === nativeWindowKey && Number.isSafeInteger(offset)
+          && offset >= 0 && offset % LIVE_GROUP_PAGE_SIZE === 0 && offset < nativePage.totalAvailable) {
+        await requestNativeWindow(offset);
+      }
+      return;
+    }
     if (liveOperation.current && !liveOperation.current.signal.aborted) return;
     setLiveMessage('');
     if (action === 'favorite') { toggleFavorite(); return; }
-    if (action === 'guide' || action === 'categories' || action === 'channels') { setLivePanel(action); return; }
+    if (action === 'guide' || action === 'categories') { setLivePanel(action); return; }
     if (action === 'groupPrevious') { setGroupsOffset(v => Math.max(0, v - 48)); return; }
     if (action === 'groupNext') { setGroupsOffset(v => v + 48 < liveCatalog.groups.length+1 ? v + 48 : v); return; }
     if (action === 'selectGroup') {
       if (event.id!==LIVE_FAVORITES_GROUP_ID && !liveCatalog.groups.some(g => g.id === event.id)) return;
       setLivePanel('channels'); handleGroupSelect(event.id!); return;
     }
-    if (action === 'selectChannel') {
+    if (action === 'selectChannel' && !continuousNativeChannels) {
       const channels = livePanel === 'favorites' ? favoritePage.channels : currentGroupChannels;
       const channel = channels.find(c => c.id === event.id);
       if (channel) { setLivePanel(null); if (selectedChannel.id !== channel.id) handleChannelSelect(channel); }
@@ -853,7 +1010,30 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
     const current = () => !controller.signal.aborted && event.previewId === previewIdRef.current && event.channelId === selectedChannel.id;
     const port = { loadPage: (id: string, offset: number, size: number) => LiveCatalogService.loadChannelPageForGroup(id, offset, size), activeSnapshot: async () => (await LiveCatalogService.loadLiveCatalog())?.snapshotId };
     try {
-      if (action === 'previous' || action === 'next') {
+      if (action === 'channels') {
+        setLivePanel('channels');
+        const fullscreen = fullscreenStateRef.current;
+        const groupId = fullscreen ? selectedChannel.groupId : effectiveGroupId;
+        if (groupId !== effectiveGroupId) {
+          await handleGroupSelect(groupId);
+        } else if (!fullscreen) {
+          await requestGroupPage(groupId, groupPage.offset, false, false, controller.signal);
+        }
+      } else if (action === 'selectChannel') {
+        setLivePanel(null);
+        if (!event.id) return;
+        const resolved = await LiveCatalogService.loadChannelById(event.id, {
+          expectedSnapshotId: liveCatalog.snapshotId, signal: controller.signal,
+        });
+        const channel = resolved?.channel;
+        if (!current() || browseGroupRef.current !== effectiveGroupId || !channel
+            || !canShowParentalLive(channel, liveCatalog)) return;
+        const belongsToGroup = favoritesSelected
+          ? favoriteChannelsRef.current.some(row => row.id === channel.id)
+          : channel.groupId === effectiveGroupId;
+        if (!belongsToGroup) return;
+        if (channel.id !== selectedChannel.id) await handleChannelSelect(channel);
+      } else if (action === 'previous' || action === 'next') {
         const channel = await adjacentLiveChannel(liveCatalog, selectedChannel, action === 'previous' ? -1 : 1, port, controller.signal);
         if (!current()) return;
         if (channel) { handleGroupSelect(channel.groupId); handleChannelSelect(channel); }
@@ -868,14 +1048,15 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
         if (action === 'favorites') favoriteCursors.current = [cursor]; else favoriteCursors.current[index] = cursor;
         setFavoriteIndex(index); setFavoritePage(page);
         if (!page.channels.length) setLiveMessage('Nenhum canal favorito disponível. Marque um canal com a estrela.');
-      } else if (action === 'pageNext' || action === 'pagePrevious') {
-        const offset = action === 'pageNext' ? groupPage.nextOffset : Math.max(0, groupPage.offset - 48);
-        if (offset === null) return;
-        await requestGroupPage(effectiveGroupId, offset, false, true);
+      } else if (!continuousNativeChannels && (action === 'pageNext' || action === 'pagePrevious')) {
+        const offset = action === 'pageNext' ? groupPage.nextOffset : Math.max(0, groupPage.offset - LIVE_GROUP_PAGE_SIZE);
+        if (offset === null || offset === groupPage.offset) return;
+        await requestGroupPage(effectiveGroupId, offset, false, true, controller.signal);
       }
     } catch { if (current()) setLiveMessage('Não foi possível carregar os canais. Tente novamente.'); }
     finally { if (liveOperation.current === controller) { liveOperation.current = null; setLiveBusy(false); } }
-  }, [liveCatalog, selectedChannel, toggleFavorite, livePanel, favoritePage, currentGroupChannels, handleGroupSelect, handleChannelSelect, favoriteIndex, favoriteKeys, groupPage, effectiveGroupId, requestGroupPage]);
+  }, [liveCatalog, selectedChannel, toggleFavorite, livePanel, favoritePage, currentGroupChannels, handleGroupSelect, handleChannelSelect, favoriteIndex, favoriteKeys, groupPage, effectiveGroupId, requestGroupPage,
+    continuousNativeChannels, nativeWindowKey, nativePage.totalAvailable, requestNativeWindow, favoritesSelected]);
   const liveActionRef = useRef(handleLiveAction); liveActionRef.current = handleLiveAction;
   useEffect(() => {
     let disposed = false;
@@ -926,7 +1107,7 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' || e.key === 'Back' || e.keyCode === 4) {
-        if (e.defaultPrevented || document.querySelector('.parental-dialog[open]')) return;
+        if (e.defaultPrevented || document.querySelector('.parental-dialog[open], [data-network-dialog][open]')) return;
         e.preventDefault();
         if (isPreviewFullscreen) {
           void exitNativeAndroidPreviewFullscreen({ previewId: previewIdRef.current || undefined });
@@ -943,29 +1124,25 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
     title={liveContext.favorite?'Remover canal dos favoritos':'Adicionar canal aos favoritos'} aria-label={liveContext.favorite?'Remover canal dos favoritos':'Adicionar canal aos favoritos'}
     onClick={()=>toggleFavorite()} onKeyDown={event=>{
       if(event.key!=='ArrowLeft')return;
+      const networkButton=event.currentTarget.closest('.live-channel-status, .live-preview-legacy-title')?.querySelector<HTMLButtonElement>('.network-connection-button');
+      if(networkButton){event.preventDefault();event.stopPropagation();networkButton.focus({preventScroll:true});return;}
       const rows=[...document.querySelectorAll<HTMLButtonElement>('.live-channel-list [data-live-channel]')];
       const target=rows.find(row=>row.dataset.liveChannel===favoriteReturnChannel.current)||rows.find(row=>row.dataset.liveChannel===selectedChannel?.id)||rows[0];
       if(target){event.preventDefault();event.stopPropagation();target.focus({preventScroll:true});}
     }}><svg viewBox="0 0 24 24" aria-hidden="true" fill={liveContext.favorite?'currentColor':'none'} stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"><path d="m12 3 2.8 5.7 6.3.9-4.6 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9Z"/></svg></button>;
-  const pageHeader = (
-    <div className="live-page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem 1.5rem', borderBottom: '1px solid #1e293b', backgroundColor: '#0f172a', flexShrink: 0 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-        <button type="button" className="focusable-item live-page-back" onClick={handleBackNavigation} aria-label="Voltar para a tela anterior" title="Voltar"
-          style={{ background: '#1e293b', color: '#f8fafc', border: '1px solid #334155', padding: '0.45rem 0.9rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem' }}>
-          <span className="live-back-label">← Voltar</span>
-          <svg className="live-back-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M19 12H5m6-6-6 6 6 6"/></svg>
-        </button>
-        {(isMobile || squareLive) && onHome && <button type="button" className="focusable-item live-page-home" onClick={onHome} aria-label="Ir para Início" title="Início">
+  const previewNetworkActions = !phoneLive ? <div className="live-preview-network-actions"><CastButton /><NetworkConnectionButton onOpenChange={setNetworkWindowOpen} /></div> : null;
+  const pageHeader = phoneLive ? (
+    <div className="live-page-header">
+      <div>
+        <h1 title="Canais ao Vivo"><span aria-hidden="true">📺</span> Canais ao Vivo</h1>
+        {onHome && <button type="button" className="focusable-item live-page-home" onClick={onHome} aria-label="Ir para Início" title="Início">
           <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V21h-6v-7H9v7H3z"/></svg>
         </button>}
-        <h1 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}><span aria-hidden="true">📺</span> Canais ao Vivo</h1>
-        <span className="live-channel-total" style={{ backgroundColor: '#166534', color: '#86efac', fontSize: '0.7rem', fontWeight: 700, padding: '0.2rem 0.6rem', borderRadius: '999px' }}>
-          {liveCatalog ? `${resolveCanonicalLiveTotal(liveCatalog, canonicalGroupCounts)} CANAIS` : isLoading ? 'Carregando…' : 'Sem canais'}
-        </span>
-        <CastButton iconOnly={isMobile || squareLive} />
+        <NetworkConnectionButton onOpenChange={setNetworkWindowOpen} />
+        <CastButton iconOnly />
       </div>
     </div>
-  );
+  ) : null;
   const headerPortal = mobileHeaderTarget ? createPortal(pageHeader, mobileHeaderTarget) : null;
 
   if (isLoading) {
@@ -1023,7 +1200,7 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
   return (
     <>{headerPortal}
     <div
-      className={`live-tv-page${squareLive ? ' live-tv-page--square' : ''}${isMobile ? ' live-tv-page--mobile' : ''}${isMobile && isEpgOpen ? ' live-tv-page--epg-open' : ''}`}
+      className={`live-tv-page${phoneLive ? ' live-tv-page--phone' : ''}${squareLive ? ' live-tv-page--square' : ''}${isMobile ? ' live-tv-page--mobile' : ''}${isMobile && isEpgOpen ? ' live-tv-page--epg-open' : ''}`}
       style={{
         display: 'flex',
         flexDirection: 'column',
@@ -1034,6 +1211,7 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
       }}
     >
       {!mobileHeaderTarget && pageHeader}
+      {!phoneLive && <h1 className="live-page-title-sr">Canais ao Vivo</h1>}
 
       {/* TABS DE NAVEGAÇÃO MOBILE EM SMARTPHONE */}
       {isMobile && (
@@ -1309,6 +1487,7 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
                     >
                       ● AO VIVO
                     </span>
+                    {!phoneLive && (isMobile||squareLive) && previewNetworkActions}
                     {(isMobile||squareLive)&&favoriteButton}
                     <h2
                       style={{
@@ -1524,7 +1703,7 @@ export const LiveTvPage: React.FC<LiveTvPageProps> = ({ onBack, onHome, onOpenSo
                       Identificador: {selectedChannel.id} • Formato: {selectedChannel.streamRef.containerExtension?.toUpperCase() || 'TS'}
                     </div>
                   </div>
-                  <div className="live-channel-status"><span className="live-channel-live-badge">● AO VIVO</span>{favoriteButton}</div>
+                  <div className="live-channel-status"><span className="live-channel-live-badge">● AO VIVO</span>{previewNetworkActions}{favoriteButton}</div>
                 </div>
 
                 <LiveEpgPanel channel={guideChannel ?? selectedChannel} browsing={browsingGuide} inline open embedded onToggle={() => {}}/>

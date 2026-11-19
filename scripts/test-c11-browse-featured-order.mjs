@@ -1,3 +1,5 @@
+import * as actualAdultPolicy from '../src/playback/content-adult-policy.ts';
+import {categoryGridSeed} from '../src/ui/catalog-grid-window.ts';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import ts from 'typescript';
@@ -25,6 +27,10 @@ function load(file, extra = {}) {
   const module = { exports: {} };
   new Function('require', 'module', 'exports', ts.transpileModule(read(file), { compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.React } }).outputText)(name => {
     if(name.includes('useHeroPlayback'))return {useHeroPlayback:()=>({})};
+    if(name.endsWith('content-adult-policy.ts'))return actualAdultPolicy;
+    if(name.endsWith('CardExpansion.tsx'))return{CardExpansionHost:()=>null};
+    if(name.endsWith('catalog-grid-window.ts'))return{categoryGridSeed};
+    if(name.endsWith('VirtualCatalogGrid.tsx'))return{VirtualCatalogGrid:Grid};
     if(name.includes('BrowseHero'))return {BrowseHero:Hero};
     if(name.includes('FavoriteTitles'))return {FavoriteTitles:()=>null};
     if(name.includes('startup-catalog-preview'))return {selectStartupPosters:()=>[]};

@@ -17,7 +17,10 @@ function load(file, imports) {
   const code = ts.transpileModule(readFileSync(new URL('../' + file, import.meta.url), 'utf8'), { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.React } }).outputText;
   new Function('require', 'module', 'exports', code)(name => {
     const parental=parentalFixtureBindings(name);if(parental)return parental;
+    if(name.endsWith('VirtualCatalogGrid.tsx'))return {VirtualCatalogGrid:imports.CatalogGrid.CatalogGrid};
+    if(name.endsWith('CategoryHero.tsx'))return {CategoryHero:()=>null};
     if(name.includes('useHeroPlayback'))return {useHeroPlayback:()=>({})};
+    if(name.endsWith('CardExpansion.tsx'))return{CardExpansionHost:()=>null};
     if(name.includes('useCatalogReturnNavigation'))return {useCatalogGridReturn:()=>{}};
     if(name.includes('FavoriteTitles'))return {FavoriteTitles:()=>null};
     if(name.includes('startup-catalog-preview'))return {selectStartupPosters:()=>[]};

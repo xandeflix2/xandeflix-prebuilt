@@ -1,0 +1,20 @@
+{
+  "observedUTC": "2026-11-05T17:18:18.516Z",
+  "status": "TRANSPORT_HINTS_READ",
+  "bytes": 545,
+  "sourceUsesHttp": true,
+  "advertisedHttpsPortValid": true,
+  "advertisedHostMatches": false,
+  "preferredProtocol": "http",
+  "auth": "AUTHORIZED",
+  "accountStatus": "Active",
+  "activeConnections": 0,
+  "maxConnections": 2,
+  "atOrAboveLimit": false,
+  "allowedFormats": [
+    "m3u8",
+    "ts"
+  ],
+  "sourceBindingStable": true,
+  "scope": "Provider-reported account metadata only; not proof of entitlement/accessibility for each VOD episode"
+}

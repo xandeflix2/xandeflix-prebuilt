@@ -3,6 +3,9 @@ import fs from 'node:fs';
 import { adjacentLiveChannel, favoriteLivePage } from '../src/playback/live-player-navigation.ts';
 import { LiveFavorites, liveFavoriteScope } from '../src/playback/live-favorites.ts';
 import { liveChannelFingerprint } from '../src/playback/last-live-channel.ts';
+import { readLiveChannelPageForGroupFromSegments } from '../src/catalog/live/live-catalog.service.ts';
+import { installUnconfiguredParentalFixture } from './lib/parental-fixture-bindings.mjs';
+import { parentalControl } from '../src/parental/parental-control.store.ts';
 
 let tests=0;
 async function test(name,run){await run();console.log('PASS '+name);tests++;}
@@ -73,5 +76,53 @@ await test('PIP_PRIVATE_CURRENT_PLAYER_ACTIONS_AND_DISPOSAL_WIRING',()=>{
     assert.ok(source.includes('new MobilePipController(')); assert.ok(source.includes('player,'+kind+')')||source.includes('previewPlayer,'+kind+')'));
     assert.ok(source.includes('pipController.close()'));
   }
+});
+await test('CHANNEL_PANEL_PAGES_COVER_EVERY_AUTHORIZED_ROW_FROM_SEGMENTS', async () => {
+  installUnconfiguredParentalFixture();
+  await parentalControl.load();
+  for (const total of [1, 48, 49, 63, 100, 105]) {
+    const expected = rows.g1.slice(0, total);
+    const segments = {
+      first: JSON.stringify([...expected.slice(0, 53), ...rows.g2.slice(0, 1)]),
+      last: JSON.stringify([...expected.slice(53), expected[0]]),
+    };
+    const seen = [];
+    let offset = 0;
+    while (offset !== null) {
+      const page = await readLiveChannelPageForGroupFromSegments(catalog, 'g1',
+        Object.keys(segments), async file => segments[file], offset, 48);
+      assert.equal(page.totalAvailable, total);
+      assert.deepEqual(page.channels.map(row => row.id), expected.slice(offset, offset + 48).map(row => row.id));
+      seen.push(...page.channels.map(row => row.id));
+      assert.equal(page.nextOffset, offset + 48 < total ? offset + 48 : null);
+      offset = page.nextOffset;
+    }
+    assert.deepEqual(seen, expected.map(row => row.id));
+  }
+});
+await test('FULLSCREEN_CHANNEL_PANEL_SCROLLS_WITH_OWN_SCOPED_WINDOWS', () => {
+  const page = fs.readFileSync(new URL('../src/ui/pages/LiveTvPage.tsx', import.meta.url), 'utf8');
+  const controls = fs.readFileSync(new URL('../android/app/src/main/java/com/xandeflix/prebuilt/player/LivePlayerControls.java', import.meta.url), 'utf8');
+  assert.ok(page.includes('fullscreen ? selectedChannel.groupId : effectiveGroupId'));
+  assert.ok(page.includes('expectedSnapshotId: liveCatalog.snapshotId'));
+  assert.ok(page.includes("ownerSignal?.addEventListener('abort', cancelPage, { once: true })"));
+  assert.ok(page.includes('browseGroupRef.current !== groupId'));
+  assert.ok(page.includes('groupPage.nextOffset'));
+  assert.ok(page.includes('channelPage,'));
+  const load = page.slice(page.indexOf('const requestNativeWindow'), page.indexOf('const currentGroupChannels'));
+  assert.ok(load.includes('LiveCatalogService.loadContinuousChannelPage(effectiveGroupId, offset,'));
+  assert.ok(load.includes('currentNativeWindowKey.current === nativeWindowKey'));
+  assert.ok(load.includes('nativeWindowRequest.current?.abort()'));
+  assert.ok(!load.includes('requestGroupPage'));
+  assert.ok(page.includes('request?.[1] === nativeWindowKey'));
+  assert.ok(page.includes('offset < nativePage.totalAvailable'));
+  assert.ok(controls.includes('list.setOnScrollListener'));
+  assert.ok(controls.includes('int getCount() { return total; }'));
+  assert.ok(controls.includes('emit("loadChannelWindow", adapter.key + ":" + offset)'));
+  const panel = controls.slice(controls.indexOf('private void updateChannelPanel()'),
+    controls.indexOf('private void requestVisibleChannelWindow()'));
+  assert.ok(panel.includes('previousPage.setVisibility(View.GONE)'));
+  assert.ok(panel.includes('nextPage.setVisibility(View.GONE)'));
+  assert.ok(!panel.includes('list.setSelection('));
 });
 console.log(JSON.stringify({tests,pass:true,networkRequests:0}));

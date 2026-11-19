@@ -25,26 +25,32 @@ export class AdultCatalogReader {
       series: { ...this.streams.series, pending: [...this.streams.series.pending] } };
     try {
     const items: CatalogItemViewModel[] = [];
-    for (const kind of ['movies', 'series'] as const) {
+    let queries = 0;
+    scan: for (const kind of ['movies', 'series'] as const) {
       const adult = (row: Movie | Series) => { const metadata = parentalCatalogMetadata(row, this.model, kind === 'movies' ? 'movie' : 'series');
         return metadata.adult || parentalControl.rule(metadata.key)?.adult === true; };
-      const stream = this.streams[kind]; let added = 0;
-      while (added < 24 && (!stream.done || stream.pending.length)) {
+      const stream = this.streams[kind];
+      while (items.length < 24 && (!stream.done || stream.pending.length)) {
         check();
         if (!stream.pending.length && !stream.done) {
           if (manifest && 'segments' in manifest) {
-            const page = await this.browse.loadPage(kind as BrowseKind, stream.cursor, 96, undefined, { count: false, signal });
+            if (queries >= 2) break scan;
+            queries++;
+            const page = await this.browse.loadPage(kind as BrowseKind, stream.cursor, 2500, undefined, { count: false, signal });
             check(); stream.pending = page.items.filter(adult);
             stream.cursor = page.nextCursor || undefined; stream.done = !page.nextCursor;
           } else {
             stream.pending = this.model.catalog[kind].filter(adult); stream.done = true;
           }
         }
-        const batch = stream.pending.splice(0, 24 - added); added += batch.length;
+        const batch = stream.pending.splice(0, 24 - items.length);
         items.push(...batch.map(row => kind === 'movies' ? movieToViewModel(this.model, row as Movie) : seriesToViewModel(this.model, row as Series)));
         if (!stream.done && !stream.pending.length) await new Promise<void>(resolve => setTimeout(resolve, 0));
       }
+      if (items.length) break;
     }
+    check();
+    if ((await this.storage.readActiveManifest())?.snapshotId !== this.model.catalog.metadata.snapshotId) throw new Error('ADULT_GENERATION_CHANGED');
     check();
     return { items, hasMore: Object.values(this.streams).some(s => !s.done || s.pending.length > 0) };
     } catch (error) {

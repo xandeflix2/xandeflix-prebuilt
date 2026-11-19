@@ -1,0 +1,59 @@
+{
+  "startedUTC": "2026-11-05T17:37:32.444Z",
+  "scope": "TABLET_LOCAL_SOURCE_ONLY",
+  "states": [
+    {
+      "phase": "ACTIVE",
+      "cardsVisible": false,
+      "loading": true,
+      "observedUTC": "2026-11-05T17:37:39.683Z"
+    },
+    {
+      "phase": "CLEANED",
+      "cardsVisible": false,
+      "loading": true,
+      "observedUTC": "2026-11-05T17:37:43.005Z"
+    },
+    {
+      "phase": "ACTIVE",
+      "cardsVisible": true,
+      "loading": false,
+      "observedUTC": "2026-11-05T17:38:42.700Z"
+    }
+  ],
+  "result": "PENDING_OR_FAILED",
+  "preflight": {
+    "version": "1.0.53",
+    "authorized": true,
+    "pathsValidated": true,
+    "linksAbsent": true,
+    "lifecycleAndPointerMatch": true,
+    "playersStopped": true,
+    "observerRemoved": true
+  },
+  "prepared": {
+    "phase": "PREPARED",
+    "metadataKeysRemoved": 5
+  },
+  "physicalRemoval": {
+    "catalogRemoved": true,
+    "artworkRemoved": true
+  },
+  "preservation": {
+    "identity": true,
+    "activationKey": true,
+    "installation": true,
+    "activationFields": true,
+    "authorized": true,
+    "personalStorageKeysUnchanged": true,
+    "personalStorageKeysCompared": 0,
+    "sourceBindingUnchanged": true,
+    "epochUnchanged": false,
+    "newSnapshot": true
+  },
+  "catalog": {
+    "phase": "ACTIVE",
+    "cardsVisible": true
+  },
+  "finishedUTC": "2026-11-05T17:38:43.611Z"
+}

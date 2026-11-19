@@ -52,6 +52,11 @@
       "required": ["schemaVersion", "catalogVersion", "snapshotId", "generatedAt", "counts"],
       "description": "Metadados completos declarados para o catálogo target final."
     },
+    "targetExtensions": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Extensoes completas do catalogo target; ausencia representa target sem extensions."
+    },
     "categories": { "$ref": "#/$defs/collectionDelta" },
     "genres": { "$ref": "#/$defs/collectionDelta" },
     "movies": { "$ref": "#/$defs/collectionDelta" },

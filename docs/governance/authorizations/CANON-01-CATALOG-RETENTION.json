@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "gate": "CANON-01-CATALOG-RETENTION",
+  "parentGate": "CANON-01",
+  "amendment": "CANON-01-CATALOG-RETENTION",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "EXPLICIT_USER_AUTOMATIC_OBSOLETE_DATA_CLEANUP_ON_EXISTING_INSTALLATIONS_AND_AUTONOMOUS_LOCAL_RECOVERY",
+  "authorizationRequestSha256": "dc9feae1e4dddb0cc8950d1df1cb93d840d99bc8446f68897e7b91b9681bf854",
+  "reason": "Bound permanent catalog generations without deleting the active/previous/last-known-good data or identity, activation, source and parental state. Automatic delayed startup and post-import maintenance.",
+  "physicalImpact": "REQUIRED",
+  "physicalImpactJustification": "Same-version/certificate separate APK, in-place tests on authorized Fire/tablet/phone; compare protected records and measure actual automatic cleanup. No uninstall/reset/PIN.",
+  "testChangesReviewed": true,
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c105-complete-root-search.mjs",
+    "scripts/test-c107-catalog-return-navigation.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c11-landscape-navigation.mjs",
+    "scripts/validate-direct-playback.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock",
+    "npm run typecheck",
+    "npm run update:check",
+    "npm run security:check",
+    "npm run playback:check",
+    "npm run build",
+    "npm run site:build",
+    "node scripts/test-vercel-prebuilt-contract.mjs",
+    "node scripts/test-c105-directory-import.mjs",
+    "node scripts/test-c105-directory-details.mjs",
+    "node scripts/test-c105-directory-orchestration.mjs",
+    "node scripts/test-c11-automatic-source-refresh.mjs",
+    "node scripts/test-catalog-read-diagnostic.mjs",
+    "node scripts/test-xui-m3u-kind-recovery.mjs",
+    "node scripts/test-c157-web-source-https.mjs",
+    "node scripts/test-catalog-physical-regressions.mjs",
+    "node scripts/test-c135-adult-reader.mjs",
+    "node scripts/test-series-poster-composition.mjs",
+    "node scripts/test-tmdb-context-identity.mjs",
+    "node scripts/test-tmdb-subtitle-preview-recovery.mjs",
+    "node scripts/test-c11-catalog-promotion-directories.mjs",
+    "node scripts/test-catalog-snapshot-retention.mjs"
+  ],
+  "evidence": "docs/evidence/CATALOG_SNAPSHOT_RETENTION.md",
+  "compatibilityRisk": "At least two journal-referenced generations retained. Missing/corrupt references, segment digests or unsupported large files defer cleanup; bounded checksum reads release the queue between files. Existing legacy recovery/import semantics preserved.",
+  "restrictions": [
+    "Preserve128 controls/21 suites and add suite22; do not weaken historical tests.",
+    "Delete only unreferenced permanent snapshot directories after proof and repeated exact state checks. No blanket clear-data, staging/temp/image cache purge.",
+    "No native/Android source, version/signing, source formats/catalog records/player/parental/license/backend or Git publication changes. Subsequent cast/actor page work is separate."
+  ],
+  "supersedes": {
+    "scripts/test-canonical-regression.mjs": "CANON-01-TMDB-SUBTITLE-PREVIEW"
+  },
+  "changes": [
+    {
+      "path": "src/bootstrap/storage/snapshot-retention.ts",
+      "before": null,
+      "after": "406293470484b22691f5371f917e2d44f1e65167"
+    },
+    {
+      "path": "src/bootstrap/storage/capacitor-filesystem.storage.ts",
+      "before": "1dbfc284e798ad2db215da84f32b7890a3bedef5",
+      "after": "3413956a4bea072983f4839efbe3bb0427af85fb"
+    },
+    {
+      "path": "src/bootstrap/storage/storage.interface.ts",
+      "before": "49b9ce7bfb0249c296f210f733b51799eff00a4f",
+      "after": "eeb8e014da1373354696041c692d98ddd3ca1df9"
+    },
+    {
+      "path": "src/bootstrap/bootstrap.service.ts",
+      "before": "1e0fe79239aaa6d09c72ce1a55810f36cf88cdac",
+      "after": "9c9a73d76f4084abab0825375dd8ae791049889e"
+    },
+    {
+      "path": "scripts/test-catalog-snapshot-retention.mjs",
+      "before": null,
+      "after": "9e12246b118bfe3c3aa95f0f5a45542067c6bdce"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "659a422dabbd7dc8a5550575cf73f640b446ea86",
+      "after": "2ae8ab1201dd4624d4eb77454b7d2a79c749883c"
+    }
+  ],
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": true,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false
+}

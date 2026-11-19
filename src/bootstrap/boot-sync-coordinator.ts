@@ -47,6 +47,8 @@ import type { LocalCatalogStorage } from './storage/storage.interface.ts';
 import type { ProvisioningManifest } from '../provisioning/types.ts';
 import { isContentDigest, localSourceContentRepository, type SourceContentRepository } from './automatic-source-refresh.ts';
 import { DIRECTORY_ROOTS_MODE } from '../source/source-directory-api.ts';
+import { createBrowserSourceReplacement, clearSourcePresentationDatabases, type SourceReplacementLifecycle, type SourceBinding,
+  type SourceCatalogReadiness, type SourcePointer } from './source-replacement.ts';
 
 installWebViewBufferCompatibility();
 
@@ -63,6 +65,8 @@ export function requiresClassificationProfileRefresh(manifest: ProvisioningManif
 }
 
 export type BootSyncOutcome =
+  | 'SOURCE_RESET_REQUIRED'
+  | 'SOURCE_REPLACEMENT_FAILED'
   | 'NO_OP'
   | 'PROMOTED'
   | 'DEVICE_NOT_AUTHORIZED'
@@ -116,6 +120,8 @@ export interface BootSyncResult {
 }
 
 export interface BootSyncCoordinatorDependencies {
+  sourceReplacement?: SourceReplacementLifecycle;
+  clearSourcePresentation?: () => Promise<void>;
   contentRepository?: SourceContentRepository;
   deviceContext?: typeof DeviceIdentityService;
   sourceResolver?: () => Promise<ResolvedSourceResult>;
@@ -131,6 +137,9 @@ export interface BootSyncCoordinatorDependencies {
 }
 
 export class BootSyncCoordinator {
+  private readonly sourceReplacement?: SourceReplacementLifecycle;
+  private readonly clearSourcePresentation: () => Promise<void>;
+  private sourceReadiness: SourceCatalogReadiness = { state: 'CHECKING' };
   private readonly contentRepository: SourceContentRepository;
   private readonly deviceContext: typeof DeviceIdentityService;
   private readonly sourceResolver: () => Promise<ResolvedSourceResult>;
@@ -156,6 +165,8 @@ export class BootSyncCoordinator {
   private stateListeners: Set<(state: BootSyncState, result?: BootSyncResult, progress?: BootSyncProgress) => void> = new Set();
 
   constructor(deps?: BootSyncCoordinatorDependencies) {
+    this.sourceReplacement = deps?.sourceReplacement || createBrowserSourceReplacement();
+    this.clearSourcePresentation = deps?.clearSourcePresentation || clearSourcePresentationDatabases;
     this.contentRepository = deps?.contentRepository || localSourceContentRepository;
     this.deviceContext = deps?.deviceContext || DeviceIdentityService;
     this.sourceResolver = deps?.sourceResolver || (() => AuthorizedSourceResolver.resolve());
@@ -176,6 +187,17 @@ export class BootSyncCoordinator {
     return this.currentState;
   }
 
+  getSourceReadiness(): SourceCatalogReadiness { return { ...this.sourceReadiness }; }
+  private sourceReady(pointer: SourcePointer, state: 'READY' | 'LOCAL_UNCONFIRMED' = 'READY'): void {
+    this.sourceReadiness = { state, sourceId: pointer.sourceId, sourceVersion: pointer.sourceVersion, snapshotId: pointer.snapshotId };
+  }
+  private sourceFailure(): BootSyncResult {
+    this.sourceReadiness = { state: 'BLOCKED' };
+    const result: BootSyncResult = { outcome: 'SOURCE_REPLACEMENT_FAILED', syncState: 'ERROR', error: 'SOURCE_REPLACEMENT_INCOMPLETE' };
+    this.setState('ERROR', result, 'Não foi possível concluir a troca da fonte. Tente novamente.');
+    return result;
+  }
+
   getProgress(): BootSyncProgress {
     return this.currentProgress;
   }
@@ -188,6 +210,17 @@ export class BootSyncCoordinator {
   }
 
   private setState(state: BootSyncState, result?: BootSyncResult, progressText?: string, percentage?: number): void {
+    if (result && ['DEVICE_NOT_AUTHORIZED', 'LICENSE_INVALID', 'SOURCE_NOT_BOUND', 'RECONCILIATION_FAILED'].includes(result.outcome)) {
+      this.sourceReadiness = { state: 'BLOCKED' };
+    }
+    if (result && this.sourceReadiness.state === 'REPLACING' && result.outcome !== 'SOURCE_RESET_REQUIRED') {
+      state = 'ERROR'; result.syncState = 'ERROR';
+      result.error ||= 'SOURCE_REPLACEMENT_INCOMPLETE';
+    }
+    if (result && this.sourceReplacement && this.sourceReadiness.state === 'BLOCKED') {
+      state = result.outcome === 'REMOTE_AUTHORITY_UNAVAILABLE' ? 'OFFLINE' : 'ERROR';
+      result.syncState = state;
+    }
     this.currentState = state;
     this.currentProgress = {
       state,
@@ -352,7 +385,7 @@ export class BootSyncCoordinator {
     );
     const existingRealPointer = isExistingReal ? activePointer! : null;
 
-    if (existingRealPointer) {
+    if (existingRealPointer && (!this.sourceReplacement || this.sourceReplacement.verified(existingRealPointer))) {
       this.scheduleDeferredSearchBuild(existingRealPointer.snapshotId);
     }
 
@@ -389,6 +422,10 @@ export class BootSyncCoordinator {
       bootTelemetry.mark('T7_SOURCE_RESOLUTION_READY');
     } catch {
       // Falha de rede ou autoridade remota indisponível
+      this.sourceReadiness = { state: 'BLOCKED' };
+      if (existingRealPointer && (!this.sourceReplacement || this.sourceReplacement.verified(existingRealPointer))) {
+        this.sourceReady(existingRealPointer, 'LOCAL_UNCONFIRMED');
+      }
       if (isExistingReal) {
         const res: BootSyncResult = {
           outcome: 'REMOTE_AUTHORITY_UNAVAILABLE',
@@ -419,6 +456,10 @@ export class BootSyncCoordinator {
         authority.remoteResultCode !== 'LOCAL_ACTIVATION_DEVICE_ID_MISMATCH');
 
     if (remoteAuthorityUnavailable) {
+      this.sourceReadiness = { state: 'BLOCKED' };
+      if (existingRealPointer && (!this.sourceReplacement || this.sourceReplacement.verified(existingRealPointer))) {
+        this.sourceReady(existingRealPointer, 'LOCAL_UNCONFIRMED');
+      }
       const res: BootSyncResult = {
         outcome: 'REMOTE_AUTHORITY_UNAVAILABLE',
         syncState: isExistingReal ? 'READY' : 'OFFLINE',
@@ -524,6 +565,29 @@ export class BootSyncCoordinator {
 
     const expectedSourceId = authority.sourceId;
     const expectedSourceVersion = authority.sourceVersion ?? 1;
+    let binding: SourceBinding | undefined;
+    let activationEpoch: string | undefined;
+    let forceFresh = false;
+    if (this.sourceReplacement) {
+      // A source tuple is trusted only after the existing commercial reconciliation.
+      if (authority.status !== 'SOURCE_READY' || authority.sourceStatus !== 'ACTIVE' ||
+          !['ACTIVE', 'TRIAL'].includes(authority.licenseStatus || '') || !authority.protocol || !authority.sourceVersion) return this.sourceFailure();
+      binding = { sourceId: expectedSourceId, sourceVersion: expectedSourceVersion, protocol: authority.protocol };
+      try {
+        const plan = this.sourceReplacement.prepare(binding, existingRealPointer);
+        activationEpoch = plan.epoch;
+        forceFresh = plan.kind !== 'UNCHANGED';
+        if (forceFresh) this.sourceReadiness = { state: 'REPLACING' };
+        else if (existingRealPointer) this.sourceReady(existingRealPointer);
+        if (plan.kind === 'RELOAD_REQUIRED') {
+          const result: BootSyncResult = { outcome: 'SOURCE_RESET_REQUIRED', syncState: 'CHECKING_SOURCE',
+            sourceId: expectedSourceId, sourceVersion: expectedSourceVersion };
+          this.setState('CHECKING_SOURCE', result, 'Preparando a nova fonte...');
+          return result;
+        }
+        if (forceFresh) await this.clearSourcePresentation();
+      } catch { return this.sourceFailure(); }
+    }
 
     // 3. Checagem de Idempotência
     const activeManifest = await this.bootstrapService.getStorage().readActiveManifest();
@@ -533,7 +597,7 @@ export class BootSyncCoordinator {
       existingRealPointer?.kind === 'REAL' &&
       existingRealPointer.sourceId === expectedSourceId &&
       existingRealPointer.sourceVersion === expectedSourceVersion &&
-      !needsProfileRebuild && !options?.checkContent
+      !forceFresh && !needsProfileRebuild && !options?.checkContent
     ) {
       const res: BootSyncResult = {
         outcome: 'NO_OP',
@@ -542,6 +606,7 @@ export class BootSyncCoordinator {
         sourceId: expectedSourceId,
         sourceVersion: expectedSourceVersion,
       };
+      this.sourceReady(existingRealPointer!);
       this.setState('READY', res, 'Catálogo sincronizado');
       return res;
     }
@@ -562,6 +627,7 @@ export class BootSyncCoordinator {
     }
 
     const needsDelivery =
+      forceFresh ||
       !localRecord ||
       localRecord.sourceId !== expectedSourceId ||
       localRecord.sourceVersion !== expectedSourceVersion;
@@ -620,14 +686,14 @@ export class BootSyncCoordinator {
     let stageResult: ManagedStagingResult;
     let checkpoint: ReturnType<SourceContentRepository['read']> = null;
     try { checkpoint = this.contentRepository.read(); } catch { /* Optional cache; force fresh inspection. */ }
-    const reusableCheckpoint = !needsProfileRebuild && existingRealPointer && checkpoint &&
+    const reusableCheckpoint = !forceFresh && !needsProfileRebuild && existingRealPointer && checkpoint &&
       checkpoint.sourceId === expectedSourceId && checkpoint.sourceVersion === expectedSourceVersion &&
       checkpoint.snapshotId === existingRealPointer.snapshotId && isContentDigest(checkpoint.contentDigest)
       ? checkpoint : undefined;
     // Never replace IDs of an existing legacy snapshot with a different inventory.
     // Directory snapshots retain provider IDs on every subsequent refresh.
     let directoryRoots: 'PREFER' | 'REQUIRE' | undefined;
-    if (!isExistingReal) {
+    if (forceFresh || !isExistingReal || existingRealPointer?.sourceId !== expectedSourceId) {
       directoryRoots = 'PREFER';
     } else {
       const activeCatalog = await this.bootstrapService.getActiveCatalog().catch(() => null);
@@ -662,6 +728,7 @@ export class BootSyncCoordinator {
           stillActive.sourceVersion === expectedSourceVersion) {
         const result: BootSyncResult = { outcome: 'NO_OP', syncState: 'READY', sourceId: expectedSourceId,
           sourceVersion: expectedSourceVersion, snapshotId: stillActive.snapshotId };
+        this.sourceReady(stillActive);
         this.setState('READY', result, 'Catálogo atualizado; nenhum conteúdo alterado');
         return result;
       }
@@ -770,6 +837,18 @@ export class BootSyncCoordinator {
     await yieldToEventLoop();
 
     // 8. Promoção Atômica
+    if (forceFresh && binding) {
+      try {
+        const latest = await this.sourceResolver();
+        if (latest.remoteAuthorityAvailable === false || latest.status !== 'SOURCE_READY' || latest.sourceStatus !== 'ACTIVE' ||
+            latest.sourceId !== binding.sourceId || latest.sourceVersion !== binding.sourceVersion || latest.protocol !== binding.protocol ||
+            latest.licenseId !== authority.licenseId || latest.mode !== authority.mode ||
+            !['ACTIVE', 'TRIAL'].includes(latest.licenseStatus || '')) throw Error('SOURCE_CHANGED_DURING_IMPORT');
+      } catch {
+        await storage.cleanupStaging(stagedSnapshotId).catch(() => {});
+        return this.sourceFailure();
+      }
+    }
     if (isExistingReal && options?.canPromote && !options.canPromote()) {
       await storage.cleanupStaging(stagedSnapshotId).catch(() => {});
       const result: BootSyncResult = { outcome: 'LOCAL_FIRST_ACTIVE_PRESERVED', syncState: 'READY',
@@ -792,6 +871,13 @@ export class BootSyncCoordinator {
 
     bootTelemetry.mark('T11_PROMOTION_COMPLETE');
     const promotedPointer = await this.bootstrapService.getActivePointer().catch(() => null);
+    if (this.sourceReplacement && binding) {
+      try {
+        if (!promotedPointer || promotedPointer.snapshotId !== stagedSnapshotId) return this.sourceFailure();
+        this.sourceReplacement.complete(binding, promotedPointer, activationEpoch!);
+      } catch { return this.sourceFailure(); }
+    }
+    if (promotedPointer) this.sourceReady(promotedPointer);
     if (promotedPointer?.snapshotId === stagedSnapshotId && promotedPointer.sourceId === expectedSourceId &&
         promotedPointer.sourceVersion === expectedSourceVersion && isContentDigest(stageResult.contentDigest)) {
       try { this.contentRepository.write({ sourceId: expectedSourceId, sourceVersion: expectedSourceVersion,

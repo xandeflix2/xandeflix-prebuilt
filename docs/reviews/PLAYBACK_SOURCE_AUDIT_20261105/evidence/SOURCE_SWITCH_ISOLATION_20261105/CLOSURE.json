@@ -1,0 +1,576 @@
+{
+  "observedUTC": "2026-11-05T17:47:42.122Z",
+  "scope": "External evidence files; workspace covered completely by CANDIDATE_SNAPSHOT_FINAL.json",
+  "files": [
+    {
+      "path": "01_CANONICAL_BEFORE.log",
+      "bytes": 2564,
+      "nlink": 1,
+      "sha256": "333306b1454599f02a6fc3a0f99cc69bfd4dd43dce42ce5906580a6cd192e8a0"
+    },
+    {
+      "path": "02_C11_BEFORE.log",
+      "bytes": 3832,
+      "nlink": 1,
+      "sha256": "86546cc7eb8a046c27d1e75abc28eab03010ecc5925a16b02288be5635d62b4e"
+    },
+    {
+      "path": "03_REGRESSION_BEFORE.log",
+      "bytes": 10953,
+      "nlink": 1,
+      "sha256": "5591ff1ab09c960b7a4a3ecd187a02267487794ce883bea3e3de0afd73c6fb96"
+    },
+    {
+      "path": "04_test-c11-automatic-source-refresh.log",
+      "bytes": 6917,
+      "nlink": 1,
+      "sha256": "0bc2e8a904fe3d376ad6d37244f3eccfac3362995a00dbf779f0c8cad5e2c622"
+    },
+    {
+      "path": "04_test-c11-new-content-badge.log",
+      "bytes": 1622,
+      "nlink": 1,
+      "sha256": "18fe242eaa4631d085efcf89867feca060d7274f1c366bec26e223e8fe07297f"
+    },
+    {
+      "path": "04_test-c11-p5b-boot-sync-coordinator.log",
+      "bytes": 3593,
+      "nlink": 1,
+      "sha256": "54de0de8ce5a036d0777d86fcbf2c0c18e629288e976e32ecf90de89a43b0afa"
+    },
+    {
+      "path": "04_test-source-replacement-bootstrap.log",
+      "bytes": 3017,
+      "nlink": 1,
+      "sha256": "54636cc02d8aa05323754097aec08aa3c6d3dde6911c88b4b4fe170a89e69862"
+    },
+    {
+      "path": "04_test-source-replacement-isolation.log",
+      "bytes": 641,
+      "nlink": 1,
+      "sha256": "ade5fc7c8f48e228982e86b999159b370b3a716f900e1b26b0667f21c143873b"
+    },
+    {
+      "path": "04_test-source-replacement-ui.log",
+      "bytes": 365,
+      "nlink": 1,
+      "sha256": "7b5cd6c41726b661b600a86fade3ea16c6f2d5ac77d9b70ef6c00dafc8a0e0d5"
+    },
+    {
+      "path": "05_test-c11-artwork-visible-recovery.mjs.log",
+      "bytes": 1124,
+      "nlink": 1,
+      "sha256": "ca23e852d826b610dfbcc02219c7a1e5c4f709def8bc07c99414cf3943f902f7"
+    },
+    {
+      "path": "05_test-c11-new-content-badge.mjs.log",
+      "bytes": 831,
+      "nlink": 1,
+      "sha256": "ef05c3d60d119d142ac9da1a8ea9707e70452b739e6b3f514309edf1b658e18a"
+    },
+    {
+      "path": "05_test-source-replacement-bootstrap.mjs.log",
+      "bytes": 3017,
+      "nlink": 1,
+      "sha256": "16b71370a39c84b7ba0469a87b7623f3f0c3bd3cc769be03c5a6dfa534b661e4"
+    },
+    {
+      "path": "06_CANONICAL_AFTER.log",
+      "bytes": 2599,
+      "nlink": 1,
+      "sha256": "47cb608f7afe9bba78fd3c7e2f86a62fba3d5887f85c8bf2270ac2b4d75ceb85"
+    },
+    {
+      "path": "07_TYPECHECK.log",
+      "bytes": 0,
+      "nlink": 1,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "08_C11_AFTER.log",
+      "bytes": 3832,
+      "nlink": 1,
+      "sha256": "ced6d7ed308ca4bf117a53cf63774e13bbb08abee0520646ec206efe1fa840a2"
+    },
+    {
+      "path": "09_TARGET_ISOLATION.log",
+      "bytes": 641,
+      "nlink": 1,
+      "sha256": "ade5fc7c8f48e228982e86b999159b370b3a716f900e1b26b0667f21c143873b"
+    },
+    {
+      "path": "10_TARGET_BOOTSTRAP.log",
+      "bytes": 3017,
+      "nlink": 1,
+      "sha256": "c3eaad2a5c4af333be748591a15287c8103c9738a3bf7ad71c7b776fdb86aa2d"
+    },
+    {
+      "path": "11_TARGET_UI.log",
+      "bytes": 365,
+      "nlink": 1,
+      "sha256": "7b5cd6c41726b661b600a86fade3ea16c6f2d5ac77d9b70ef6c00dafc8a0e0d5"
+    },
+    {
+      "path": "12_NOVELTY.log",
+      "bytes": 831,
+      "nlink": 1,
+      "sha256": "ef05c3d60d119d142ac9da1a8ea9707e70452b739e6b3f514309edf1b658e18a"
+    },
+    {
+      "path": "13_ARTWORK_RECOVERY.log",
+      "bytes": 1300,
+      "nlink": 1,
+      "sha256": "272bd43b53665d62e1d44bdba251e1cb1099f09cf99d6e689ed8a19e12db31c4"
+    },
+    {
+      "path": "14_ARTWORK_PREPARATION.log",
+      "bytes": 326,
+      "nlink": 1,
+      "sha256": "964ef38a558b8112a5c24cf942ab39405ecedab50eee7a052fce8b83a96945e5"
+    },
+    {
+      "path": "15_FULL_REGRESSION.log",
+      "bytes": 11117,
+      "nlink": 1,
+      "sha256": "7bc6da3d3344edf6ec2efb48f046174208daf5e52eece0a2fb3ed5745ba6d980"
+    },
+    {
+      "path": "16_CANONICAL_FINAL.log",
+      "bytes": 2599,
+      "nlink": 1,
+      "sha256": "47cb608f7afe9bba78fd3c7e2f86a62fba3d5887f85c8bf2270ac2b4d75ceb85"
+    },
+    {
+      "path": "17_PUBLIC_WEB_BUILD.log",
+      "bytes": 11922,
+      "nlink": 1,
+      "sha256": "62a58fe8200b98642300d404ad0d9018b0f26af43a436b688525988cc758863f"
+    },
+    {
+      "path": "18_CAPACITOR_SYNC.log",
+      "bytes": 432,
+      "nlink": 1,
+      "sha256": "9692309395ef925113b3cf06a8870ed241665d41be6d1ab456ff58a5b2e1b259"
+    },
+    {
+      "path": "19_C11_PRE_GRADLE.log",
+      "bytes": 3832,
+      "nlink": 1,
+      "sha256": "2bfaf644daccd7d7df415b4bf4c0df08884a3370b8eeacdda1062ab9600beb62"
+    },
+    {
+      "path": "20_ANDROID_TEST_BUILD.log",
+      "bytes": 13350,
+      "nlink": 1,
+      "sha256": "2bcb7e08fe9f5ef7f42130b9b3220650f2ee5007586ab0074fa2aa5c06a2dc88"
+    },
+    {
+      "path": "21_CANONICAL_POST_BUILD.log",
+      "bytes": 2647,
+      "nlink": 1,
+      "sha256": "9f6b321d2bcedce84d6b668317dd7c34f94920e4a04cac0b0d23fe35032ad779"
+    },
+    {
+      "path": "22_C11_POST_BUILD.log",
+      "bytes": 3832,
+      "nlink": 1,
+      "sha256": "c633b778c7de05ad0c1b47b2b147723c108b6f7f8e5a96eb5787013f91059c3f"
+    },
+    {
+      "path": "APK_AUDIT.json",
+      "bytes": 2795,
+      "nlink": 1,
+      "sha256": "a6a8939c1410ebe7195860682767ac6610f3c1198ff32fa2d7c84a71bf30e7c8"
+    },
+    {
+      "path": "audit-apk.mjs",
+      "bytes": 4189,
+      "nlink": 1,
+      "sha256": "e7c7bd5d17d5071e4a764cd80aae7aa13d87676d6d5923c2a96d3ba99ea375b0"
+    },
+    {
+      "path": "AUTHORIZATION_CAPTURE.json",
+      "bytes": 897,
+      "nlink": 1,
+      "sha256": "399e803fbaa00f07b861c8bc503f861c41fb73356e32b5448ebd68b14eec3a44"
+    },
+    {
+      "path": "BASELINE_NOVELTY_INCOMPATIBILITY.json",
+      "bytes": 327,
+      "nlink": 1,
+      "sha256": "08a323db8610626b6bc4b48483648462b6fac7cc335feac1946f67199d62d26b"
+    },
+    {
+      "path": "BASELINE_NOVELTY_INCOMPATIBILITY.log",
+      "bytes": 1512,
+      "nlink": 1,
+      "sha256": "ea9297518ff24f17e7e0b88ed58e04010e127669e23abd5bf5a5d99f5e8a7eed"
+    },
+    {
+      "path": "BASELINE_VALIDATIONS.json",
+      "bytes": 637,
+      "nlink": 1,
+      "sha256": "1d4c2ad6a4b3d291bc863017abda5849d1bbb2bdf7f840604dd71c30f074bf74"
+    },
+    {
+      "path": "BEFORE.json",
+      "bytes": 17734,
+      "nlink": 1,
+      "sha256": "07489de6023c642b60e406f44925a492bd925203637cc230229f7b2d4858b733"
+    },
+    {
+      "path": "BUILD_RESULTS.json",
+      "bytes": 932,
+      "nlink": 1,
+      "sha256": "586af2e50cefa87811058afe8b7ec1f8696a1b0d7c3f331c77242c08ecd75255"
+    },
+    {
+      "path": "build-test-apk.mjs",
+      "bytes": 2947,
+      "nlink": 1,
+      "sha256": "b77c6e66c423dc3e811b4692492e905cdb8652f47f197fd7b5beea6976426876"
+    },
+    {
+      "path": "CACHE_REVIEW_REGISTRATION.json",
+      "bytes": 1229,
+      "nlink": 1,
+      "sha256": "f88c251757e51ff98e37ed52089cbcb66890d61c3d5f115af9db9746da0f6b1f"
+    },
+    {
+      "path": "CACHE_REVIEW_VALIDATIONS.json",
+      "bytes": 2470,
+      "nlink": 1,
+      "sha256": "dd779ec49b982483257d3083231eb01b5104849eef65ec5aefeff2decf13a023"
+    },
+    {
+      "path": "CANDIDATE_GIT_BEFORE_BUILD.json",
+      "bytes": 4948,
+      "nlink": 1,
+      "sha256": "7e8717cc478fed87892e2e21a6e1c2a780632d9fa1e7eb93e338050925d4fb43"
+    },
+    {
+      "path": "CANDIDATE_SNAPSHOT_FINAL.json",
+      "bytes": 2081124,
+      "nlink": 1,
+      "sha256": "0bf345fe431ba7ccfbd657a104391f692308fcf25fbfd7a045bc699147dfb28a"
+    },
+    {
+      "path": "CANONICAL_CLOSING.json",
+      "bytes": 81,
+      "nlink": 1,
+      "sha256": "2949214631d870310387b4542096ab51386a519b9e4663ede4c7c5404aff9f80"
+    },
+    {
+      "path": "CANONICAL_CLOSING.log",
+      "bytes": 2647,
+      "nlink": 1,
+      "sha256": "9f6b321d2bcedce84d6b668317dd7c34f94920e4a04cac0b0d23fe35032ad779"
+    },
+    {
+      "path": "cleanup-media.mjs",
+      "bytes": 786,
+      "nlink": 1,
+      "sha256": "49eb7d3ffa0d558895d58f376b5cf0f6ef74f814890763ba4ab995ad5f990d19"
+    },
+    {
+      "path": "close-evidence.mjs",
+      "bytes": 3073,
+      "nlink": 1,
+      "sha256": "aa8599548c8b94337a30374afb4cd2901ed08f208d828e18f21df97c1cef0b33"
+    },
+    {
+      "path": "collect-media.mjs",
+      "bytes": 584,
+      "nlink": 1,
+      "sha256": "0b20d709c493b924bf0f06af3200ee85f5b1eb158b7d3ad226986c57dd2723cb"
+    },
+    {
+      "path": "DEPENDENCIES_MANIFEST.json",
+      "bytes": 1202932,
+      "nlink": 1,
+      "sha256": "666395e4941e4e8fe7180a6131f7e9d2e6714a7b495da14c3e1055ae91f6037c"
+    },
+    {
+      "path": "FINAL_VALIDATIONS.json",
+      "bytes": 2470,
+      "nlink": 1,
+      "sha256": "f65ce2026057726ff932b40ffe9df02dbf9f1cbaad5c5cd2ca477c6017a436a4"
+    },
+    {
+      "path": "FIRE_SAME_SOURCE_RESTART.json",
+      "bytes": 214,
+      "nlink": 1,
+      "sha256": "2872719badf28d833597d3a8843881c1dd2eb194774dce3a2c4b627493d40990"
+    },
+    {
+      "path": "FIRE_UPGRADE.json",
+      "bytes": 1545,
+      "nlink": 1,
+      "sha256": "594ad8ba3c3e15d896b8dca73b259fa1fb9db9e83bed48ac4a5b984094881c7b"
+    },
+    {
+      "path": "GENERATED_GRADLE_COMPARISON.json",
+      "bytes": 237,
+      "nlink": 1,
+      "sha256": "2f6c56df9a46569295289c61606b91654b6cc2ab34be7475cb86faf601296c44"
+    },
+    {
+      "path": "media-observer.mjs",
+      "bytes": 2714,
+      "nlink": 1,
+      "sha256": "9a63795dbccf10c277a7a6d5413ecf304d7ae049ef51eda44fb094aec70859bf"
+    },
+    {
+      "path": "PATCH_REVIEW_COUNTS.json",
+      "bytes": 2308,
+      "nlink": 1,
+      "sha256": "0261f03008492dab142c3aef3c841ef2d4815f493abaf6c5bd88ca68b8705e0f"
+    },
+    {
+      "path": "PATCH_REVIEW.diff",
+      "bytes": 91519,
+      "nlink": 1,
+      "sha256": "29d5bad3a776b289d5f8861f8433c06a97f9b3796724cad5c7a1993e96130b42"
+    },
+    {
+      "path": "playback-action.mjs",
+      "bytes": 2018,
+      "nlink": 1,
+      "sha256": "355fe790587b057e1afa78249cacd920387ca90d7dfb2a17c6b248c9b2e2d0a2"
+    },
+    {
+      "path": "PREPARATION_RESULT.json",
+      "bytes": 591,
+      "nlink": 1,
+      "sha256": "9c477509db718084b910bb24b8328ea28777ac07acc3d2a40d75381721e8c8b2"
+    },
+    {
+      "path": "PREPARATION_SPEC.md",
+      "bytes": 3191,
+      "nlink": 1,
+      "sha256": "d6d52499a1271161b6df41c761dd96597a66ffb4fdb5bbc3db1f521a2e52fe58"
+    },
+    {
+      "path": "prepare-workspace.mjs",
+      "bytes": 6489,
+      "nlink": 1,
+      "sha256": "9775d860987b6f6eb49de9b02e60e1bec4b71d425055f1c438fa4d3baa78e3b0"
+    },
+    {
+      "path": "PRESERVATION_GENERATED_OUTPUT_REVIEW.json",
+      "bytes": 10712,
+      "nlink": 1,
+      "sha256": "e8cb1b1fabe2e0677e22059fa77ef146a2122a32adaa71fa9dfa965764b84b26"
+    },
+    {
+      "path": "PRESERVATION_POST_BUILD.json",
+      "bytes": 4958,
+      "nlink": 1,
+      "sha256": "db84a8c2c95cb56bb5aa2c287bc182e6f14424023a2463cb05f4fe38e07889d5"
+    },
+    {
+      "path": "PRESERVATION_PREBUILD.json",
+      "bytes": 323,
+      "nlink": 1,
+      "sha256": "be9bb293d58f513380faa8d78dcb9c9f64fd049acd49025c1a5fa91ffe42cab5"
+    },
+    {
+      "path": "register-cache-review.mjs",
+      "bytes": 3716,
+      "nlink": 1,
+      "sha256": "f1b5619dc57376fe6b89f798621c2d5c4c0e3b7422127c2e151485c9c66dca7c"
+    },
+    {
+      "path": "register.mjs",
+      "bytes": 8329,
+      "nlink": 1,
+      "sha256": "5304382a16a22384ca00b5712c4723f28e4f3bccff2a0c418cfd4188bf980e5e"
+    },
+    {
+      "path": "REGISTRATION.json",
+      "bytes": 4498,
+      "nlink": 1,
+      "sha256": "46ca1bf4f231eca88c35677af6b51641a96298fddef4914414f973ab309d1eba"
+    },
+    {
+      "path": "REGRESSION_FIRST_PASS_RESULT.json",
+      "bytes": 13475,
+      "nlink": 1,
+      "sha256": "95dd54a90af9e1929d601b23c3d042744100a56f096fd3c31517ac59a575873d"
+    },
+    {
+      "path": "REPORT.md",
+      "bytes": 6688,
+      "nlink": 1,
+      "sha256": "20917c6f20ac880033bce2fef5ca8e39cefdc215aafd49de9f045d786e680716"
+    },
+    {
+      "path": "restart-same-source.mjs",
+      "bytes": 2003,
+      "nlink": 1,
+      "sha256": "7ca8dad2247f996d7109144296743235874dd22a2ad05f83d420264a9d3afe23"
+    },
+    {
+      "path": "REVIEW_06_CANONICAL_AFTER.log",
+      "bytes": 2647,
+      "nlink": 1,
+      "sha256": "9f6b321d2bcedce84d6b668317dd7c34f94920e4a04cac0b0d23fe35032ad779"
+    },
+    {
+      "path": "REVIEW_07_TYPECHECK.log",
+      "bytes": 0,
+      "nlink": 1,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "REVIEW_08_C11_AFTER.log",
+      "bytes": 3832,
+      "nlink": 1,
+      "sha256": "a63d440c582050e67c9f1deda5b18703736783625de2776d1b89caf8b72fb73f"
+    },
+    {
+      "path": "REVIEW_09_TARGET_ISOLATION.log",
+      "bytes": 733,
+      "nlink": 1,
+      "sha256": "8ed108f5f3945a2afa1aae8b6ad63bb50777a35dcffe2e50fc7b59f5a15d0449"
+    },
+    {
+      "path": "REVIEW_10_TARGET_BOOTSTRAP.log",
+      "bytes": 3439,
+      "nlink": 1,
+      "sha256": "9edf1f107b95e56a31dbb458e309fdb6d2d028d3e1c4f0bdad7ff204767c1ffc"
+    },
+    {
+      "path": "REVIEW_11_TARGET_UI.log",
+      "bytes": 365,
+      "nlink": 1,
+      "sha256": "7b5cd6c41726b661b600a86fade3ea16c6f2d5ac77d9b70ef6c00dafc8a0e0d5"
+    },
+    {
+      "path": "REVIEW_12_NOVELTY.log",
+      "bytes": 831,
+      "nlink": 1,
+      "sha256": "ef05c3d60d119d142ac9da1a8ea9707e70452b739e6b3f514309edf1b658e18a"
+    },
+    {
+      "path": "REVIEW_13_ARTWORK_RECOVERY.log",
+      "bytes": 1300,
+      "nlink": 1,
+      "sha256": "272bd43b53665d62e1d44bdba251e1cb1099f09cf99d6e689ed8a19e12db31c4"
+    },
+    {
+      "path": "REVIEW_14_ARTWORK_PREPARATION.log",
+      "bytes": 326,
+      "nlink": 1,
+      "sha256": "964ef38a558b8112a5c24cf942ab39405ecedab50eee7a052fce8b83a96945e5"
+    },
+    {
+      "path": "REVIEW_15_FULL_REGRESSION.log",
+      "bytes": 11117,
+      "nlink": 1,
+      "sha256": "7bc6da3d3344edf6ec2efb48f046174208daf5e52eece0a2fb3ed5745ba6d980"
+    },
+    {
+      "path": "REVIEW_16_CANONICAL_FINAL.log",
+      "bytes": 2647,
+      "nlink": 1,
+      "sha256": "9f6b321d2bcedce84d6b668317dd7c34f94920e4a04cac0b0d23fe35032ad779"
+    },
+    {
+      "path": "run-baseline.mjs",
+      "bytes": 1338,
+      "nlink": 1,
+      "sha256": "40b87c51dcf9697065d5062320241319e6177eab0ab0e3765be27722a36bbd8d"
+    },
+    {
+      "path": "run-cache-review.mjs",
+      "bytes": 1776,
+      "nlink": 1,
+      "sha256": "3184019d375c615446266fa101b40eeff5c1220f1fa76c54a71fb1626d699137"
+    },
+    {
+      "path": "run-final.mjs",
+      "bytes": 1759,
+      "nlink": 1,
+      "sha256": "791049e07fab6c122bc739ff1473235fe1f2b88ee143459dfd7014e1403de332"
+    },
+    {
+      "path": "run-targeted.mjs",
+      "bytes": 1306,
+      "nlink": 1,
+      "sha256": "ed8072c90a7eddc0fba472c26c3930310c1216e9fcde8b0c131f421938515b0e"
+    },
+    {
+      "path": "SOURCE_GIT_BEFORE.json",
+      "bytes": 7164,
+      "nlink": 1,
+      "sha256": "947adf832b07bf56091b92fb1eea0205790838df6b49a90072452ee6f9b12f07"
+    },
+    {
+      "path": "SOURCE_MANIFEST.json",
+      "bytes": 288563,
+      "nlink": 1,
+      "sha256": "0be4a12e035a8c73bd8ae78c17eac86073d673bb1d96386a6f8aff1075b902f6"
+    },
+    {
+      "path": "SPEC.md",
+      "bytes": 13410,
+      "nlink": 1,
+      "sha256": "66a8cb12df82d358091e79f032557d6d505d3adbebe3e4ae40a6a274f4a9ec4f"
+    },
+    {
+      "path": "SUPABASE_API_KEYS.md",
+      "bytes": 21982,
+      "nlink": 1,
+      "sha256": "303970942f92da5425b2fe34e531a6a2d1eb79f4abcae70a5adafbb6c389877a"
+    },
+    {
+      "path": "SUPABASE_CHANGELOG.md",
+      "bytes": 103503,
+      "nlink": 1,
+      "sha256": "e0c7128cf15f0836b0c567e9d0c10fb03796cd25bbd5f8b54a5dcc7389de880f"
+    },
+    {
+      "path": "TABLET_SAME_SOURCE_RESTART.json",
+      "bytes": 214,
+      "nlink": 1,
+      "sha256": "41fd3177c7e132548511af6b9869a3aee757ed795c9abbef6996b114e28367cc"
+    },
+    {
+      "path": "TABLET_UPGRADE.json",
+      "bytes": 1298,
+      "nlink": 1,
+      "sha256": "e135805857f3b3d00a594fe27323b3fe2f8929bda95fc83889260dc88b57b5cf"
+    },
+    {
+      "path": "TABLET_V153_MOVIE.json",
+      "bytes": 1544,
+      "nlink": 1,
+      "sha256": "d328e6999a54e4bd8e5cc84c24772dc44a8f91792fcc80145119fcc614259ba2"
+    },
+    {
+      "path": "TARGETED_REVIEW_VALIDATIONS.json",
+      "bytes": 520,
+      "nlink": 1,
+      "sha256": "7701b56ebc975f0069bc107b80406a0651eb58a4f71a99a78b997271a829166a"
+    },
+    {
+      "path": "TARGETED_VALIDATIONS.json",
+      "bytes": 1039,
+      "nlink": 1,
+      "sha256": "d3f98000e862a715f7be3359f72eac57047ed92fbcdff61fa6144f19db604832"
+    },
+    {
+      "path": "upgrade-device.mjs",
+      "bytes": 4114,
+      "nlink": 1,
+      "sha256": "c4b4cb7bb04af1591ff04ba7bc5232d54b16e810c92ca4540a850dcad8a531f8"
+    },
+    {
+      "path": "Xandeflix-v1.0.53-Source-Isolation-20261105.apk",
+      "bytes": 21056416,
+      "nlink": 1,
+      "sha256": "d849a27e0106006b324ea86b320909b455b11c92c774967b1189b3f8900e1caa"
+    }
+  ]
+}

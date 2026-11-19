@@ -1,0 +1,2194 @@
+{
+  "evidence": [
+    {
+      "source": "DEVICE_AUDIT_20261104/APK_RESET_EVIDENCE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/APK_RESET_EVIDENCE.json",
+      "bytes": 32057,
+      "sha256": "9cc9b20d6e4b38cc98d05f1543a69bffe97d10c2fc34364de1dbcc141d5eec5c"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/build-map-probe.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/build-map-probe.mjs",
+      "bytes": 2052,
+      "sha256": "c087d1e3dec87a6af135feb95b67b1c393078f92bf9a69cf9e7569d82d21f91d"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/cdp.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/cdp.mjs",
+      "bytes": 1991,
+      "sha256": "6aac1d4d7dcc3068fbf8f8ce4449ffd896f1e98dd02438739a2c819281c812fe"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/cleanup-check.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/cleanup-check.mjs",
+      "bytes": 674,
+      "sha256": "141ccc7391b07a80ae7f5e6272de7f2ba271c26d8a438f35eb2a8d66b6cdd959"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/CLEANUP_CHECK.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/CLEANUP_CHECK.json",
+      "bytes": 279,
+      "sha256": "4b40f6396dcc4fb4f31f69918acbe2d309997fedd86b8d9e6c18a58fc35cb1f9"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/CLOSURE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/CLOSURE.json",
+      "bytes": 9800,
+      "sha256": "72ad014326a8bdc1d94d74fdd31687f08ec0b5278371bae1014ccb6158feb21b"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/CORRECTIVE_PLAN.md",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/CORRECTIVE_PLAN.md",
+      "bytes": 5521,
+      "sha256": "60b78edb0c5471e5be9231fbfe5ec214d2bacf8e110da079c6a0373eac024109"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/DEVICES_BEFORE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/DEVICES_BEFORE.json",
+      "bytes": 2387,
+      "sha256": "bdd69d452822e313d45aa4302abf7dd87869cc8f384515b4c3fe4e44f7fc651d"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/DEVICES_FINAL.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/DEVICES_FINAL.json",
+      "bytes": 1280,
+      "sha256": "23ec49bf9af12f65d118941bee0a9cfd9326b253aa4af0ff038adf0402946aa5"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/divergence-review.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/divergence-review.mjs",
+      "bytes": 2461,
+      "sha256": "e7bd4ad7e3ff2dc80e25c2c3545f5d67e39f551285f486feb454029005d8d49b"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/finalize-audit.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/finalize-audit.mjs",
+      "bytes": 3237,
+      "sha256": "5435efc0779a17b5fc33e99793705f0c7e421ad645575dd209a91793b10edb83"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/fire-layout-runtime.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/fire-layout-runtime.json",
+      "bytes": 1230,
+      "sha256": "7855e3a942160c22bc56ee162333529d096ca13740c7b602bacfa5e33c781bf3"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/fire-silo-details.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/fire-silo-details.json",
+      "bytes": 735,
+      "sha256": "fa287c3880ec32eb9e566120ae71d84e45d24866ffd1de16548d5ef9c1089500"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/fire-silo-final.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/fire-silo-final.json",
+      "bytes": 2579,
+      "sha256": "3d5fad182f1166c33a64c453914858e8d2177f20311d9272b80ee609f8d7572f"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/fire-silo-playback.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/fire-silo-playback.json",
+      "bytes": 1374,
+      "sha256": "6410aae9069026bab24f0f3175cf783e71ee438ace98610274a36500be511678"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/fire-update.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/fire-update.mjs",
+      "bytes": 4797,
+      "sha256": "08dfebe64b7af56b8289ad204f74fdb2c2a68123bb06d9cfa4f40808730947cd"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/FUTURE_CREDITS_SPEC.md",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/FUTURE_CREDITS_SPEC.md",
+      "bytes": 6412,
+      "sha256": "72506ab9941bd1e6097ec44e494a6318f1d54adf9d1ff4bea60a79dd5ebb85d2"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/G3_DIVERGENCE_REVIEW.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/G3_DIVERGENCE_REVIEW.json",
+      "bytes": 16954,
+      "sha256": "f079667818930e6cad6591c8dc8f38819c5b139f9aa8fe108fb45fcf7735e088"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/INCIDENTS.md",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/INCIDENTS.md",
+      "bytes": 1456,
+      "sha256": "48a8dff63e4e7bb33bad492adc8cd1ec73bfeea6160c626d2cf6aceca2cb4c58"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/installed-final.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/installed-final.mjs",
+      "bytes": 1650,
+      "sha256": "8c0ccab9ceff4bdccb8b21339d7ce46e425d75119c82c3873bfc74b2fab95585"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/INSTALL_SCOPE.md",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/INSTALL_SCOPE.md",
+      "bytes": 1499,
+      "sha256": "8851f46d2e169765563863ae678a3502a6e8e7c3b5e251b1a9e9596c3725fce8"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/layout-audit.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/layout-audit.mjs",
+      "bytes": 1268,
+      "sha256": "813bdf4a2cf5286ae5d9f73e0afebdd707cb402cfc738a158635612a9818bcd6"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/map-seasons-probe.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/map-seasons-probe.mjs",
+      "bytes": 17930,
+      "sha256": "71d3ad14edfcefc4414c386861f7e9b9cb90866b6c24821cb50136cf7860e05b"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/phone-baseapi-network2.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/phone-baseapi-network2.json",
+      "bytes": 102,
+      "sha256": "bf5fd94940f2a83b91b2fb5074183fc4298df796273c5944f3915a077fce168f"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/phone-httpstatus-network2.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/phone-httpstatus-network2.json",
+      "bytes": 125,
+      "sha256": "c61354cb7388c90661e93323485a3ed1eb0c33447168e0ce165e6e4d35f5c280"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/phone-layout-runtime.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/phone-layout-runtime.json",
+      "bytes": 1591,
+      "sha256": "7935457ba61f5e5d30053dbe15e4c079656ea73a200d4fb9a460eb7298f4cdd6"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/phone-movie-checkpoints.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/phone-movie-checkpoints.json",
+      "bytes": 289,
+      "sha256": "3c4051e7960de8c80a6e92a70f52684debe2c6b6047fa8beea628cdb011530d7"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/phone-movie-errors.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/phone-movie-errors.json",
+      "bytes": 2,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/phone-movie-result.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/phone-movie-result.json",
+      "bytes": 1854,
+      "sha256": "8d2287d46c8b84cb4ef4594659567f721e78c26403e8d647937794359c152320"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/phone-movie-runtime.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/phone-movie-runtime.json",
+      "bytes": 498,
+      "sha256": "c35cb3e968a2f13489096a63146e04b321c9957dd12e973b2662125b85b72536"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/phone-silo-details.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/phone-silo-details.json",
+      "bytes": 861,
+      "sha256": "0cbfb2f1cfafba7013c13ab5c4ef19f926f2b30faa86919127f1d65f39597ccb"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/phone-silo-diagnostic.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/phone-silo-diagnostic.json",
+      "bytes": 71,
+      "sha256": "f571b5a49c329ddbf007545197b55be306cb544dd4082b414dad12e32dea153c"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/phone-silo-final.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/phone-silo-final.json",
+      "bytes": 701,
+      "sha256": "5ae5c1357ad4d359d1c63852f058037a10dcbbf06edbc11cb7a5bc896ba69e6e"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/phone-Ted_Lasso-scenario.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/phone-Ted_Lasso-scenario.json",
+      "bytes": 1131,
+      "sha256": "444c1653fa62d885250b777a4584afc65189d43c5d0e50494b503082c7e7cd42"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/phone-transport-comparison.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/phone-transport-comparison.json",
+      "bytes": 246,
+      "sha256": "ec5ad8cb78d458bacf8ca83ccd5406667edd63589b967c46d91340d6f1bd42e3"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/phone-transport-diagnostic.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/phone-transport-diagnostic.json",
+      "bytes": 253,
+      "sha256": "d2bb5269d434b9aeb1c76f3ef1333d5e8e0a0d03844a7673e2a52058d6842cbd"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/phone_network2-Ted_Lasso-scenario.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/phone_network2-Ted_Lasso-scenario.json",
+      "bytes": 1129,
+      "sha256": "2a4014d4f2d4fccf9f578f9a85483b59f863c33d73ad4bd8c00eb82af5b6c139"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/REPORT.md",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/REPORT.md",
+      "bytes": 21828,
+      "sha256": "814943e24b31dc9e1cf2c918573f3065bf2cb8b229ab46447fcc8ef79a80ff80"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/repository-audit.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/repository-audit.mjs",
+      "bytes": 2868,
+      "sha256": "15a7438c9ccdeb20996a5d29eb62ca468be18c3ff56bd9e3ea2f159d96e72ca8"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/REPOSITORY_AUDIT.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/REPOSITORY_AUDIT.json",
+      "bytes": 62567,
+      "sha256": "c176eab527c2793d8b196cd932444212c439ec9350908ba1d844a752c4e84b33"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/RESULT.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/RESULT.json",
+      "bytes": 1487,
+      "sha256": "0d59af5ec20b181b9b4d8b54e36d206eaccad44cdf0febd8e96917aed6b35f1d"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/series-scenario.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/series-scenario.mjs",
+      "bytes": 2903,
+      "sha256": "615aaf169a328ca02632862a72bc368d2b1012d34466d5f6d87ba3205ad1f566"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/SIGNATURES.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/SIGNATURES.json",
+      "bytes": 321,
+      "sha256": "f811c296f93c8ea9f11923f7c450f41a738846fc4c5102a672cebe2da20cdcd3"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/SPEC.md",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/SPEC.md",
+      "bytes": 734,
+      "sha256": "84200ce091b41b20b18127be882eed54338e9a15b35a74938e72be23c665cfb4"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/tablet-base-api-diagnostic.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/tablet-base-api-diagnostic.json",
+      "bytes": 340,
+      "sha256": "ca8c0399a1cf19c0256acce9bf24d264431d67592b798569bf49e61f95d07b85"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/tablet-layout-runtime.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/tablet-layout-runtime.json",
+      "bytes": 2158,
+      "sha256": "12caa0be09a9a15f25af9a42e89f11e0aa6e8d5db8c5b10bf9b5907f8ab7a779"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/tablet-Mat_ria_Escura-scenario.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/tablet-Mat_ria_Escura-scenario.json",
+      "bytes": 1190,
+      "sha256": "9807691a0e4abacb815577bd7ff13c137a9da9c97bd70a0550239214a84c8711"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/tablet-silo-details.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/tablet-silo-details.json",
+      "bytes": 747,
+      "sha256": "7fa8e73d5376cc30ba31e2da064ed9aaf275226b28f119dfda41770e15fa9ca5"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/tablet-silo-diagnostic.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/tablet-silo-diagnostic.json",
+      "bytes": 71,
+      "sha256": "f571b5a49c329ddbf007545197b55be306cb544dd4082b414dad12e32dea153c"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/tablet-silo-final.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/tablet-silo-final.json",
+      "bytes": 704,
+      "sha256": "91e8df928f289845fe24a197b8f469a11d5428d5c2b731b0bd6cb8037723f32b"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/tablet-Ted_Lasso-scenario.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/tablet-Ted_Lasso-scenario.json",
+      "bytes": 1147,
+      "sha256": "f1cf01584e6dd8060ac249c4f1fa0223e5bba0ef539e6cb600a96b046215a219"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/tablet-transport-comparison.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/tablet-transport-comparison.json",
+      "bytes": 246,
+      "sha256": "ec5ad8cb78d458bacf8ca83ccd5406667edd63589b967c46d91340d6f1bd42e3"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/tablet-transport-diagnostic.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/tablet-transport-diagnostic.json",
+      "bytes": 253,
+      "sha256": "d2bb5269d434b9aeb1c76f3ef1333d5e8e0a0d03844a7673e2a52058d6842cbd"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/tablet_network2-Silo-scenario.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/tablet_network2-Silo-scenario.json",
+      "bytes": 1168,
+      "sha256": "78bca6abef0ddc478ff18461f34102ccba05c455d47c73d8c7cd748bdcd5bd0e"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/validation-c11.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/validation-c11.log.txt",
+      "bytes": 3832,
+      "sha256": "fb7c492919126190103095a24ce32220bd91f55af26f762b79c05ad6f492bd57"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/validation-canonical.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/validation-canonical.log.txt",
+      "bytes": 2564,
+      "sha256": "333306b1454599f02a6fc3a0f99cc69bfd4dd43dce42ce5906580a6cd192e8a0"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/validation-regression-result.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/validation-regression-result.json",
+      "bytes": 13185,
+      "sha256": "ccefd69c642066fe3379b54a1f2d573e056eac74955548b9153984410504194c"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/validation-regression.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/validation-regression.log.txt",
+      "bytes": 10953,
+      "sha256": "5591ff1ab09c960b7a4a3ecd187a02267487794ce883bea3e3de0afd73c6fb96"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/validation-results.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/validation-results.json",
+      "bytes": 1197,
+      "sha256": "9015f362b396bdca9101cf541946cdca272dab59178182c4984479a5e4f1cf0c"
+    },
+    {
+      "source": "DEVICE_AUDIT_20261104/validation-typecheck.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/DEVICE_AUDIT_20261104/validation-typecheck.log.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": "OTHER_AGENT_REVIEW_20261104/REPORT.md",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/OTHER_AGENT_REVIEW_20261104/REPORT.md",
+      "bytes": 15718,
+      "sha256": "a19b6b46c4fde6dae178f1bae594f377a53a961e2f4ac4d275f8ab7fc5994f09"
+    },
+    {
+      "source": "APK_PREVIOUS_COMPARISON_20261104/APK_IDENTITIES_FINAL.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/APK_PREVIOUS_COMPARISON_20261104/APK_IDENTITIES_FINAL.json",
+      "bytes": 442,
+      "sha256": "07186765b83acdf39b915bcec422b6de3ffc7ec64740a1b46d42fb46e0d9238f"
+    },
+    {
+      "source": "APK_PREVIOUS_COMPARISON_20261104/check-helper-syntax.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/APK_PREVIOUS_COMPARISON_20261104/check-helper-syntax.mjs",
+      "bytes": 349,
+      "sha256": "f19eb8e74d8b72c2fd7ca625349ca2101a68728e31330df2f438e448ec4bb6e0"
+    },
+    {
+      "source": "APK_PREVIOUS_COMPARISON_20261104/check-source-residue.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/APK_PREVIOUS_COMPARISON_20261104/check-source-residue.mjs",
+      "bytes": 4429,
+      "sha256": "e69ece24bda46aec68f9d6a6e76a815a163c84e81972468e39b7fe5634494d54"
+    },
+    {
+      "source": "APK_PREVIOUS_COMPARISON_20261104/check-tablet-source-binding.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/APK_PREVIOUS_COMPARISON_20261104/check-tablet-source-binding.mjs",
+      "bytes": 4993,
+      "sha256": "ea2242eee87380663e4f7940c00ed896c18b709fe122166a00ec5890ecd4430c"
+    },
+    {
+      "source": "APK_PREVIOUS_COMPARISON_20261104/cleanup-tablet-observer.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/APK_PREVIOUS_COMPARISON_20261104/cleanup-tablet-observer.mjs",
+      "bytes": 1332,
+      "sha256": "6f6945df49ac00d81be4365c48c5aa2c159b68f5a16fecd95cf03ea2e9581789"
+    },
+    {
+      "source": "APK_PREVIOUS_COMPARISON_20261104/close-evidence.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/APK_PREVIOUS_COMPARISON_20261104/close-evidence.mjs",
+      "bytes": 1382,
+      "sha256": "393651b4561d47ed7bf30e73be4bfb09d9315eb19de1a8d9a74afecd96c7f4c8"
+    },
+    {
+      "source": "APK_PREVIOUS_COMPARISON_20261104/CLOSURE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/APK_PREVIOUS_COMPARISON_20261104/CLOSURE.json",
+      "bytes": 18033,
+      "sha256": "0415e5390cf4a4e07eceec412162e78bf28f0e75c9d812a609dbccf5d4ecf2ad"
+    },
+    {
+      "source": "APK_PREVIOUS_COMPARISON_20261104/compare-inventory.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/APK_PREVIOUS_COMPARISON_20261104/compare-inventory.mjs",
+      "bytes": 1893,
+      "sha256": "98ede7713c1aa343663335393c0b59a02aa1f437f37dccdb6847f8804bba2699"
+    },
+    {
+      "source": "APK_PREVIOUS_COMPARISON_20261104/compare-symbols.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/APK_PREVIOUS_COMPARISON_20261104/compare-symbols.mjs",
+      "bytes": 4059,
+      "sha256": "d14c127ab286140451c7772339e64716069a721b01e55fa338de256537bd7877"
+    },
+    {
+      "source": "APK_PREVIOUS_COMPARISON_20261104/extract-public.ps1",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/APK_PREVIOUS_COMPARISON_20261104/extract-public.ps1",
+      "bytes": 2736,
+      "sha256": "c6a7f51051a8401ae2cbc05bcac4a5499970fdde6e7a735ed0a6ce382b823ed5"
+    },
+    {
+      "source": "APK_PREVIOUS_COMPARISON_20261104/FIRE_SOURCE_RESIDUE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/APK_PREVIOUS_COMPARISON_20261104/FIRE_SOURCE_RESIDUE.json",
+      "bytes": 1291,
+      "sha256": "8f8559b591d8de450e717ecf8cbaf42c52e760f01980fe7cac9ebb6672a3325f"
+    },
+    {
+      "source": "APK_PREVIOUS_COMPARISON_20261104/format-assets.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/APK_PREVIOUS_COMPARISON_20261104/format-assets.mjs",
+      "bytes": 805,
+      "sha256": "dc4f5c3439652527ac03dc48e956015f6c7ba7e2b1309d0769367f3710df1118"
+    },
+    {
+      "source": "APK_PREVIOUS_COMPARISON_20261104/inspect-js.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/APK_PREVIOUS_COMPARISON_20261104/inspect-js.mjs",
+      "bytes": 2897,
+      "sha256": "a669b6589dfa3942b44e907397773d5c2f2c19f31fd735ec3b6878488cc9708b"
+    },
+    {
+      "source": "APK_PREVIOUS_COMPARISON_20261104/JS_FOCUSED_FINDINGS.md",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/APK_PREVIOUS_COMPARISON_20261104/JS_FOCUSED_FINDINGS.md",
+      "bytes": 5848,
+      "sha256": "c821d0a10de11375ffdd5dd30661901024409113b40059f6a8dd9252dba23ea4"
+    },
+    {
+      "source": "APK_PREVIOUS_COMPARISON_20261104/JS_STRUCTURAL_MATCHES.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/APK_PREVIOUS_COMPARISON_20261104/JS_STRUCTURAL_MATCHES.json",
+      "bytes": 1755377,
+      "sha256": "9d8f542ec6bb3d38c1e764b000addc91ac5fec23403b0b12ba5fb05361d9b913"
+    },
+    {
+      "source": "APK_PREVIOUS_COMPARISON_20261104/JS_SYMBOL_COMPARISON.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/APK_PREVIOUS_COMPARISON_20261104/JS_SYMBOL_COMPARISON.json",
+      "bytes": 50409,
+      "sha256": "b40f10af77d2903a683679fc464eb2d2da5ac24a22a1e9fa75175ee1259804ad"
+    },
+    {
+      "source": "APK_PREVIOUS_COMPARISON_20261104/OLD_PACKAGE_EVIDENCE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/APK_PREVIOUS_COMPARISON_20261104/OLD_PACKAGE_EVIDENCE.json",
+      "bytes": 21774,
+      "sha256": "f74397f445ee9a1f910c8ee1c349ea600fe0cc119c20563f9c53c5bf94447a66"
+    },
+    {
+      "source": "APK_PREVIOUS_COMPARISON_20261104/read-source-metadata-adb.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/APK_PREVIOUS_COMPARISON_20261104/read-source-metadata-adb.mjs",
+      "bytes": 3534,
+      "sha256": "58d8bcf148b04306fc3f1ac6c61faf7133b380740ac1072fae3795055de8bc8a"
+    },
+    {
+      "source": "APK_PREVIOUS_COMPARISON_20261104/REA_VERSION_COMPARISON_PROJECTION.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/APK_PREVIOUS_COMPARISON_20261104/REA_VERSION_COMPARISON_PROJECTION.json",
+      "bytes": 115812,
+      "sha256": "e0cc16e766bd5d84a6465f4f2dd64fd74553aa32fb264ab97b3fd3ff73addf49"
+    },
+    {
+      "source": "APK_PREVIOUS_COMPARISON_20261104/REPORT.md",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/APK_PREVIOUS_COMPARISON_20261104/REPORT.md",
+      "bytes": 18288,
+      "sha256": "8ff44a36e34f1760e897192a53a128fb6f061176b85d09ffac04c0b5850a0e20"
+    },
+    {
+      "source": "APK_PREVIOUS_COMPARISON_20261104/RESULT.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/APK_PREVIOUS_COMPARISON_20261104/RESULT.json",
+      "bytes": 1263,
+      "sha256": "59edd9804a6320f596768f1da14d0c8b4ea9a80d168c7e231590e70eb61baf32"
+    },
+    {
+      "source": "APK_PREVIOUS_COMPARISON_20261104/slice-js.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/APK_PREVIOUS_COMPARISON_20261104/slice-js.mjs",
+      "bytes": 385,
+      "sha256": "01db0b3d6b1d816baad85ac15f80e660e2e5fbb2fa24fff381dd1fd9f5332da4"
+    },
+    {
+      "source": "APK_PREVIOUS_COMPARISON_20261104/SOURCE_RESIDUE_SPEC.md",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/APK_PREVIOUS_COMPARISON_20261104/SOURCE_RESIDUE_SPEC.md",
+      "bytes": 1221,
+      "sha256": "3c91c07caf751fd502f366cc66c8cdc06de90821cf20928f69049b33fd01f91c"
+    },
+    {
+      "source": "APK_PREVIOUS_COMPARISON_20261104/SPEC.md",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/APK_PREVIOUS_COMPARISON_20261104/SPEC.md",
+      "bytes": 1275,
+      "sha256": "80251763156c186f02197398f850a2c1e8efe0b8800b2065d89ccfdab788a6b7"
+    },
+    {
+      "source": "APK_PREVIOUS_COMPARISON_20261104/TABLET_OBSERVER_CLEANUP_AND_HISTORY.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/APK_PREVIOUS_COMPARISON_20261104/TABLET_OBSERVER_CLEANUP_AND_HISTORY.json",
+      "bytes": 346,
+      "sha256": "7a1537a89f10bcd4e5771baf30262cb0fb44166774ae134d14a0b67d289de374"
+    },
+    {
+      "source": "APK_PREVIOUS_COMPARISON_20261104/TABLET_SOURCE_BINDING.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/APK_PREVIOUS_COMPARISON_20261104/TABLET_SOURCE_BINDING.json",
+      "bytes": 1243,
+      "sha256": "b25b707d826fd1953501520d8f00347e22fb635c62456ace208307d1b942e2cf"
+    },
+    {
+      "source": "APK_PREVIOUS_COMPARISON_20261104/TABLET_SOURCE_RESIDUE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/APK_PREVIOUS_COMPARISON_20261104/TABLET_SOURCE_RESIDUE.json",
+      "bytes": 1381,
+      "sha256": "5888735dc24bbfe80699d42bd3dd0c95345235200a26135ef64b233f78e878df"
+    },
+    {
+      "source": "APK_PREVIOUS_COMPARISON_20261104/v137-inventory.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/APK_PREVIOUS_COMPARISON_20261104/v137-inventory.json",
+      "bytes": 304077,
+      "sha256": "ab3c4a11b63fc4e009e8c492345fa563ce77bad0c63dbd5d83bbda12e235a49c"
+    },
+    {
+      "source": "APK_PREVIOUS_COMPARISON_20261104/v137-JS_REA_SUMMARY.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/APK_PREVIOUS_COMPARISON_20261104/v137-JS_REA_SUMMARY.json",
+      "bytes": 14338,
+      "sha256": "74b20e496d755dd85ed9d53ff27c51cb531af8110656c7678ce36a42e0074867"
+    },
+    {
+      "source": "APK_PREVIOUS_COMPARISON_20261104/v137-signature.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/APK_PREVIOUS_COMPARISON_20261104/v137-signature.log.txt",
+      "bytes": 10917,
+      "sha256": "4531a489141e34d3f74a2925836695bf383b50f6d5e37e45d4bb097c223c9e4f"
+    },
+    {
+      "source": "APK_PREVIOUS_COMPARISON_20261104/v152-inventory.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/APK_PREVIOUS_COMPARISON_20261104/v152-inventory.json",
+      "bytes": 304458,
+      "sha256": "fb68a914b68726aeb57718ba90e4cee47d09f4a2fccd7a5115d5accd2473f61b"
+    },
+    {
+      "source": "APK_PREVIOUS_COMPARISON_20261104/v152-JS_REA_SUMMARY.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/APK_PREVIOUS_COMPARISON_20261104/v152-JS_REA_SUMMARY.json",
+      "bytes": 14338,
+      "sha256": "fc337f254e55d8f30cbd922dc4580e944e874e84dac8dbb90f62968fc4ce3161"
+    },
+    {
+      "source": "APK_PREVIOUS_COMPARISON_20261104/v152-signature.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/APK_PREVIOUS_COMPARISON_20261104/v152-signature.log.txt",
+      "bytes": 10917,
+      "sha256": "4531a489141e34d3f74a2925836695bf383b50f6d5e37e45d4bb097c223c9e4f"
+    },
+    {
+      "source": "APK_PREVIOUS_COMPARISON_20261104/ZIP_COMPARISON.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/APK_PREVIOUS_COMPARISON_20261104/ZIP_COMPARISON.json",
+      "bytes": 13752,
+      "sha256": "469d645da3712f5c1dfb06d31130d8e0ce1838c15af7d3efd685d031e7120739"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/cleanup-media.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/cleanup-media.mjs",
+      "bytes": 786,
+      "sha256": "49eb7d3ffa0d558895d58f376b5cf0f6ef74f814890763ba4ab995ad5f990d19"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/collect-fire-trace.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/collect-fire-trace.mjs",
+      "bytes": 585,
+      "sha256": "3ab7829de68497a955724d27d984e0b868cc4251db228bc722da6b3086ef86cd"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/collect-media.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/collect-media.mjs",
+      "bytes": 584,
+      "sha256": "0b20d709c493b924bf0f06af3200ee85f5b1eb158b7d3ad226986c57dd2723cb"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/compare-latest-js.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/compare-latest-js.mjs",
+      "bytes": 4137,
+      "sha256": "87eb6c343dc5fe251cd616f37cc85e11c09dfb42a71b7d153e4b554b6a7b5931"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/EPISODE_REFERENCE_SPEC.md",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/EPISODE_REFERENCE_SPEC.md",
+      "bytes": 1251,
+      "sha256": "11a2b87399ee0a349d311e46cc69d49139cf513bc6d313fea1bb0da0ac6cb77d"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/extract-fire-usb.ps1",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/extract-fire-usb.ps1",
+      "bytes": 1933,
+      "sha256": "a858f98c443b4ff66e3d5b39ada88250d8043bd53093767e439055925d80b48f"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/fire-deep-trace.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/fire-deep-trace.mjs",
+      "bytes": 4171,
+      "sha256": "674318c539630a88ff2d750628ff54224af78350c78b815cb479037afa059243"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/fire-ui-state.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/fire-ui-state.mjs",
+      "bytes": 1088,
+      "sha256": "521fdca2579cf76612149255edaf52c95f45b2188bc793dfb34a7dd107a430fc"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/FIRE_DEEP_TRACE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/FIRE_DEEP_TRACE.json",
+      "bytes": 252,
+      "sha256": "36d8eba36663806d2ba3438c9f3e7550848c70971e5e5e6e97dc6b5c1362eeb0"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/FIRE_EPISODE_REFERENCE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/FIRE_EPISODE_REFERENCE.json",
+      "bytes": 310,
+      "sha256": "02ad30f0d46e0445a4d316c529cef6100c9d60e5b61a59212b18a6744973d21a"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/FIRE_LATEST_JS_COMPARISON.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/FIRE_LATEST_JS_COMPARISON.json",
+      "bytes": 125931,
+      "sha256": "9b00d3c0140b6d79b69a5cd75e25f5ed9ae33e12a4eadd3df8cbdd24dcd3a904"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/FIRE_LATEST_REA_COMPARISON_PROJECTION.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/FIRE_LATEST_REA_COMPARISON_PROJECTION.json",
+      "bytes": 115730,
+      "sha256": "e93cc442a4bf1865d5f66620d612ac851a47d1b3213b56f6db8e08501759fc4e"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/FIRE_LATEST_ZIP_COMPARISON.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/FIRE_LATEST_ZIP_COMPARISON.json",
+      "bytes": 4261,
+      "sha256": "0d3016fbd82bc2446da9c93585a20538d51b125be90ecaecbc894425979c3d39"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/FIRE_MOVIE_BASELINE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/FIRE_MOVIE_BASELINE.json",
+      "bytes": 2411,
+      "sha256": "b0008f0e0a8f45c2424925c6c1f741098bcb7754dafb8b2f201c7fd9f277d70a"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/FIRE_MOVIE_NATIVE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/FIRE_MOVIE_NATIVE.json",
+      "bytes": 939,
+      "sha256": "81ee4b3e97d95970da8dbd61d5897d09e5ae2e9d5c81f0bd34c63a22df956e0d"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/FIRE_OBSERVER_CLEANUP.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/FIRE_OBSERVER_CLEANUP.json",
+      "bytes": 150,
+      "sha256": "14ad773e0af163cb9cda7c98aa6546bdf7b93346f2f2febe7991e28a437e5ab6"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/FIRE_SERIES_BASELINE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/FIRE_SERIES_BASELINE.json",
+      "bytes": 1775,
+      "sha256": "d0470a92a597b3dcf04e968a35b0b6826bd53587ffa48074ca6278ce3765cf7d"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/FIRE_SERIES_UI.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/FIRE_SERIES_UI.json",
+      "bytes": 760,
+      "sha256": "24f8ef39587b51f5f4e0f3ba4d8596ceaf63162aabf0bd269c0a6ee40150994a"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/FIRE_SOURCE_RESIDUE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/FIRE_SOURCE_RESIDUE.json",
+      "bytes": 1379,
+      "sha256": "2ce4ebbfad8ef73d8ea78bb2895d28ac36b2189f10875ed3ab541a148589cc24"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/FIRE_UI_CURRENT.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/FIRE_UI_CURRENT.json",
+      "bytes": 780,
+      "sha256": "a281d7532ebafe3a9120d6242cc7174eea82b2020c13763023d6882760b77f45"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/FIRE_USB_JS_REA_SUMMARY.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/FIRE_USB_JS_REA_SUMMARY.json",
+      "bytes": 14373,
+      "sha256": "52c186c2e1db85eb3c7dc9cef877406cb6433b10b70af1022ce1e8c1e3deafb4"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/FIRE_USB_ZIP_INVENTORY.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/FIRE_USB_ZIP_INVENTORY.json",
+      "bytes": 304458,
+      "sha256": "6d2969a4ee0dfbf7d6b68f41b36eacfc80153408dcd34e75e1937138b349b864"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/inspect-selected-episode.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/inspect-selected-episode.mjs",
+      "bytes": 5439,
+      "sha256": "8b585a1baa37dc0706f709dbb651899fb175ccf85047a0a3ed17b55f3b2dd47c"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/LATEST_APK_COMPARISON.md",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/LATEST_APK_COMPARISON.md",
+      "bytes": 11449,
+      "sha256": "87560bf9901edc4e72d81e037b129dba745540e0eaa8be2b37b92a1aa7d21d51"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/LATEST_APK_VS_INSTALLED.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/LATEST_APK_VS_INSTALLED.json",
+      "bytes": 1761,
+      "sha256": "e12fe467e894d8070d61cae9593b215708ee497c9b06f0871025b8355011c69e"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/LATEST_USER_APK_EVIDENCE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/LATEST_USER_APK_EVIDENCE.json",
+      "bytes": 21684,
+      "sha256": "c0deb86cb6cfbcd42268955aba2ef771783fc81a19490b824317626dd2811b41"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/media-observer.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/media-observer.mjs",
+      "bytes": 2714,
+      "sha256": "9a63795dbccf10c277a7a6d5413ecf304d7ae049ef51eda44fb094aec70859bf"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/native-playback-proof.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/native-playback-proof.mjs",
+      "bytes": 2675,
+      "sha256": "4960f067044f732924df145bf17d459ac86f5d54c625836c582ae35815d0d496"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/play-visible-movie.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/play-visible-movie.mjs",
+      "bytes": 406,
+      "sha256": "1d0f8b889339deef36884ab11ac8e2740338e85716158d530f3505504b98362a"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/read-source-metadata-adb.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/read-source-metadata-adb.mjs",
+      "bytes": 3534,
+      "sha256": "58d8bcf148b04306fc3f1ac6c61faf7133b380740ac1072fae3795055de8bc8a"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/select-series.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/select-series.mjs",
+      "bytes": 462,
+      "sha256": "8df9802c647b4490d3e5e709ef2a5ea3e60fe4780e0f48400cad1452bf12365f"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/series-ui.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/series-ui.mjs",
+      "bytes": 1356,
+      "sha256": "e26a4941d777ac3cc8c40b3ad1b815c60c00350084c1b74419ecb1032b918968"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/SPEC.md",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/SPEC.md",
+      "bytes": 2285,
+      "sha256": "3cc38bf52403024b6feab352d576d4b924c5ea0a1347369acfe9668ccd7dff02"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/tablet-ui-state.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/tablet-ui-state.mjs",
+      "bytes": 1248,
+      "sha256": "ba5c5337ab81f04b89d4eaaeb68bbcb9b17a1956a14432f4055b4c24aab6599e"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/TABLET_EPISODE_REFERENCE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/TABLET_EPISODE_REFERENCE.json",
+      "bytes": 312,
+      "sha256": "b2338a1d4ea9bfb55ec43458aa036499b3fb120ea2620c8d56065bc4d9dceea7"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/TABLET_MOVIE_BASELINE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/TABLET_MOVIE_BASELINE.json",
+      "bytes": 2279,
+      "sha256": "51d3462685c810e636f4815edd2e0d8648401d7bd180053bc813e10ad1fd7699"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/TABLET_MOVIE_NATIVE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/TABLET_MOVIE_NATIVE.json",
+      "bytes": 1375,
+      "sha256": "267303c05d6d84ea3c52ffcc074b9de39507f5abcbc3874fe645defd135584af"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/TABLET_OBSERVER_CLEANUP.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/TABLET_OBSERVER_CLEANUP.json",
+      "bytes": 150,
+      "sha256": "4aedccf02ffef09102da19c5eb5129e99be4b290c6c59f4715e03d4d894ef961"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/TABLET_SERIES_BASELINE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/TABLET_SERIES_BASELINE.json",
+      "bytes": 1775,
+      "sha256": "712f3e8746f40914707c51c9d0ecd2531e439d2f6fae63f22ee816df99d06a74"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/TABLET_SERIES_UI.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/TABLET_SERIES_UI.json",
+      "bytes": 761,
+      "sha256": "32facc583f15f1e97937775521879f0bbdda6235da8d006ab882881f39d2066c"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/TABLET_UI_BEFORE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/TABLET_UI_BEFORE.json",
+      "bytes": 447,
+      "sha256": "594cc2a2d7d7502e946d407d2a1b33d2c688027d8a3cc1a7a1bacc452818cb0b"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/verify-installed-artifacts.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/verify-installed-artifacts.mjs",
+      "bytes": 2312,
+      "sha256": "94e09b098cfd1519b323b9fe38be97279f2719b84aa6d94aca284e7f262e99af"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/account-state.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/account-state.mjs",
+      "bytes": 3705,
+      "sha256": "5e3266cfe395dd16e03602fdfb714314d1d37e05e712632f60f82af0008546e0"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/cleanup-media.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/cleanup-media.mjs",
+      "bytes": 797,
+      "sha256": "450050a173509ddda64226563fdcb60bb009bcdbd1e7cd9c2c6fff18118e0a7d"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/CLOSURE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/CLOSURE.json",
+      "bytes": 13742,
+      "sha256": "eb084b732e2878d13d3b48664f45aa2e099406d8866dc1a2ba1112696aab6be6"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/collect-media.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/collect-media.mjs",
+      "bytes": 593,
+      "sha256": "6809e39825f53416326fe80bcba94d90b4d68078b414f589741cd2dfdc74d01e"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/compare-current-requests.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/compare-current-requests.mjs",
+      "bytes": 1685,
+      "sha256": "32754d723475ab461f001302d1d9e3655c2ad90dc6af9428cad1c23c82585aa9"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/compare-source-bindings.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/compare-source-bindings.mjs",
+      "bytes": 2688,
+      "sha256": "a788d67e08ca6608a3f772446f7ee671370aa8d3d241dfcfff20984911f67cc0"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/episode-action.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/episode-action.mjs",
+      "bytes": 2042,
+      "sha256": "670768cce42bee0cbfeae6e421c4f9b0e20c0f435cb5bdaf7e40c0d585ec303a"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/fire-account-state.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/fire-account-state.mjs",
+      "bytes": 3707,
+      "sha256": "1d6625422d8a2b64148497695bafd0237ef0e93c66819ce19b05eb4f396bbcab"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/fire-play-current.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/fire-play-current.mjs",
+      "bytes": 1431,
+      "sha256": "c8c64f2fca3041fc7bb6cbc5ff3d4c85e656f28bbb109207f965934d443d8dad"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/FIRE_OBSERVER_CLEANUP.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/FIRE_OBSERVER_CLEANUP.json",
+      "bytes": 150,
+      "sha256": "b175e7af541d8acc056197510067f9e54d3dfe0dd30693b1bfddc231718cc5d2"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/FIRE_USB_5G_NATIVE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/FIRE_USB_5G_NATIVE.json",
+      "bytes": 728,
+      "sha256": "f3a19654f51ce3bd84b1dd2c611c02ecaf1eef1dca16bdc4967babebd8c65ad8"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/FIRE_USB_ACCOUNT_STATE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/FIRE_USB_ACCOUNT_STATE.json",
+      "bytes": 419,
+      "sha256": "47f29e07b89551895ef1bfc531e37be063c7394c9b7c1e8516381c2979712074"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/FIRE_USB_KNOWN_MOVIE_5G.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/FIRE_USB_KNOWN_MOVIE_5G.json",
+      "bytes": 1094,
+      "sha256": "d2f9670e3079fee8525a2891925bb8326de06e5a490f261f965af3b9ab24cfaf"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/FIRE_USB_KNOWN_MOVIE_ATTEMPT.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/FIRE_USB_KNOWN_MOVIE_ATTEMPT.json",
+      "bytes": 85,
+      "sha256": "83aee89121e91ff3e1d7c6e0ac3cf9d1c049ad0814fa9da3632f0f184d85fbde"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/FIRE_USB_MOVIE_5G.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/FIRE_USB_MOVIE_5G.json",
+      "bytes": 2221,
+      "sha256": "47e109011bcbeafe4dffaf117b818f3a6d7e79802b41007ba30decc55d3de3e3"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/FIRE_USB_MOVIE_5G_FINISH.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/FIRE_USB_MOVIE_5G_FINISH.json",
+      "bytes": 2357,
+      "sha256": "280e78fc2aa6009a8ac5d2ee76191daaa6c8f982218cd7a75ba749f6effe318c"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/inspect-selected-episode.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/inspect-selected-episode.mjs",
+      "bytes": 5442,
+      "sha256": "58773cea80e2874b24d4119ca25c438ebe0b2047156fb52ba6955f865d311fe6"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/INSTALLED_APKS_AFTER_TESTS.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/INSTALLED_APKS_AFTER_TESTS.json",
+      "bytes": 1761,
+      "sha256": "efe365d627e4d7599b09fa7dd34c4f8a709e64cee97791618f6a7c31a36ea3cc"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/known-movie-on-fire.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/known-movie-on-fire.mjs",
+      "bytes": 2634,
+      "sha256": "6c3e5fe0fdd716310811fa07e2662b598920d30994ea7352844442d3808b28c6"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/media-observer.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/media-observer.mjs",
+      "bytes": 2717,
+      "sha256": "3e753fe302f3a31e08a94ee2344ad23f8808027c0b7124dbdbf10556fdc3fafc"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/native-playback-proof.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/native-playback-proof.mjs",
+      "bytes": 2681,
+      "sha256": "e065fe961f81db5da99c2ee2ced9aeba627c82dca10b255d1b44c725ba5d02ac"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/network-repeat.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/network-repeat.mjs",
+      "bytes": 2284,
+      "sha256": "e7dc8d4a92c4c605b2656c0d10014fdbd9c853f644aa6cb2a51c61a4d19152d1"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/next-sample.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/next-sample.mjs",
+      "bytes": 1435,
+      "sha256": "c64c1d5aeaad01f0259dbb7c0fc8f5fc03bcdcb78e2e41d2c5d4c7826f128689"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/paired-movie-by-card.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/paired-movie-by-card.mjs",
+      "bytes": 4633,
+      "sha256": "9c851fcf5618f89243928106e86cca8fc29031bcddc65a1e6c4ba9698dc2b9d2"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/PAIRED_MOVIE_BY_CARD.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/PAIRED_MOVIE_BY_CARD.json",
+      "bytes": 1157,
+      "sha256": "036236a9c273b7496c73fb327c209ddb9b1a6842e0b46fd9b3df14983fa4d649"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/PAIRED_MOVIE_EXACT_PLAY.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/PAIRED_MOVIE_EXACT_PLAY.json",
+      "bytes": 2310,
+      "sha256": "b4cae3115f76a5ee1b81f6d810f03dd3d615877d30c02491fbdb367f049d351c"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/phone-movie-on-tablet.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/phone-movie-on-tablet.mjs",
+      "bytes": 3256,
+      "sha256": "4f9689dfd2b62ed7e10235e149c83709b0484abf6e3be07c3591aa8ba35ad36b"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/PHONE_5G_NATIVE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/PHONE_5G_NATIVE.json",
+      "bytes": 1901,
+      "sha256": "8e340c37ad8fc3eab00e7c67a28d139c37db116a70bf67afbeb28b45174d57a4"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/PHONE_FINAL_NATIVE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/PHONE_FINAL_NATIVE.json",
+      "bytes": 2428,
+      "sha256": "1114d437c7ba61d37a9edab2c9f8ba2f280f44f8bba65cffb67e1169bdd538ee"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/PHONE_MOVIE_5G.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/PHONE_MOVIE_5G.json",
+      "bytes": 951,
+      "sha256": "58d9faf0e775215a2dbbb1243c00f1a0a9fec731676fd0865b7c35728462f0bb"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/PHONE_MOVIE_5G_FINISH.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/PHONE_MOVIE_5G_FINISH.json",
+      "bytes": 2279,
+      "sha256": "5d6cf6ade9bff67a14d7b1f45daef95d267cf42269e895ed14bda6d3102a4a64"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/PHONE_OBSERVER_CLEANUP.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/PHONE_OBSERVER_CLEANUP.json",
+      "bytes": 150,
+      "sha256": "22391f764a66e46f695cadd160f93dffd04cca7091d01848be1525387baf2f49"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/PHONE_POST_PAIR.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/PHONE_POST_PAIR.json",
+      "bytes": 150,
+      "sha256": "c0ff7466a2bbd702c2c1e43ef1090f54d323a21e027118a81dcc4bbc979eb411"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/PHONE_SERIES_5G.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/PHONE_SERIES_5G.json",
+      "bytes": 1546,
+      "sha256": "064e16e5cfed76e666517efb912b2e21962c786b5802969a361a109d3f652e7a"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/REPORT.md",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/REPORT.md",
+      "bytes": 12116,
+      "sha256": "1ebb95acc28c91d6091e4751847af7b5d8872a6782be07af77ac3cdab9afb747"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/request-binding.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/request-binding.mjs",
+      "bytes": 1788,
+      "sha256": "e8e6ad177aa0b0572f17d77333f94ae915bc9d01063afa4c81123333501c4f28"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/RESULT.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/RESULT.json",
+      "bytes": 503,
+      "sha256": "b2e3437f4dc1d9665b83299b94c1463f0d7c4946bab0af75533680a881ad1a57"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/select-series.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/select-series.mjs",
+      "bytes": 508,
+      "sha256": "84ae82953c32a9fd375966153693844ba8b04625d2ea858260a43e67016a47cb"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/series-ui.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/series-ui.mjs",
+      "bytes": 1359,
+      "sha256": "690b6b9dbaf5502689a39abece541a2b781c12381a5f3dfe1e53e51a184a976d"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/SOURCE_BINDING_COMPARISON.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/SOURCE_BINDING_COMPARISON.json",
+      "bytes": 854,
+      "sha256": "d0dacc7aed3d2f759d2ca9c007f30a005bab7b10f90dffcc480b74ddf7581c40"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/SPEC.md",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/SPEC.md",
+      "bytes": 2739,
+      "sha256": "b0aae8c28d6e826e66b495fb428fd5b516a9d7a91d455401da24b3bb88560653"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/TABLET_ACCOUNT_STATE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/TABLET_ACCOUNT_STATE.json",
+      "bytes": 419,
+      "sha256": "ae58334712faabf1e166c8a78ba0ce6a761345dc2469b5a6a34fa13525b6813b"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/TABLET_EPISODE_BROWSER_UA.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/TABLET_EPISODE_BROWSER_UA.json",
+      "bytes": 1541,
+      "sha256": "015103de36371270c13b31de7112db4bc124230a1bb3a305a70c6ccd067af733"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/TABLET_EPISODE_DEFAULT.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/TABLET_EPISODE_DEFAULT.json",
+      "bytes": 1546,
+      "sha256": "04dd09265ac1a7664111ff67f0a72610e34cb719236856b95af1a6af529291fb"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/TABLET_EPISODE_REFERENCE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/TABLET_EPISODE_REFERENCE.json",
+      "bytes": 312,
+      "sha256": "812d20c89e05d1aeefa8ead485195a4221178f283a6bcad7ad54a5b405c0d404"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/TABLET_FINAL_NATIVE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/TABLET_FINAL_NATIVE.json",
+      "bytes": 5035,
+      "sha256": "320ba0e168e590a55bb10e32387326bb122330990253788ef2ce859815f5b22d"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/TABLET_MOVIE_CURRENT.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/TABLET_MOVIE_CURRENT.json",
+      "bytes": 1388,
+      "sha256": "80af7386dbab7569a643beb718768d8b4ff4e461c164235e07dc87f261f88d31"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/TABLET_NETWORK_REPEAT.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/TABLET_NETWORK_REPEAT.json",
+      "bytes": 1690,
+      "sha256": "e34102223424417e8efaaf33e66b33c33a49aa261a6ac2df73b1b99a0f866c9d"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/TABLET_OBSERVER_CLEANUP.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/TABLET_OBSERVER_CLEANUP.json",
+      "bytes": 150,
+      "sha256": "cc6b8433a4536849f1062584953fea3c4c1ebeaab8ecc483308b08aeeb3a97a7"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/TABLET_PHONE_CURRENT_REQUEST_COMPARISON.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/TABLET_PHONE_CURRENT_REQUEST_COMPARISON.json",
+      "bytes": 5513,
+      "sha256": "0d2540b8841676c2611f45a6b0e502fdc594777701f2a9c098f5435cda9e312d"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/TABLET_POST_PAIR.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/TABLET_POST_PAIR.json",
+      "bytes": 1251,
+      "sha256": "72fd57410f5babeffee7dfd6c79433ee7b26789cf142688adf1b42ad7bc68b0f"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/TABLET_REQUEST_BINDING.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/TABLET_REQUEST_BINDING.json",
+      "bytes": 500,
+      "sha256": "6b732b3c00c9536a5863bc58cc5deebb194b437c5db2c51e3057eb86d926d898"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/TABLET_SECOND_EPISODE_DEFAULT.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/TABLET_SECOND_EPISODE_DEFAULT.json",
+      "bytes": 1546,
+      "sha256": "82ace38898d6c14096da9acd28300dd6ae85f078d7934d6dcd212ac150ebd8b8"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/TABLET_UA_EXPERIMENT.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/TABLET_UA_EXPERIMENT.json",
+      "bytes": 224,
+      "sha256": "2fc67abce677d41a6bdfdb0c2be6234b9f6e2df943bed81928a5e01f833d235a"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/ua-once.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/ua-once.mjs",
+      "bytes": 2094,
+      "sha256": "17deea971bdc9bbe876538b099a46577ab33a23b72fba810ca15dfd8a1c280c7"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/ui-probe.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/ui-probe.mjs",
+      "bytes": 1109,
+      "sha256": "68a0eabeca3d11d17b46428fe9e9509b064480475bbd72f28f00ac9d8dc7cba0"
+    },
+    {
+      "source": "CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/verify-apks-after-tests.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/CONNECTION_RECOVERY_20261104/CURRENT_USB_20261105/verify-apks-after-tests.mjs",
+      "bytes": 2315,
+      "sha256": "64581364604a14f4be5b1bd8375322a402583ef743897f5542de0ab5b79049d8"
+    },
+    {
+      "source": "PLAYBACK_HTTP_CORRECTION_20261105/cleanup-media.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/PLAYBACK_HTTP_CORRECTION_20261105/cleanup-media.mjs",
+      "bytes": 786,
+      "sha256": "49eb7d3ffa0d558895d58f376b5cf0f6ef74f814890763ba4ab995ad5f990d19"
+    },
+    {
+      "source": "PLAYBACK_HTTP_CORRECTION_20261105/CLOSURE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/PLAYBACK_HTTP_CORRECTION_20261105/CLOSURE.json",
+      "bytes": 3444,
+      "sha256": "acf1fd1450329ba9788f1b75b2c364440280672c9f3a30be0a889786fdb31563"
+    },
+    {
+      "source": "PLAYBACK_HTTP_CORRECTION_20261105/collect-media.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/PLAYBACK_HTTP_CORRECTION_20261105/collect-media.mjs",
+      "bytes": 584,
+      "sha256": "0b20d709c493b924bf0f06af3200ee85f5b1eb158b7d3ad226986c57dd2723cb"
+    },
+    {
+      "source": "PLAYBACK_HTTP_CORRECTION_20261105/episode-action.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/PLAYBACK_HTTP_CORRECTION_20261105/episode-action.mjs",
+      "bytes": 2039,
+      "sha256": "fb2b42b9c9e559566803669beceb9a29656ad5fecfe62f0e68ece5bcdb384271"
+    },
+    {
+      "source": "PLAYBACK_HTTP_CORRECTION_20261105/HttpExceptionProbe.java",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/PLAYBACK_HTTP_CORRECTION_20261105/HttpExceptionProbe.java",
+      "bytes": 8858,
+      "sha256": "854a40d464853259fb3af9d1f68b49af7d0a4af34523b1fec3fdc175e8830632"
+    },
+    {
+      "source": "PLAYBACK_HTTP_CORRECTION_20261105/HttpExceptionProbeDetails.java",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/PLAYBACK_HTTP_CORRECTION_20261105/HttpExceptionProbeDetails.java",
+      "bytes": 9187,
+      "sha256": "a3b5e12fe591c1a0d87dae88d7ff510608b035858fc1f3cb27eeb8f21587242c"
+    },
+    {
+      "source": "PLAYBACK_HTTP_CORRECTION_20261105/inspect-selected-episode.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/PLAYBACK_HTTP_CORRECTION_20261105/inspect-selected-episode.mjs",
+      "bytes": 5439,
+      "sha256": "8b585a1baa37dc0706f709dbb651899fb175ccf85047a0a3ed17b55f3b2dd47c"
+    },
+    {
+      "source": "PLAYBACK_HTTP_CORRECTION_20261105/media-observer.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/PLAYBACK_HTTP_CORRECTION_20261105/media-observer.mjs",
+      "bytes": 2714,
+      "sha256": "9a63795dbccf10c277a7a6d5413ecf304d7ae049ef51eda44fb094aec70859bf"
+    },
+    {
+      "source": "PLAYBACK_HTTP_CORRECTION_20261105/read-source-metadata-adb.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/PLAYBACK_HTTP_CORRECTION_20261105/read-source-metadata-adb.mjs",
+      "bytes": 3534,
+      "sha256": "58d8bcf148b04306fc3f1ac6c61faf7133b380740ac1072fae3795055de8bc8a"
+    },
+    {
+      "source": "PLAYBACK_HTTP_CORRECTION_20261105/REPORT.md",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/PLAYBACK_HTTP_CORRECTION_20261105/REPORT.md",
+      "bytes": 4638,
+      "sha256": "09f7f424496cca16818d9eeb25eec435b3b3e86d8931039997ebb3d6f926f50e"
+    },
+    {
+      "source": "PLAYBACK_HTTP_CORRECTION_20261105/select-series.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/PLAYBACK_HTTP_CORRECTION_20261105/select-series.mjs",
+      "bytes": 462,
+      "sha256": "8df9802c647b4490d3e5e709ef2a5ea3e60fe4780e0f48400cad1452bf12365f"
+    },
+    {
+      "source": "PLAYBACK_HTTP_CORRECTION_20261105/SPEC.md",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/PLAYBACK_HTTP_CORRECTION_20261105/SPEC.md",
+      "bytes": 2219,
+      "sha256": "2a5fa188f109ac645ccd9a3f053b7d71bc57ff9da3266892e3b92caad3ea9fb5"
+    },
+    {
+      "source": "PLAYBACK_HTTP_CORRECTION_20261105/TABLET_EPISODE_REFERENCE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/PLAYBACK_HTTP_CORRECTION_20261105/TABLET_EPISODE_REFERENCE.json",
+      "bytes": 312,
+      "sha256": "e81225bf867247b7c3adff39dd8a9e59055e4de7c4ef57d8b390fd9f2e60fa38"
+    },
+    {
+      "source": "PLAYBACK_HTTP_CORRECTION_20261105/TABLET_HTTP_EXCEPTION.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/PLAYBACK_HTTP_CORRECTION_20261105/TABLET_HTTP_EXCEPTION.log.txt",
+      "bytes": 2056,
+      "sha256": "eaa1268913568a6d026788056cae5f45fe072bb513f21c54efc8b0e16cf7297e"
+    },
+    {
+      "source": "PLAYBACK_HTTP_CORRECTION_20261105/TABLET_HTTP_EXCEPTION_DETAILS.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/PLAYBACK_HTTP_CORRECTION_20261105/TABLET_HTTP_EXCEPTION_DETAILS.log.txt",
+      "bytes": 2950,
+      "sha256": "3ebaf9045c845200ea41484b6ef6a1931fc3e191a7d626eb8b550866c2fa8077"
+    },
+    {
+      "source": "PLAYBACK_HTTP_CORRECTION_20261105/TABLET_HTTP_PROBE_PLAYBACK.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/PLAYBACK_HTTP_CORRECTION_20261105/TABLET_HTTP_PROBE_PLAYBACK.json",
+      "bytes": 1775,
+      "sha256": "aaa7dfee4af8b2b25360c29c5ee46fa6093cc1206fe433ffe8ac1897ab5189c1"
+    },
+    {
+      "source": "PLAYBACK_HTTP_CORRECTION_20261105/TABLET_OBSERVER_CLEANUP.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/PLAYBACK_HTTP_CORRECTION_20261105/TABLET_OBSERVER_CLEANUP.json",
+      "bytes": 150,
+      "sha256": "9f2c62511c4d541250d7b2f70b55978dc0b62575f5a9f605966f0a662d6c9d5f"
+    },
+    {
+      "source": "PLAYBACK_HTTP_CORRECTION_20261105/TABLET_SOURCE_RESIDUE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/PLAYBACK_HTTP_CORRECTION_20261105/TABLET_SOURCE_RESIDUE.json",
+      "bytes": 1381,
+      "sha256": "44e3591bbfb52e7541a7ff3bd9685115d0bcbb90c3bd042d01edaf0d6a798a31"
+    },
+    {
+      "source": "PLAYBACK_HTTP_CORRECTION_20261105/TABLET_TRANSPORT_HINTS.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/PLAYBACK_HTTP_CORRECTION_20261105/TABLET_TRANSPORT_HINTS.json",
+      "bytes": 549,
+      "sha256": "97921fe959fd9775ea436ac48584212b0e2157527737140f4592b516a0fddf8e"
+    },
+    {
+      "source": "PLAYBACK_HTTP_CORRECTION_20261105/transport-hints.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/PLAYBACK_HTTP_CORRECTION_20261105/transport-hints.mjs",
+      "bytes": 4422,
+      "sha256": "e3dd696717f799b53e0b57bf292eaffe751705015897bfe6188b25618a52303d"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/01_CANONICAL_BEFORE.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/01_CANONICAL_BEFORE.log.txt",
+      "bytes": 2564,
+      "sha256": "333306b1454599f02a6fc3a0f99cc69bfd4dd43dce42ce5906580a6cd192e8a0"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/02_C11_BEFORE.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/02_C11_BEFORE.log.txt",
+      "bytes": 3832,
+      "sha256": "86546cc7eb8a046c27d1e75abc28eab03010ecc5925a16b02288be5635d62b4e"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/03_REGRESSION_BEFORE.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/03_REGRESSION_BEFORE.log.txt",
+      "bytes": 10953,
+      "sha256": "5591ff1ab09c960b7a4a3ecd187a02267487794ce883bea3e3de0afd73c6fb96"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/04_test-c11-automatic-source-refresh.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/04_test-c11-automatic-source-refresh.log.txt",
+      "bytes": 6917,
+      "sha256": "0bc2e8a904fe3d376ad6d37244f3eccfac3362995a00dbf779f0c8cad5e2c622"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/04_test-c11-new-content-badge.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/04_test-c11-new-content-badge.log.txt",
+      "bytes": 1622,
+      "sha256": "18fe242eaa4631d085efcf89867feca060d7274f1c366bec26e223e8fe07297f"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/04_test-c11-p5b-boot-sync-coordinator.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/04_test-c11-p5b-boot-sync-coordinator.log.txt",
+      "bytes": 3593,
+      "sha256": "54de0de8ce5a036d0777d86fcbf2c0c18e629288e976e32ecf90de89a43b0afa"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/04_test-source-replacement-bootstrap.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/04_test-source-replacement-bootstrap.log.txt",
+      "bytes": 3017,
+      "sha256": "54636cc02d8aa05323754097aec08aa3c6d3dde6911c88b4b4fe170a89e69862"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/04_test-source-replacement-isolation.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/04_test-source-replacement-isolation.log.txt",
+      "bytes": 641,
+      "sha256": "ade5fc7c8f48e228982e86b999159b370b3a716f900e1b26b0667f21c143873b"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/04_test-source-replacement-ui.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/04_test-source-replacement-ui.log.txt",
+      "bytes": 365,
+      "sha256": "7b5cd6c41726b661b600a86fade3ea16c6f2d5ac77d9b70ef6c00dafc8a0e0d5"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/05_test-c11-artwork-visible-recovery.mjs.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/05_test-c11-artwork-visible-recovery.mjs.log.txt",
+      "bytes": 1124,
+      "sha256": "ca23e852d826b610dfbcc02219c7a1e5c4f709def8bc07c99414cf3943f902f7"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/05_test-c11-new-content-badge.mjs.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/05_test-c11-new-content-badge.mjs.log.txt",
+      "bytes": 831,
+      "sha256": "ef05c3d60d119d142ac9da1a8ea9707e70452b739e6b3f514309edf1b658e18a"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/05_test-source-replacement-bootstrap.mjs.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/05_test-source-replacement-bootstrap.mjs.log.txt",
+      "bytes": 3017,
+      "sha256": "16b71370a39c84b7ba0469a87b7623f3f0c3bd3cc769be03c5a6dfa534b661e4"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/06_CANONICAL_AFTER.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/06_CANONICAL_AFTER.log.txt",
+      "bytes": 2599,
+      "sha256": "47cb608f7afe9bba78fd3c7e2f86a62fba3d5887f85c8bf2270ac2b4d75ceb85"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/07_TYPECHECK.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/07_TYPECHECK.log.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/08_C11_AFTER.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/08_C11_AFTER.log.txt",
+      "bytes": 3832,
+      "sha256": "ced6d7ed308ca4bf117a53cf63774e13bbb08abee0520646ec206efe1fa840a2"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/09_TARGET_ISOLATION.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/09_TARGET_ISOLATION.log.txt",
+      "bytes": 641,
+      "sha256": "ade5fc7c8f48e228982e86b999159b370b3a716f900e1b26b0667f21c143873b"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/10_TARGET_BOOTSTRAP.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/10_TARGET_BOOTSTRAP.log.txt",
+      "bytes": 3017,
+      "sha256": "c3eaad2a5c4af333be748591a15287c8103c9738a3bf7ad71c7b776fdb86aa2d"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/11_TARGET_UI.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/11_TARGET_UI.log.txt",
+      "bytes": 365,
+      "sha256": "7b5cd6c41726b661b600a86fade3ea16c6f2d5ac77d9b70ef6c00dafc8a0e0d5"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/12_NOVELTY.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/12_NOVELTY.log.txt",
+      "bytes": 831,
+      "sha256": "ef05c3d60d119d142ac9da1a8ea9707e70452b739e6b3f514309edf1b658e18a"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/13_ARTWORK_RECOVERY.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/13_ARTWORK_RECOVERY.log.txt",
+      "bytes": 1300,
+      "sha256": "272bd43b53665d62e1d44bdba251e1cb1099f09cf99d6e689ed8a19e12db31c4"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/14_ARTWORK_PREPARATION.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/14_ARTWORK_PREPARATION.log.txt",
+      "bytes": 326,
+      "sha256": "964ef38a558b8112a5c24cf942ab39405ecedab50eee7a052fce8b83a96945e5"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/15_FULL_REGRESSION.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/15_FULL_REGRESSION.log.txt",
+      "bytes": 11117,
+      "sha256": "7bc6da3d3344edf6ec2efb48f046174208daf5e52eece0a2fb3ed5745ba6d980"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/16_CANONICAL_FINAL.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/16_CANONICAL_FINAL.log.txt",
+      "bytes": 2599,
+      "sha256": "47cb608f7afe9bba78fd3c7e2f86a62fba3d5887f85c8bf2270ac2b4d75ceb85"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/17_PUBLIC_WEB_BUILD.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/17_PUBLIC_WEB_BUILD.log.txt",
+      "bytes": 11922,
+      "sha256": "62a58fe8200b98642300d404ad0d9018b0f26af43a436b688525988cc758863f"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/18_CAPACITOR_SYNC.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/18_CAPACITOR_SYNC.log.txt",
+      "bytes": 432,
+      "sha256": "9692309395ef925113b3cf06a8870ed241665d41be6d1ab456ff58a5b2e1b259"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/19_C11_PRE_GRADLE.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/19_C11_PRE_GRADLE.log.txt",
+      "bytes": 3832,
+      "sha256": "2bfaf644daccd7d7df415b4bf4c0df08884a3370b8eeacdda1062ab9600beb62"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/20_ANDROID_TEST_BUILD.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/20_ANDROID_TEST_BUILD.log.txt",
+      "bytes": 13350,
+      "sha256": "2bcb7e08fe9f5ef7f42130b9b3220650f2ee5007586ab0074fa2aa5c06a2dc88"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/21_CANONICAL_POST_BUILD.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/21_CANONICAL_POST_BUILD.log.txt",
+      "bytes": 2647,
+      "sha256": "9f6b321d2bcedce84d6b668317dd7c34f94920e4a04cac0b0d23fe35032ad779"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/22_C11_POST_BUILD.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/22_C11_POST_BUILD.log.txt",
+      "bytes": 3832,
+      "sha256": "c633b778c7de05ad0c1b47b2b147723c108b6f7f8e5a96eb5787013f91059c3f"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/APK_AUDIT.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/APK_AUDIT.json",
+      "bytes": 2795,
+      "sha256": "a6a8939c1410ebe7195860682767ac6610f3c1198ff32fa2d7c84a71bf30e7c8"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/audit-apk.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/audit-apk.mjs",
+      "bytes": 4189,
+      "sha256": "e7c7bd5d17d5071e4a764cd80aae7aa13d87676d6d5923c2a96d3ba99ea375b0"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/AUTHORIZATION_CAPTURE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/AUTHORIZATION_CAPTURE.json",
+      "bytes": 897,
+      "sha256": "399e803fbaa00f07b861c8bc503f861c41fb73356e32b5448ebd68b14eec3a44"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/BASELINE_NOVELTY_INCOMPATIBILITY.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/BASELINE_NOVELTY_INCOMPATIBILITY.json",
+      "bytes": 327,
+      "sha256": "08a323db8610626b6bc4b48483648462b6fac7cc335feac1946f67199d62d26b"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/BASELINE_NOVELTY_INCOMPATIBILITY.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/BASELINE_NOVELTY_INCOMPATIBILITY.log.txt",
+      "bytes": 1512,
+      "sha256": "ea9297518ff24f17e7e0b88ed58e04010e127669e23abd5bf5a5d99f5e8a7eed"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/BASELINE_VALIDATIONS.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/BASELINE_VALIDATIONS.json",
+      "bytes": 637,
+      "sha256": "1d4c2ad6a4b3d291bc863017abda5849d1bbb2bdf7f840604dd71c30f074bf74"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/BEFORE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/BEFORE.json",
+      "bytes": 17734,
+      "sha256": "07489de6023c642b60e406f44925a492bd925203637cc230229f7b2d4858b733"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/build-test-apk.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/build-test-apk.mjs",
+      "bytes": 2947,
+      "sha256": "b77c6e66c423dc3e811b4692492e905cdb8652f47f197fd7b5beea6976426876"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/BUILD_RESULTS.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/BUILD_RESULTS.json",
+      "bytes": 932,
+      "sha256": "586af2e50cefa87811058afe8b7ec1f8696a1b0d7c3f331c77242c08ecd75255"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/CACHE_REVIEW_REGISTRATION.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/CACHE_REVIEW_REGISTRATION.json",
+      "bytes": 1229,
+      "sha256": "f88c251757e51ff98e37ed52089cbcb66890d61c3d5f115af9db9746da0f6b1f"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/CACHE_REVIEW_VALIDATIONS.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/CACHE_REVIEW_VALIDATIONS.json",
+      "bytes": 2470,
+      "sha256": "dd779ec49b982483257d3083231eb01b5104849eef65ec5aefeff2decf13a023"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/CANDIDATE_GIT_BEFORE_BUILD.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/CANDIDATE_GIT_BEFORE_BUILD.json",
+      "bytes": 4948,
+      "sha256": "7e8717cc478fed87892e2e21a6e1c2a780632d9fa1e7eb93e338050925d4fb43"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/CANDIDATE_SNAPSHOT_FINAL.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/CANDIDATE_SNAPSHOT_FINAL.json",
+      "bytes": 2081124,
+      "sha256": "0bf345fe431ba7ccfbd657a104391f692308fcf25fbfd7a045bc699147dfb28a"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/CANONICAL_CLOSING.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/CANONICAL_CLOSING.json",
+      "bytes": 81,
+      "sha256": "2949214631d870310387b4542096ab51386a519b9e4663ede4c7c5404aff9f80"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/CANONICAL_CLOSING.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/CANONICAL_CLOSING.log.txt",
+      "bytes": 2647,
+      "sha256": "9f6b321d2bcedce84d6b668317dd7c34f94920e4a04cac0b0d23fe35032ad779"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/cleanup-media.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/cleanup-media.mjs",
+      "bytes": 786,
+      "sha256": "49eb7d3ffa0d558895d58f376b5cf0f6ef74f814890763ba4ab995ad5f990d19"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/close-evidence.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/close-evidence.mjs",
+      "bytes": 3073,
+      "sha256": "aa8599548c8b94337a30374afb4cd2901ed08f208d828e18f21df97c1cef0b33"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/CLOSURE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/CLOSURE.json",
+      "bytes": 17012,
+      "sha256": "87bfc3b3bd2c9cb1767b02b88244a9acdbb89d0feb756764e0631dfdf0456cfa"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/collect-media.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/collect-media.mjs",
+      "bytes": 584,
+      "sha256": "0b20d709c493b924bf0f06af3200ee85f5b1eb158b7d3ad226986c57dd2723cb"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/DEPENDENCIES_MANIFEST.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/DEPENDENCIES_MANIFEST.json",
+      "bytes": 1202932,
+      "sha256": "666395e4941e4e8fe7180a6131f7e9d2e6714a7b495da14c3e1055ae91f6037c"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/FINAL_VALIDATIONS.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/FINAL_VALIDATIONS.json",
+      "bytes": 2470,
+      "sha256": "f65ce2026057726ff932b40ffe9df02dbf9f1cbaad5c5cd2ca477c6017a436a4"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/FIRE_SAME_SOURCE_RESTART.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/FIRE_SAME_SOURCE_RESTART.json",
+      "bytes": 214,
+      "sha256": "2872719badf28d833597d3a8843881c1dd2eb194774dce3a2c4b627493d40990"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/FIRE_UPGRADE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/FIRE_UPGRADE.json",
+      "bytes": 1545,
+      "sha256": "594ad8ba3c3e15d896b8dca73b259fa1fb9db9e83bed48ac4a5b984094881c7b"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/GENERATED_GRADLE_COMPARISON.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/GENERATED_GRADLE_COMPARISON.json",
+      "bytes": 237,
+      "sha256": "2f6c56df9a46569295289c61606b91654b6cc2ab34be7475cb86faf601296c44"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/media-observer.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/media-observer.mjs",
+      "bytes": 2714,
+      "sha256": "9a63795dbccf10c277a7a6d5413ecf304d7ae049ef51eda44fb094aec70859bf"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/PATCH_REVIEW.diff",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/PATCH_REVIEW.diff",
+      "bytes": 91519,
+      "sha256": "29d5bad3a776b289d5f8861f8433c06a97f9b3796724cad5c7a1993e96130b42"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/PATCH_REVIEW_COUNTS.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/PATCH_REVIEW_COUNTS.json",
+      "bytes": 2308,
+      "sha256": "0261f03008492dab142c3aef3c841ef2d4815f493abaf6c5bd88ca68b8705e0f"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/playback-action.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/playback-action.mjs",
+      "bytes": 2018,
+      "sha256": "355fe790587b057e1afa78249cacd920387ca90d7dfb2a17c6b248c9b2e2d0a2"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/PREPARATION_RESULT.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/PREPARATION_RESULT.json",
+      "bytes": 591,
+      "sha256": "9c477509db718084b910bb24b8328ea28777ac07acc3d2a40d75381721e8c8b2"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/PREPARATION_SPEC.md",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/PREPARATION_SPEC.md",
+      "bytes": 3191,
+      "sha256": "d6d52499a1271161b6df41c761dd96597a66ffb4fdb5bbc3db1f521a2e52fe58"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/prepare-workspace.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/prepare-workspace.mjs",
+      "bytes": 6489,
+      "sha256": "9775d860987b6f6eb49de9b02e60e1bec4b71d425055f1c438fa4d3baa78e3b0"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/PRESERVATION_GENERATED_OUTPUT_REVIEW.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/PRESERVATION_GENERATED_OUTPUT_REVIEW.json",
+      "bytes": 10712,
+      "sha256": "e8cb1b1fabe2e0677e22059fa77ef146a2122a32adaa71fa9dfa965764b84b26"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/PRESERVATION_POST_BUILD.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/PRESERVATION_POST_BUILD.json",
+      "bytes": 4958,
+      "sha256": "db84a8c2c95cb56bb5aa2c287bc182e6f14424023a2463cb05f4fe38e07889d5"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/PRESERVATION_PREBUILD.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/PRESERVATION_PREBUILD.json",
+      "bytes": 323,
+      "sha256": "be9bb293d58f513380faa8d78dcb9c9f64fd049acd49025c1a5fa91ffe42cab5"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/register-cache-review.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/register-cache-review.mjs",
+      "bytes": 3716,
+      "sha256": "f1b5619dc57376fe6b89f798621c2d5c4c0e3b7422127c2e151485c9c66dca7c"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/register.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/register.mjs",
+      "bytes": 8329,
+      "sha256": "5304382a16a22384ca00b5712c4723f28e4f3bccff2a0c418cfd4188bf980e5e"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/REGISTRATION.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/REGISTRATION.json",
+      "bytes": 4498,
+      "sha256": "46ca1bf4f231eca88c35677af6b51641a96298fddef4914414f973ab309d1eba"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/REGRESSION_FIRST_PASS_RESULT.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/REGRESSION_FIRST_PASS_RESULT.json",
+      "bytes": 13475,
+      "sha256": "95dd54a90af9e1929d601b23c3d042744100a56f096fd3c31517ac59a575873d"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/REPORT.md",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/REPORT.md",
+      "bytes": 6688,
+      "sha256": "20917c6f20ac880033bce2fef5ca8e39cefdc215aafd49de9f045d786e680716"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/restart-same-source.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/restart-same-source.mjs",
+      "bytes": 2003,
+      "sha256": "7ca8dad2247f996d7109144296743235874dd22a2ad05f83d420264a9d3afe23"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/REVIEW_06_CANONICAL_AFTER.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/REVIEW_06_CANONICAL_AFTER.log.txt",
+      "bytes": 2647,
+      "sha256": "9f6b321d2bcedce84d6b668317dd7c34f94920e4a04cac0b0d23fe35032ad779"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/REVIEW_07_TYPECHECK.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/REVIEW_07_TYPECHECK.log.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/REVIEW_08_C11_AFTER.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/REVIEW_08_C11_AFTER.log.txt",
+      "bytes": 3832,
+      "sha256": "a63d440c582050e67c9f1deda5b18703736783625de2776d1b89caf8b72fb73f"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/REVIEW_09_TARGET_ISOLATION.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/REVIEW_09_TARGET_ISOLATION.log.txt",
+      "bytes": 733,
+      "sha256": "8ed108f5f3945a2afa1aae8b6ad63bb50777a35dcffe2e50fc7b59f5a15d0449"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/REVIEW_10_TARGET_BOOTSTRAP.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/REVIEW_10_TARGET_BOOTSTRAP.log.txt",
+      "bytes": 3439,
+      "sha256": "9edf1f107b95e56a31dbb458e309fdb6d2d028d3e1c4f0bdad7ff204767c1ffc"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/REVIEW_11_TARGET_UI.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/REVIEW_11_TARGET_UI.log.txt",
+      "bytes": 365,
+      "sha256": "7b5cd6c41726b661b600a86fade3ea16c6f2d5ac77d9b70ef6c00dafc8a0e0d5"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/REVIEW_12_NOVELTY.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/REVIEW_12_NOVELTY.log.txt",
+      "bytes": 831,
+      "sha256": "ef05c3d60d119d142ac9da1a8ea9707e70452b739e6b3f514309edf1b658e18a"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/REVIEW_13_ARTWORK_RECOVERY.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/REVIEW_13_ARTWORK_RECOVERY.log.txt",
+      "bytes": 1300,
+      "sha256": "272bd43b53665d62e1d44bdba251e1cb1099f09cf99d6e689ed8a19e12db31c4"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/REVIEW_14_ARTWORK_PREPARATION.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/REVIEW_14_ARTWORK_PREPARATION.log.txt",
+      "bytes": 326,
+      "sha256": "964ef38a558b8112a5c24cf942ab39405ecedab50eee7a052fce8b83a96945e5"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/REVIEW_15_FULL_REGRESSION.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/REVIEW_15_FULL_REGRESSION.log.txt",
+      "bytes": 11117,
+      "sha256": "7bc6da3d3344edf6ec2efb48f046174208daf5e52eece0a2fb3ed5745ba6d980"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/REVIEW_16_CANONICAL_FINAL.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/REVIEW_16_CANONICAL_FINAL.log.txt",
+      "bytes": 2647,
+      "sha256": "9f6b321d2bcedce84d6b668317dd7c34f94920e4a04cac0b0d23fe35032ad779"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/run-baseline.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/run-baseline.mjs",
+      "bytes": 1338,
+      "sha256": "40b87c51dcf9697065d5062320241319e6177eab0ab0e3765be27722a36bbd8d"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/run-cache-review.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/run-cache-review.mjs",
+      "bytes": 1776,
+      "sha256": "3184019d375c615446266fa101b40eeff5c1220f1fa76c54a71fb1626d699137"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/run-final.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/run-final.mjs",
+      "bytes": 1759,
+      "sha256": "791049e07fab6c122bc739ff1473235fe1f2b88ee143459dfd7014e1403de332"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/run-targeted.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/run-targeted.mjs",
+      "bytes": 1306,
+      "sha256": "ed8072c90a7eddc0fba472c26c3930310c1216e9fcde8b0c131f421938515b0e"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/SOURCE_GIT_BEFORE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/SOURCE_GIT_BEFORE.json",
+      "bytes": 7164,
+      "sha256": "947adf832b07bf56091b92fb1eea0205790838df6b49a90072452ee6f9b12f07"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/SOURCE_MANIFEST.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/SOURCE_MANIFEST.json",
+      "bytes": 288563,
+      "sha256": "0be4a12e035a8c73bd8ae78c17eac86073d673bb1d96386a6f8aff1075b902f6"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/SPEC.md",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/SPEC.md",
+      "bytes": 13410,
+      "sha256": "66a8cb12df82d358091e79f032557d6d505d3adbebe3e4ae40a6a274f4a9ec4f"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/SUPABASE_API_KEYS.md",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/SUPABASE_API_KEYS.md",
+      "bytes": 21982,
+      "sha256": "303970942f92da5425b2fe34e531a6a2d1eb79f4abcae70a5adafbb6c389877a"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/SUPABASE_CHANGELOG.md",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/SUPABASE_CHANGELOG.md",
+      "bytes": 103503,
+      "sha256": "e0c7128cf15f0836b0c567e9d0c10fb03796cd25bbd5f8b54a5dcc7389de880f"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/TABLET_SAME_SOURCE_RESTART.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/TABLET_SAME_SOURCE_RESTART.json",
+      "bytes": 214,
+      "sha256": "41fd3177c7e132548511af6b9869a3aee757ed795c9abbef6996b114e28367cc"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/TABLET_UPGRADE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/TABLET_UPGRADE.json",
+      "bytes": 1298,
+      "sha256": "e135805857f3b3d00a594fe27323b3fe2f8929bda95fc83889260dc88b57b5cf"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/TABLET_V153_MOVIE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/TABLET_V153_MOVIE.json",
+      "bytes": 1544,
+      "sha256": "d328e6999a54e4bd8e5cc84c24772dc44a8f91792fcc80145119fcc614259ba2"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/TARGETED_REVIEW_VALIDATIONS.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/TARGETED_REVIEW_VALIDATIONS.json",
+      "bytes": 520,
+      "sha256": "7701b56ebc975f0069bc107b80406a0651eb58a4f71a99a78b997271a829166a"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/TARGETED_VALIDATIONS.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/TARGETED_VALIDATIONS.json",
+      "bytes": 1039,
+      "sha256": "d3f98000e862a715f7be3359f72eac57047ed92fbcdff61fa6144f19db604832"
+    },
+    {
+      "source": "SOURCE_SWITCH_ISOLATION_20261105/upgrade-device.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/SOURCE_SWITCH_ISOLATION_20261105/upgrade-device.mjs",
+      "bytes": 4114,
+      "sha256": "c4b4cb7bb04af1591ff04ba7bc5232d54b16e810c92ca4540a850dcad8a531f8"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/cdp-local.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/cdp-local.mjs",
+      "bytes": 2291,
+      "sha256": "a6e655fb66ef35f367affb64975cd538ddac9550342aacbfe8ab9afd15757279"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/cleanup-media.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/cleanup-media.mjs",
+      "bytes": 769,
+      "sha256": "8a11fd7c30900c3922c91257cbdc0e3cd28514e7f4e98d15fcc2ef198f384679"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/CLOSURE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/CLOSURE.json",
+      "bytes": 8609,
+      "sha256": "590fe946808e64eb2b0316af246979e6e79d554aa26c6d4f40f2f95c95760018"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/collect-media.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/collect-media.mjs",
+      "bytes": 567,
+      "sha256": "a6b48ae63dcc4544f6ba3a7ba9f955d9665efb577efcac000bf14a0cf4e9f327"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/FIRE_5G_INITIAL.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/FIRE_5G_INITIAL.json",
+      "bytes": 152,
+      "sha256": "6f20dffb19daaccd14a4eb4b434a00c773aece789883b328d8f70eb523d9c1e9"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/FIRE_5G_MOVIE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/FIRE_5G_MOVIE.json",
+      "bytes": 1221,
+      "sha256": "1d81a8fae4cc425f2337f87fea8ac9f6b9c7d9b2e985279e7fc7ccc86352ee35"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/FIRE_5G_MOVIE_RETRY.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/FIRE_5G_MOVIE_RETRY.json",
+      "bytes": 1846,
+      "sha256": "f284cd809fe8438c0a4861df10bbf3362e7e2e4a839ee104cc6b15c54725a63e"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/FIRE_5G_MOVIE_RETRY_FOLLOWUP.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/FIRE_5G_MOVIE_RETRY_FOLLOWUP.json",
+      "bytes": 2613,
+      "sha256": "81a0d3b91679963cfc54c0eabc7e21d27959521bf2ce14d87c3faf2bf032c5d6"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/FIRE_OBSERVER_CLEANUP.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/FIRE_OBSERVER_CLEANUP.json",
+      "bytes": 150,
+      "sha256": "449b9eb85d66644bbff5f0165c56a392738a1c18c96a279e2b5ed47701f8e66e"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/HttpDeliveryProbe.java",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/HttpDeliveryProbe.java",
+      "bytes": 13808,
+      "sha256": "40d9912c5f09bdd227970d0bb06401207a7b427cae36333f841b2112b4c0f2f9"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/https-api-probe.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/https-api-probe.mjs",
+      "bytes": 3239,
+      "sha256": "b47f58e80714649e48e16c40d78c960fd5eb1073440c388db5e0f78ee23281fa"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/inspect-selected-episode.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/inspect-selected-episode.mjs",
+      "bytes": 5434,
+      "sha256": "3b58f0ba1a862a160ad5158fc21a8d451cd51c153ac577c910e353db6590ef5b"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/media-observer.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/media-observer.mjs",
+      "bytes": 2697,
+      "sha256": "2eeb348780a9940cada1110f5f9e232c0dcee520ef607cb655c9ef0f84c199de"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/native-current-proof.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/native-current-proof.mjs",
+      "bytes": 1952,
+      "sha256": "8b06de1db9e391df0917104b60a663238745de37bf3230247c294f48b8a0a572"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/playback-action.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/playback-action.mjs",
+      "bytes": 2447,
+      "sha256": "2319245c5af6672c91d2d7a931fd07681ddc28b2a63c494443303e74abcb3966"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/post-clean-account.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/post-clean-account.mjs",
+      "bytes": 4409,
+      "sha256": "0ab26fd4e68a7bebfd5f390340130b7bfc86ab3aaa8f894fe44f0dd0a3da9aea"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/redirect-https-probe.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/redirect-https-probe.mjs",
+      "bytes": 2575,
+      "sha256": "5536f6b16b6c563dcffe220d7c44249562f65ad2cdd282087d05629854263cc5"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/repeat-5g.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/repeat-5g.mjs",
+      "bytes": 977,
+      "sha256": "26fb8190761fe7c85fc69653c859f39c0f8f79e6c5577c67857a6b3b3407979a"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/REPORT.md",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/REPORT.md",
+      "bytes": 5560,
+      "sha256": "292cdf5f0f2e053a83c23688ae642da4be694d17cae253baf730e482a033a04d"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/run-http-probe.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/run-http-probe.mjs",
+      "bytes": 1298,
+      "sha256": "13ab3b26b03f3b943e8ef1fd644219af677c8e3976895216dabd0e825be5abf0"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/SPEC.md",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/SPEC.md",
+      "bytes": 3890,
+      "sha256": "04087978920fdfe39209409bc19b1816acf5f81721e910321f73e81e077b67c5"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/TABLET_5G_ACTION.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/TABLET_5G_ACTION.json",
+      "bytes": 116,
+      "sha256": "155a6866f82f76967ebb8b8b6d67b21eccfe69915615fbe30e2b942d58cd34c7"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/TABLET_5G_INITIAL_STATE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/TABLET_5G_INITIAL_STATE.json",
+      "bytes": 149,
+      "sha256": "d27ec7e15228678e53ea5c6bd9a6ed67974e70635b502217215111fc149ec699"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/TABLET_5G_MOVIE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/TABLET_5G_MOVIE.json",
+      "bytes": 621,
+      "sha256": "5364f90d50079b0498fe3a0a0edf5437a0f991946e38893fa07bacb88a778054"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/TABLET_5G_MOVIE_FOLLOWUP.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/TABLET_5G_MOVIE_FOLLOWUP.json",
+      "bytes": 955,
+      "sha256": "92dde01d17f9698b5656b7cdcd8278eb2a355e12d6e9103bb39bc3b9b46bcc77"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/TABLET_5G_MOVIE_PROOF.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/TABLET_5G_MOVIE_PROOF.json",
+      "bytes": 2576,
+      "sha256": "f61073acecc25f48dfe2487f7c4c4a228c7440237597cece3d97c37f1c66f1e0"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/TABLET_5G_REDIRECT_HTTPS.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/TABLET_5G_REDIRECT_HTTPS.json",
+      "bytes": 104,
+      "sha256": "a7820eb9dc9fb5f83c9947e47a81bc76506a15750c6e2316de437940bc00d5be"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/TABLET_5G_SERIES.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/TABLET_5G_SERIES.json",
+      "bytes": 623,
+      "sha256": "4735e0c679b41e82f1470a59c36085b96b274b32437f763fe15d0bf446a15d59"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/TABLET_5G_SERIES_FOLLOWUP.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/TABLET_5G_SERIES_FOLLOWUP.json",
+      "bytes": 935,
+      "sha256": "b0ccc2acda4ce39f9454308cdb141bd0a7ad8e4fc47e23ab7e5dae17c52fd2d4"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/TABLET_5G_SERIES_HTTP.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/TABLET_5G_SERIES_HTTP.log.txt",
+      "bytes": 2022,
+      "sha256": "1aa50f6fa08a8ecc57395ec810853366a944aa1850a22a7c85e92262917e2a38"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/TABLET_5G_SERIES_HTTPS_OBSERVATION.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/TABLET_5G_SERIES_HTTPS_OBSERVATION.json",
+      "bytes": 1702,
+      "sha256": "d45852ff64ce446999fcee3f96f7f03e435bf7bfab22a269918113c68ee6b89f"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/TABLET_5G_SERIES_HTTPS_TARGET.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/TABLET_5G_SERIES_HTTPS_TARGET.log.txt",
+      "bytes": 2328,
+      "sha256": "62aa95d00100bb6fe12b271b8f9e9338b1f42bdeccd1b13d29d9404edd6c1763"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/TABLET_AFTER_CLEAN_ACCOUNT.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/TABLET_AFTER_CLEAN_ACCOUNT.json",
+      "bytes": 549,
+      "sha256": "b95f741ee5f6ec8fb8878e3956971591ae400ab340bcbc93a1b9362123870ce3"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/TABLET_AFTER_CLEAN_EPISODE_REFERENCE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/TABLET_AFTER_CLEAN_EPISODE_REFERENCE.json",
+      "bytes": 314,
+      "sha256": "3446be395d1b87cca912bda53391fdfb125e07f70100af2c0ba5d590eded23e1"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/TABLET_AFTER_CLEAN_MOVIE_PROOF.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/TABLET_AFTER_CLEAN_MOVIE_PROOF.json",
+      "bytes": 1816,
+      "sha256": "721cc1161bb67570e5ed7f8678d6bd842d07f30bbd44a5e7a117a72b06331a76"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/TABLET_AFTER_CLEAN_REQUEST_BINDING.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/TABLET_AFTER_CLEAN_REQUEST_BINDING.json",
+      "bytes": 324,
+      "sha256": "f440f3934c0327fa66660d7bb3f3d98e77f88f5abaf61658c36ae954d78813ac"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/TABLET_AFTER_CLEAN_SERIES_PROOF.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/TABLET_AFTER_CLEAN_SERIES_PROOF.json",
+      "bytes": 1950,
+      "sha256": "17e28a7723d31dd40f8a35321457d34685328f1ddb3b7a771721f1d1cd0fcf15"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/TABLET_HTTPS_API.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/TABLET_HTTPS_API.json",
+      "bytes": 162,
+      "sha256": "ada4928440946ea95518e22282412924f4c401730026ef0fae172162ca1ecad6"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/TABLET_HTTP_DELIVERY_DETAIL.log",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/TABLET_HTTP_DELIVERY_DETAIL.log.txt",
+      "bytes": 1788,
+      "sha256": "436a872469eeaf349e38d874edf65e66a2f35631d8cfe03e0bbed35350552959"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/TABLET_OBSERVER_CLEANUP.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/TABLET_OBSERVER_CLEANUP.json",
+      "bytes": 150,
+      "sha256": "edb503f4e14ddcab674fce1d6ffff246d35ee34fa71dad6492ddd5e6498a316a"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/TABLET_TLS_DETAIL.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/TABLET_TLS_DETAIL.json",
+      "bytes": 570,
+      "sha256": "e18cdf4229ce4a2a620a60fbd9caf3aa80d507323c64d6915ba60b19e0816e6f"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/TABLET_TRANSPORT_HINTS.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/TABLET_TRANSPORT_HINTS.json",
+      "bytes": 549,
+      "sha256": "9e85a3d08bdb783b075441eff2fa7bc48106f1b7c5544a596ac69b2ac4009867"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/tls-detail.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/tls-detail.mjs",
+      "bytes": 2028,
+      "sha256": "4a3bc950d2cc98ff0a57926f13b5388db3ef7ac9983175934c05076ddc58f5c8"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/transport-hints.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/transport-hints.mjs",
+      "bytes": 4405,
+      "sha256": "d4e86aa8f0beab4b97e2cac34da7541eb4682a105653f443ac351733f45d2da4"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/verify-5g-movie.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/verify-5g-movie.mjs",
+      "bytes": 1838,
+      "sha256": "270356722fbe90365a31cfaa1d9a403b2f70cef22f17bed4e262d893f1a44227"
+    },
+    {
+      "source": "HTTP_TRANSPORT_RECOVERY_20261105/verify-reference-binding.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/HTTP_TRANSPORT_RECOVERY_20261105/verify-reference-binding.mjs",
+      "bytes": 1322,
+      "sha256": "7da957d0f8572b44d1a0b146adec6f3d42ffb2cfe95123850f4c3db19a9a3371"
+    },
+    {
+      "source": "TABLET_SOURCE_CLEANUP_20261105/clean-tablet.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/TABLET_SOURCE_CLEANUP_20261105/clean-tablet.mjs",
+      "bytes": 7514,
+      "sha256": "7eee945cdf96984d29b46e76b1b6976086b4b39dbdacb02f970140aad8b88486"
+    },
+    {
+      "source": "TABLET_SOURCE_CLEANUP_20261105/CLOSURE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/TABLET_SOURCE_CLEANUP_20261105/CLOSURE.json",
+      "bytes": 1322,
+      "sha256": "fba5b9818756dfb302885bd8633baca9a3efee445bbd6e249f525b9bcc881b4d"
+    },
+    {
+      "source": "TABLET_SOURCE_CLEANUP_20261105/OBSERVATION_NOTE.md",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/TABLET_SOURCE_CLEANUP_20261105/OBSERVATION_NOTE.md",
+      "bytes": 1875,
+      "sha256": "7ac1d42b4b47c8b4b5e83a8bdce4b714601002188a08831ee682f73199bd2c9a"
+    },
+    {
+      "source": "TABLET_SOURCE_CLEANUP_20261105/read-source-metadata-adb.mjs",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/TABLET_SOURCE_CLEANUP_20261105/read-source-metadata-adb.mjs",
+      "bytes": 3534,
+      "sha256": "58d8bcf148b04306fc3f1ac6c61faf7133b380740ac1072fae3795055de8bc8a"
+    },
+    {
+      "source": "TABLET_SOURCE_CLEANUP_20261105/REPORT.md",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/TABLET_SOURCE_CLEANUP_20261105/REPORT.md",
+      "bytes": 1701,
+      "sha256": "8215f9191d4cd96045ab0e89383ccdee385ceb886076d7fc898ae2ae9d2e774e"
+    },
+    {
+      "source": "TABLET_SOURCE_CLEANUP_20261105/RESULT.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/TABLET_SOURCE_CLEANUP_20261105/RESULT.json",
+      "bytes": 1363,
+      "sha256": "23b541cca6a96c2c37615898760aef974e5cebf5eb12c5f17a4321db3f629507"
+    },
+    {
+      "source": "TABLET_SOURCE_CLEANUP_20261105/SPEC.md",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/TABLET_SOURCE_CLEANUP_20261105/SPEC.md",
+      "bytes": 2270,
+      "sha256": "e0bff6cafd9ffbd9a682a6a3234d1eb8db01ccb41c603c6f1b87d462a79c78a6"
+    },
+    {
+      "source": "TABLET_SOURCE_CLEANUP_20261105/TABLET_SOURCE_RESIDUE.json",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/TABLET_SOURCE_CLEANUP_20261105/TABLET_SOURCE_RESIDUE.json",
+      "bytes": 1381,
+      "sha256": "91eb0296742dc45346f7faba01dcac726ba206aa34b8eccc698d3731c8a411cf"
+    },
+    {
+      "sourceAbsolute": "C:/Xandeflix/xandeflix-prebuilt-c11-main/tmp/tmdb-episode-metadata-enrichment-20261027/NEXT_EPISODE_HANDOFF_20261102/REPORT.md",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/NEXT_EPISODE_HANDOFF_20261102/REPORT.md",
+      "bytes": 32883,
+      "sha256": "f837c217734525a76a7a6cf0497ebf5c316025c3f1c547f4c360fa63b73eb877"
+    },
+    {
+      "sourceAbsolute": "C:/Xandeflix/xandeflix-prebuilt-c11-main/tmp/tmdb-episode-metadata-enrichment-20261027/P2_50_APK_V139/P2_50D_R1/REPORT.md",
+      "target": "docs/reviews/PLAYBACK_SOURCE_AUDIT_20261105/evidence/P2_50_APK_V139/P2_50D_R1/REPORT.md",
+      "bytes": 6530,
+      "sha256": "accbab4b77bc2109f5e94b1b5a2ef68d4f50d0971ddcc11c150f18f7a3da0292"
+    }
+  ]
+}

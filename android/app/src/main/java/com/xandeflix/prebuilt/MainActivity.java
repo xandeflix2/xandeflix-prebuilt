@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.content.Intent;
+import android.graphics.Rect;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -26,8 +28,23 @@ import com.xandeflix.prebuilt.security.LocalSecureSourceStorePlugin;
 import com.xandeflix.prebuilt.security.PendingDeviceReactivationStorePlugin;
 import com.xandeflix.prebuilt.source.LargeSourceTransportPlugin;
 import com.xandeflix.prebuilt.update.AppUpdatesPlugin;
+import com.xandeflix.prebuilt.intro.AppIntroPolicy;
+import com.xandeflix.prebuilt.intro.AppIntroController;
+import com.xandeflix.prebuilt.intro.AppIntroPlugin;
+import androidx.core.splashscreen.SplashScreen;
 
 public class MainActivity extends BridgeActivity {
+    private static final AppIntroPolicy.ProcessAdmission INTRO_ADMISSION = new AppIntroPolicy.ProcessAdmission();
+    private AppIntroPolicy.Session appIntroSession = new AppIntroPolicy.Session(false);
+    private AppIntroController appIntro;
+    private boolean appIntroComplete = true;
+    private boolean destroying;
+    private Runnable introCompletionListener;
+    public boolean isAppIntroComplete() { return appIntroComplete; }
+    public String appIntroReason() { return appIntroSession.reason().name(); }
+    public void whenAppIntroComplete(Runnable listener) {
+        if (appIntroComplete) listener.run(); else introCompletionListener = listener;
+    }
     // UI-thread only. Weak keys avoid retaining destroyed activity windows.
     private static final java.util.Map<View, Boolean> fullscreenDecorViews = new java.util.WeakHashMap<>();
     public static int phoneUiOrientation(int smallestScreenWidthDp, int uiMode, boolean fullscreen) {
@@ -39,11 +56,38 @@ public class MainActivity extends BridgeActivity {
                 : ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
     }
 
+    static int smallestNormalWindowDp(int widthPixels, int heightPixels, float density, int fallbackDp) {
+        if (widthPixels <= 0 || heightPixels <= 0 || !(density > 0) || Float.isInfinite(density)) {
+            return fallbackDp;
+        }
+        return (int) (Math.min(widthPixels, heightPixels) / density);
+    }
+
+    private static int smallestNormalWindowDp(Activity activity, Configuration configuration) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return configuration.smallestScreenWidthDp;
+        Rect bounds = activity.getWindowManager().getMaximumWindowMetrics().getBounds();
+        return smallestNormalWindowDp(bounds.width(), bounds.height(),
+                activity.getResources().getDisplayMetrics().density, configuration.smallestScreenWidthDp);
+    }
+
+    private static boolean isWindowed(Activity activity) {
+        // Android includes picture-in-picture in multi-window mode.
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && activity.isInMultiWindowMode();
+    }
+
+    static boolean shouldReleaseTabletOrientation(int smallestDp, int uiMode, int requested) {
+        return smallestDp >= 600
+                && (uiMode & Configuration.UI_MODE_TYPE_MASK) != Configuration.UI_MODE_TYPE_TELEVISION
+                && requested != ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
+    }
+
     public static void applyPhoneUiOrientation(Activity activity, boolean fullscreen) {
         if (activity == null) return;
         try {
+            if (isWindowed(activity)) return;
             Configuration configuration = activity.getResources().getConfiguration();
-            int orientation = phoneUiOrientation(configuration.smallestScreenWidthDp, configuration.uiMode, fullscreen);
+            int orientation = phoneUiOrientation(smallestNormalWindowDp(activity, configuration),
+                    configuration.uiMode, fullscreen);
             if (orientation != ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
                     && activity.getRequestedOrientation() != orientation) {
                 activity.setRequestedOrientation(orientation);
@@ -154,7 +198,16 @@ public class MainActivity extends BridgeActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        applyPhoneUiOrientation(this, false);
+        SplashScreen.installSplashScreen(this);
+        Intent launch = getIntent();
+        boolean launcher = launch != null && Intent.ACTION_MAIN.equals(launch.getAction())
+                && (launch.hasCategory(Intent.CATEGORY_LAUNCHER) || launch.hasCategory(Intent.CATEGORY_LEANBACK_LAUNCHER));
+        boolean admitted = INTRO_ADMISSION.claim(launcher, savedInstanceState != null, launch != null && launch.getData() != null);
+        appIntroSession = new AppIntroPolicy.Session(admitted);
+        appIntroComplete = !admitted;
+        if (!admitted) applyPhoneUiOrientation(this, false);
+        Log.i("XF_INTRO07", "ACTIVITY_CREATE eligible=" + admitted + " atMs=" + android.os.SystemClock.elapsedRealtime());
+        registerPlugin(AppIntroPlugin.class);
         registerPlugin(NativeAndroidPlayerPlugin.class);
         registerPlugin(NativePlayerPlugin.class);
         registerPlugin(LocalSecureSourceStorePlugin.class);
@@ -162,12 +215,14 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(PendingDeviceReactivationStorePlugin.class);
         registerPlugin(LargeSourceTransportPlugin.class);
         registerPlugin(AppUpdatesPlugin.class);
+        registerPlugin(com.xandeflix.prebuilt.network.NetworkStatusPlugin.class);
         registerPlugin(com.xandeflix.prebuilt.artwork.ArtworkCachePlugin.class);
         registerPlugin(com.xandeflix.prebuilt.cast.GoogleCastPlugin.class);
         registerPlugin(com.xandeflix.prebuilt.trailer.PublicTrailerPlugin.class);
         super.onCreate(savedInstanceState);
-        applyAppSystemUiPolicy(getWindow());
+        applyAppSystemUiPolicy(getWindow(), !appIntroComplete);
         if (getBridge() != null && getBridge().getWebView() != null) {
+            if (admitted) getBridge().getWebView().setBackgroundColor(android.graphics.Color.BLACK);
             getBridge().getWebView().getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
             bindSafeInsets(getBridge().getWebView());
         }
@@ -175,20 +230,66 @@ public class MainActivity extends BridgeActivity {
                 "R2F3B_SECURE_PREFLIGHT",
                 LocalSecureSourceStorePlugin.buildSanitizedPreflight(this, true).toString());
         DebugProvisioner.handleIntent(this, getIntent());
+        if (admitted) {
+            try {
+                appIntro = new AppIntroController(this, appIntroSession, this::completeAppIntro);
+                appIntro.attach();
+            } catch (RuntimeException | OutOfMemoryError error) {
+                appIntroSession.finish(AppIntroPolicy.Reason.INITIALIZATION_ERROR);
+                completeAppIntro();
+            }
+        }
+    }
+
+    private void completeAppIntro() {
+        if (appIntroComplete) return;
+        appIntroComplete = true;
+        if (!destroying) {
+            applyPhoneUiOrientation(this, false);
+            applyAppSystemUiPolicy(getWindow(), false);
+        }
+        Runnable listener = introCompletionListener; introCompletionListener = null;
+        if (listener != null) listener.run();
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
+        if (appIntro != null && !appIntroComplete) appIntro.finish(AppIntroPolicy.Reason.NEW_INTENT, false);
         applyAppSystemUiPolicy(getWindow());
         DebugProvisioner.handleIntent(this, intent);
+    }
+
+    private void restoreUiOrientation() {
+        if (!appIntroComplete || isWindowed(this)) return;
+        try {
+            Configuration configuration = getResources().getConfiguration();
+            int smallestDp = smallestNormalWindowDp(this, configuration);
+            if (smallestDp >= 600) {
+                if (shouldReleaseTabletOrientation(smallestDp, configuration.uiMode, getRequestedOrientation())) {
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+                }
+                return;
+            }
+            NativeAndroidPlayerPlugin player = nativePlayerPlugin();
+            applyPhoneUiOrientation(this, player != null && player.isPreviewFullscreen());
+        } catch (RuntimeException ignored) {
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration configuration) {
+        super.onConfigurationChanged(configuration);
+        if (hasWindowFocus()) restoreUiOrientation();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        applyAppSystemUiPolicy(getWindow());
+        restoreUiOrientation();
+        applyAppSystemUiPolicy(getWindow(), !appIntroComplete);
+        if (appIntro != null && !appIntroComplete) appIntro.onResume();
         if (getBridge() != null && getBridge().getWebView() != null) {
             ViewCompat.requestApplyInsets(getBridge().getWebView());
         }
@@ -198,12 +299,14 @@ public class MainActivity extends BridgeActivity {
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         if (hasFocus) {
-            applyAppSystemUiPolicy(getWindow());
+            restoreUiOrientation();
+            applyAppSystemUiPolicy(getWindow(), !appIntroComplete);
         }
     }
 
     @Override
     public void onBackPressed() {
+        if (appIntro != null && appIntro.skipBack()) return;
         if (getBridge() != null && getBridge().getPlugin("NativeAndroidPlayer") != null) {
             Plugin plugin = getBridge().getPlugin("NativeAndroidPlayer").getInstance();
             if (plugin instanceof NativeAndroidPlayerPlugin) {
@@ -228,6 +331,7 @@ public class MainActivity extends BridgeActivity {
         return plugin instanceof NativeAndroidPlayerPlugin ? (NativeAndroidPlayerPlugin)plugin : null;
     }
     @Override public boolean dispatchKeyEvent(android.view.KeyEvent event) {
+        if (appIntro != null && appIntro.dispatchKey(event)) return true;
         NativeAndroidPlayerPlugin plugin=nativePlayerPlugin();
         if(plugin!=null && plugin.dispatchLiveKey(event))return true;
         return super.dispatchKeyEvent(event);
@@ -239,9 +343,27 @@ public class MainActivity extends BridgeActivity {
     @Override public void onPictureInPictureModeChanged(boolean pip, Configuration configuration) {
         super.onPictureInPictureModeChanged(pip,configuration);
         NativeAndroidPlayerPlugin plugin=nativePlayerPlugin();if(plugin!=null)plugin.onPipModeChanged(pip);
+        if (!pip && hasWindowFocus()) restoreUiOrientation();
     }
     @Override public void onStop() {
+        if (appIntro != null && !appIntroComplete) appIntro.background();
         super.onStop();NativeAndroidPlayerPlugin plugin=nativePlayerPlugin();
         if(plugin!=null)plugin.onHostStopped();
+    }
+    @Override public void onPause() {
+        if (appIntro != null && !appIntroComplete) appIntro.background();
+        super.onPause();
+    }
+    @Override public void onDestroy() {
+        destroying = true;
+        if (appIntro != null) appIntro.background();
+        introCompletionListener = null;
+        appIntro = null;
+        super.onDestroy();
+    }
+    @Override public void onTrimMemory(int level) {
+        super.onTrimMemory(level);
+        if (level >= android.content.ComponentCallbacks2.TRIM_MEMORY_RUNNING_LOW && appIntro != null && !appIntroComplete)
+            appIntro.finish(AppIntroPolicy.Reason.LOW_MEMORY, true);
     }
 }

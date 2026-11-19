@@ -1,0 +1,89 @@
+{
+  "observedUTC": "2026-11-05T10:30:08.453Z",
+  "status": "SEQUENTIAL_MOVIE_PAIR_OBSERVED",
+  "uniqueDisplayedTitleMatch": true,
+  "comparable": true,
+  "sameUri": true,
+  "sameOrigin": true,
+  "samePath": true,
+  "sameHeaders": true,
+  "phone": {
+    "version": "1.0.37",
+    "events": [
+      {
+        "event": "OPEN",
+        "kind": "movie",
+        "scheme": "http:",
+        "typedPath": "movie",
+        "extension": "mp4",
+        "pathDepth": 4,
+        "hasQuery": false,
+        "headerNames": [
+          "User-Agent"
+        ],
+        "uaClass": "IPTV_SMARTERS_DEFAULT",
+        "observedUTC": "2026-11-05T10:29:40.756Z"
+      },
+      {
+        "event": "OPEN_RETURN",
+        "accepted": true,
+        "candidateCount": 1,
+        "observedUTC": "2026-11-05T10:29:40.813Z"
+      },
+      {
+        "event": "progress",
+        "positionMs": 4371,
+        "durationMs": 5448683,
+        "ended": false,
+        "observedUTC": "2026-11-05T10:29:45.875Z"
+      },
+      {
+        "event": "progress",
+        "positionMs": 9383,
+        "durationMs": 5448683,
+        "ended": false,
+        "observedUTC": "2026-11-05T10:29:50.887Z"
+      }
+    ]
+  },
+  "tablet": {
+    "version": "1.0.52",
+    "events": [
+      {
+        "event": "OPEN",
+        "kind": "movie",
+        "scheme": "http:",
+        "typedPath": "movie",
+        "extension": "mp4",
+        "pathDepth": 4,
+        "hasQuery": false,
+        "headerNames": [
+          "User-Agent"
+        ],
+        "uaClass": "IPTV_SMARTERS_DEFAULT",
+        "observedUTC": "2026-11-05T10:29:57.715Z"
+      },
+      {
+        "event": "OPEN_RETURN",
+        "accepted": true,
+        "candidateCount": 1,
+        "observedUTC": "2026-11-05T10:29:58.195Z"
+      },
+      {
+        "event": "progress",
+        "positionMs": 6129,
+        "durationMs": 5448683,
+        "ended": false,
+        "observedUTC": "2026-11-05T10:30:03.297Z"
+      },
+      {
+        "event": "progress",
+        "positionMs": 11142,
+        "durationMs": 5448683,
+        "ended": false,
+        "observedUTC": "2026-11-05T10:30:07.896Z"
+      }
+    ]
+  },
+  "scope": "Unique displayed title used only to select cards; actual URI identity established separately; normal application authorization and play actions, source configuration unchanged, tests sequential"
+}

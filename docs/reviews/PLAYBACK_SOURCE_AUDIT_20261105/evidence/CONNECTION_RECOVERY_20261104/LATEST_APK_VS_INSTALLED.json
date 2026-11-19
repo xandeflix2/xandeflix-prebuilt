@@ -1,0 +1,52 @@
+{
+  "observedUTC": "2026-11-05T09:58:58.393Z",
+  "providedApk": {
+    "path": "C:/Users/Alexandre/Downloads/app-debug.apk",
+    "bytes": 22317875,
+    "sha256": "0146a2fc05d3e45f5670f4c5aba0fa0d0ba1cd25bd0086f7ac00de4cb6ab8c29"
+  },
+  "devices": [
+    {
+      "label": "TABLET",
+      "serial": "RX2X301Q3KY",
+      "model": "SM-X610",
+      "status": "INSPECTED",
+      "versionCode": 52,
+      "versionName": "1.0.52",
+      "firstInstallTime": "2026-11-04 17:01:00",
+      "lastUpdateTime": "2026-11-04 17:01:00",
+      "sha256": "0146a2fc05d3e45f5670f4c5aba0fa0d0ba1cd25bd0086f7ac00de4cb6ab8c29",
+      "matchesProvidedApk": true,
+      "splitApks": 0
+    },
+    {
+      "label": "PHONE",
+      "serial": "RXGYB03FL4W",
+      "model": "SM-S926B",
+      "status": "INSPECTED",
+      "versionCode": 37,
+      "versionName": "1.0.37",
+      "firstInstallTime": "2026-11-04 20:00:38",
+      "lastUpdateTime": "2026-11-04 20:00:38",
+      "sha256": "433a60d77669430de4cc09b45db0b3f29760b2578d920d76f60ee9580ce18252",
+      "matchesProvidedApk": false,
+      "splitApks": 0
+    },
+    {
+      "label": "FIRE_USB",
+      "serial": "G071CQ070344374G",
+      "model": "AFTSS",
+      "status": "INSPECTED",
+      "versionCode": 52,
+      "versionName": "1.0.52",
+      "firstInstallTime": "2026-10-23 14:38:21",
+      "lastUpdateTime": "2026-11-03 07:42:10",
+      "sha256": "f1eb668de79aebd0384424c67a289eea9c5206fa8db901020789f52a8a079358",
+      "matchesProvidedApk": false,
+      "splitApks": 0
+    }
+  ],
+  "allInspectedIdentical": false,
+  "allTargetsCurrentlyInspected": true,
+  "scope": "Byte identity of the provided APK and base APK files on reachable devices; disconnected targets explicitly not certified by this observation. No installation performed."
+}

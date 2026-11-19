@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "gate": "CANON-01-G10FIX",
+  "parentGate": "CANON-01",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "USER_SUPPLIED_CHAT_MASTER_AMENDMENT_2026_10_20",
+  "authorizationRequestSha256": "47ef44bc36a7c43f46729265b8c4d6e1b39fe55cb64e6f9a93b5903fefb90ed6",
+  "reason": "Correct only DeltaV1 transport and reconstruction of target catalog extensions, preserving SHA-256/signature/binding and all existing negative tests.",
+  "physicalImpact": "NOT_REQUIRED_JUSTIFIED",
+  "physicalImpactJustification": "Local synthetic artifact/reader tests only, no Android binary or device installation. Historical Android1.0.37 evidence remains separate; physical retest of a future delivered reader is pending.",
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c105-complete-root-search.mjs",
+    "scripts/test-c107-catalog-return-navigation.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c11-landscape-navigation.mjs"
+  ],
+  "mandatoryCommands": [
+    "npm run update:check",
+    "npm run security:check",
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock",
+    "npm run typecheck",
+    "node scripts/test-g10-delta-extensions-regression.mjs",
+    "npm run build",
+    "npm run site:build"
+  ],
+  "evidence": "docs/evidence/CANON_01_G10_FIX_EVIDENCE.md",
+  "compatibilityRisk": "New deltas containing targetExtensions are rejected by old readers. Use explicitly selected signed full V1/V2 packages through the existing secure import API for old/unknown readers. No automatic negotiation/download/fallback is implemented or claimed.",
+  "changes": [
+    {
+      "path": "src/update/catalog-delta.types.ts",
+      "before": "89280b442ad7c60ad06f5c629ed38c07116820e8",
+      "after": "764b180194d03f623c14b2674ae4635cfe9004f3"
+    },
+    {
+      "path": "src/update/catalog-delta-builder.ts",
+      "before": "ac72f25bcf768afe009916fb9979400b342b9a39",
+      "after": "67caae72cd87ee31da684a73e4065c6da4543335"
+    },
+    {
+      "path": "src/update/catalog-delta-applier.ts",
+      "before": "0948b1980ce4a245d0ef0adb508b182597f4203a",
+      "after": "30ff91ecaf0513030a4069d127149c8f8b1b130b"
+    },
+    {
+      "path": "schemas/prebuilt-catalog-delta.schema.json",
+      "before": "38b015140a3aa5b75e06750e10524f04c54f0eb3",
+      "after": "a963e041f3180fd96e085e0874f4a06359412954"
+    },
+    {
+      "path": "scripts/test-g10-delta-extensions-regression.mjs",
+      "before": null,
+      "after": "a958e557a099614522d3bd695802d3ee99f9cfbb"
+    }
+  ],
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": false,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false
+}

@@ -48,7 +48,16 @@ function verify(m, p, xml) {
   const mainTag = xml.match(/<activity\s[^>]*android:name="\.MainActivity"[^>]*>/s)?.[0];
   assert.ok(mainTag);assert.doesNotMatch(mainTag, /screenOrientation/);
   assert.match(mainTag, /configChanges="[^"]*orientation[^"]*screenSize/);
-  assert.match(xml, /android:name="\.player.NativePlayerActivity"\s+android:exported="false"\s+android:screenOrientation="sensorLandscape"/);
+  const nativeActivities = [...xml.replace(/<!--[\s\S]*?-->/g, '')
+    .matchAll(/<activity\b[^>]*>/g)].map(([tag]) => {
+      const pairs = [...tag.matchAll(/([A-Za-z_][\w:.-]*)\s*=\s*(["'])(.*?)\2/gs)];
+      const attrs = new Map(pairs.map(m => [m[1], m[3]]));
+      assert.equal(attrs.size, pairs.length, 'DUPLICATE_ACTIVITY_ATTRIBUTE');
+      return attrs;
+    }).filter(attrs => attrs.get('android:name') === '.player.NativePlayerActivity');
+  assert.equal(nativeActivities.length, 1, 'EXACTLY_ONE_NATIVE_PLAYER_ACTIVITY_REQUIRED');
+  assert.equal(nativeActivities[0].get('android:exported'), 'false');
+  assert.equal(nativeActivities[0].get('android:screenOrientation'), 'sensorLandscape');
   assert.match(vod, /setRequestedOrientation\(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE\)/);
 }
 verify(main, player, manifest);
@@ -63,5 +72,27 @@ for (const [label, m, p, xml] of negatives) {
   assert.throws(() => verify(m, p, xml), undefined, 'NEGATIVE_CONTROL_NOT_REJECTED_' + label);
   console.log('PASS PHONE_ORIENTATION_NEGATIVE_' + label);
 }
+const nativeTag = manifest.match(/<activity\b[^>]*android:name="\.player.NativePlayerActivity"[^>]*>/s)[0];
+const nativeAttrs = ['android:name=".player.NativePlayerActivity"', 'android:exported="false"', 'android:screenOrientation="sensorLandscape"'];
+const permutations = [[0,1,2],[0,2,1],[1,0,2],[1,2,0],[2,0,1],[2,1,0]];
+for (const order of permutations) {
+  const tag = '<activity android:supportsPictureInPicture="true" ' + order.map(i => nativeAttrs[i]).join(' ') + '>';
+  verify(main, player, manifest.replace(nativeTag, tag));
+}
+verify(main, player, manifest.replace(nativeTag, nativeTag.replaceAll('"', "'")));
+const xmlNegatives = [
+  ['exported-true', nativeTag.replace('android:exported="false"', 'android:exported="true"')],
+  ['exported-missing', nativeTag.replace('android:exported="false"', '')],
+  ['orientation-wrong', nativeTag.replace('sensorLandscape', 'portrait')],
+  ['orientation-missing', nativeTag.replace('android:screenOrientation="sensorLandscape"', '')],
+  ['duplicate-attribute', nativeTag.replace('<activity', '<activity android:exported="false"')],
+  ['comment-only', '<!-- ' + nativeTag + ' -->'],
+  ['duplicate-activity', nativeTag + nativeTag],
+];
+for (const [label, tag] of xmlNegatives) {
+  assert.throws(() => verify(main, player, manifest.replace(nativeTag, tag)), undefined, 'XML_NEGATIVE_NOT_REJECTED_' + label);
+  console.log('PASS PHONE_ORIENTATION_XML_NEGATIVE_' + label);
+}
+console.log('C11_PHONE_UI_ORIENTATION_XML=PASS_7_POSITIVES_AND_7_NEGATIVES');
 console.log('C11_PHONE_UI_ORIENTATION=PASS_STATIC_CALL_SITES_AND_5_NEGATIVES');
 console.log('PHYSICAL_ROTATION_NOT_PROVEN_BY_SOURCE_GUARD');

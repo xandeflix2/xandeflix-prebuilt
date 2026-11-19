@@ -1,0 +1,257 @@
+{
+  "schema": 1,
+  "gate": "CANON-01-XANDEFLIX-UI-PERFORMANCE-RECOVERY-03",
+  "parentGate": "CANON-01",
+  "amendment": "CANON-01-XANDEFLIX-UI-PERFORMANCE-RECOVERY-03",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "EXPLICIT_USER_ATTACHED_UI_PERFORMANCE_RECOVERY_03_2026_10_25",
+  "authorizationRequestSha256": "8409bb26fd147dec97f610bc9dc7d0da69b4ec2328d48726b58a7e224b65119d",
+  "reason": "Local focus/expansion performance recovery, shared repeat guard, special D-pad rail sizing, official same-title hero fallback, full-width vertical featured collections, bidirectional local search focus, one-second card preview attempt and original sidebar logo.",
+  "physicalImpact": "REQUIRED",
+  "physicalImpactJustification": "New binary not installed. Fire60 FPS, flicker cause, real autoplay and prolonged hardware/Phone/Tablet regression remain pending; desktop fixtures are not physical certification.",
+  "testChangesReviewed": true,
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c105-complete-root-search.mjs",
+    "scripts/test-c107-catalog-return-navigation.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c11-landscape-navigation.mjs",
+    "scripts/validate-direct-playback.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock",
+    "npm run typecheck",
+    "npm run update:check",
+    "npm run security:check",
+    "npm run playback:check",
+    "npm run build",
+    "npm run site:build",
+    "node scripts/test-site-build-contract.mjs",
+    "node scripts/test-vercel-artifact-contract.mjs",
+    "node scripts/verify-vercel-artifact.mjs inspect",
+    "node scripts/test-vercel-prebuilt-contract.mjs"
+  ],
+  "evidence": "docs/evidence/XANDEFLIX_UI_PERFORMANCE_RECOVERY_03.md",
+  "compatibilityRisk": "Instant expanded geometry and cached alignment require actual WebView/D-pad validation; same-title official art availability and third-party autoplay remain external constraints.",
+  "restrictions": [
+    "Local implementation within preceding allowlist. Preserve all192 prior controls/32 suites,36 prior receipts and four normative byte prefixes.",
+    "No APK/build Android/install/reset, native/dependency/version changes, Git staging/commit/push/merge/PR/deploy/backend/Supabase.",
+    "No source/import/auth/activation/C9/Live/main player or parental authority changes. Local search queries unchanged; only navigation changes.",
+    "Featured main rails opt in; Recentes size only retains resume/no autoplay. SeeAll/Search grids never expand.",
+    "Actual card UI attempts at1000ms using explicit option; generic session default3000ms retained for compatibility and historical tests. Single media lease/stale identity/cleanup preserved.",
+    "Original logo unchanged, sidebar only. Same-title metadata/image validation remains. No unrelated evidence photographs in assets.",
+    "No claim of Fire60 FPS, flicker correction or real trailer playing without physical evidence."
+  ],
+  "previousGovernanceHashes": {
+    "docs/governance/CANON_CHANGE_AUTHORIZATION.json": "e73152f228cbb625c508062d70ef810e8342059a",
+    "docs/governance/CANON_01_LEGACY_TESTS_AUTHORIZATION.json": "e59e2d328db3d0dfd8c1d873b154e2e3f7900a0c",
+    "docs/governance/CANON_01_AUTHORIZATION_HARDENING.json": "766db763ee98aeeb33230c2828f050a8527555b7",
+    "docs/governance/authorizations/CANON-01-A22A-CI-DIAG.json": "7d89451bf23a05fa1ba819b72b99b28025aa7a66",
+    "docs/governance/authorizations/CANON-01-A22A-WINDOWS-EOL.json": "73ffd5ed494cb87a7c0d22e4a8a3f94252cf321e",
+    "docs/governance/authorizations/CANON-01-A22A-WINDOWS-METADATA-EOL.json": "90d7db4a18e84221afa6fa9dda40c82d6dad6121",
+    "docs/governance/authorizations/CANON-01-CATALOG-PHYSICAL-FIXES.json": "ea179b852518e2a14c7ee79b6c3c72e76c0df6a9",
+    "docs/governance/authorizations/CANON-01-CATALOG-READ-DIAG.json": "169b19ee02a4c1cacbe575cded00ec02928fa3c7",
+    "docs/governance/authorizations/CANON-01-CATALOG-RETENTION.json": "b3c18f01ba1e753597af3a162c2605669dcd4e6b",
+    "docs/governance/authorizations/CANON-01-DETAIL-BACKDROP-TYPES.json": "da8c532e25e220040bba3c942bad41507d4b9245",
+    "docs/governance/authorizations/CANON-01-DETAIL-BACKDROP-UI.json": "579097e952a7ddf142ba885aaf23e164c0241e54",
+    "docs/governance/authorizations/CANON-01-DPAD-CARD-SCOPE-SEEALL-GRID-01.json": "1be58b8db36f88a75e115fd1cb7bbb0d17f0bb71",
+    "docs/governance/authorizations/CANON-01-DPAD-EXPANDED-CARDS-AUTOPREVIEW-01.json": "8d031488e5175dc1a0fbca3246345be638074fe7",
+    "docs/governance/authorizations/CANON-01-HERO-PLATFORM-ALIGNMENT.json": "66a112450541d8a038292d8b07d08cc5547ad51e",
+    "docs/governance/authorizations/CANON-01-HERO-PLATFORM-COMPOSITION.json": "75f9ca539c1723ca1db6c2e8948a63a3a19d5264",
+    "docs/governance/authorizations/CANON-01-HOME-DPAD-CAROUSEL-PREVIEW-PAGINATION-02.json": "a91ff1c57b2c412e808fb79917fc00a1bfaa1e1e",
+    "docs/governance/authorizations/CANON-01-LIVE-NETWORK-ACTIONS.json": "e345e800a7a52d79241701cb5fd13f34bc699e01",
+    "docs/governance/authorizations/CANON-01-LIVE-SINGLE-TRANSPORT.json": "039d22359310380cd79432efe17f9533c93fb6cb",
+    "docs/governance/authorizations/CANON-01-NETWORK-DIAGNOSTICS.json": "80a4d01348eb82b4a7cafd4836c3f221d97e02e5",
+    "docs/governance/authorizations/CANON-01-NETWORK-UI-POLISH.json": "2fc3ce79b3a78454e7ad15f1d06002a6bc69d594",
+    "docs/governance/authorizations/CANON-01-OPAQUE-HLS-MIME-RECOVERY.json": "5a8c735b59f921a5d24be15f6c14f32541687719",
+    "docs/governance/authorizations/CANON-01-SERIES-POSTER-COMPOSITION.json": "645dc8b2b5d4b822bc83d72e9f5ab9f4f4cb4347",
+    "docs/governance/authorizations/CANON-01-SOURCE-OUTPUT.json": "a93d98a1022f99c0e0957dd8f4a2c7d078b8f588",
+    "docs/governance/authorizations/CANON-01-STREAMED-VOD-INVENTORY-RECOVERY.json": "a16dd131aa09b3027724ea94f49a6d841551a9cb",
+    "docs/governance/authorizations/CANON-01-TABLET-SIDEBAR-TRANSPARENCY.json": "ffcc5c6c6005e4fcd24ce40ba776950bf55a5dbe",
+    "docs/governance/authorizations/CANON-01-TMDB-CONTEXT-IDENTITY.json": "3ab236bab99175dcb5374047c2fc6565650d8945",
+    "docs/governance/authorizations/CANON-01-TMDB-RELEASE-TAGS.json": "30bcebd64ad85f8d981f09b320cbf3864b6bad7a",
+    "docs/governance/authorizations/CANON-01-TMDB-SUBTITLE-PREVIEW.json": "5e50d1c29c33b5fe3455112818e978213d065e96",
+    "docs/governance/authorizations/CANON-01-TV-CAST-SENDER-HIDDEN.json": "f1e466b249afac7a6dab2a62952dc83a4dd31540",
+    "docs/governance/authorizations/CANON-01-TV-SIDEBAR-COMPOSITION.json": "f5d43f845cd4e3fdb7947dc33e4f9b3df8669ab7",
+    "docs/governance/authorizations/CANON-01-VERCEL-A2-ARTIFACT.json": "fb613a143676e3e32267ebacb3bec81123791823",
+    "docs/governance/authorizations/CANON-01-VERCEL-A22A.json": "c698fec429f4058118d4701a7f5208ece9a0b0d1",
+    "docs/governance/authorizations/CANON-01-VERCEL-BUILD-A1.json": "7edaa32c4b13c8295fc0daa64abed1ef7a4b0c2d",
+    "docs/governance/authorizations/CANON-01-VERCEL-PREBUILT-RECOVERY-01.json": "9cb685590481ba094ffbca2e2abe2f585aa3ae46",
+    "docs/governance/authorizations/CANON-01-VOD-DPAD-HIDDEN-CONTROLS.json": "f33a7c6510ca7fe14f22367d0da0344e285e754a",
+    "docs/governance/authorizations/CANON-01-XUI-OPAQUE-RECOVERY.json": "cf4176d0007b4a04997bf2631558bd9d954fd6f7"
+  },
+  "supersedes": {
+    "src/ui/expanded-card-controller.ts": "CANON-01-DPAD-CARD-SCOPE-SEEALL-GRID-01",
+    "src/ui/hooks/useCatalogReturnNavigation.ts": "CANON-01-DPAD-CARD-SCOPE-SEEALL-GRID-01",
+    "src/ui/components/CardExpansion.tsx": "CANON-01-DPAD-CARD-SCOPE-SEEALL-GRID-01",
+    "src/ui/components/CardExpansion.css": "CANON-01-DPAD-CARD-SCOPE-SEEALL-GRID-01",
+    "src/ui/components/MediaRail.tsx": "CANON-01-DPAD-CARD-SCOPE-SEEALL-GRID-01",
+    "src/ui/pages/HomePage.tsx": "CANON-01-DPAD-CARD-SCOPE-SEEALL-GRID-01",
+    "src/ui/pages/CatalogBrowsePage.tsx": "CANON-01-DPAD-CARD-SCOPE-SEEALL-GRID-01",
+    "src/artwork/hero-artwork.service.ts": "CANON-01-TMDB-CONTEXT-IDENTITY",
+    "src/ui/components/DetailBackdrop.tsx": "CANON-01-DETAIL-BACKDROP-TYPES",
+    "src/ui/components/Artwork.tsx": "CANON-01-DETAIL-BACKDROP-UI",
+    "src/ui/card-preview-session.ts": "CANON-01-HOME-DPAD-CAROUSEL-PREVIEW-PAGINATION-02",
+    "src/ui/hooks/useDpadNavigation.ts": "CANON-01-HOME-DPAD-CAROUSEL-PREVIEW-PAGINATION-02",
+    "src/ui/components/Header.tsx": "CANON-01-NETWORK-UI-POLISH",
+    "src/index.css": "CANON-01-DPAD-CARD-SCOPE-SEEALL-GRID-01",
+    "scripts/test-c11-artwork-visible-recovery.mjs": "CANON-01-HOME-DPAD-CAROUSEL-PREVIEW-PAGINATION-02",
+    "scripts/test-c11-category-rails.mjs": "CANON-01-DPAD-CARD-SCOPE-SEEALL-GRID-01",
+    "scripts/test-c11-home-special-collections.mjs": "CANON-01-DPAD-CARD-SCOPE-SEEALL-GRID-01",
+    "scripts/test-canonical-regression.mjs": "CANON-01-DPAD-CARD-SCOPE-SEEALL-GRID-01"
+  },
+  "changes": [
+    {
+      "path": "src/ui/expanded-card-controller.ts",
+      "before": "28be87dfd1f762a70e66eb609fdf8a85208f22dd",
+      "after": "b23c1f9c821dad3cd4e8e268fc768619d6a933e0"
+    },
+    {
+      "path": "src/ui/dpad-repeat.ts",
+      "before": null,
+      "after": "8b4efb83ab98eb9ee666b4560e609f820dda5a82"
+    },
+    {
+      "path": "src/ui/search-dpad-navigation.ts",
+      "before": null,
+      "after": "4aef79eb5d06db9bfce01636217a6205897597e0"
+    },
+    {
+      "path": "src/ui/hooks/useCatalogReturnNavigation.ts",
+      "before": "7594c6ca9230d8ff47e31990bb06a1e2496c74d9",
+      "after": "4153a8a208d406dff1d5b8a2f141cec5fd91db34"
+    },
+    {
+      "path": "src/ui/components/CardExpansion.tsx",
+      "before": "6121bda8c4d351735bcaf734ac4aa63ccb5d0ec3",
+      "after": "e139e1d74455295ad401fc3cbff28d23dc6add16"
+    },
+    {
+      "path": "src/ui/components/CardExpansion.css",
+      "before": "a78675b68b591f09e01ff47b93df465fd4881814",
+      "after": "efd7e4cc95c07cf096131a4288752c39b29c2ad5"
+    },
+    {
+      "path": "src/ui/components/MediaRail.tsx",
+      "before": "60e84e4f228144b4458d86517fe39aa2b88464b4",
+      "after": "ae65ba7e29fd63fcd0e768e6752e04d7fa4352fc"
+    },
+    {
+      "path": "src/ui/components/RecentTitles.tsx",
+      "before": "2679f5419a6bcc0ff54b45c0f44811ebe2a2ec31",
+      "after": "89b5e09a03264c1bfe14685fb1bc77f5a89b8e6a"
+    },
+    {
+      "path": "src/ui/pages/HomePage.tsx",
+      "before": "081af4b2e1396040c936458db85dc54170283719",
+      "after": "b78c83ee03e8d4e8a1a88855fa9cc5b49d0e383a"
+    },
+    {
+      "path": "src/ui/pages/CatalogBrowsePage.tsx",
+      "before": "b7040671b6f73011554870f2ff098b236adadde7",
+      "after": "e39f828a5ba644a46beee0b6832b724cd3808aed"
+    },
+    {
+      "path": "src/ui/pages/HomeCollectionPage.tsx",
+      "before": "c897dcd60da0fd5c9f4ffb984ffa8d8175ad7c64",
+      "after": "64ffcd7f778607d28041338a68a79684443e8532"
+    },
+    {
+      "path": "src/ui/components/CategoryHero.tsx",
+      "before": "d523ef38d765e4e9d18481e644906f73957d0706",
+      "after": "1ce4b0b4e1947a84e1520b2e5e9a03f5f927bdee"
+    },
+    {
+      "path": "src/artwork/hero-artwork.service.ts",
+      "before": "7186917a860e87da4f2c04a2f2060f59075fc808",
+      "after": "03c5b142b0adf31566fc65f31dc1f9b08ce9054c"
+    },
+    {
+      "path": "src/ui/components/DetailBackdrop.tsx",
+      "before": "129b76646f91db41c60645d9636c0ab435914ed9",
+      "after": "4033135efeb23ffeae9b4fd728fa4b435a873d92"
+    },
+    {
+      "path": "src/ui/components/Artwork.tsx",
+      "before": "e607776bd4bd193ad40fa12aae8e629f73e7e9b1",
+      "after": "b155d5ee6216ec25ec73fbcc23f71be02222f5da"
+    },
+    {
+      "path": "src/artwork/artwork-uri.ts",
+      "before": "5cffe2f83f493832a24ab995ad334bd4b64f881c",
+      "after": "4de98805712dcd0597011729de76471459bb05c5"
+    },
+    {
+      "path": "src/ui/card-preview-session.ts",
+      "before": "74064c250c9b2993c001121bec647d9bcaf4db67",
+      "after": "290e53050394143fc7b1f696d648ba1ccf330bfa"
+    },
+    {
+      "path": "src/ui/hooks/useDpadNavigation.ts",
+      "before": "f3c89d0e587d8eb504e2d54f22c0cc7b6e851608",
+      "after": "d9144e8fac06645510acf20e5225c423d1d6fe59"
+    },
+    {
+      "path": "src/ui/components/Header.tsx",
+      "before": "35ba4b68e27ecf41474f67b41d8dc593eee6ff20",
+      "after": "49f8f7b551bf7891fb48286ed8d3d4b8da1119c6"
+    },
+    {
+      "path": "src/index.css",
+      "before": "967286816a87c206482793da7de7323e486bd9bb",
+      "after": "e8f05fb620797ab5c57f005eb30088882de474dc"
+    },
+    {
+      "path": "src/assets/xandeflix-sidebar-logo.png",
+      "before": null,
+      "after": "3ded921aeaeaabca160b5a375eb022658b3acc0f"
+    },
+    {
+      "path": "scripts/test-c11-artwork-visible-recovery.mjs",
+      "before": "c22dfde42f7fece7f019506fcd4496b7b3be6be0",
+      "after": "4cc4964d27a61687b4d7749cc233bc4df0702910"
+    },
+    {
+      "path": "scripts/test-c11-fire-dpad-rail-return.mjs",
+      "before": "0d71f69af8d45cd00e3b8fe8365ed55015fb5e45",
+      "after": "b47b56fc45f613ef4534969746fc417297e36c93"
+    },
+    {
+      "path": "scripts/test-c11-fire-home-hero-dpad.mjs",
+      "before": "7b5e6b95bb665b345151979b801bc73094d66612",
+      "after": "5419811c0a975f5ff65f0cf49da45a2a7eec25f0"
+    },
+    {
+      "path": "scripts/test-c11-category-rails.mjs",
+      "before": "0b69c421d46c0f1c976cc135e48713312153b8ae",
+      "after": "5fc53833b677de38d134bfa9c8c7c2370af8e58c"
+    },
+    {
+      "path": "scripts/test-c11-home-special-collections.mjs",
+      "before": "618332735804ff36fa8b5f30fed233e1e9018815",
+      "after": "298d342cf9a1b170f9037ab1b29c364fb5454554"
+    },
+    {
+      "path": "scripts/test-ui-performance-recovery-03.mjs",
+      "before": null,
+      "after": "222808499eb251698aeb0afc05f1c2f7cb3388b4"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "d391ed952a2dab8cb8f086a90ecd7619d1ead48b",
+      "after": "c9c2853d315c0676cf6129ffba32267d35fd569f"
+    }
+  ],
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": false,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false
+}

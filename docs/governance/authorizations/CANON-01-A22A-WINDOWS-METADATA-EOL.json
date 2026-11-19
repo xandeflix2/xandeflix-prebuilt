@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "gate": "CANON-01-A22A-WINDOWS-METADATA-EOL",
+  "parentGate": "CANON-01",
+  "amendment": "CANON-01-A22A-WINDOWS-METADATA-EOL",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "EXPLICIT_USER_WINDOWS_CI_CORRECTION_REQUEST_2026_10_22",
+  "authorizationRequestSha256": "c52e07473b77bd9ad4ac174203c6104cb33e3f14a3ca074c763773cc5fa8dad7",
+  "reason": "Correct the Windows CRLF test assertion for ATTEST_ARTIFACT_METADATA_PERMISSION by verifying against lfWorkflow instead of raw workflow, resolving multi-line LF regex mismatch on Windows checkouts while preserving exact permissions enforcement and negative controls.",
+  "physicalImpact": "NOT_REQUIRED_JUSTIFIED",
+  "physicalImpactJustification": "Test assertion and synthetic amendment registry expectation only; no runtime or Android source changed.",
+  "testChangesReviewed": true,
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c105-complete-root-search.mjs",
+    "scripts/test-c107-catalog-return-navigation.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c11-landscape-navigation.mjs",
+    "scripts/validate-direct-playback.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock",
+    "npm run typecheck",
+    "npm run update:check",
+    "npm run security:check",
+    "npm run playback:check",
+    "npm run build",
+    "npm run site:build",
+    "node scripts/test-vercel-prebuilt-contract.mjs"
+  ],
+  "evidence": "docs/evidence/CANON_01_A22A_WINDOWS_METADATA_EOL.md",
+  "compatibilityRisk": "Local tests cannot certify the remote Windows job; no workflow, canonical verifier or historical receipt is weakened.",
+  "restrictions": [
+    "CI-only correction. All 128 canonical controls, 23 suites and 116 prior dedicated controls remain mandatory.",
+    "Only isolated review-branch commit/push permitted after validation and subject to the explicit prohibition on deployments. No main, merge, force, release or integration changes.",
+    "No Android, runtime, backend, workflow or historical receipt changes in this amendment."
+  ],
+  "supersedes": {
+    "scripts/test-vercel-prebuilt-contract.mjs": "CANON-01-A22A-WINDOWS-EOL",
+    "scripts/test-canonical-regression.mjs": "CANON-01-TV-SIDEBAR-COMPOSITION"
+  },
+  "changes": [
+    {
+      "path": "scripts/test-vercel-prebuilt-contract.mjs",
+      "before": "82f78c239466fd40c089dcb2c339bd247c245bcb",
+      "after": "3044824a5863e6f589a1919901a2d8eee990c5fc"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "af7945e9e88e14338a17e4ba265abe5f381cd332",
+      "after": "d161c2db644cfa4678a3f39167de9e83793d70ec"
+    }
+  ],
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": false,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false
+}

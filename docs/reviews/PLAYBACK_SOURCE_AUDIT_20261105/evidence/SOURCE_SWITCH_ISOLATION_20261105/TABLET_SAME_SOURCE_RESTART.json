@@ -1,0 +1,9 @@
+{
+  "observedUTC": "2026-11-05T11:56:03.555Z",
+  "sameEpoch": true,
+  "sameSnapshot": true,
+  "phase": "ACTIVE",
+  "cardsRendered": true,
+  "visibility": "visible",
+  "result": "PASS_SAME_SOURCE_BOOT_NO_REIMPORT"
+}

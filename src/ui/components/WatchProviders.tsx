@@ -35,7 +35,7 @@ export function WatchProviders({identity,inline=false}:{identity:ArtworkIdentity
   if(!availability?.groups.length)return null;
   const providers=uniqueWatchProviders(availability.groups.flatMap(group=>group.providers));
   if(!providers.length)return null;
-  const logos=providers.map(provider=><Provider key={provider.id} provider={provider}/>);
+  const logos=(inline?providers:providers.slice(0,3)).map(provider=><Provider key={provider.id} provider={provider}/>);
   return inline?<span className="watch-providers watch-providers--inline" role="group" tabIndex={0} aria-label="Plataformas deste conteúdo">{logos}</span>
     :<section className="watch-providers" aria-label="Plataformas deste conteúdo">{logos}</section>;
 }

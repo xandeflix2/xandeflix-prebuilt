@@ -1,0 +1,48 @@
+{
+  "observedUTC": "2026-11-05T17:47:42.260Z",
+  "scope": "All evidence files, except this self-referential closure",
+  "files": [
+    {
+      "path": "clean-tablet.mjs",
+      "bytes": 7514,
+      "nlink": 1,
+      "sha256": "7eee945cdf96984d29b46e76b1b6976086b4b39dbdacb02f970140aad8b88486"
+    },
+    {
+      "path": "OBSERVATION_NOTE.md",
+      "bytes": 1875,
+      "nlink": 1,
+      "sha256": "7ac1d42b4b47c8b4b5e83a8bdce4b714601002188a08831ee682f73199bd2c9a"
+    },
+    {
+      "path": "read-source-metadata-adb.mjs",
+      "bytes": 3534,
+      "nlink": 1,
+      "sha256": "58d8bcf148b04306fc3f1ac6c61faf7133b380740ac1072fae3795055de8bc8a"
+    },
+    {
+      "path": "REPORT.md",
+      "bytes": 1701,
+      "nlink": 1,
+      "sha256": "8215f9191d4cd96045ab0e89383ccdee385ceb886076d7fc898ae2ae9d2e774e"
+    },
+    {
+      "path": "RESULT.json",
+      "bytes": 1363,
+      "nlink": 1,
+      "sha256": "23b541cca6a96c2c37615898760aef974e5cebf5eb12c5f17a4321db3f629507"
+    },
+    {
+      "path": "SPEC.md",
+      "bytes": 2270,
+      "nlink": 1,
+      "sha256": "e0bff6cafd9ffbd9a682a6a3234d1eb8db01ccb41c603c6f1b87d462a79c78a6"
+    },
+    {
+      "path": "TABLET_SOURCE_RESIDUE.json",
+      "bytes": 1381,
+      "nlink": 1,
+      "sha256": "91eb0296742dc45346f7faba01dcac726ba206aa34b8eccc698d3731c8a411cf"
+    }
+  ]
+}

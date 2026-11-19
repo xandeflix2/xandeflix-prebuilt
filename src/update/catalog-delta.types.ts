@@ -33,6 +33,7 @@ export interface CatalogDelta {
   baseCatalogVersion: string;
   targetCatalogVersion: string;
   targetMetadata: SnapshotMetadata;
+  targetExtensions?: Record<string, unknown>;
 
   categories: CollectionDelta<Category>;
   genres: CollectionDelta<Genre>;

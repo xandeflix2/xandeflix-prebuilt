@@ -1,0 +1,45 @@
+{
+  "observedUTC": "2026-11-05T01:16:45.454Z",
+  "status": "READ_ONLY_BINDING_AUDIT",
+  "activePointerStable": true,
+  "localSecureRecord": {
+    "found": true,
+    "sourceIdentityMatches": true,
+    "sourceVersionMatches": true,
+    "protocol": "M3U"
+  },
+  "manifest": {
+    "sourceIdentityMatches": true,
+    "sourceVersionMatches": true,
+    "snapshotMatches": true
+  },
+  "recoveryJournal": {
+    "activeMatches": true,
+    "previousPresent": false,
+    "lastKnownGoodMatches": true
+  },
+  "sample": {
+    "totalStreamSegments": 18,
+    "segmentsRead": 1,
+    "limitRows": 64,
+    "counts": {
+      "sampled": 64,
+      "withDirectUrl": 64,
+      "withoutDirectUrl": 0,
+      "sameOrigin": 64,
+      "differentOrigin": 0,
+      "invalidUrl": 0,
+      "typedMovie": 64,
+      "typedSeries": 0,
+      "otherPath": 0,
+      "credentialPairsCompared": 64,
+      "credentialPairsMatch": 64,
+      "credentialPairsDiffer": 0
+    }
+  },
+  "limitations": [
+    "Local sealed configuration only; remote assignment was not queried.",
+    "Bounded stream sample; no on-demand episode requests, HTTP playback or full stream inventory tested.",
+    "Different origin or credential pair alone would require review; no private value was exported."
+  ]
+}

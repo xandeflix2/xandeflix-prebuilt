@@ -1,5 +1,6 @@
 import {parentalFixtureBindings} from './lib/parental-fixture-bindings.mjs';
 import {meaningfulDetailGenres} from '../src/ui/detail-genres.ts';
+import {artworkCategoryContext} from '../src/artwork/tmdb-metadata.service.ts';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import ts from 'typescript';
@@ -21,7 +22,7 @@ const {Hero}=load('src/ui/components/Hero.tsx',name=>{
  if(name.includes('useCachedArtwork'))return{useCachedArtwork:src=>({src,handleCacheError:()=>false})};
  if(name.includes('useArtworkMetadata'))return{useArtworkMetadata:(identity,enabled)=>{request={identity,enabled};return metadata;}};
  if(name.includes('PlatformCategoryBadge'))return{PlatformCategoryLogo:({label})=>label};
- if(name.includes('tmdb-metadata.service'))return{tmdbPosterPath:()=>undefined};
+ if(name.includes('tmdb-metadata.service'))return{tmdbPosterPath:()=>undefined,artworkCategoryContext};
  return{};
 },{navigator});
 const find=(tree,predicate)=>{if(!tree)return;if(Array.isArray(tree)){for(const child of tree){const hit=find(child,predicate);if(hit)return hit;}return;}if(typeof tree!=='object')return;if(predicate(tree))return tree;return find(tree.props?.children,predicate);};
@@ -51,10 +52,13 @@ test('MISSING_REAL_GENRE_NEVER_INVENTS_DATA_OR_BLOCKS_ACTIONS',()=>{
   assert.equal(byClass(tree,'hero-backdrop-img').props.src,'data:image/svg+xml,synthetic');
  }
 });
-test('CONTENT_CATEGORY_IS_LOCAL_ADJACENT_TO_NOVELTY_FOR_SERIES_AND_MOVIES',()=>{
+test('CONTENT_CATEGORY_IS_LOCAL_BELOW_TITLE_LEFT_OF_GENRES_FOR_SERIES_AND_MOVIES',()=>{
  metadata=null;badge='NOVIDADE';const tree=render(item('series',['Drama'],['','Geral','Prime Video']));
  const labels=byClass(tree,'hero-meta').props.children.filter(Boolean);
- assert.equal(labels[1].props.children,'NOVIDADE');assert.equal(labels[2].props['aria-label'],'Prime Video');
+ assert.equal(labels[1].props.children,'NOVIDADE');assert.equal(labels.some(n=>n.props['aria-label']==='Prime Video'),false);
+ const copy=byClass(tree,'hero-copy').props.children.filter(Boolean),row=byClass(tree,'hero-platform-genres');
+ assert.ok(copy.indexOf(row)>copy.indexOf(byClass(tree,'hero-title')));assert.ok(copy.indexOf(row)<copy.indexOf(byClass(tree,'hero-overview')));
+ const parts=row.props.children.filter(Boolean);assert.equal(parts[0].props['aria-label'],'Prime Video');assert.equal(parts[1].props.className,'hero-genres');
  assert.equal(byClass(render(item('movie')),'hero-category-badge').props['aria-label'],'NETFLIX');
  assert.equal(byClass(render(item('series',[],['Geral'])),'hero-category-badge'),undefined);
  badge=undefined;const noNovelty=render(item());assert.equal(byClass(noNovelty,'hero-category-badge').props['aria-label'],'NETFLIX');
@@ -94,8 +98,11 @@ test('MOVIE_PREFIX_REMOVED_AND_SHARED_PLATFORM_COMPONENT_USED_WITHOUT_GUESS',()=
 
 const header=load('src/ui/components/Header.tsx',name=>name==='react'?React:{});
 const {AppShell}=load('src/ui/components/AppShell.tsx',name=>{
- if(name==='react')return{...React,useEffect:()=>{}};
+ if(name==='react')return{...React,useEffect:()=>{},useRef:value=>({current:value})};
  if(name.includes('Header.tsx'))return header;
+ if(name.includes('usePhoneLayout'))return{usePhoneLayout:()=>choice==='PHONE'};
+ if(name.includes('HeroActions.tsx'))return{HeroActions:({showBack,onBack})=>showBack?React.createElement('button',{'aria-label':'Voltar para a tela anterior',onClick:onBack}):null};
+ if(name.endsWith('CardExpansion.tsx'))return{CardExpansionHost:()=>null};
  if(name.includes('useLandscapeNavigation'))return{useLandscapeNavigation:()=>landscape};
  if(name.includes('useDevicePresentation'))return{useDevicePresentation:()=>choice};
  if(name.includes('useLivePresentation'))return{useLivePresentation:()=>({tabletPortrait,stackedLive:false,squareLive})};
@@ -113,10 +120,10 @@ test('REMOTE_TV_DOMAIN_HAS_NO_TOP_BACK_BUTTON_ALL_SUPPORTED_TV_PROFILES',()=>{
   assert.equal(renderToStaticMarkup(shell('search')).includes('Voltar para a tela anterior'),true);
  }
 });
-test('TOUCH_BACK_RETAINED_AND_EXISTING_BACK_CALLBACK_STILL_PASSED',()=>{
+test('TABLET_BACK_RETAINED_PHONE_BACK_HIDDEN_AND_EXISTING_CALLBACK_PASSED',()=>{
  for(const profile of ['PHONE','TABLET']){
   choice=profile;ua='Android Mobile';landscape=profile==='TABLET';tabletPortrait=false;
-  for(const route of ['movies','series','movie-detail','series-detail'])assert.equal(renderToStaticMarkup(shell(route)).includes('Voltar para a tela anterior'),true);
+  for(const route of ['movies','series','movie-detail','series-detail'])assert.equal(renderToStaticMarkup(shell(route)).includes('Voltar para a tela anterior'),profile==='TABLET');
  }
  choice='TV';ua='Android AFTSS';landscape=true;const tree=shell('movie-detail');
  const headerElement=find(tree,n=>n.type===header.Header);assert.equal(typeof headerElement.props.onBack,'function');
@@ -128,3 +135,5 @@ test('EXISTING_SQUARE_DECISION_MARKS_HERO_PAGES_WITHOUT_CHANGING_LIVE_RULE',()=>
  squareLive=false;assert.equal(shell('home').props.className.includes('app-shell--square-display'),false);
 });
 console.log(JSON.stringify({tests,pass:true,fixtureOnly:true,networkRequests:0}));
+
+console.log("HERO_PLATFORM_METADATA=PASS");

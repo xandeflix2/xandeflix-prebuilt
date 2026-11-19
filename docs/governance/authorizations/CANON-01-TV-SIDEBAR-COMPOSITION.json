@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "gate": "CANON-01-TV-SIDEBAR-COMPOSITION",
+  "parentGate": "CANON-01",
+  "amendment": "CANON-01-TV-SIDEBAR-COMPOSITION",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "EXPLICIT_USER_CONTINUITY_AUDIT_THEN_FIRE_SIDEBAR_BACKGROUND_AND_SPACING_CORRECTION_FIRE_ONLY_INSTALL",
+  "authorizationRequestSha256": "6e9b4895e7d89bc87b351caa80f52f06e22aea123f76546c0f34758a28d39aa0",
+  "reason": "Real Fire confirmed transparent header over dark shell without native background extension;44px controls still cause46px pitch. Extend existing palette behind rail and compact TV-only remote targets.",
+  "physicalImpact": "REQUIRED",
+  "physicalImpactJustification": "Fire-only in-place install under same version/certificate, private-state preservation and real pixels/D-pad inspection. Phone/tablet APK manual only. No uninstall/reset/restore/PIN.",
+  "testChangesReviewed": true,
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c105-complete-root-search.mjs",
+    "scripts/test-c107-catalog-return-navigation.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c11-landscape-navigation.mjs",
+    "scripts/validate-direct-playback.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock",
+    "npm run typecheck",
+    "npm run update:check",
+    "npm run security:check",
+    "npm run playback:check",
+    "npm run build",
+    "npm run site:build",
+    "node scripts/test-vercel-prebuilt-contract.mjs",
+    "node scripts/test-c105-directory-import.mjs",
+    "node scripts/test-c105-directory-details.mjs",
+    "node scripts/test-c105-directory-orchestration.mjs",
+    "node scripts/test-c11-automatic-source-refresh.mjs",
+    "node scripts/test-catalog-read-diagnostic.mjs",
+    "node scripts/test-xui-m3u-kind-recovery.mjs",
+    "node scripts/test-c157-web-source-https.mjs",
+    "node scripts/test-catalog-physical-regressions.mjs",
+    "node scripts/test-c135-adult-reader.mjs",
+    "node scripts/test-series-poster-composition.mjs",
+    "node scripts/test-tmdb-context-identity.mjs",
+    "node scripts/test-tmdb-subtitle-preview-recovery.mjs",
+    "node scripts/test-c11-catalog-promotion-directories.mjs",
+    "node scripts/test-catalog-snapshot-retention.mjs",
+    "node scripts/test-detail-backdrop-recovery.mjs",
+    "node scripts/test-c11-source-first-tmdb-artwork.mjs",
+    "node scripts/test-c11-artwork-visible-recovery.mjs"
+  ],
+  "evidence": "docs/evidence/TV_SIDEBAR_COMPOSITION_RECOVERY.md",
+  "compatibilityRisk": "CSS-only TV side-navigation rules exclude phone/tablet;44px width/36px height remote targets, existing callbacks/focus retained. Pointer-inert56px inherited background extension, no new image requests or native layers.",
+  "restrictions": [
+    "Preserve all77 incoming dirty paths, all18 existing receipts and old ui-fundos APK.",
+    "Preserve128 controls/23 suites and existing assertions/timeouts; runner authorization identity registration only.",
+    "Fire-only install. Do not install on phone/tablet, uninstall/reset, restore unverified backups, claim automatic cleanup from clean-install savings, change runtime/source/catalog/player/parental/license/storage/native/version/backend/Git publication or start another feature."
+  ],
+  "supersedes": {
+    "src/index.css": "CANON-01-DETAIL-BACKDROP-UI",
+    "scripts/test-canonical-regression.mjs": "CANON-01-DETAIL-BACKDROP-TYPES"
+  },
+  "changes": [
+    {
+      "path": "src/index.css",
+      "before": "b69221154aac2db071f23b316f576410482e9945",
+      "after": "8e57a5fd789f0980d32d33cba11b5979087fba1e"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "c778eb274d3fd2aa2f93ae9d60dc4d4d7554a983",
+      "after": "af7945e9e88e14338a17e4ba265abe5f381cd332"
+    }
+  ],
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": true,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false
+}

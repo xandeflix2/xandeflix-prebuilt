@@ -1,0 +1,389 @@
+{
+  "scope": "ZIP member raw bytes, decompressed SHA-256. Matching paths only; renamed assets listed separately. No application runtime behavior inferred.",
+  "counts": {
+    "old": 1533,
+    "new": 1535,
+    "same": 1412,
+    "changed": 112,
+    "onlyOld": 9,
+    "onlyNew": 11
+  },
+  "selected": [
+    {
+      "path": "assets/capacitor.config.json",
+      "old": {
+        "Path": "assets/capacitor.config.json",
+        "Sha256": "e9a47f98eeaad4e20c26f63617ed8cc19013499ce9d793aba975e314735386eb",
+        "Bytes": 272
+      },
+      "new": {
+        "Path": "assets/capacitor.config.json",
+        "Sha256": "e9a47f98eeaad4e20c26f63617ed8cc19013499ce9d793aba975e314735386eb",
+        "Bytes": 272
+      },
+      "equal": true
+    },
+    {
+      "path": "assets/capacitor.plugins.json",
+      "old": {
+        "Path": "assets/capacitor.plugins.json",
+        "Sha256": "8be7477b854298624914f779bcf7e471e5b0e81323c466d9e5daa4d5752d72d9",
+        "Bytes": 309
+      },
+      "new": {
+        "Path": "assets/capacitor.plugins.json",
+        "Sha256": "8be7477b854298624914f779bcf7e471e5b0e81323c466d9e5daa4d5752d72d9",
+        "Bytes": 309
+      },
+      "equal": true
+    },
+    {
+      "path": "res/xml/network_security_config.xml",
+      "old": {
+        "Path": "res/xml/network_security_config.xml",
+        "Sha256": "f4861a2727f78aa4a30a4dc82308b1ec645dcce1ed7ab8aa05e806684b4dbee7",
+        "Bytes": 264
+      },
+      "new": {
+        "Path": "res/xml/network_security_config.xml",
+        "Sha256": "f4861a2727f78aa4a30a4dc82308b1ec645dcce1ed7ab8aa05e806684b4dbee7",
+        "Bytes": 264
+      },
+      "equal": true
+    },
+    {
+      "path": "res/xml/backup_rules.xml",
+      "old": {
+        "Path": "res/xml/backup_rules.xml",
+        "Sha256": "d03ae40504406ba26e2afdd276affdd91c20bb2912a694b447a6bbee53039ce8",
+        "Bytes": 1344
+      },
+      "new": {
+        "Path": "res/xml/backup_rules.xml",
+        "Sha256": "d03ae40504406ba26e2afdd276affdd91c20bb2912a694b447a6bbee53039ce8",
+        "Bytes": 1344
+      },
+      "equal": true
+    },
+    {
+      "path": "res/xml/data_extraction_rules.xml",
+      "old": {
+        "Path": "res/xml/data_extraction_rules.xml",
+        "Sha256": "e6e7855232c0cc71adc897aca3ad723742d731bdbeb1d3c44b745e8f9ca10a81",
+        "Bytes": 2408
+      },
+      "new": {
+        "Path": "res/xml/data_extraction_rules.xml",
+        "Sha256": "e6e7855232c0cc71adc897aca3ad723742d731bdbeb1d3c44b745e8f9ca10a81",
+        "Bytes": 2408
+      },
+      "equal": true
+    },
+    {
+      "path": "classes.dex",
+      "old": {
+        "Path": "classes.dex",
+        "Sha256": "0d95a8ad0f761c476c18151985915e393e5f48234a5dcfb6cc210ec7e3d6e922",
+        "Bytes": 9425000
+      },
+      "new": {
+        "Path": "classes.dex",
+        "Sha256": "0d95a8ad0f761c476c18151985915e393e5f48234a5dcfb6cc210ec7e3d6e922",
+        "Bytes": 9425000
+      },
+      "equal": true
+    },
+    {
+      "path": "classes10.dex",
+      "old": {
+        "Path": "classes10.dex",
+        "Sha256": "501eb24127655b3ca06a56e44cd9744c3225b2ff6fbd9bc682d02835060c0af1",
+        "Bytes": 13632
+      },
+      "new": {
+        "Path": "classes10.dex",
+        "Sha256": "66eebcbf3ae70ecb51ea6b8714e9249a3557b509b19ccd06f2540d53cf747104",
+        "Bytes": 13632
+      },
+      "equal": false
+    },
+    {
+      "path": "classes11.dex",
+      "old": {
+        "Path": "classes11.dex",
+        "Sha256": "01177cf7b85b997e74c319caf33f8cb12c9e62721cfcfca3aba1cd4c888a959d",
+        "Bytes": 49792
+      },
+      "new": {
+        "Path": "classes11.dex",
+        "Sha256": "01177cf7b85b997e74c319caf33f8cb12c9e62721cfcfca3aba1cd4c888a959d",
+        "Bytes": 49792
+      },
+      "equal": true
+    },
+    {
+      "path": "classes12.dex",
+      "old": {
+        "Path": "classes12.dex",
+        "Sha256": "bc11b272e45d9ca664b39d3b1a543824a4e61a39470d9b4d9b006ec977a3c719",
+        "Bytes": 9252544
+      },
+      "new": {
+        "Path": "classes12.dex",
+        "Sha256": "bc11b272e45d9ca664b39d3b1a543824a4e61a39470d9b4d9b006ec977a3c719",
+        "Bytes": 9252544
+      },
+      "equal": true
+    },
+    {
+      "path": "classes2.dex",
+      "old": {
+        "Path": "classes2.dex",
+        "Sha256": "00d7e4cb4cf5a45d20338e355b96646988650abd1451c8e072355a44a6cd3aa3",
+        "Bytes": 279368
+      },
+      "new": {
+        "Path": "classes2.dex",
+        "Sha256": "00d7e4cb4cf5a45d20338e355b96646988650abd1451c8e072355a44a6cd3aa3",
+        "Bytes": 279368
+      },
+      "equal": true
+    },
+    {
+      "path": "classes3.dex",
+      "old": {
+        "Path": "classes3.dex",
+        "Sha256": "d368bd685b28c6d876bfbbd643b2a5f86228cee2de96fd761335b34ef67c3542",
+        "Bytes": 273080
+      },
+      "new": {
+        "Path": "classes3.dex",
+        "Sha256": "66e21ec43b3a2da8a894811715a854f43f205ff7ca82e1c601a3c5a31c9f3090",
+        "Bytes": 273600
+      },
+      "equal": false
+    },
+    {
+      "path": "classes4.dex",
+      "old": {
+        "Path": "classes4.dex",
+        "Sha256": "8f9c783cf3ab5fd0c08bd4b3291c37ddc12d33ba8062706860780ec5523202ab",
+        "Bytes": 25836
+      },
+      "new": {
+        "Path": "classes4.dex",
+        "Sha256": "8f9c783cf3ab5fd0c08bd4b3291c37ddc12d33ba8062706860780ec5523202ab",
+        "Bytes": 25836
+      },
+      "equal": true
+    },
+    {
+      "path": "classes5.dex",
+      "old": {
+        "Path": "classes5.dex",
+        "Sha256": "8c30a1dfb48a01de2bd5b855d04ff730eb8ab7bb5f483e05403a107fdb95ae47",
+        "Bytes": 28060
+      },
+      "new": {
+        "Path": "classes5.dex",
+        "Sha256": "8c30a1dfb48a01de2bd5b855d04ff730eb8ab7bb5f483e05403a107fdb95ae47",
+        "Bytes": 28060
+      },
+      "equal": true
+    },
+    {
+      "path": "classes6.dex",
+      "old": {
+        "Path": "classes6.dex",
+        "Sha256": "38e5997e6205bbb1d44a729a0cf9bdaebc500c92e684560780691bc3015dd4b9",
+        "Bytes": 16328
+      },
+      "new": {
+        "Path": "classes6.dex",
+        "Sha256": "2aeadb4b4ac6411a616071e2c274e19800831a1dc6ab2e4400394a23435152fe",
+        "Bytes": 24924
+      },
+      "equal": false
+    },
+    {
+      "path": "classes7.dex",
+      "old": {
+        "Path": "classes7.dex",
+        "Sha256": "49d00dfe3d11d4c24729232e0b0800bd0072e179c7d18058eadb950937e99d02",
+        "Bytes": 26416
+      },
+      "new": {
+        "Path": "classes7.dex",
+        "Sha256": "49d00dfe3d11d4c24729232e0b0800bd0072e179c7d18058eadb950937e99d02",
+        "Bytes": 26416
+      },
+      "equal": true
+    },
+    {
+      "path": "classes8.dex",
+      "old": {
+        "Path": "classes8.dex",
+        "Sha256": "6796138af51d34b341372975acbdf0cf12b6ba70cea81ce029eff9922e5371e6",
+        "Bytes": 47480
+      },
+      "new": {
+        "Path": "classes8.dex",
+        "Sha256": "6796138af51d34b341372975acbdf0cf12b6ba70cea81ce029eff9922e5371e6",
+        "Bytes": 47480
+      },
+      "equal": true
+    },
+    {
+      "path": "classes9.dex",
+      "old": {
+        "Path": "classes9.dex",
+        "Sha256": "73f07c49366ef15b621e5e14975520f499ebe1ee690996cae26d8ec5b768e064",
+        "Bytes": 204496
+      },
+      "new": {
+        "Path": "classes9.dex",
+        "Sha256": "0b09064231cf5981135037e6c27e156e0d2963ad8846d0029b13d6174ed3c37c",
+        "Bytes": 214076
+      },
+      "equal": false
+    }
+  ],
+  "changed": [
+    "classes10.dex",
+    "classes3.dex",
+    "classes6.dex",
+    "classes9.dex",
+    "assets/public/index.html",
+    "AndroidManifest.xml",
+    "res/drawable/abc_btn_check_material_anim.xml",
+    "res/drawable/abc_btn_radio_material_anim.xml",
+    "res/drawable/cast_ic_expanded_controller_closed_caption.xml",
+    "res/drawable/cast_ic_expanded_controller_forward30.xml",
+    "res/drawable/cast_ic_expanded_controller_mute.xml",
+    "res/drawable/cast_ic_expanded_controller_pause.xml",
+    "res/drawable/cast_ic_expanded_controller_play.xml",
+    "res/drawable/cast_ic_expanded_controller_rewind30.xml",
+    "res/drawable/cast_ic_expanded_controller_skip_next.xml",
+    "res/drawable/cast_ic_expanded_controller_skip_previous.xml",
+    "res/drawable/cast_ic_mini_controller_closed_caption.xml",
+    "res/drawable/cast_ic_mini_controller_forward30.xml",
+    "res/drawable/cast_ic_mini_controller_mute.xml",
+    "res/drawable/cast_ic_mini_controller_pause.xml",
+    "res/drawable/cast_ic_mini_controller_pause_large.xml",
+    "res/drawable/cast_ic_mini_controller_play.xml",
+    "res/drawable/cast_ic_mini_controller_play_large.xml",
+    "res/drawable/cast_ic_mini_controller_rewind30.xml",
+    "res/drawable/cast_ic_mini_controller_skip_next.xml",
+    "res/drawable/cast_ic_mini_controller_skip_prev.xml",
+    "res/drawable/cast_ic_mini_controller_stop.xml",
+    "res/drawable/cast_ic_mini_controller_stop_large.xml",
+    "res/drawable/cast_ic_notification_disconnect.xml",
+    "res/drawable/cast_ic_notification_forward.xml",
+    "res/drawable/cast_ic_notification_forward10.xml",
+    "res/drawable/cast_ic_notification_forward30.xml",
+    "res/drawable/cast_ic_notification_pause.xml",
+    "res/drawable/cast_ic_notification_play.xml",
+    "res/drawable/cast_ic_notification_rewind.xml",
+    "res/drawable/cast_ic_notification_rewind10.xml",
+    "res/drawable/cast_ic_notification_rewind30.xml",
+    "res/drawable/cast_ic_notification_skip_next.xml",
+    "res/drawable/cast_ic_notification_skip_prev.xml",
+    "res/drawable/cast_ic_notification_small_icon.xml",
+    "res/drawable/cast_ic_notification_stop_live_stream.xml",
+    "res/drawable/notification_bg.xml",
+    "res/drawable/notification_bg_low.xml",
+    "res/drawable/notification_tile_bg.xml",
+    "res/layout-v21/notification_template_custom_big.xml",
+    "res/layout-v21/notification_template_icon_group.xml",
+    "res/layout-v23/exo_player_control_ffwd_button.xml",
+    "res/layout-v23/exo_player_control_rewind_button.xml",
+    "res/layout-watch-v20/abc_alert_dialog_title_material.xml",
+    "res/layout/abc_activity_chooser_view.xml",
+    "res/layout/abc_activity_chooser_view_list_item.xml",
+    "res/layout/abc_alert_dialog_button_bar_material.xml",
+    "res/layout/abc_alert_dialog_material.xml",
+    "res/layout/abc_alert_dialog_title_material.xml",
+    "res/layout/abc_cascading_menu_item_layout.xml",
+    "res/layout/abc_dialog_title_material.xml",
+    "res/layout/abc_expanded_menu_layout.xml",
+    "res/layout/abc_list_menu_item_icon.xml",
+    "res/layout/abc_list_menu_item_layout.xml",
+    "res/layout/abc_list_menu_item_radio.xml",
+    "res/layout/abc_popup_menu_item_layout.xml",
+    "res/layout/abc_search_view.xml",
+    "res/layout/abc_select_dialog_material.xml",
+    "res/layout/abc_tooltip.xml",
+    "res/layout/activity_native_player.xml",
+    "res/layout/app_intro.xml",
+    "res/layout/bridge_layout_main.xml",
+    "res/layout/capacitor_bridge_layout_main.xml",
+    "res/layout/cast_expanded_controller_activity.xml",
+    "res/layout/cast_intro_overlay.xml",
+    "res/layout/cast_mini_controller.xml",
+    "res/layout/cast_tracks_chooser_dialog_layout.xml",
+    "res/layout/cast_tracks_chooser_dialog_row_layout.xml",
+    "res/layout/exo_legacy_player_control_view.xml",
+    "res/layout/exo_player_control_view.xml",
+    "res/layout/exo_player_view.xml",
+    "res/layout/exo_styled_settings_list.xml",
+    "res/layout/exo_styled_settings_list_item.xml",
+    "res/layout/exo_styled_sub_settings_list_item.xml",
+    "res/layout/exo_track_selection_dialog.xml",
+    "res/layout/ime_secondary_split_test_activity.xml",
+    "res/layout/mr_cast_dialog.xml",
+    "res/layout/mr_cast_group_item.xml",
+    "res/layout/mr_cast_group_volume_item.xml",
+    "res/layout/mr_cast_header_item.xml",
+    "res/layout/mr_cast_media_metadata.xml",
+    "res/layout/mr_cast_route_item.xml",
+    "res/layout/mr_chooser_dialog.xml",
+    "res/layout/mr_chooser_list_item.xml",
+    "res/layout/mr_controller_material_dialog_b.xml",
+    "res/layout/mr_controller_volume_item.xml",
+    "res/layout/mr_picker_dialog.xml",
+    "res/layout/mr_picker_header_item.xml",
+    "res/layout/mr_picker_route_item.xml",
+    "res/layout/mr_playback_control.xml",
+    "res/layout/mr_volume_control.xml",
+    "res/layout/no_webview.xml",
+    "res/layout/notification_template_big_media.xml",
+    "res/layout/notification_template_big_media_custom.xml",
+    "res/layout/notification_template_big_media_narrow.xml",
+    "res/layout/notification_template_big_media_narrow_custom.xml",
+    "res/layout/notification_template_lines_media.xml",
+    "res/layout/notification_template_media.xml",
+    "res/layout/notification_template_media_custom.xml",
+    "res/layout/notification_template_part_time.xml",
+    "res/layout/splash_screen_view.xml",
+    "res/layout/xandeflix_live_controls.xml",
+    "res/layout/xandeflix_player_controls.xml",
+    "resources.arsc",
+    "META-INF/CERT.SF",
+    "META-INF/CERT.RSA",
+    "META-INF/MANIFEST.MF"
+  ],
+  "onlyOld": [
+    "assets/public/assets/index-BfrSNXAb.css",
+    "assets/public/assets/index-Dn1Gk7az.js",
+    "assets/public/assets/main-0tm47RwT.css",
+    "assets/public/assets/main-BR94MoO6.js",
+    "assets/public/assets/parental-storage-aPa_M4gg.js",
+    "assets/public/assets/poster-identity-BqS5cTIX.js",
+    "assets/public/assets/web-CDo1gQaZ.js",
+    "assets/public/assets/web-CsjmlDUs.js",
+    "assets/public/assets/web-zdXfKmxj.js"
+  ],
+  "onlyNew": [
+    "assets/public/assets/index-DrzG8pmq.css",
+    "assets/public/assets/main-B8Sgg5pC.css",
+    "res/drawable/next_episode_card_bg.xml",
+    "res/drawable/next_episode_progress_drawable.xml",
+    "assets/public/assets/index-CaP1mZod.js",
+    "assets/public/assets/main-CvPs0nkG.js",
+    "assets/public/assets/parental-storage-B2We-MID.js",
+    "assets/public/assets/poster-identity-CcRU0_zO.js",
+    "assets/public/assets/web-B9IMg_bw.js",
+    "assets/public/assets/web-BSolGl22.js",
+    "assets/public/assets/web-CGH2gZSZ.js"
+  ]
+}

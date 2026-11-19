@@ -1,0 +1,39 @@
+{
+  "observedUTC": "2026-11-05T01:26:28.608Z",
+  "visibility": "visible",
+  "shell": "app-shell app-shell--hero-top app-shell--catalog-page app-shell--tablet app-shell--side-nav app-shell--home-page",
+  "catalogVisible": true,
+  "buttons": [
+    {
+      "label": "Filmes",
+      "action": "NAV"
+    },
+    {
+      "label": "Séries",
+      "action": "NAV"
+    },
+    {
+      "label": "Ver detalhes [TITLE]",
+      "action": "NAV"
+    },
+    {
+      "label": "Assistir [TITLE]",
+      "action": "PLAY"
+    },
+    {
+      "label": "",
+      "action": "DETAIL"
+    },
+    {
+      "label": "Ver todos: Filmes em Destaque",
+      "action": "NAV"
+    },
+    {
+      "label": "Ver todos: Séries em Destaque",
+      "action": "NAV"
+    }
+  ],
+  "scripts": [
+    "index-CaP1mZod.js"
+  ]
+}

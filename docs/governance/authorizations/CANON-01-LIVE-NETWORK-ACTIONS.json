@@ -1,0 +1,142 @@
+{
+  "schema": 1,
+  "gate": "CANON-01-LIVE-NETWORK-ACTIONS",
+  "parentGate": "CANON-01",
+  "amendment": "CANON-01-LIVE-NETWORK-ACTIONS",
+  "status": "APPROVED_BY_CHAT_MASTER",
+  "referenceCommit": "b3fc8d1e3844bc5601813ab1b298289af5b3f1fd",
+  "authorizationOrigin": "EXPLICIT_USER_SINGLE_MOBILE_HEADER_WIFI_DIALOG_PROVIDER_COUNT_IN_SETTINGS_AND_PREVIEW_ACTIONS_WITH_ADB_DEVICES_2026_10_24",
+  "authorizationRequestSha256": "335fbf6134da9868413a034309a650572afa5ab5841032bba298c38536ddb673",
+  "reason": "Implement requested single mobile title/actions row, remove Live Back/global total/provider count, move provider metadata to connection modal, place Cast/Wi-Fi between Live badge and favorite below tablet/TV preview and remove the page header gap. The subsequent explicit tablet-only request hides the Cast text and preserves its accessible name and action.",
+  "physicalImpact": "REQUIRED",
+  "physicalImpactJustification": "Same-package in-place update and layout/modal tests on the three user-connected ADB devices; preserve private state, never uninstall/reset or bypass parental protection.",
+  "testChangesReviewed": true,
+  "requiredTests": [
+    "scripts/validate-device-bootstrap.mjs",
+    "scripts/test-c105-complete-root-search.mjs",
+    "scripts/test-c107-catalog-return-navigation.mjs",
+    "scripts/test-c11-vod-direct-stream-contract.mjs",
+    "scripts/test-c11-playback-session-c9-runtime-wiring.mjs",
+    "scripts/validate-security-recovery.mjs",
+    "scripts/test-c11-phone-ui-orientation.mjs",
+    "scripts/test-c11-landscape-navigation.mjs",
+    "scripts/validate-direct-playback.mjs",
+    "scripts/test-c126-parental-control.mjs"
+  ],
+  "mandatoryCommands": [
+    "npm run canon:check",
+    "npm run canon:test",
+    "npm run c11:new-device:lock",
+    "npm run typecheck",
+    "npm run update:check",
+    "npm run security:check",
+    "npm run playback:check",
+    "npm run build",
+    "npm run site:build",
+    "node scripts/test-site-build-contract.mjs",
+    "node scripts/test-vercel-artifact-contract.mjs",
+    "node scripts/verify-vercel-artifact.mjs inspect",
+    "node scripts/test-vercel-prebuilt-contract.mjs"
+  ],
+  "evidence": "docs/evidence/LIVE_NETWORK_ACTIONS.md",
+  "compatibilityRisk": "TV sending Google Cast is explicitly unsupported by unchanged native controller, displayed unavailable. Native preview is only obscured during modal, not stopped. Speed test remains Settings-only with playback/Cast guards. Truncated mobile title may be necessary with connected Cast on narrow screens; accessible full title remains.",
+  "restrictions": [
+    "Only16 nominal paths; preserve29 receipts,170 controls/28 suites,21 network scenarios,222 native tests/37 suites,127 Prebuilt controls and C11.",
+    "No source transport, credentials, authority/license, player/buffer/C9, native/bridge/config/manifest/package/lock/version/workflow/verifier mutation. Existing source-info authority/pointer validation is unchanged; no fake counts or media probes.",
+    "Counter requests only in an opened modal; authenticated metadata at60s foreground. No bandwidth tests during Live; public test guard remains intact in Settings.",
+    "No Git add/commit/push/PR/merge/main, Supabase/Vercel administration, deployment, data reset, uninstall, PIN/PUK/bypass or next implementation.",
+    "Only in-place same-certificate com.xandeflix.prebuilt update on user-connected SM-S926B/SM-X610/AFTSS, private records compared in RAM without persisting values/digests."
+  ],
+  "previousGovernanceHashes": {
+    "docs/governance/CANON_CHANGE_AUTHORIZATION.json": "e73152f228cbb625c508062d70ef810e8342059a",
+    "docs/governance/CANON_01_LEGACY_TESTS_AUTHORIZATION.json": "e59e2d328db3d0dfd8c1d873b154e2e3f7900a0c",
+    "docs/governance/CANON_01_AUTHORIZATION_HARDENING.json": "766db763ee98aeeb33230c2828f050a8527555b7",
+    "docs/governance/authorizations/CANON-01-VERCEL-BUILD-A1.json": "7edaa32c4b13c8295fc0daa64abed1ef7a4b0c2d",
+    "docs/governance/authorizations/CANON-01-VERCEL-A2-ARTIFACT.json": "fb613a143676e3e32267ebacb3bec81123791823",
+    "docs/governance/authorizations/CANON-01-VERCEL-A22A.json": "c698fec429f4058118d4701a7f5208ece9a0b0d1",
+    "docs/governance/authorizations/CANON-01-A22A-CI-DIAG.json": "7d89451bf23a05fa1ba819b72b99b28025aa7a66",
+    "docs/governance/authorizations/CANON-01-A22A-WINDOWS-EOL.json": "73ffd5ed494cb87a7c0d22e4a8a3f94252cf321e",
+    "docs/governance/authorizations/CANON-01-SOURCE-OUTPUT.json": "a93d98a1022f99c0e0957dd8f4a2c7d078b8f588",
+    "docs/governance/authorizations/CANON-01-CATALOG-READ-DIAG.json": "169b19ee02a4c1cacbe575cded00ec02928fa3c7",
+    "docs/governance/authorizations/CANON-01-XUI-OPAQUE-RECOVERY.json": "cf4176d0007b4a04997bf2631558bd9d954fd6f7",
+    "docs/governance/authorizations/CANON-01-CATALOG-PHYSICAL-FIXES.json": "ea179b852518e2a14c7ee79b6c3c72e76c0df6a9",
+    "docs/governance/authorizations/CANON-01-SERIES-POSTER-COMPOSITION.json": "645dc8b2b5d4b822bc83d72e9f5ab9f4f4cb4347",
+    "docs/governance/authorizations/CANON-01-TMDB-CONTEXT-IDENTITY.json": "3ab236bab99175dcb5374047c2fc6565650d8945",
+    "docs/governance/authorizations/CANON-01-TMDB-SUBTITLE-PREVIEW.json": "5e50d1c29c33b5fe3455112818e978213d065e96",
+    "docs/governance/authorizations/CANON-01-CATALOG-RETENTION.json": "b3c18f01ba1e753597af3a162c2605669dcd4e6b",
+    "docs/governance/authorizations/CANON-01-DETAIL-BACKDROP-UI.json": "579097e952a7ddf142ba885aaf23e164c0241e54",
+    "docs/governance/authorizations/CANON-01-DETAIL-BACKDROP-TYPES.json": "da8c532e25e220040bba3c942bad41507d4b9245",
+    "docs/governance/authorizations/CANON-01-TV-SIDEBAR-COMPOSITION.json": "f5d43f845cd4e3fdb7947dc33e4f9b3df8669ab7",
+    "docs/governance/authorizations/CANON-01-A22A-WINDOWS-METADATA-EOL.json": "90d7db4a18e84221afa6fa9dda40c82d6dad6121",
+    "docs/governance/authorizations/CANON-01-VERCEL-PREBUILT-RECOVERY-01.json": "9cb685590481ba094ffbca2e2abe2f585aa3ae46",
+    "docs/governance/authorizations/CANON-01-OPAQUE-HLS-MIME-RECOVERY.json": "5a8c735b59f921a5d24be15f6c14f32541687719",
+    "docs/governance/authorizations/CANON-01-STREAMED-VOD-INVENTORY-RECOVERY.json": "a16dd131aa09b3027724ea94f49a6d841551a9cb",
+    "docs/governance/authorizations/CANON-01-TABLET-SIDEBAR-TRANSPARENCY.json": "ffcc5c6c6005e4fcd24ce40ba776950bf55a5dbe",
+    "docs/governance/authorizations/CANON-01-HERO-PLATFORM-COMPOSITION.json": "75f9ca539c1723ca1db6c2e8948a63a3a19d5264",
+    "docs/governance/authorizations/CANON-01-HERO-PLATFORM-ALIGNMENT.json": "66a112450541d8a038292d8b07d08cc5547ad51e",
+    "docs/governance/authorizations/CANON-01-LIVE-SINGLE-TRANSPORT.json": "039d22359310380cd79432efe17f9533c93fb6cb",
+    "docs/governance/authorizations/CANON-01-NETWORK-DIAGNOSTICS.json": "80a4d01348eb82b4a7cafd4836c3f221d97e02e5",
+    "docs/governance/authorizations/CANON-01-NETWORK-UI-POLISH.json": "2fc3ce79b3a78454e7ad15f1d06002a6bc69d594"
+  },
+  "supersedes": {
+    "src/ui/components/ConnectionIndicator.tsx": "CANON-01-NETWORK-DIAGNOSTICS",
+    "src/ui/components/NetworkSettings.tsx": "CANON-01-NETWORK-DIAGNOSTICS",
+    "src/ui/components/NetworkDiagnostics.css": "CANON-01-NETWORK-UI-POLISH",
+    "src/ui/pages/LiveTvPage.tsx": "CANON-01-NETWORK-DIAGNOSTICS",
+    "src/ui/pages/LiveTvPage.css": "CANON-01-NETWORK-UI-POLISH",
+    "scripts/test-network-diagnostics.mjs": "CANON-01-NETWORK-DIAGNOSTICS",
+    "scripts/test-canonical-regression.mjs": "CANON-01-NETWORK-UI-POLISH"
+  },
+  "changes": [
+    {
+      "path": "src/ui/components/ConnectionIndicator.tsx",
+      "before": "2f9494c57c5e7f10fdedfeaacdd7a4713738232a",
+      "after": "5ea7afe6d4265d0ff593751db8928801c7663242"
+    },
+    {
+      "path": "src/ui/components/NetworkSettings.tsx",
+      "before": "e23032104cf4a1f013e2b08a6e4666b6cfc7c198",
+      "after": "5b93eebf0ae48c38e6ffdf94bdbbfd3316087228"
+    },
+    {
+      "path": "src/ui/components/NetworkConnectionButton.tsx",
+      "before": null,
+      "after": "44b1b591e28079aa3334f08316a7ae1c4c62de51"
+    },
+    {
+      "path": "src/ui/components/NetworkDiagnostics.css",
+      "before": "1f9af92655172e9b5a3d4325fa814d664b281070",
+      "after": "a67af91c4138266d6f9df3a64ba21ca342e4b5b8"
+    },
+    {
+      "path": "src/ui/components/CastButton.tsx",
+      "before": "79e68b18e7478b368d77bf97f8cff3fae6bf56cd",
+      "after": "eae48c55483e4d71d4a4d899564e5d2d53630a5c"
+    },
+    {
+      "path": "src/ui/pages/LiveTvPage.tsx",
+      "before": "a3654beaf0cf76e4e36bff7b588b3ad3a580d0c2",
+      "after": "54aa4b81eb801da1f6a0c0d8720d1887fa6839ab"
+    },
+    {
+      "path": "src/ui/pages/LiveTvPage.css",
+      "before": "6879b7ae2b939e5f05b89109aa31dfa7415c3625",
+      "after": "f02569f72e4eea5f50fea1c5a06484d5e76ad9d3"
+    },
+    {
+      "path": "scripts/test-network-diagnostics.mjs",
+      "before": "db8a21407d22908a0ac1094c8a273ed0923588a0",
+      "after": "338f9cd73383ae1647d5ebb8b66d13777f036962"
+    },
+    {
+      "path": "scripts/test-canonical-regression.mjs",
+      "before": "6785376183d2c5a72090a6ef94598319f8db7b4d",
+      "after": "d3075027c1019e5f57cdf8e14e72540711fc641d"
+    }
+  ],
+  "gitCommitAuthorized": false,
+  "gitPushAuthorized": false,
+  "androidBuildAuthorized": true,
+  "supabaseWriteAuthorized": false,
+  "nextGateStarted": false
+}

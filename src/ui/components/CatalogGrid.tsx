@@ -4,8 +4,8 @@ import { MediaCard } from './MediaCard.tsx';
 import { useParentalControl } from '../hooks/useParentalControl.ts';
 import { canShowParentalItem } from '../../parental/parental-content.ts';
 import { CATALOG_RETURN_EXPAND, CATALOG_RETURN_END } from '../hooks/useCatalogReturnNavigation.ts';
-interface CatalogGridProps { items: CatalogItemViewModel[]; onItemClick: (item: CatalogItemViewModel) => void; emptyMessage?: string; hasMoreRemote?: boolean; isLoadingRemote?: boolean; onLoadMoreRemote?: () => void | Promise<void>; autoLoadMore?: boolean; loadMoreFailed?: boolean; getItemKey?: (item: CatalogItemViewModel) => React.Key; }
-export const CatalogGrid: React.FC<CatalogGridProps> = ({ items, onItemClick, emptyMessage = 'Nenhum item encontrado nesta seleção.', hasMoreRemote, isLoadingRemote, onLoadMoreRemote, autoLoadMore = false, loadMoreFailed = false, getItemKey }) => {
+export interface CatalogGridProps { showKindBadge?: boolean; items: CatalogItemViewModel[]; onItemClick: (item: CatalogItemViewModel) => void; emptyMessage?: string; hasMoreRemote?: boolean; isLoadingRemote?: boolean; onLoadMoreRemote?: () => void | Promise<void>; autoLoadMore?: boolean; loadMoreFailed?: boolean; getItemKey?: (item: CatalogItemViewModel) => React.Key; }
+export const CatalogGrid: React.FC<CatalogGridProps> = ({ items, onItemClick, showKindBadge=false, emptyMessage = 'Nenhum item encontrado nesta seleção.', hasMoreRemote, isLoadingRemote, onLoadMoreRemote, autoLoadMore = false, loadMoreFailed = false, getItemKey }) => {
   const parental = useParentalControl();
   items = React.useMemo(() => items.filter(canShowParentalItem), [items, parental.revision]);
   const [visibleCount, setVisibleCount] = useState(GRID_BATCH_SIZE);
@@ -61,7 +61,7 @@ export const CatalogGrid: React.FC<CatalogGridProps> = ({ items, onItemClick, em
     return () => { window.removeEventListener('scroll', check); window.removeEventListener('resize', check); if (frame) cancelAnimationFrame(frame); };
   }, [autoLoadMore, hasMore, isLoadingRemote, requesting, loadMoreFailed, handleLoadMore]);
   if (items.length === 0 && !isLoadingRemote) return <div ref={rootRef} className="catalog-grid-empty"><p>{emptyMessage}</p></div>;
-  return <div ref={rootRef} className="catalog-grid-container"><div className="catalog-grid">{visibleItems.map((item, index) => <MediaCard key={getItemKey ? getItemKey(item) : item.id} item={item} onClick={onItemClick} onFocus={() => {
+  return <div ref={rootRef} className="catalog-grid-container"><div className="catalog-grid">{visibleItems.map((item, index) => <MediaCard showKindBadge={showKindBadge} key={getItemKey ? getItemKey(item) : item.id} item={item} onClick={onItemClick} onFocus={() => {
     if (index === visibleItems.length - 1 && !loadMoreFailed) void handleLoadMore().catch(() => {});
   }} />)}</div>{autoLoadMore ? (hasMore || requesting) && <div ref={sentinelRef} className="catalog-grid-sentinel">
     {loadMoreFailed ? <><p role="status">Não foi possível carregar os próximos títulos.</p><button type="button" className="focusable-item btn-secondary" onClick={() => void handleLoadMore().catch(() => {})}>Tentar novamente</button></>
